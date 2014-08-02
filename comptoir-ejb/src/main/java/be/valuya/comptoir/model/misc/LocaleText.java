@@ -71,10 +71,7 @@ public class LocaleText implements Serializable {
             return false;
         }
         final LocaleText other = (LocaleText) obj;
-        if (!Objects.equals(this.id, other.id)) {
-            return false;
-        }
-        return true;
+        return Objects.equals(this.id, other.id);
     }
 
 }

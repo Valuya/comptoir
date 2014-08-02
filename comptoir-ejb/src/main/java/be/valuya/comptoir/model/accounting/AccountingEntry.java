@@ -2,10 +2,12 @@ package be.valuya.comptoir.model.accounting;
 
 import be.valuya.comptoir.model.commercial.Sale;
 import be.valuya.comptoir.model.misc.LocaleText;
+import be.valuya.comptoir.model.company.Company;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.Objects;
+import javax.annotation.Nonnull;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -13,6 +15,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 /**
  *
@@ -24,6 +27,10 @@ public class AccountingEntry implements Serializable {
 
     @Id
     private Long id;
+    @NotNull
+    @Nonnull
+    @ManyToOne
+    private Company company;
     @ManyToOne
     @JoinColumn(name = "from_account_id")
     private Account fromAccount;
@@ -46,6 +53,14 @@ public class AccountingEntry implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Company getCompany() {
+        return company;
+    }
+
+    public void setCompany(Company company) {
+        this.company = company;
     }
 
     public Account getFromAccount() {
@@ -128,10 +143,7 @@ public class AccountingEntry implements Serializable {
             return false;
         }
         final AccountingEntry other = (AccountingEntry) obj;
-        if (!Objects.equals(this.id, other.id)) {
-            return false;
-        }
-        return true;
+        return Objects.equals(this.id, other.id);
     }
 
 }

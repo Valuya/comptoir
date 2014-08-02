@@ -107,9 +107,6 @@ public class ItemSale implements Serializable {
             return false;
         }
         final ItemSale other = (ItemSale) obj;
-        if (!Objects.equals(this.id, other.id)) {
-            return false;
-        }
-        return true;
+        return Objects.equals(this.id, other.id);
     }
 }

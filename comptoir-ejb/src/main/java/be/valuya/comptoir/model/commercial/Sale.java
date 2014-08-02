@@ -1,16 +1,19 @@
 package be.valuya.comptoir.model.commercial;
 
 import be.valuya.comptoir.model.accounting.AccountingEntry;
+import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.thirdparty.Customer;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.Objects;
+import javax.annotation.Nonnull;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.NotNull;
 
 /**
  *
@@ -21,6 +24,10 @@ public class Sale implements Serializable {
 
     @Id
     private Long id;
+    @ManyToOne
+    @NotNull
+    @Nonnull
+    private Company company;
     @ManyToOne
     private Customer customer;
     @Column(name = "date_time")
@@ -36,6 +43,14 @@ public class Sale implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Company getCompany() {
+        return company;
+    }
+
+    public void setCompany(Company company) {
+        this.company = company;
     }
 
     public Customer getCustomer() {

@@ -1,13 +1,16 @@
 package be.valuya.comptoir.model.commercial;
 
+import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.misc.LocaleText;
 import java.io.Serializable;
 import java.util.Objects;
+import javax.annotation.Nonnull;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 /**
@@ -19,9 +22,14 @@ public class Item implements Serializable {
 
     @Id
     private Long id;
+    @ManyToOne
+    @NotNull
+    @Nonnull
+    private Company company;
     @Column(length = 128)
     @Size(max = 128)
     private String barCode;
+    @ManyToOne
     private LocaleText description;
     @ManyToOne
     @JoinColumn(name = "current_price_id")
@@ -33,6 +41,14 @@ public class Item implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Company getCompany() {
+        return company;
+    }
+
+    public void setCompany(Company company) {
+        this.company = company;
     }
 
     public String getBarCode() {
@@ -75,10 +91,7 @@ public class Item implements Serializable {
             return false;
         }
         final Item other = (Item) obj;
-        if (!Objects.equals(this.id, other.id)) {
-            return false;
-        }
-        return true;
+        return Objects.equals(this.id, other.id);
     }
 
 }

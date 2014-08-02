@@ -14,14 +14,14 @@ import javax.persistence.Table;
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @Entity
-@Table(name="item_price")
+@Table(name = "item_price")
 public class ItemPrice implements Serializable {
 
     @Id
     private Long id;
-    @Column(name = "start")
+    @Column(name = "start_date_time")
     private ZonedDateTime startDateTime;
-    @Column(name = "end")
+    @Column(name = "end_date_time")
     private ZonedDateTime endDateTime;
     private Item item;
     private BigDecimal value;
@@ -82,10 +82,7 @@ public class ItemPrice implements Serializable {
             return false;
         }
         final ItemPrice other = (ItemPrice) obj;
-        if (!Objects.equals(this.id, other.id)) {
-            return false;
-        }
-        return true;
+        return Objects.equals(this.id, other.id);
     }
 
 }

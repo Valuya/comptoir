@@ -1,10 +1,14 @@
 package be.valuya.comptoir.model.thirdparty;
 
+import be.valuya.comptoir.model.company.Company;
 import java.io.Serializable;
 import java.util.Objects;
+import javax.annotation.Nonnull;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 /**
@@ -16,6 +20,10 @@ public class Customer implements Serializable {
 
     @Id
     private Long id;
+    @ManyToOne
+    @NotNull
+    @Nonnull
+    private Company company;
     @Column(name = "first_name", length = 200)
     @Size(max = 200)
     private String firstName;
@@ -52,6 +60,14 @@ public class Customer implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Company getCompany() {
+        return company;
+    }
+
+    public void setCompany(Company company) {
+        this.company = company;
     }
 
     public String getFirstName() {
@@ -150,10 +166,7 @@ public class Customer implements Serializable {
             return false;
         }
         final Customer other = (Customer) obj;
-        if (!Objects.equals(this.id, other.id)) {
-            return false;
-        }
-        return true;
+        return Objects.equals(this.id, other.id);
     }
 
 }

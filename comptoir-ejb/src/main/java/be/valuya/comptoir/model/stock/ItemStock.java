@@ -86,10 +86,7 @@ public class ItemStock implements Serializable {
             return false;
         }
         final ItemStock other = (ItemStock) obj;
-        if (!Objects.equals(this.id, other.id)) {
-            return false;
-        }
-        return true;
+        return Objects.equals(this.id, other.id);
     }
 
 }

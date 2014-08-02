@@ -1,29 +1,23 @@
-package be.valuya.comptoir.model.accounting;
+package be.valuya.comptoir.model.company;
 
-import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.misc.LocaleText;
 import java.io.Serializable;
 import java.util.Objects;
-import javax.annotation.Nonnull;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.validation.constraints.NotNull;
 
 /**
  *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @Entity
-public class Account implements Serializable {
+public class Company implements Serializable {
 
     @Id
     private Long id;
-    @NotNull
-    @Nonnull
     @ManyToOne
-    private Company company;
-    private String name;
+    private LocaleText name;
     @ManyToOne
     private LocaleText description;
 
@@ -35,19 +29,11 @@ public class Account implements Serializable {
         this.id = id;
     }
 
-    public Company getCompany() {
-        return company;
-    }
-
-    public void setCompany(Company company) {
-        this.company = company;
-    }
-
-    public String getName() {
+    public LocaleText getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(LocaleText name) {
         this.name = name;
     }
 
@@ -62,7 +48,7 @@ public class Account implements Serializable {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 59 * hash + Objects.hashCode(this.id);
+        hash = 31 * hash + Objects.hashCode(this.id);
         return hash;
     }
 
@@ -74,7 +60,7 @@ public class Account implements Serializable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final Account other = (Account) obj;
+        final Company other = (Company) obj;
         return Objects.equals(this.id, other.id);
     }
 
