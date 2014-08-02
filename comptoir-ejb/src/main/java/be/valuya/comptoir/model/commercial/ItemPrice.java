@@ -7,6 +7,7 @@ import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /**
@@ -23,8 +24,9 @@ public class ItemPrice implements Serializable {
     private ZonedDateTime startDateTime;
     @Column(name = "end_date_time")
     private ZonedDateTime endDateTime;
+    @ManyToOne
     private Item item;
-    private BigDecimal value;
+    private BigDecimal amount;
 
     public Long getId() {
         return id;
@@ -58,12 +60,12 @@ public class ItemPrice implements Serializable {
         this.item = item;
     }
 
-    public BigDecimal getValue() {
-        return value;
+    public BigDecimal getAmount() {
+        return amount;
     }
 
-    public void setValue(BigDecimal value) {
-        this.value = value;
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
     }
 
     @Override
