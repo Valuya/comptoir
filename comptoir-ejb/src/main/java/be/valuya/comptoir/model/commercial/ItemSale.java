@@ -3,6 +3,7 @@ package be.valuya.comptoir.model.commercial;
 import be.valuya.comptoir.model.accounting.AccountingEntry;
 import be.valuya.comptoir.model.misc.LocaleText;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.Objects;
 import javax.persistence.Column;
@@ -28,6 +29,7 @@ public class ItemSale implements Serializable {
     private Item item;
     @ManyToOne
     private ItemPrice price;
+    private BigDecimal quantity;
     @ManyToOne
     private Sale sale;
     @ManyToOne
@@ -65,6 +67,14 @@ public class ItemSale implements Serializable {
 
     public void setPrice(ItemPrice price) {
         this.price = price;
+    }
+
+    public BigDecimal getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(BigDecimal quantity) {
+        this.quantity = quantity;
     }
 
     public Sale getSale() {

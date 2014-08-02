@@ -1,5 +1,6 @@
 package be.valuya.comptoir.model.stock;
 
+import be.valuya.comptoir.model.commercial.Item;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
@@ -21,10 +22,14 @@ public class ItemStock implements Serializable {
 
     @Id
     private Long id;
-    @Column(name = "date_time")
-    private ZonedDateTime dateTime;
+    @Column(name = "start_date_time")
+    private ZonedDateTime startDateTime;
+    @Column(name = "end_date_time")
+    private ZonedDateTime endDateTime;
     @ManyToOne
     private Stock stock;
+    @ManyToOne
+    private Item item;
     @ManyToOne
     @JoinColumn(name = "previous_item_stock_id")
     private ItemStock previousItemStock;
@@ -38,13 +43,22 @@ public class ItemStock implements Serializable {
         this.id = id;
     }
 
-    public ZonedDateTime getDateTime() {
-        return dateTime;
+    public ZonedDateTime getStartDateTime() {
+        return startDateTime;
     }
 
-    public void setDateTime(ZonedDateTime dateTime) {
-        this.dateTime = dateTime;
+    public void setStartDateTime(ZonedDateTime startDateTime) {
+        this.startDateTime = startDateTime;
     }
+
+    public ZonedDateTime getEndDateTime() {
+        return endDateTime;
+    }
+
+    public void setEndDateTime(ZonedDateTime endDateTime) {
+        this.endDateTime = endDateTime;
+    }
+
 
     public Stock getStock() {
         return stock;
@@ -52,6 +66,14 @@ public class ItemStock implements Serializable {
 
     public void setStock(Stock stock) {
         this.stock = stock;
+    }
+
+    public Item getItem() {
+        return item;
+    }
+
+    public void setItem(Item item) {
+        this.item = item;
     }
 
     public ItemStock getPreviousItemStock() {

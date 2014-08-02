@@ -30,6 +30,8 @@ public class Item implements Serializable {
     @Size(max = 128)
     private String barCode;
     @ManyToOne
+    private LocaleText name;
+    @ManyToOne
     private LocaleText description;
     @ManyToOne
     @JoinColumn(name = "current_price_id")
@@ -57,6 +59,14 @@ public class Item implements Serializable {
 
     public void setBarCode(String barCode) {
         this.barCode = barCode;
+    }
+
+    public LocaleText getName() {
+        return name;
+    }
+
+    public void setName(LocaleText name) {
+        this.name = name;
     }
 
     public LocaleText getDescription() {

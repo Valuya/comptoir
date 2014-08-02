@@ -14,6 +14,7 @@ public class ItemSearch {
     @Nonnull
     private Company company;
     private String nameContains;
+    private String descriptionContains;
     private String barCode;
 
     public Company getCompany() {
@@ -30,6 +31,14 @@ public class ItemSearch {
 
     public void setNameContains(String nameContains) {
         this.nameContains = nameContains;
+    }
+
+    public String getDescriptionContains() {
+        return descriptionContains;
+    }
+
+    public void setDescriptionContains(String descriptionContains) {
+        this.descriptionContains = descriptionContains;
     }
 
     public String getBarCode() {
