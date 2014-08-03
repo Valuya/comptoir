@@ -8,6 +8,8 @@ import java.time.ZonedDateTime;
 import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -41,6 +43,8 @@ public class ItemStock implements Serializable {
     private Sale stockChangeSale;
     @Column(columnDefinition = "TEXT")
     private String comment;
+    @Enumerated(EnumType.STRING)
+    private StockChangeType stockChangeType;
 
     public Long getId() {
         return id;
@@ -112,6 +116,14 @@ public class ItemStock implements Serializable {
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public StockChangeType getStockChangeType() {
+        return stockChangeType;
+    }
+
+    public void setStockChangeType(StockChangeType stockChangeType) {
+        this.stockChangeType = stockChangeType;
     }
 
     @Override

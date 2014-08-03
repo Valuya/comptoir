@@ -11,6 +11,8 @@ import be.valuya.comptoir.model.search.ItemStockSearch;
 import be.valuya.comptoir.model.stock.ItemStock;
 import be.valuya.comptoir.model.stock.ItemStock_;
 import be.valuya.comptoir.model.stock.Stock;
+import be.valuya.comptoir.model.stock.StockChangeType;
+import be.valuya.comptoir.model.stock.Stock_;
 import be.valuya.comptoir.util.pagination.ItemColumn;
 import be.valuya.comptoir.util.pagination.Pagination;
 import be.valuya.comptoir.util.pagination.Sorting;
@@ -119,7 +121,7 @@ public class StockService {
         return items;
     }
 
-    public ItemStock adaptStockFromItemSale(ZonedDateTime fromDateTime, Stock stock, ItemSale managedItemSale) {
+    public ItemStock adaptStockFromItemSale(ZonedDateTime fromDateTime, Stock stock, ItemSale managedItemSale, StockChangeType stockChangeType, String comment) {
         Item managedItem = managedItemSale.getItem();
         BigDecimal soldQuantity = managedItemSale.getQuantity();
 
@@ -137,14 +139,14 @@ public class StockService {
         // adapt quantities
         BigDecimal newQuantity = oldQuantity.subtract(soldQuantity);
 
-        return adaptStock(fromDateTime, stock, managedItem, newQuantity, managedPreviousItemStock);
+        return adaptStock(fromDateTime, stock, managedItem, newQuantity, managedPreviousItemStock, stockChangeType, comment);
     }
 
-    public ItemStock adaptStock(ZonedDateTime fromDateTime, Stock stock, Item managedItem, BigDecimal newQuantity) {
+    public ItemStock adaptStock(ZonedDateTime fromDateTime, Stock stock, Item managedItem, BigDecimal newQuantity, StockChangeType stockChangeType, String comment) {
         // find previous stock value
         ItemStock managedPreviousItemStock = findItemStock(managedItem, stock, fromDateTime);
 
-        return adaptStock(fromDateTime, stock, managedItem, newQuantity, managedPreviousItemStock);
+        return adaptStock(fromDateTime, stock, managedItem, newQuantity, managedPreviousItemStock, stockChangeType, comment);
     }
 
     /**
@@ -155,9 +157,18 @@ public class StockService {
      * @param managedItem
      * @param newQuantity
      * @param managedPreviousItemStock
+     * @param comment
      * @return
      */
-    public ItemStock adaptStock(ZonedDateTime fromDateTime, Stock stock, Item managedItem, BigDecimal newQuantity, ItemStock managedPreviousItemStock) {
+    @Nonnull
+    public ItemStock adaptStock(@Nonnull
+            ZonedDateTime fromDateTime, @Nonnull
+            Stock stock, @Nonnull
+            Item managedItem, @Nonnull
+            BigDecimal newQuantity, @CheckForNull
+            ItemStock managedPreviousItemStock, @Nonnull
+            StockChangeType stockChangeType, @CheckForNull
+            String comment) {
         // create new stock value
         ItemStock itemStock = new ItemStock();
         itemStock.setStock(stock);
@@ -165,6 +176,7 @@ public class StockService {
         itemStock.setStartDateTime(fromDateTime);
         itemStock.setPreviousItemStock(managedPreviousItemStock);
         itemStock.setQuantity(newQuantity);
+        itemStock.setComment(comment);
 
         if (managedPreviousItemStock != null) {
             managedPreviousItemStock.setEndDateTime(fromDateTime);
@@ -235,6 +247,12 @@ public class StockService {
         return findItemStocks(itemStockSearch);
     }
 
+    @Nonnull
+    public List<ItemStock> findItemStocks(Item item) {
+        ZonedDateTime dateTime = ZonedDateTime.now();
+        return findItemStocks(item, dateTime);
+    }
+
     /**
      * Find ItemStock at given time for item, in given Stock.
      *
@@ -261,6 +279,21 @@ public class StockService {
             throw new AssertionError(errorMessage);
         }
         return itemStocks.get(0);
+    }
+
+    @Nonnull
+    public List<Stock> findStocks(@Nonnull Company company) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Stock> query = criteriaBuilder.createQuery(Stock.class);
+        Root<Stock> stockRoot = query.from(Stock.class);
+
+        Path<Company> companyPath = stockRoot.get(Stock_.company);
+        Predicate companyPredicate = criteriaBuilder.equal(companyPath, company);
+
+        query.where(companyPredicate);
+
+        TypedQuery<Stock> typedQuery = entityManager.createQuery(query);
+        return typedQuery.getResultList();
     }
 
 }

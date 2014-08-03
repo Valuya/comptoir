@@ -3,6 +3,7 @@ package be.valuya.comptoir.service;
 import be.valuya.comptoir.model.commercial.ItemSale;
 import be.valuya.comptoir.model.commercial.Sale;
 import be.valuya.comptoir.model.stock.Stock;
+import be.valuya.comptoir.model.stock.StockChangeType;
 import java.time.ZonedDateTime;
 import java.util.List;
 import javax.ejb.EJB;
@@ -29,7 +30,7 @@ public class SaleService {
             ItemSale managedItemSale = entityManager.merge(itemSale);
             managedItemSale.setSale(managedSale);
             ZonedDateTime zonedDateTime = ZonedDateTime.now();
-            stockService.adaptStockFromItemSale(zonedDateTime, stock, managedItemSale);
+            stockService.adaptStockFromItemSale(zonedDateTime, stock, managedItemSale, StockChangeType.SALE, null);
         }
 
         // TODO: create accounting entry
