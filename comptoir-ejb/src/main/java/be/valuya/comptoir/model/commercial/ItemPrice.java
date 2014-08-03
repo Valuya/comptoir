@@ -4,11 +4,13 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.Objects;
+import javax.annotation.Nonnull;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 /**
  *
@@ -26,7 +28,12 @@ public class ItemPrice implements Serializable {
     private ZonedDateTime endDateTime;
     @ManyToOne
     private Item item;
-    private BigDecimal amount;
+    @NotNull
+    @Nonnull
+    private BigDecimal vatExclusive;
+    @NotNull
+    @Nonnull
+    private BigDecimal vatRate = BigDecimal.valueOf(21L, 2);
 
     public Long getId() {
         return id;
@@ -60,12 +67,24 @@ public class ItemPrice implements Serializable {
         this.item = item;
     }
 
-    public BigDecimal getAmount() {
-        return amount;
+    @NotNull
+    @Nonnull
+    public BigDecimal getVatExclusive() {
+        return vatExclusive;
     }
 
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
+    public void setVatExclusive(@NotNull @Nonnull BigDecimal vatExclusive) {
+        this.vatExclusive = vatExclusive;
+    }
+
+    @NotNull
+    @Nonnull
+    public BigDecimal getVatRate() {
+        return vatRate;
+    }
+
+    public void setVatRate(@NotNull @Nonnull BigDecimal vatRate) {
+        this.vatRate = vatRate;
     }
 
     @Override

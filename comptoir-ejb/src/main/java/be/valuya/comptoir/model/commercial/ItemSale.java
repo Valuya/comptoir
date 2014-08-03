@@ -33,7 +33,7 @@ public class ItemSale implements Serializable {
     @ManyToOne
     private Sale sale;
     @ManyToOne
-    private LocaleText localeText;
+    private LocaleText comment;
     @OneToOne
     private AccountingEntry accountingEntry;
 
@@ -85,12 +85,12 @@ public class ItemSale implements Serializable {
         this.sale = sale;
     }
 
-    public LocaleText getLocaleText() {
-        return localeText;
+    public LocaleText getComment() {
+        return comment;
     }
 
-    public void setLocaleText(LocaleText localeText) {
-        this.localeText = localeText;
+    public void setComment(LocaleText comment) {
+        this.comment = comment;
     }
 
     public AccountingEntry getAccountingEntry() {

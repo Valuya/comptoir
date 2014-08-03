@@ -161,14 +161,7 @@ public class StockService {
      * @return
      */
     @Nonnull
-    public ItemStock adaptStock(@Nonnull
-            ZonedDateTime fromDateTime, @Nonnull
-            Stock stock, @Nonnull
-            Item managedItem, @Nonnull
-            BigDecimal newQuantity, @CheckForNull
-            ItemStock managedPreviousItemStock, @Nonnull
-            StockChangeType stockChangeType, @CheckForNull
-            String comment) {
+    public ItemStock adaptStock(@Nonnull ZonedDateTime fromDateTime, @Nonnull Stock stock, @Nonnull Item managedItem, @Nonnull BigDecimal newQuantity, @CheckForNull ItemStock managedPreviousItemStock, @Nonnull StockChangeType stockChangeType, @CheckForNull String comment) {
         // create new stock value
         ItemStock itemStock = new ItemStock();
         itemStock.setStock(stock);
@@ -294,6 +287,15 @@ public class StockService {
 
         TypedQuery<Stock> typedQuery = entityManager.createQuery(query);
         return typedQuery.getResultList();
+    }
+
+    public Item saveItem(Item item, Stock stock, BigDecimal initialQuantity) {
+        Item managedItem = entityManager.merge(item);
+        ZonedDateTime dateTime = ZonedDateTime.now();
+
+        adaptStock(dateTime, stock, managedItem, initialQuantity, StockChangeType.INITIAL, null);
+
+        return managedItem;
     }
 
 }

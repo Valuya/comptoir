@@ -21,7 +21,7 @@ public class ItemListController implements Serializable {
     private LazyDataModel<Item> itemDataModel;
     private ItemSearch itemSearch;
 
-    public String actionShow() {
+    public String actionList() {
         return Views.ITEM_LIST;
     }
 
