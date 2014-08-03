@@ -15,7 +15,9 @@ public class ItemSearch {
     private Company company;
     private String nameContains;
     private String descriptionContains;
-    private String barCode;
+    private String reference;
+    // size, color, ...
+    private String model; 
 
     public Company getCompany() {
         return company;
@@ -41,12 +43,20 @@ public class ItemSearch {
         this.descriptionContains = descriptionContains;
     }
 
-    public String getBarCode() {
-        return barCode;
+    public String getReference() {
+        return reference;
     }
 
-    public void setBarCode(String barCode) {
-        this.barCode = barCode;
+    public void setReference(String reference) {
+        this.reference = reference;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
     }
 
 }

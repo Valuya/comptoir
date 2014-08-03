@@ -1,6 +1,7 @@
 package be.valuya.comptoir.model.stock;
 
 import be.valuya.comptoir.model.commercial.Item;
+import be.valuya.comptoir.model.commercial.Sale;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
@@ -10,6 +11,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 /**
@@ -34,6 +36,11 @@ public class ItemStock implements Serializable {
     @JoinColumn(name = "previous_item_stock_id")
     private ItemStock previousItemStock;
     private BigDecimal quantity;
+    @OneToOne
+    @JoinColumn(name = "stock_change_sale_id")
+    private Sale stockChangeSale;
+    @Column(columnDefinition = "TEXT")
+    private String comment;
 
     public Long getId() {
         return id;
@@ -58,7 +65,6 @@ public class ItemStock implements Serializable {
     public void setEndDateTime(ZonedDateTime endDateTime) {
         this.endDateTime = endDateTime;
     }
-
 
     public Stock getStock() {
         return stock;
@@ -90,6 +96,22 @@ public class ItemStock implements Serializable {
 
     public void setQuantity(BigDecimal quantity) {
         this.quantity = quantity;
+    }
+
+    public Sale getStockChangeSale() {
+        return stockChangeSale;
+    }
+
+    public void setStockChangeSale(Sale stockChangeSale) {
+        this.stockChangeSale = stockChangeSale;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 
     @Override

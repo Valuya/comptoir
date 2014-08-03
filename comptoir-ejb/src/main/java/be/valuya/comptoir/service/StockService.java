@@ -3,11 +3,11 @@ package be.valuya.comptoir.service;
 import be.valuya.comptoir.model.commercial.Item;
 import be.valuya.comptoir.model.commercial.ItemSale;
 import be.valuya.comptoir.model.commercial.Item_;
-import be.valuya.comptoir.model.commercial.Sale;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.misc.LocaleText;
 import be.valuya.comptoir.model.misc.LocaleText_;
 import be.valuya.comptoir.model.search.ItemSearch;
+import be.valuya.comptoir.model.search.ItemStockSearch;
 import be.valuya.comptoir.model.stock.ItemStock;
 import be.valuya.comptoir.model.stock.ItemStock_;
 import be.valuya.comptoir.model.stock.Stock;
@@ -15,19 +15,22 @@ import be.valuya.comptoir.util.pagination.ItemColumn;
 import be.valuya.comptoir.util.pagination.Pagination;
 import be.valuya.comptoir.util.pagination.Sorting;
 import java.math.BigDecimal;
+import java.text.MessageFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Join;
+import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.MapJoin;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Path;
@@ -44,7 +47,8 @@ public class StockService {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public List<Item> findItems(ItemSearch itemSearch, Pagination<Item, ItemColumn> pagination) {
+    @Nonnull
+    public List<Item> findItems(@Nonnull ItemSearch itemSearch, @CheckForNull Pagination<Item, ItemColumn> pagination) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Item> query = criteriaBuilder.createQuery(Item.class);
         Root<Item> itemRoot = query.from(Item.class);
@@ -56,12 +60,20 @@ public class StockService {
         Predicate companyPredicate = criteriaBuilder.equal(companyPath, company);
         predicates.add(companyPredicate);
 
-        String barCode = itemSearch.getBarCode();
-        if (barCode != null && !barCode.trim().isEmpty()) {
-            barCode = barCode.trim();
-            Path<String> barCodePath = itemRoot.get(Item_.barCode);
-            Predicate barCodePredicate = criteriaBuilder.equal(barCodePath, barCode);
-            predicates.add(barCodePredicate);
+        String reference = itemSearch.getReference();
+        if (reference != null && !reference.trim().isEmpty()) {
+            reference = reference.trim();
+            Path<String> referencePath = itemRoot.get(Item_.reference);
+            Predicate referencePredicate = criteriaBuilder.equal(referencePath, reference);
+            predicates.add(referencePredicate);
+        }
+
+        String model = itemSearch.getModel();
+        if (model != null && !model.trim().isEmpty()) {
+            model = model.trim();
+            Path<String> modelPath = itemRoot.get(Item_.model);
+            Predicate modelPredicate = criteriaBuilder.equal(modelPath, model);
+            predicates.add(modelPredicate);
         }
 
         String nameContains = itemSearch.getNameContains();
@@ -107,47 +119,56 @@ public class StockService {
         return items;
     }
 
-    public Sale createSale(Stock stock, Sale sale, List<ItemSale> itemSales) {
-        Sale managedSale = entityManager.merge(sale);
-        
-        for (ItemSale itemSale : itemSales) {
-            ItemSale managedItemSale = entityManager.merge(itemSale);
-            managedItemSale.setSale(managedSale);
-            ZonedDateTime zonedDateTime = ZonedDateTime.now();
-            adaptStock(stock, managedItemSale, zonedDateTime);
-        }
-        
-        // TODO: create accounting entry
-        
-        return managedSale;
-    }
-
-    private ItemStock adaptStock(Stock stock, ItemSale managedItemSale, ZonedDateTime zonedDateTime) {
+    public ItemStock adaptStockFromItemSale(ZonedDateTime fromDateTime, Stock stock, ItemSale managedItemSale) {
         Item managedItem = managedItemSale.getItem();
         BigDecimal soldQuantity = managedItemSale.getQuantity();
 
         // find previous stock value
-        ItemStock managedPreviousItemStock = findItemStock(managedItem, stock, zonedDateTime);
+        ItemStock managedPreviousItemStock = findItemStock(managedItem, stock, fromDateTime);
 
         // handle old values
         BigDecimal oldQuantity;
-        if (managedPreviousItemStock == null) {
-            oldQuantity = BigDecimal.ZERO;
-        } else {
+        if (managedPreviousItemStock != null) {
             oldQuantity = managedPreviousItemStock.getQuantity();
-            managedPreviousItemStock.setEndDateTime(zonedDateTime);
+        } else {
+            oldQuantity = BigDecimal.ZERO;
         }
 
         // adapt quantities
         BigDecimal newQuantity = oldQuantity.subtract(soldQuantity);
 
+        return adaptStock(fromDateTime, stock, managedItem, newQuantity, managedPreviousItemStock);
+    }
+
+    public ItemStock adaptStock(ZonedDateTime fromDateTime, Stock stock, Item managedItem, BigDecimal newQuantity) {
+        // find previous stock value
+        ItemStock managedPreviousItemStock = findItemStock(managedItem, stock, fromDateTime);
+
+        return adaptStock(fromDateTime, stock, managedItem, newQuantity, managedPreviousItemStock);
+    }
+
+    /**
+     * Adapt stock values by creating a new ItemStock and updating the previous one.
+     *
+     * @param fromDateTime
+     * @param stock
+     * @param managedItem
+     * @param newQuantity
+     * @param managedPreviousItemStock
+     * @return
+     */
+    public ItemStock adaptStock(ZonedDateTime fromDateTime, Stock stock, Item managedItem, BigDecimal newQuantity, ItemStock managedPreviousItemStock) {
         // create new stock value
         ItemStock itemStock = new ItemStock();
         itemStock.setStock(stock);
         itemStock.setItem(managedItem);
-        itemStock.setStartDateTime(zonedDateTime);
+        itemStock.setStartDateTime(fromDateTime);
         itemStock.setPreviousItemStock(managedPreviousItemStock);
         itemStock.setQuantity(newQuantity);
+
+        if (managedPreviousItemStock != null) {
+            managedPreviousItemStock.setEndDateTime(fromDateTime);
+        }
 
         // persist
         ItemStock managedItemStock = entityManager.merge(itemStock);
@@ -155,24 +176,39 @@ public class StockService {
         return managedItemStock;
     }
 
-    public ItemStock findItemStock(Item item, Stock stock, ZonedDateTime atDateTime) {
+    @Nonnull
+    public List<ItemStock> findItemStocks(@Nonnull ItemStockSearch itemStockSearch) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<ItemStock> query = criteriaBuilder.createQuery(ItemStock.class);
         Root<ItemStock> itemStockRoot = query.from(ItemStock.class);
 
         List<Predicate> predicates = new ArrayList<>();
 
-        Path<Stock> stockPath = itemStockRoot.get(ItemStock_.stock);
-        Predicate stockPredicate = criteriaBuilder.equal(stockPath, stock);
-        predicates.add(stockPredicate);
+        Company company = itemStockSearch.getCompany();
+        Join<ItemStock, Item> itemJoin = itemStockRoot.join(ItemStock_.item, JoinType.INNER);
+        Path<Company> companyPath = itemJoin.get(Item_.company);
+        Predicate companyPredicate = criteriaBuilder.equal(companyPath, company);
+        predicates.add(companyPredicate);
 
-        Path<Item> itemPath = itemStockRoot.get(ItemStock_.item);
-        Predicate itemPredicate = criteriaBuilder.equal(itemPath, item);
-        predicates.add(itemPredicate);
+        Stock stock = itemStockSearch.getStock();
+        if (stock != null) {
+            Path<Stock> stockPath = itemStockRoot.get(ItemStock_.stock);
+            Predicate stockPredicate = criteriaBuilder.equal(stockPath, stock);
+            predicates.add(stockPredicate);
+        }
 
-        Path<ZonedDateTime> startDateTimePath = itemStockRoot.get(ItemStock_.startDateTime);
-        Predicate startDateTimePredicate = criteriaBuilder.greaterThanOrEqualTo(startDateTimePath, atDateTime);
-        predicates.add(startDateTimePredicate);
+        Item item = itemStockSearch.getItem();
+        if (item != null) {
+            Predicate itemPredicate = criteriaBuilder.equal(itemJoin, item);
+            predicates.add(itemPredicate);
+        }
+
+        ZonedDateTime atDateTime = itemStockSearch.getAtDateTime();
+        if (atDateTime != null) {
+            Path<ZonedDateTime> startDateTimePath = itemStockRoot.get(ItemStock_.startDateTime);
+            Predicate startDateTimePredicate = criteriaBuilder.greaterThanOrEqualTo(startDateTimePath, atDateTime);
+            predicates.add(startDateTimePredicate);
+        }
 
         Path<ZonedDateTime> toDateTimePath = itemStockRoot.get(ItemStock_.endDateTime);
         Predicate noEndPredicate = criteriaBuilder.isNull(toDateTimePath);
@@ -184,12 +220,47 @@ public class StockService {
         query.where(predicateArray);
 
         TypedQuery<ItemStock> typedQuery = entityManager.createQuery(query);
-        try {
-            ItemStock managedItemStock = typedQuery.getSingleResult();
-            return managedItemStock;
-        } catch (NoResultException noResultException) {
+
+        return typedQuery.getResultList();
+    }
+
+    @Nonnull
+    public List<ItemStock> findItemStocks(@Nonnull Item item, @Nonnull ZonedDateTime atDateTime) {
+        Company company = item.getCompany();
+        ItemStockSearch itemStockSearch = new ItemStockSearch();
+        itemStockSearch.setCompany(company);
+        itemStockSearch.setItem(item);
+        itemStockSearch.setAtDateTime(atDateTime);
+
+        return findItemStocks(itemStockSearch);
+    }
+
+    /**
+     * Find ItemStock at given time for item, in given Stock.
+     *
+     * @param item
+     * @param stock
+     * @param atDateTime
+     * @return
+     */
+    @CheckForNull
+    public ItemStock findItemStock(@Nonnull Item item, @Nonnull Stock stock, @Nonnull ZonedDateTime atDateTime) {
+        Company company = item.getCompany();
+        ItemStockSearch itemStockSearch = new ItemStockSearch();
+        itemStockSearch.setCompany(company);
+        itemStockSearch.setStock(stock);
+        itemStockSearch.setItem(item);
+        itemStockSearch.setAtDateTime(atDateTime);
+
+        List<ItemStock> itemStocks = findItemStocks(itemStockSearch);
+        if (itemStocks.isEmpty()) {
             return null;
         }
+        if (itemStocks.size() > 1) {
+            String errorMessage = MessageFormat.format("Multiple stock entries for item {0} in stock {1} at {2}", item, stock, atDateTime);
+            throw new AssertionError(errorMessage);
+        }
+        return itemStocks.get(0);
     }
 
 }

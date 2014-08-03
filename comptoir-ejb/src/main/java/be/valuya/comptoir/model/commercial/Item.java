@@ -28,7 +28,10 @@ public class Item implements Serializable {
     private Company company;
     @Column(length = 128)
     @Size(max = 128)
-    private String barCode;
+    private String reference;
+    @Column(length = 128)
+    @Size(max = 128)
+    private String model;
     @ManyToOne
     private LocaleText name;
     @ManyToOne
@@ -53,12 +56,20 @@ public class Item implements Serializable {
         this.company = company;
     }
 
-    public String getBarCode() {
-        return barCode;
+    public String getReference() {
+        return reference;
     }
 
-    public void setBarCode(String barCode) {
-        this.barCode = barCode;
+    public void setReference(String reference) {
+        this.reference = reference;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
     }
 
     public LocaleText getName() {
