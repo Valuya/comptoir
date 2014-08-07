@@ -11,8 +11,6 @@ import javax.annotation.Nonnull;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -57,10 +55,6 @@ public class AccountingEntry implements Serializable {
     private AccountingEntry vatAccountingEntry;
     @ManyToOne
     private Customer customer;
-    @NotNull
-    @Nonnull
-    @Enumerated(EnumType.STRING)
-    private AccountingEntryType accountingEntryType;
 
     public Long getId() {
         return id;
@@ -154,16 +148,6 @@ public class AccountingEntry implements Serializable {
 
     public void setCustomer(Customer customer) {
         this.customer = customer;
-    }
-
-    @NotNull
-    @Nonnull
-    public AccountingEntryType getAccountingEntryType() {
-        return accountingEntryType;
-    }
-
-    public void setAccountingEntryType(@NotNull @Nonnull AccountingEntryType accountingEntryType) {
-        this.accountingEntryType = accountingEntryType;
     }
 
     @Override
