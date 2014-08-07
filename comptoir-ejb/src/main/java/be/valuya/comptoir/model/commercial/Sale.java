@@ -1,16 +1,20 @@
 package be.valuya.comptoir.model.commercial;
 
 import be.valuya.comptoir.model.accounting.AccountingEntry;
+import be.valuya.comptoir.model.accounting.AccountingTransaction;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.thirdparty.Customer;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.Objects;
 import javax.annotation.Nonnull;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
@@ -32,10 +36,25 @@ public class Sale implements Serializable {
     private Customer customer;
     @Column(name = "date_time")
     private ZonedDateTime dateTime;
-    @OneToOne(mappedBy = "sale", fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "sale", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Invoice invoice;
+    @NotNull
+    @Nonnull
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "accounting_transaction_id")
+    private AccountingTransaction accountingTransaction;
+    @NotNull
+    @Nonnull
+    @Column(name = "vat_exclusive_amount")
+    private BigDecimal vatExclusiveAmout;
+    @NotNull
+    @Nonnull
+    @Column(name = "vat_amount")
+    private BigDecimal vatAmount;
+    private boolean closed;
     @OneToOne
-    private AccountingEntry accountingEntry;
+    @JoinColumn(name = "vat_accounting_entry_id")
+    private AccountingEntry vatAccountingEntry;
 
     public Long getId() {
         return id;
@@ -77,12 +96,50 @@ public class Sale implements Serializable {
         this.invoice = invoice;
     }
 
-    public AccountingEntry getAccountingEntry() {
-        return accountingEntry;
+    @NotNull
+    @Nonnull
+    public AccountingTransaction getAccountingTransaction() {
+        return accountingTransaction;
     }
 
-    public void setAccountingEntry(AccountingEntry accountingEntry) {
-        this.accountingEntry = accountingEntry;
+    public void setAccountingTransaction(@NotNull @Nonnull AccountingTransaction accountingTransaction) {
+        this.accountingTransaction = accountingTransaction;
+    }
+
+    @NotNull
+    @Nonnull
+    public BigDecimal getVatExclusiveAmout() {
+        return vatExclusiveAmout;
+    }
+
+    public void setVatExclusiveAmout(@NotNull @Nonnull BigDecimal vatExclusiveAmout) {
+        this.vatExclusiveAmout = vatExclusiveAmout;
+    }
+
+    @NotNull
+    @Nonnull
+    public BigDecimal getVatAmount() {
+        return vatAmount;
+    }
+
+    public void setVatAmount(@NotNull @Nonnull BigDecimal vatAmount) {
+        this.vatAmount = vatAmount;
+    }
+
+    public boolean isClosed() {
+        return closed;
+    }
+
+    public void setClosed(boolean closed) {
+        this.closed = closed;
+    }
+
+    public AccountingEntry getVatAccountingEntry() {
+        return vatAccountingEntry;
+    }
+
+    public void setVatAccountingEntry(AccountingEntry vatAccountingEntry) {
+        this.vatAccountingEntry = vatAccountingEntry;
     }
 
     @Override

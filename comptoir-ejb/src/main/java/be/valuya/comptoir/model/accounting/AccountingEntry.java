@@ -1,15 +1,18 @@
 package be.valuya.comptoir.model.accounting;
 
-import be.valuya.comptoir.model.commercial.Sale;
-import be.valuya.comptoir.model.misc.LocaleText;
 import be.valuya.comptoir.model.company.Company;
+import be.valuya.comptoir.model.misc.LocaleText;
+import be.valuya.comptoir.model.thirdparty.Customer;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.Objects;
 import javax.annotation.Nonnull;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -31,21 +34,33 @@ public class AccountingEntry implements Serializable {
     @Nonnull
     @ManyToOne
     private Company company;
+    @NotNull
+    @Nonnull
     @ManyToOne
-    @JoinColumn(name = "from_account_id")
-    private Account fromAccount;
-    @ManyToOne
-    @JoinColumn(name = "to_account_id")
-    private Account toAccount;
-    private BigDecimal vatExclusiveAmount;
+    private Account account;
+    @NotNull
+    @Nonnull
+    private BigDecimal amount;
     private BigDecimal vatRate;
-    private BigDecimal vatAmount;
+    @NotNull
+    @Nonnull
     @Column(name = "date_time")
     private ZonedDateTime dateTime;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     private LocaleText description;
-    @OneToOne
-    private Sale sale;
+    @NotNull
+    @Nonnull
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "accounting_transaction_id")
+    private AccountingTransaction accountingTransaction;
+    @OneToOne(cascade = CascadeType.ALL)
+    private AccountingEntry vatAccountingEntry;
+    @ManyToOne
+    private Customer customer;
+    @NotNull
+    @Nonnull
+    @Enumerated(EnumType.STRING)
+    private AccountingEntryType accountingEntryType;
 
     public Long getId() {
         return id;
@@ -55,36 +70,37 @@ public class AccountingEntry implements Serializable {
         this.id = id;
     }
 
+    @NotNull
+    @Nonnull
     public Company getCompany() {
         return company;
     }
 
-    public void setCompany(Company company) {
+    public void setCompany(@NotNull
+            @Nonnull Company company) {
         this.company = company;
     }
 
-    public Account getFromAccount() {
-        return fromAccount;
+    @NotNull
+    @Nonnull
+    public Account getAccount() {
+        return account;
     }
 
-    public void setFromAccount(Account fromAccount) {
-        this.fromAccount = fromAccount;
+    public void setAccount(@NotNull
+            @Nonnull Account account) {
+        this.account = account;
     }
 
-    public Account getToAccount() {
-        return toAccount;
+    @NotNull
+    @Nonnull
+    public BigDecimal getAmount() {
+        return amount;
     }
 
-    public void setToAccount(Account toAccount) {
-        this.toAccount = toAccount;
-    }
-
-    public BigDecimal getVatExclusiveAmount() {
-        return vatExclusiveAmount;
-    }
-
-    public void setVatExclusiveAmount(BigDecimal vatExclusiveAmount) {
-        this.vatExclusiveAmount = vatExclusiveAmount;
+    public void setAmount(@NotNull
+            @Nonnull BigDecimal amount) {
+        this.amount = amount;
     }
 
     public BigDecimal getVatRate() {
@@ -95,19 +111,14 @@ public class AccountingEntry implements Serializable {
         this.vatRate = vatRate;
     }
 
-    public BigDecimal getVatAmount() {
-        return vatAmount;
-    }
-
-    public void setVatAmount(BigDecimal vatAmount) {
-        this.vatAmount = vatAmount;
-    }
-
+    @NotNull
+    @Nonnull
     public ZonedDateTime getDateTime() {
         return dateTime;
     }
 
-    public void setDateTime(ZonedDateTime dateTime) {
+    public void setDateTime(@NotNull
+            @Nonnull ZonedDateTime dateTime) {
         this.dateTime = dateTime;
     }
 
@@ -119,12 +130,40 @@ public class AccountingEntry implements Serializable {
         this.description = description;
     }
 
-    public Sale getSale() {
-        return sale;
+    @NotNull
+    @Nonnull
+    public AccountingTransaction getAccountingTransaction() {
+        return accountingTransaction;
     }
 
-    public void setSale(Sale sale) {
-        this.sale = sale;
+    public void setAccountingTransaction(@NotNull @Nonnull AccountingTransaction accountingTransaction) {
+        this.accountingTransaction = accountingTransaction;
+    }
+
+    public AccountingEntry getVatAccountingEntry() {
+        return vatAccountingEntry;
+    }
+
+    public void setVatAccountingEntry(AccountingEntry vatAccountingEntry) {
+        this.vatAccountingEntry = vatAccountingEntry;
+    }
+
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
+
+    @NotNull
+    @Nonnull
+    public AccountingEntryType getAccountingEntryType() {
+        return accountingEntryType;
+    }
+
+    public void setAccountingEntryType(@NotNull @Nonnull AccountingEntryType accountingEntryType) {
+        this.accountingEntryType = accountingEntryType;
     }
 
     @Override

@@ -5,10 +5,14 @@ import be.valuya.comptoir.model.misc.LocaleText;
 import java.io.Serializable;
 import java.util.Objects;
 import javax.annotation.Nonnull;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  *
@@ -23,9 +27,22 @@ public class Account implements Serializable {
     @Nonnull
     @ManyToOne
     private Company company;
+    @Column(name = "accounting_number", length = 32)
+    @Size(max = 32)
+    private String accountingNumber;
+    @Column(length = 32)
+    @Size(max = 32)
+    private String iban;
+    @Column(length = 12)
+    @Size(max = 12)
+    private String bic;
     private String name;
     @ManyToOne
     private LocaleText description;
+    @Enumerated(EnumType.STRING)
+    @NotNull
+    @Nonnull
+    private AccountType accountType;
 
     public Long getId() {
         return id;
@@ -57,6 +74,41 @@ public class Account implements Serializable {
 
     public void setDescription(LocaleText description) {
         this.description = description;
+    }
+
+    public String getAccountingNumber() {
+        return accountingNumber;
+    }
+
+    public void setAccountingNumber(String accountingNumber) {
+        this.accountingNumber = accountingNumber;
+    }
+
+    public String getIban() {
+        return iban;
+    }
+
+    public void setIban(String iban) {
+        this.iban = iban;
+    }
+
+    public String getBic() {
+        return bic;
+    }
+
+    public void setBic(String bic) {
+        this.bic = bic;
+    }
+
+    @NotNull
+    @Nonnull
+    public AccountType getAccountType() {
+        return accountType;
+    }
+
+    public void setAccountType(@NotNull
+            @Nonnull AccountType accountType) {
+        this.accountType = accountType;
     }
 
     @Override

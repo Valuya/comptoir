@@ -4,6 +4,7 @@ import be.valuya.comptoir.model.accounting.Account;
 import be.valuya.comptoir.model.commercial.Item;
 import be.valuya.comptoir.model.commercial.ItemPrice;
 import be.valuya.comptoir.model.commercial.ItemSale;
+import be.valuya.comptoir.model.commercial.Payment;
 import be.valuya.comptoir.model.commercial.Sale;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.thirdparty.Employee;
@@ -37,7 +38,9 @@ public class SaleController implements Serializable {
     private ItemSale itemSale;
     private BigDecimal payedAmount;
     private BigDecimal giveBackAmount;
-    private Account selectedAccount;
+    private List<Payment> payments;
+    private Account paymentAccount;
+    private boolean closeSale;
 
     public String actionNew() {
         Employee loggedEmployee = loginController.getLoggedEmployee();
@@ -48,6 +51,7 @@ public class SaleController implements Serializable {
         sale.setCompany(company);
 
         resetItemSale();
+        resetPayements();
 
         return Views.SALE_DETAILS;
     }
@@ -61,24 +65,24 @@ public class SaleController implements Serializable {
 
     public void actionAddItem() {
         Item item = itemSale.getItem();
-        
+
         ZonedDateTime dateTime = ZonedDateTime.now();
         ItemPrice price = item.getCurrentPrice();
-        
+
         itemSale.setPrice(price);
         itemSale.setDateTime(dateTime);
-        
+
         itemSales.add(itemSale);
-        
+
         sale = saleService.calcSale(sale, itemSales);
-        
+
         resetItemSale();
     }
-    
-    public void actionCloseSale() {
-        sale = saleService.closeSale(sale, itemSales, selectedAccount);
+
+    public void actionPay() {
+        sale = saleService.pay(sale, itemSales, payments, closeSale);
     }
-    
+
     public void handlePayedChange() {
         giveBackAmount = saleService.calcPayBackAmount(sale, itemSales, payedAmount);
     }
@@ -103,17 +107,37 @@ public class SaleController implements Serializable {
         return giveBackAmount;
     }
 
-    public Account getSelectedAccount() {
-        return selectedAccount;
+    public Account getPaymentAccount() {
+        return paymentAccount;
     }
 
-    public void setSelectedAccount(Account selectedAccount) {
-        this.selectedAccount = selectedAccount;
+    public void setPaymentAccount(Account paymentAccount) {
+        this.paymentAccount = paymentAccount;
+    }
+
+    public List<Payment> getPayments() {
+        return payments;
+    }
+
+    public void setPayments(List<Payment> payments) {
+        this.payments = payments;
+    }
+
+    public boolean isCloseSale() {
+        return closeSale;
+    }
+
+    public void setCloseSale(boolean closeSale) {
+        this.closeSale = closeSale;
     }
 
     private void resetItemSale() {
         itemSale = new ItemSale();
         itemSale.setSale(sale);
+    }
+
+    private void resetPayements() {
+        payments = new ArrayList<>();
     }
 
 }
