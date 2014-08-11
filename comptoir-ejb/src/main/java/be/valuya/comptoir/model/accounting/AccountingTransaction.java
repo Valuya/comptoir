@@ -31,7 +31,6 @@ public class AccountingTransaction implements Serializable {
     @Nonnull
     @ManyToOne
     private Company company;
-    @ManyToOne(cascade = CascadeType.ALL)
     @Column(name = "date_time")
     private ZonedDateTime dateTime;
     @OneToOne(cascade = CascadeType.ALL)
