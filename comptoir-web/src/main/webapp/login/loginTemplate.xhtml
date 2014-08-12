@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html">
+    <ui:composition template="/template.xhtml">
+        <ui:define name="menu" />
+        <ui:define name="body">
+            <h:panelGrid columns="2" styleClass="top-align">
+                <h:graphicImage name="img/shop.jpg" height="550" />
+
+                <h:panelGroup>
+                    <p><ui:insert name="loginMessage" /></p>
+                    <h:panelGrid columns="2" styleClass="top-align">
+                        <h:panelGroup>
+
+                            <form method="POST" action="j_security_check">
+                                <h:panelGrid columns="2" styleClass="data_entry">
+                                    <h:outputText value="Identifiant :" />
+                                    <input type="text" name="j_username" />
+
+                                    <h:outputText value="Mot de passe :" />
+                                    <input type="password" name="j_password" />
+
+                                    <h:outputText value="" />
+                                    <input type="submit" value="Login" />
+                                </h:panelGrid>
+                            </form>
+
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <h:graphicImage name="eid.png" library="img" alt="Authentification par carte d'identité électronique pas encore disponible" />
+                        </h:panelGroup>
+
+                    </h:panelGrid>
+                </h:panelGroup>
+            </h:panelGrid>
+        </ui:define>
+    </ui:composition>
+</html>
+

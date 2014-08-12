@@ -1,0 +1,50 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:cpt="http://xmlns.jcp.org/jsf/composite/cpt"
+      xmlns:h="http://xmlns.jcp.org/jsf/html">
+    <ui:composition template="/template.xhtml">
+
+        <h:form id="searchForm">
+            <p:panel header="Recherche">
+                <h:panelGrid columns="2">
+                    <h:outputLabel value="Référence" for="reference"/>
+                    <h:inputText id="reference" value="#{itemListController.itemSearch.reference}" />
+                    
+                    <h:outputLabel value="Description contient" for="descriptionContains" />
+                    <h:inputText id="descriptionContains" value="#{itemListController.itemSearch.descriptionContains}" />
+                    
+                    <h:outputLabel value="Nom contient" for="nameContains" />
+                    <h:inputText id="nameContains" value="#{itemListController.itemSearch.nameContains}" />
+                </h:panelGrid>
+                <p:commandButton action="#{itemListController.actionSearch()}" value="Recherche" />
+            </p:panel>
+        </h:form>
+
+        <h:form id="editForm">
+            <p:dataTable value="#{itemListController.itemDataModel}" var="item">
+                <p:column headerText="Nom">
+                    <h:outputText value="#{item.name}" />
+                </p:column>
+                <p:column headerText="Description">
+                    <cpt:localeText value="#{item.description}" />
+                </p:column>
+                <p:column headerText="HTVA">
+                    <cpt:price value="#{item.currentPrice.vatExclusive}" />
+                </p:column>
+                <p:column headerText="% TVA">
+                    <cpt:vatRate value="#{item.currentPrice.vatRate}" />
+                </p:column>
+                <p:column>
+                    <p:commandButton value="Détails" action="#{itemDetailsController.actionDetails(item)}" />
+                </p:column>
+            </p:dataTable>
+            
+            <p:commandButton value="Nouveau" action="#{itemDetailsController.actionNew()}" />
+        </h:form>
+
+    </ui:composition>
+</html>
+
