@@ -7,10 +7,10 @@ import be.valuya.comptoir.model.accounting.AccountingEntry;
 import be.valuya.comptoir.model.accounting.AccountingTransaction;
 import be.valuya.comptoir.model.accounting.AccountingTransactionType;
 import be.valuya.comptoir.model.commercial.Item;
-import be.valuya.comptoir.model.commercial.ItemPrice;
 import be.valuya.comptoir.model.commercial.ItemSale;
 import be.valuya.comptoir.model.commercial.ItemSale_;
 import be.valuya.comptoir.model.commercial.Payment;
+import be.valuya.comptoir.model.commercial.Price;
 import be.valuya.comptoir.model.commercial.Sale;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.misc.LocaleText;
@@ -92,7 +92,7 @@ public class SaleService {
         sale.setAccountingTransaction(accountingTransaction);
 
         for (ItemSale itemSale : itemSales) {
-            ItemPrice price = itemSale.getPrice();
+            Price price = itemSale.getPrice();
             BigDecimal vatExclusive = price.getVatExclusive();
             BigDecimal vatRate = price.getVatRate();
             BigDecimal vatAmount = vatExclusive.multiply(vatRate);
