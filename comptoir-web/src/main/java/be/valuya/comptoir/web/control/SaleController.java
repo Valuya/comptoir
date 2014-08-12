@@ -1,15 +1,15 @@
-package be.valuya.web.control;
+package be.valuya.comptoir.web.control;
 
 import be.valuya.comptoir.model.accounting.Account;
 import be.valuya.comptoir.model.commercial.Item;
-import be.valuya.comptoir.model.commercial.ItemPrice;
+import be.valuya.comptoir.model.commercial.Price;
 import be.valuya.comptoir.model.commercial.ItemSale;
 import be.valuya.comptoir.model.commercial.Payment;
 import be.valuya.comptoir.model.commercial.Sale;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.thirdparty.Employee;
 import be.valuya.comptoir.service.SaleService;
-import be.valuya.web.view.Views;
+import be.valuya.comptoir.web.view.Views;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
@@ -67,7 +67,7 @@ public class SaleController implements Serializable {
         Item item = itemSale.getItem();
 
         ZonedDateTime dateTime = ZonedDateTime.now();
-        ItemPrice price = item.getCurrentPrice();
+        Price price = item.getCurrentPrice();
 
         itemSale.setPrice(price);
         itemSale.setDateTime(dateTime);

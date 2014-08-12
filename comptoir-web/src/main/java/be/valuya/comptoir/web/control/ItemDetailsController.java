@@ -1,13 +1,14 @@
-package be.valuya.web.control;
+package be.valuya.comptoir.web.control;
 
 import be.valuya.comptoir.model.commercial.Item;
 import be.valuya.comptoir.model.company.Company;
+import be.valuya.comptoir.model.factory.ItemFactory;
 import be.valuya.comptoir.model.stock.ItemStock;
 import be.valuya.comptoir.model.stock.Stock;
 import be.valuya.comptoir.model.stock.StockChangeType;
 import be.valuya.comptoir.model.thirdparty.Employee;
 import be.valuya.comptoir.service.StockService;
-import be.valuya.web.view.Views;
+import be.valuya.comptoir.web.view.Views;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
@@ -42,8 +43,7 @@ public class ItemDetailsController implements Serializable {
         Employee loggedEmployee = loginController.getLoggedEmployee();
         Company company = loggedEmployee.getCompany();
 
-        item = new Item();
-        item.setCompany(company);
+        item = ItemFactory.createItem(company);
 
         newQuantity = BigDecimal.ONE;
         

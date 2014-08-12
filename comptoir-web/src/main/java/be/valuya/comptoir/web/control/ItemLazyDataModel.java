@@ -1,4 +1,4 @@
-package be.valuya.web.control;
+package be.valuya.comptoir.web.control;
 
 import be.valuya.comptoir.model.commercial.Item;
 import be.valuya.comptoir.model.search.ItemSearch;
@@ -6,7 +6,7 @@ import be.valuya.comptoir.service.StockService;
 import be.valuya.comptoir.util.pagination.ItemColumn;
 import be.valuya.comptoir.util.pagination.Pagination;
 import be.valuya.comptoir.util.pagination.Sorting;
-import be.valuya.web.pagination.PaginationUtil;
+import be.valuya.comptoir.web.pagination.PaginationUtil;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;

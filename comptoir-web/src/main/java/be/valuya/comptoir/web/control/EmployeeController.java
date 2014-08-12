@@ -1,4 +1,4 @@
-package be.valuya.web.control;
+package be.valuya.comptoir.web.control;
 
 import java.io.Serializable;
 import javax.enterprise.context.SessionScoped;

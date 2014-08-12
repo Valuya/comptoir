@@ -1,4 +1,4 @@
-package be.valuya.web.control;
+package be.valuya.comptoir.web.control;
 
 import be.valuya.comptoir.model.accounting.Account;
 import be.valuya.comptoir.model.company.Company;

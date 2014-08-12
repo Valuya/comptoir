@@ -1,4 +1,4 @@
-package be.valuya.web.pagination;
+package be.valuya.comptoir.web.pagination;
 
 import be.valuya.comptoir.util.pagination.Column;
 import be.valuya.comptoir.util.pagination.Sorting;
