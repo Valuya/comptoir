@@ -1,7 +1,6 @@
 package be.valuya.comptoir.model.misc;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -10,6 +9,7 @@ import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.MapKeyColumn;
@@ -24,12 +24,13 @@ import javax.persistence.Table;
 public class LocaleText implements Serializable {
 
     @Id
+    @GeneratedValue
     private Long id;
     @ElementCollection(fetch = FetchType.EAGER)
-    @MapKeyColumn(name = "locale", insertable = false, updatable = false)
+    @MapKeyColumn(name = "locale", columnDefinition = "VARCHAR(16)", insertable = false, updatable = false)
     @Column(name = "localized_text", columnDefinition = "TEXT")
     @CollectionTable(name = "locale_text_value", joinColumns = @JoinColumn(name = "locale_text_id"))
-    private Map<Locale, String> localeTextMap = new HashMap<>();
+    private Map<Locale, String> localeTextMap;
 
     public Long getId() {
         return id;

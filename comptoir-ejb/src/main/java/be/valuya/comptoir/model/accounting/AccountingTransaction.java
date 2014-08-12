@@ -11,6 +11,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
@@ -26,10 +27,11 @@ import javax.validation.constraints.NotNull;
 public class AccountingTransaction implements Serializable {
 
     @Id
+    @GeneratedValue
     private Long id;
     @NotNull
     @Nonnull
-    @ManyToOne
+    @ManyToOne(optional = false)
     private Company company;
     @Column(name = "date_time")
     private ZonedDateTime dateTime;

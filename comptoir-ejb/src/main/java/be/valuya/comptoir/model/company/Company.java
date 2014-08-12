@@ -4,6 +4,7 @@ import be.valuya.comptoir.model.misc.LocaleText;
 import java.io.Serializable;
 import java.util.Objects;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
@@ -15,6 +16,7 @@ import javax.persistence.ManyToOne;
 public class Company implements Serializable {
 
     @Id
+    @GeneratedValue
     private Long id;
     @ManyToOne
     private LocaleText name;

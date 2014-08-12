@@ -7,8 +7,8 @@ import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -17,17 +17,16 @@ import javax.validation.constraints.NotNull;
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @Entity
-@Table(name = "item_price")
-public class ItemPrice implements Serializable {
+@Table(name = "price")
+public class Price implements Serializable {
 
     @Id
+    @GeneratedValue
     private Long id;
     @Column(name = "start_date_time")
     private ZonedDateTime startDateTime;
     @Column(name = "end_date_time")
     private ZonedDateTime endDateTime;
-    @ManyToOne
-    private Item item;
     @NotNull
     @Nonnull
     private BigDecimal vatExclusive;
@@ -57,14 +56,6 @@ public class ItemPrice implements Serializable {
 
     public void setEndDateTime(ZonedDateTime endDateTime) {
         this.endDateTime = endDateTime;
-    }
-
-    public Item getItem() {
-        return item;
-    }
-
-    public void setItem(Item item) {
-        this.item = item;
     }
 
     @NotNull
@@ -102,7 +93,7 @@ public class ItemPrice implements Serializable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final ItemPrice other = (ItemPrice) obj;
+        final Price other = (Price) obj;
         return Objects.equals(this.id, other.id);
     }
 

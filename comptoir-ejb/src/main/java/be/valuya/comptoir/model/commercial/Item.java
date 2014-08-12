@@ -7,6 +7,7 @@ import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -21,10 +22,11 @@ import javax.validation.constraints.Size;
 public class Item implements Serializable {
 
     @Id
+    @GeneratedValue
     private Long id;
-    @ManyToOne
     @NotNull
     @Nonnull
+    @ManyToOne(optional = false)
     private Company company;
     @Column(length = 128)
     @Size(max = 128)
@@ -38,7 +40,7 @@ public class Item implements Serializable {
     private LocaleText description;
     @ManyToOne
     @JoinColumn(name = "current_price_id")
-    private ItemPrice currentPrice;
+    private Price currentPrice;
 
     public Long getId() {
         return id;
@@ -88,11 +90,11 @@ public class Item implements Serializable {
         this.description = description;
     }
 
-    public ItemPrice getCurrentPrice() {
+    public Price getCurrentPrice() {
         return currentPrice;
     }
 
-    public void setCurrentPrice(ItemPrice currentPrice) {
+    public void setCurrentPrice(Price currentPrice) {
         this.currentPrice = currentPrice;
     }
 

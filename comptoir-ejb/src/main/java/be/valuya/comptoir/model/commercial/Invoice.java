@@ -3,6 +3,7 @@ package be.valuya.comptoir.model.commercial;
 import java.io.Serializable;
 import java.util.Objects;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 
@@ -14,6 +15,7 @@ import javax.persistence.OneToOne;
 public class Invoice implements Serializable {
 
     @Id
+    @GeneratedValue
     private Long id;
     private String number;
     @OneToOne

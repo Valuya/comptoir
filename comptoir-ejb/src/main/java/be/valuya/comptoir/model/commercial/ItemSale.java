@@ -8,6 +8,7 @@ import java.time.ZonedDateTime;
 import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
@@ -22,13 +23,14 @@ import javax.persistence.Table;
 public class ItemSale implements Serializable {
 
     @Id
+    @GeneratedValue
     private Long id;
     @Column(name = "date_time")
     private ZonedDateTime dateTime;
     @ManyToOne
     private Item item;
     @ManyToOne
-    private ItemPrice price;
+    private Price price;
     private BigDecimal quantity;
     @ManyToOne
     private Sale sale;
@@ -61,11 +63,11 @@ public class ItemSale implements Serializable {
         this.item = item;
     }
 
-    public ItemPrice getPrice() {
+    public Price getPrice() {
         return price;
     }
 
-    public void setPrice(ItemPrice price) {
+    public void setPrice(Price price) {
         this.price = price;
     }
 

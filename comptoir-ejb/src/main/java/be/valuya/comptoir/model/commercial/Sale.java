@@ -13,6 +13,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -27,10 +28,11 @@ import javax.validation.constraints.NotNull;
 public class Sale implements Serializable {
 
     @Id
+    @GeneratedValue
     private Long id;
-    @ManyToOne
     @NotNull
     @Nonnull
+    @ManyToOne(optional = false)
     private Company company;
     @ManyToOne
     private Customer customer;
