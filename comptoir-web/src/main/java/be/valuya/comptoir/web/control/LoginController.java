@@ -31,7 +31,7 @@ public class LoginController implements Serializable {
     /**
      * Should be called by main page (preRenderView), which can't be loaded without login.
      */
-    public void init() {
+    public void handleInit() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         ExternalContext externalContext = facesContext.getExternalContext();
         HttpServletRequest request = (HttpServletRequest) externalContext.getRequest();
