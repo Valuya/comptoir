@@ -23,7 +23,7 @@ import javax.validation.constraints.NotNull;
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @Entity
-@Table(name = "accounting_entry")
+@Table(name = "accounting_transaction")
 public class AccountingTransaction implements Serializable {
 
     @Id
@@ -33,7 +33,7 @@ public class AccountingTransaction implements Serializable {
     @Nonnull
     @ManyToOne(optional = false)
     private Company company;
-    @Column(name = "date_time")
+    @Column(name = "date_time", columnDefinition = "DATETIME")
     private ZonedDateTime dateTime;
     @OneToOne(cascade = CascadeType.ALL)
     private Sale sale;

@@ -5,18 +5,19 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
 import java.util.Locale;
-import javax.annotation.ManagedBean;
+import javax.enterprise.context.RequestScoped;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
-import javax.faces.convert.FacesConverter;
+import javax.faces.convert.ConverterException;
+import javax.inject.Named;
 
 /**
  *
  * @author Yannick Majoros
  */
-@FacesConverter("EuroConverter")
-@ManagedBean
+@Named
+@RequestScoped
 public class EuroConverter implements Converter {
 
     private final DecimalFormat decimalFormat;
@@ -41,8 +42,8 @@ public class EuroConverter implements Converter {
             }
             BigDecimal valueNumber = (BigDecimal) decimalFormat.parse(numberStr);
             return valueNumber;
-        } catch (ParseException ex) {
-            throw new NumberFormatException("Erreur de conversion : " + valueStr);
+        } catch (ParseException parseException) {
+            throw new ConverterException("Erreur de conversion : " + valueStr, parseException);
         }
     }
 

@@ -70,6 +70,16 @@ public class StockService {
             predicates.add(referencePredicate);
         }
 
+        String referenceContains = itemSearch.getReferenceContains();
+        if (referenceContains != null && !referenceContains.trim().isEmpty()) {
+            referenceContains = referenceContains.trim().toLowerCase(Locale.FRENCH);
+            Path<String> referencePath = itemRoot.get(Item_.reference);
+            Expression<String> lowerReferenceExpression = criteriaBuilder.lower(referencePath);
+            Expression<Integer> locationExpression = criteriaBuilder.locate(lowerReferenceExpression, referenceContains);
+            Predicate referenceContainsPredicate = criteriaBuilder.greaterThan(locationExpression, 0);
+            predicates.add(referenceContainsPredicate);
+        }
+
         String model = itemSearch.getModel();
         if (model != null && !model.trim().isEmpty()) {
             model = model.trim();
@@ -80,20 +90,24 @@ public class StockService {
 
         String nameContains = itemSearch.getNameContains();
         if (nameContains != null && !nameContains.trim().isEmpty()) {
+            nameContains = nameContains.trim().toLowerCase(Locale.FRENCH);
             Join<Item, LocaleText> nameJoin = itemRoot.join(Item_.name);
             MapJoin<LocaleText, Locale, String> localeTextMapJoin = nameJoin.join(LocaleText_.localeTextMap);
             Path<String> textPath = localeTextMapJoin.value();
-            Expression<Integer> locationExpression = criteriaBuilder.locate(textPath, nameContains);
+            Expression<String> lowerTextExpression = criteriaBuilder.lower(textPath);
+            Expression<Integer> locationExpression = criteriaBuilder.locate(lowerTextExpression, nameContains);
             Predicate namePredicate = criteriaBuilder.greaterThan(locationExpression, 0);
             predicates.add(namePredicate);
         }
 
         String descriptionContains = itemSearch.getDescriptionContains();
         if (descriptionContains != null && !descriptionContains.trim().isEmpty()) {
+            descriptionContains = descriptionContains.trim().toLowerCase(Locale.FRENCH);
             Join<Item, LocaleText> descriptionJoin = itemRoot.join(Item_.description);
             MapJoin<LocaleText, Locale, String> localeTextMapJoin = descriptionJoin.join(LocaleText_.localeTextMap);
             Path<String> textPath = localeTextMapJoin.value();
-            Expression<Integer> locationExpression = criteriaBuilder.locate(textPath, descriptionContains);
+            Expression<String> lowerTextExpression = criteriaBuilder.lower(textPath);
+            Expression<Integer> locationExpression = criteriaBuilder.locate(lowerTextExpression, descriptionContains);
             Predicate descriptionPredicate = criteriaBuilder.greaterThan(locationExpression, 0);
             predicates.add(descriptionPredicate);
         }
@@ -296,6 +310,10 @@ public class StockService {
         adaptStock(dateTime, stock, managedItem, initialQuantity, StockChangeType.INITIAL, null);
 
         return managedItem;
+    }
+
+    public Item findItemById(Long id) {
+        return entityManager.find(Item.class, id);
     }
 
 }

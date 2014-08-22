@@ -6,26 +6,41 @@
       xmlns:cpt="http://xmlns.jcp.org/jsf/composite/cpt"
       xmlns:h="http://xmlns.jcp.org/jsf/html">
     <ui:composition template="/template.xhtml">
-
-        <h:form id="detailsForm">
-            <p:panel header="Recherche">
+        <ui:define name="body">
+            <h:form id="detailsForm">
                 <h:panelGrid columns="2">
-                    <h:outputLabel value="Référence" for="reference" />
-                    <h:inputText id="reference" value="#{itemDetailsController.item.reference}" />
+                    <p:panel header="Inventaire">
+                        <h:panelGrid columns="2">
+                            <p:outputLabel value="Référence" for="reference" />
+                            <p:inputText id="reference" value="#{itemDetailsController.item.reference}" />
 
-                    <h:outputLabel value="Modèle, couleur, taille, ..." for="model" />
-                    <h:inputText id="model" value="#{itemDetailsController.item.model}" />
+                            <p:outputLabel value="Modèle, couleur, taille, ..." for="model" />
+                            <p:inputText id="model" value="#{itemDetailsController.item.model}" />
 
-                    <h:outputLabel value="Description" for="description"/>
-                    <cpt:localeText id="description" value="#{itemDetailsController.item.description}" />
+                            <p:outputLabel value="Nom" for="name"/>
+                            <cpt:localeText id="name" value="#{itemDetailsController.item.name}" edit="true" />
 
-                    <h:outputLabel value="Nom" for="name"/>
-                    <cpt:localeText id="name" value="#{itemDetailsController.item.name}" />
+                            <p:outputLabel value="Description" for="description"/>
+                            <cpt:localeText id="description" value="#{itemDetailsController.item.description}" edit="true" />
+                        </h:panelGrid>
+                        <p:commandButton action="#{itemDetailsController.actionSave()}" value="Enregistrer" />
+                    </p:panel>
+                    <p:panel header="Prix" rendered="#{!empty itemDetailsController.item.currentPrice}" >
+                        <h:panelGrid columns="2">
+                            <p:outputLabel value="Début validité" for="startDateTime" />
+                            <p:calendar id="startDateTime" value="#{itemDetailsController.item.currentPrice.startDateTime}" converter="#{zonedDateTimeConverter}" pattern="dd/MM/yyyy HH:mm:ss" timeZone="#{loginController.userTimeZone}" navigator="true" />
+
+                            <p:outputLabel value="Prix de vente HTVA" for="vatExclusive" rendered="#{!empty itemDetailsController.item.currentPrice}" />
+                            <cpt:amount id="vatExclusive" value="#{itemDetailsController.item.currentPrice.vatExclusive}" edit="true" />
+
+                            <p:outputLabel value="Taux TVA" for="vatRate" rendered="#{!empty itemDetailsController.item.currentPrice}" />
+                            <cpt:vatRate id="vatRate" value="#{itemDetailsController.item.currentPrice.vatRate}" edit="true" />
+
+                        </h:panelGrid>
+                    </p:panel>
                 </h:panelGrid>
-                <p:commandButton action="#{itemDetailsController.actionSave()}" value="Enregistrer" />
-            </p:panel>
-        </h:form>
-
+            </h:form>
+        </ui:define>
     </ui:composition>
 </html>
 

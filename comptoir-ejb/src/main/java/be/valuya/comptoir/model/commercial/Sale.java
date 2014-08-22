@@ -36,7 +36,7 @@ public class Sale implements Serializable {
     private Company company;
     @ManyToOne
     private Customer customer;
-    @Column(name = "date_time")
+    @Column(name = "date_time", columnDefinition = "DATETIME")
     private ZonedDateTime dateTime;
     @OneToOne(mappedBy = "sale", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Invoice invoice;

@@ -4,6 +4,7 @@ import be.valuya.comptoir.model.thirdparty.Employee;
 import be.valuya.comptoir.service.EmployeeService;
 import java.io.Serializable;
 import java.util.Locale;
+import java.util.TimeZone;
 import javax.annotation.Nonnull;
 import javax.ejb.EJB;
 import javax.enterprise.context.SessionScoped;
@@ -26,7 +27,8 @@ public class LoginController implements Serializable {
     private Employee loggedEmployee;
     private boolean eidLogin;
     private Locale userLocale = Locale.ENGLISH;
-    private Locale editLocale;
+    private Locale editLocale = Locale.ENGLISH;
+    private TimeZone userTimeZone = TimeZone.getTimeZone("Europe/Brussels"); // TODO: user-dependant
 
     /**
      * Should be called by main page (preRenderView), which can't be loaded without login.
@@ -69,6 +71,22 @@ public class LoginController implements Serializable {
 
     public void setEditLocale(Locale editLocale) {
         this.editLocale = editLocale;
+    }
+
+    public EmployeeService getEmployeeService() {
+        return employeeService;
+    }
+
+    public void setEmployeeService(EmployeeService employeeService) {
+        this.employeeService = employeeService;
+    }
+
+    public TimeZone getUserTimeZone() {
+        return userTimeZone;
+    }
+
+    public void setUserTimeZone(TimeZone userTimeZone) {
+        this.userTimeZone = userTimeZone;
     }
 
 }

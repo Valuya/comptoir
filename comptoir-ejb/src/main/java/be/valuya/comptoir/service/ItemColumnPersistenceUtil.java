@@ -4,6 +4,7 @@ import be.valuya.comptoir.model.commercial.Item;
 import be.valuya.comptoir.model.commercial.Item_;
 import be.valuya.comptoir.util.pagination.ItemColumn;
 import be.valuya.comptoir.util.pagination.Sorting;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -18,6 +19,9 @@ import javax.persistence.criteria.Root;
 public class ItemColumnPersistenceUtil {
 
     public static List<Order> createOrdersFromSortings(CriteriaBuilder criteriaBuilder, Root<Item> itemRoot, List<Sorting<ItemColumn>> sortings) {
+        if (sortings == null) {
+            return new ArrayList<>();
+        }
         List<Order> orders = sortings.stream().map(
                 sorting
                 -> createOrderFromSorting(criteriaBuilder, itemRoot, sorting))

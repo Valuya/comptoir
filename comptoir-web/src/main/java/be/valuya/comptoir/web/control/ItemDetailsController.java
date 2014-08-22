@@ -32,6 +32,8 @@ public class ItemDetailsController implements Serializable {
     private LoginController loginController;
     @Inject
     private ItemListController itemListController;
+    @Inject
+    private ItemFactory itemFactory;
     //
     private Item item;
     private List<ItemStock> itemStocks;
@@ -43,17 +45,17 @@ public class ItemDetailsController implements Serializable {
         Employee loggedEmployee = loginController.getLoggedEmployee();
         Company company = loggedEmployee.getCompany();
 
-        item = ItemFactory.createItem(company);
+        item = itemFactory.createItem(company);
 
         newQuantity = BigDecimal.ONE;
-        
+
         return Views.ITEM_DETAILS;
     }
 
     public String actionDetails(Item item) {
         this.item = item;
         searchItemStocks();
-        
+
         return Views.ITEM_DETAILS;
     }
 

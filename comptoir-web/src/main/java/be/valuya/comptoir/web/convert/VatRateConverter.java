@@ -7,6 +7,7 @@ import javax.annotation.ManagedBean;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
+import javax.faces.convert.ConverterException;
 import javax.faces.convert.FacesConverter;
 
 /**
@@ -41,7 +42,7 @@ public class VatRateConverter implements Converter {
             }
             return value.divide(PERCENTS_IN_UNIT);
         } catch (ParseException parseException) {
-            throw new NumberFormatException("Erreur de conversion : " + valueStr);
+            throw new ConverterException("Erreur de conversion : " + valueStr, parseException);
         }
     }
 

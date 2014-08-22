@@ -25,7 +25,7 @@ public class ItemSale implements Serializable {
     @Id
     @GeneratedValue
     private Long id;
-    @Column(name = "date_time")
+    @Column(name = "date_time", columnDefinition = "DATETIME")
     private ZonedDateTime dateTime;
     @ManyToOne
     private Item item;

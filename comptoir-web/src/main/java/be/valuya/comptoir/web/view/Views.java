@@ -12,4 +12,7 @@ public class Views {
     public static final String ITEM_DETAILS = "/stock/details" + REDIRECT;
 
     public static final String SALE_DETAILS = "/sale/details" + REDIRECT;
+
+    public static final String REGISTRATION_START = "/register/start" + REDIRECT;
+    public static final String REGISTRATION_DONE = "/register/done" + REDIRECT;
 }

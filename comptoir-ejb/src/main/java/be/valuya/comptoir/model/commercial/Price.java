@@ -23,16 +23,16 @@ public class Price implements Serializable {
     @Id
     @GeneratedValue
     private Long id;
-    @Column(name = "start_date_time")
+    @Column(name = "start_date_time", columnDefinition = "DATETIME")
     private ZonedDateTime startDateTime;
-    @Column(name = "end_date_time")
+    @Column(name = "end_date_time", columnDefinition = "DATETIME")
     private ZonedDateTime endDateTime;
     @NotNull
     @Nonnull
     private BigDecimal vatExclusive;
     @NotNull
     @Nonnull
-    private BigDecimal vatRate = BigDecimal.valueOf(21L, 2);
+    private BigDecimal vatRate;
 
     public Long getId() {
         return id;

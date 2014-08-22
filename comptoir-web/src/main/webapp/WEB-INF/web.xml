@@ -51,7 +51,7 @@
         </web-resource-collection>
         <auth-constraint>
             <description/>
-            <role-name>actif</role-name>
+            <role-name>user</role-name>
         </auth-constraint>
     </security-constraint>
     <security-constraint>
@@ -63,6 +63,7 @@
             <url-pattern>*.gif</url-pattern>
             <url-pattern>*.js</url-pattern>
             <url-pattern>/login/*</url-pattern>
+            <url-pattern>/register/*</url-pattern>
             <url-pattern>/error/*</url-pattern>
             <url-pattern>/javax.faces.resource/*</url-pattern>
         </web-resource-collection>

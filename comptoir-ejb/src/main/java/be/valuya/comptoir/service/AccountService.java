@@ -3,6 +3,7 @@ package be.valuya.comptoir.service;
 import be.valuya.comptoir.model.accounting.Account;
 import be.valuya.comptoir.model.accounting.Account_;
 import be.valuya.comptoir.model.company.Company;
+import be.valuya.comptoir.model.thirdparty.Employee;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nonnull;
@@ -46,6 +47,11 @@ public class AccountService {
         List<Account> accounts = typedQuery.getResultList();
 
         return accounts;
+    }
+
+    public void register(Company company, Employee employee) {
+        Company managedCompany = entityManager.merge(company);
+        Employee managedEmployee = entityManager.merge(employee);
     }
 
 }

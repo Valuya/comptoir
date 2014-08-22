@@ -1,0 +1,53 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:cpt="http://xmlns.jcp.org/jsf/composite/cpt"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:composition template="/template.xhtml">
+        <ui:define name="body">
+            <h:form id="detailsForm">
+                <h:panelGrid columns="2">
+                    <p:panel header="Recherche">
+                        <h:panelGrid>
+                            <cpt:itemSearch id="itemSearch" value="#{saleController.itemSearch}">
+                                <p:ajax event="change" listener="#{saleController.handleSearchChanged}" process=":detailsForm:itemSearch" update=":detailsForm:searchResultTable :detailsForm:itemSalePanel" />
+                                <p:ajax event="itemSelect" listener="#{saleController.handleSearchChanged}" process=":detailsForm:itemSearch" update=":detailsForm:searchResultTable :detailsForm:itemSalePanel" />
+                            </cpt:itemSearch>
+                        </h:panelGrid>
+                        <p:dataTable id="searchResultTable" value="#{saleController.foundItems}" var="item" selection="#{saleController.itemSale.item}" selectionMode="single" rowKey="#{item.id}">
+                            <p:column>
+                                <cpt:item value="#{item}" />
+                            </p:column>
+                            <p:ajax event="rowSelect" listener="#{saleController.handleRowSelection}" update=":detailsForm:itemSalePanel" />
+                            <p:ajax event="rowUnselect" listener="#{saleController.handleRowSelection}" update=":detailsForm:itemSalePanel" />
+                        </p:dataTable>
+                    </p:panel>
+                    <p:panel id="itemSalePanel" header="Produit">
+                        <cpt:amount value="#{saleController.itemSale.price.vatExclusive}" placeholder="Prix hors TVA" edit="true" />
+                        <cpt:vatRate value="#{saleController.itemSale.price.vatRate}" placeholder="TVA" edit="true" />
+                        <cpt:vatInclusive vatExclusive="#{saleController.itemSale.price.vatExclusive}" vatRate="#{saleController.itemSale.price.vatRate}" />
+                        <p:spinner value="#{saleController.itemSale.quantity}" placeholder="Quantité" size="5" />
+                        <p:commandButton value="Ajouter" action="#{saleController.actionAddCurrentItemSale()}" />
+                    </p:panel>
+                </h:panelGrid>
+            </h:form>
+            <h:form id="listForm">
+                <p:panel header="Panier">
+                    <p:dataTable value="#{saleController.itemSales}" var="itemSale">
+                        <p:column headerText="Objet">
+                            <cpt:item value="#{itemSale.item}" />
+                        </p:column>
+                    </p:dataTable>
+                </p:panel>
+            </h:form>
+            <h:form id="payForm">
+                <p:panel header="Payement">
+                </p:panel>
+            </h:form>
+        </ui:define>
+    </ui:composition>
+</html>
+

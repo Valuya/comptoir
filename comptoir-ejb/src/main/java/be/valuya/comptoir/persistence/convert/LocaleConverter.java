@@ -9,16 +9,23 @@ import javax.persistence.Converter;
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @Converter(autoApply = true)
-public class LocaleConverter implements AttributeConverter<String, Locale> {
+public class LocaleConverter implements AttributeConverter<Locale, String> {
 
     @Override
-    public Locale convertToDatabaseColumn(String languageTag) {
-        return Locale.forLanguageTag(languageTag);
+    public String convertToDatabaseColumn(Locale locale) {
+        if (locale == null) {
+            return null;
+        }
+        return locale.toLanguageTag();
     }
 
     @Override
-    public String convertToEntityAttribute(Locale locale) {
-        return locale.toLanguageTag();
+    public Locale convertToEntityAttribute(String languageTag) {
+        if (languageTag == null) {
+            return null;
+        }
+        return Locale.forLanguageTag(languageTag);
+
     }
 
 }

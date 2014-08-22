@@ -44,7 +44,7 @@ public class AccountingEntry implements Serializable {
     private BigDecimal vatRate;
     @NotNull
     @Nonnull
-    @Column(name = "date_time")
+    @Column(name = "date_time", columnDefinition = "DATETIME")
     private ZonedDateTime dateTime;
     @ManyToOne(cascade = CascadeType.ALL)
     private LocaleText description;

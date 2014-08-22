@@ -28,9 +28,9 @@ public class ItemStock implements Serializable {
     @Id
     @GeneratedValue
     private Long id;
-    @Column(name = "start_date_time")
+    @Column(name = "start_date_time", columnDefinition = "DATETIME")
     private ZonedDateTime startDateTime;
-    @Column(name = "end_date_time")
+    @Column(name = "end_date_time", columnDefinition = "DATETIME")
     private ZonedDateTime endDateTime;
     @ManyToOne
     private Stock stock;

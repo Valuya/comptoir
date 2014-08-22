@@ -95,7 +95,7 @@ public class SaleService {
             Price price = itemSale.getPrice();
             BigDecimal vatExclusive = price.getVatExclusive();
             BigDecimal vatRate = price.getVatRate();
-            BigDecimal vatAmount = vatExclusive.multiply(vatRate);
+            BigDecimal vatAmount = VatUtils.calcVatAmount(price);
             vatExclusiveTotal = vatExclusiveTotal.add(vatExclusive);
             vatTotal = vatTotal.add(vatAmount);
             BigDecimal productCredit = vatExclusive.negate();

@@ -16,6 +16,7 @@ public class ItemSearch {
     private String nameContains;
     private String descriptionContains;
     private String reference;
+    private String referenceContains;
     // size, color, ...
     private String model; 
 
@@ -49,6 +50,14 @@ public class ItemSearch {
 
     public void setReference(String reference) {
         this.reference = reference;
+    }
+
+    public String getReferenceContains() {
+        return referenceContains;
+    }
+
+    public void setReferenceContains(String referenceContains) {
+        this.referenceContains = referenceContains;
     }
 
     public String getModel() {

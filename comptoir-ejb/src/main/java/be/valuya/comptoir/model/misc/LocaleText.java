@@ -27,9 +27,9 @@ public class LocaleText implements Serializable {
     @GeneratedValue
     private Long id;
     @ElementCollection(fetch = FetchType.EAGER)
-    @MapKeyColumn(name = "locale", columnDefinition = "VARCHAR(16)", insertable = false, updatable = false)
+    @MapKeyColumn(name = "locale", columnDefinition = "VARCHAR(16)", nullable = false)
     @Column(name = "localized_text", columnDefinition = "TEXT")
-    @CollectionTable(name = "locale_text_value", joinColumns = @JoinColumn(name = "locale_text_id"))
+    @CollectionTable(name = "locale_text_value", joinColumns = @JoinColumn(name = "locale_text_id", nullable = false))
     private Map<Locale, String> localeTextMap;
 
     public Long getId() {

@@ -17,6 +17,9 @@ public class PaginationUtil {
 
     public static <T, C extends Column<T>> List<Sorting<C>> createSortings(List<SortMeta> multiSortMeta, Function<String, C> conversionFunction) {
         List<Sorting<C>> sortings = new ArrayList<>();
+        if (multiSortMeta == null) {
+            return new ArrayList<>();
+        }
         multiSortMeta.stream().
                 filter(s -> s.getSortOrder() != SortOrder.UNSORTED).
                 map(

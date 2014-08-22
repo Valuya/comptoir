@@ -8,7 +8,10 @@
             <h:outputText value="Comptoir - Identification"></h:outputText>
         </ui:define>
         <ui:define name="loginMessage">
-            Bienvenue dans Comptoir. Veuillez vous identifier.
+            <h:form>
+                <p>Bienvenue dans Comptoir. Veuillez vous identifier.</p>
+                <p>You could alternatively <h:commandLink value="create a new account" action="#{registrationController.actionShow()}" />.</p>
+            </h:form>
         </ui:define>
     </ui:composition>
 </html>

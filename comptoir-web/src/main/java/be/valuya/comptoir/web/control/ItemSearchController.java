@@ -9,7 +9,6 @@ import be.valuya.comptoir.util.pagination.ItemColumn;
 import be.valuya.comptoir.util.pagination.Pagination;
 import java.io.Serializable;
 import java.util.List;
-import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
@@ -28,27 +27,30 @@ public class ItemSearchController implements Serializable {
     @Inject
     private transient LoginController loginController;
     //
-    private ItemSearch itemSearch;
+    private Item selectedItem;
 
-    @PostConstruct
-    public void init() {
+    public List<String> completeReference(String reference) {
         Employee loggedEmployee = loginController.getLoggedEmployee();
         Company company = loggedEmployee.getCompany();
-        
-        itemSearch = new ItemSearch();
-        itemSearch.setCompany(company);
-    }
 
-    public List<Item> completeName(String reference) {
+        ItemSearch itemSearch = new ItemSearch();
+        itemSearch.setCompany(company);
+        itemSearch.setReferenceContains(reference);
+
         Pagination<Item, ItemColumn> pagination = new Pagination<>();
         pagination.setMaxResults(10);
-
         List<Item> items = stockService.findItems(itemSearch, pagination);
-        return items;
+
+        List<String> references = ItemUtil.getItemListReferences(items);
+        return references;
     }
 
-    public ItemSearch getItemSearch() {
-        return itemSearch;
+    public Item getSelectedItem() {
+        return selectedItem;
+    }
+
+    public void setSelectedItem(Item selectedItem) {
+        this.selectedItem = selectedItem;
     }
 
 }

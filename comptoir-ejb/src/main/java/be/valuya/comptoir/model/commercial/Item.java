@@ -5,6 +5,7 @@ import be.valuya.comptoir.model.misc.LocaleText;
 import java.io.Serializable;
 import java.util.Objects;
 import javax.annotation.Nonnull;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -28,17 +29,23 @@ public class Item implements Serializable {
     @Nonnull
     @ManyToOne(optional = false)
     private Company company;
+    @NotNull
+    @Nonnull
     @Column(length = 128)
     @Size(max = 128)
     private String reference;
     @Column(length = 128)
     @Size(max = 128)
     private String model;
-    @ManyToOne
+    @NotNull
+    @Nonnull
+    @ManyToOne(cascade = CascadeType.ALL, optional = false)
     private LocaleText name;
-    @ManyToOne
+    @NotNull
+    @Nonnull
+    @ManyToOne(cascade = CascadeType.ALL, optional = false)
     private LocaleText description;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "current_price_id")
     private Price currentPrice;
 
