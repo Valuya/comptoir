@@ -25,9 +25,9 @@ public class RegistrationController implements Serializable {
     private transient AccountService accountService;
     @Inject
     private transient LoginController loginController;
-    @Inject
+    @EJB
     private transient CompanyFactory companyFactory;
-    @Inject
+    @EJB
     private transient EmployeeFactory employeeFactory;
 
     private Company company;

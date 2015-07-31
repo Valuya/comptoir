@@ -4,7 +4,8 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:p="http://primefaces.org/ui"
       xmlns:cpt="http://xmlns.jcp.org/jsf/composite/cpt"
-      xmlns:h="http://xmlns.jcp.org/jsf/html">
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
     <ui:composition template="/template.xhtml">
         <ui:define name="body">
             <h:form id="detailsForm">
@@ -23,7 +24,6 @@
                             <p:outputLabel value="Description" for="description"/>
                             <cpt:localeText id="description" value="#{itemDetailsController.item.description}" edit="true" />
                         </h:panelGrid>
-                        <p:commandButton action="#{itemDetailsController.actionSave()}" value="Enregistrer" />
                     </p:panel>
                     <p:panel header="Prix" rendered="#{!empty itemDetailsController.item.currentPrice}" >
                         <h:panelGrid columns="2">
@@ -38,7 +38,57 @@
 
                         </h:panelGrid>
                     </p:panel>
+                    <p:panel header="Stock" toggleable="true" collapsed="true">
+                        <h:panelGroup rendered="#{!empty itemDetailsController.itemStocks}">
+                            
+                            <p:dataTable value="#{itemDetailsController.itemStocks}" var="itemStock">
+                                <p:column headerText="Début validité">
+                                    <h:outputText value="#{itemStock.startDateTime}" converter="#{zonedDateTimeConverter}" />
+                                </p:column>
+                                <p:column headerText="Fin validité">
+                                    <h:outputText value="#{itemStock.endDateTime}" converter="#{zonedDateTimeConverter}" />
+                                </p:column>
+                                <p:column headerText="Qté">
+                                    <h:outputText value="#{itemStock.quantity}">
+                                        <f:convertNumber />
+                                    </h:outputText>
+                                </p:column>
+                                <p:column headerText="Note">
+                                    <h:outputText value="#{itemStock.comment}" />
+                                </p:column>
+                                <p:column headerText="Stock">
+                                    <h:outputText value="#{itemStock.stock.description}" rendered="#{!empty itemStock.stock}"/>
+                                </p:column>
+                            </p:dataTable>
+                        </h:panelGroup>
+                    </p:panel>
+
+                    <p:panel header="Prix" toggleable="true" collapsed="true">
+                        <h:panelGroup rendered="#{!empty itemDetailsController.itemStocks}">
+                            
+                            <p:dataTable value="#{itemDetailsController.itemStocks}" var="itemStock">
+                                <p:column headerText="Début validité">
+                                    <h:outputText value="#{itemStock.startDateTime}" converter="#{zonedDateTimeConverter}" />
+                                </p:column>
+                                <p:column headerText="Fin validité">
+                                    <h:outputText value="#{itemStock.endDateTime}" converter="#{zonedDateTimeConverter}" />
+                                </p:column>
+                                <p:column headerText="Qté">
+                                    <h:outputText value="#{itemStock.quantity}">
+                                        <f:convertNumber />
+                                    </h:outputText>
+                                </p:column>
+                                <p:column headerText="Note">
+                                    <h:outputText value="#{itemStock.comment}" />
+                                </p:column>
+                                <p:column headerText="Stock">
+                                    <h:outputText value="#{itemStock.stock.description}" rendered="#{!empty itemStock.stock}"/>
+                                </p:column>
+                            </p:dataTable>
+                        </h:panelGroup>
+                    </p:panel>
                 </h:panelGrid>
+                <p:commandButton action="#{itemDetailsController.actionSave()}" value="Enregistrer" ajax="false" />
             </h:form>
         </ui:define>
     </ui:composition>

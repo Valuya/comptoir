@@ -1,6 +1,7 @@
 package be.valuya.comptoir.web.control;
 
 import be.valuya.comptoir.model.accounting.Account;
+import be.valuya.comptoir.model.accounting.AccountType;
 import be.valuya.comptoir.model.commercial.Item;
 import be.valuya.comptoir.model.commercial.ItemSale;
 import be.valuya.comptoir.model.commercial.Payment;
@@ -10,6 +11,7 @@ import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.factory.PriceFactory;
 import be.valuya.comptoir.model.search.ItemSearch;
 import be.valuya.comptoir.model.thirdparty.Employee;
+import be.valuya.comptoir.service.AccountService;
 import be.valuya.comptoir.service.SaleService;
 import be.valuya.comptoir.service.StockService;
 import be.valuya.comptoir.util.pagination.ItemColumn;
@@ -20,6 +22,7 @@ import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
@@ -37,6 +40,8 @@ public class SaleController implements Serializable {
     private transient SaleService saleService;
     @EJB
     private transient StockService stockService;
+    @EJB
+    private transient AccountService accountService;
     @Inject
     private transient LoginController loginController;
     @Inject
@@ -45,13 +50,18 @@ public class SaleController implements Serializable {
     private Sale sale;
     private List<ItemSale> itemSales;
     private ItemSale itemSale;
-    private BigDecimal payedAmount;
     private BigDecimal giveBackAmount;
+    private List<Account> paymentAccounts;
+    private Payment currentPayment;
     private List<Payment> payments;
-    private Account paymentAccount;
     private boolean closeSale;
     private ItemSearch itemSearch;
     private List<Item> foundItems;
+
+    @PostConstruct
+    public void init() {
+        loadPaymentAccounts();
+    }
 
     public String actionNew() {
         Employee loggedEmployee = loginController.getLoggedEmployee();
@@ -65,7 +75,7 @@ public class SaleController implements Serializable {
         itemSearch.setCompany(company);
 
         resetItemSale();
-        resetPayements();
+        resetPayments();
 
         return Views.SALE_DETAILS;
     }
@@ -90,6 +100,7 @@ public class SaleController implements Serializable {
         itemSales.add(itemSale);
 
         sale = saleService.calcSale(sale, itemSales);
+        foundItems = null;
 
         resetItemSale();
     }
@@ -98,8 +109,10 @@ public class SaleController implements Serializable {
         sale = saleService.pay(sale, itemSales, payments, closeSale);
     }
 
-    public void handlePayedChange() {
-        giveBackAmount = saleService.calcPayBackAmount(sale, itemSales, payedAmount);
+    public void actionAddCurrentPayment() {
+        payments.add(currentPayment);
+        currentPayment = new Payment();
+        giveBackAmount = saleService.calcPayBackAmount(sale, itemSales, payments);
     }
 
     public void handleSearchChanged() {
@@ -129,6 +142,12 @@ public class SaleController implements Serializable {
         }
     }
 
+    private void loadPaymentAccounts() {
+        Employee loggedEmployee = loginController.getLoggedEmployee();
+        Company company = loggedEmployee.getCompany();
+        paymentAccounts = accountService.findAccounts(company, AccountType.PAYMENT);
+    }
+
     private void resetItemSale() {
         Employee loggedEmployee = loginController.getLoggedEmployee();
         Company company = loggedEmployee.getCompany();
@@ -141,7 +160,8 @@ public class SaleController implements Serializable {
         itemSale.setQuantity(quantity);
     }
 
-    private void resetPayements() {
+    private void resetPayments() {
+        currentPayment = new Payment();
         payments = new ArrayList<>();
     }
 
@@ -157,20 +177,8 @@ public class SaleController implements Serializable {
         return itemSale;
     }
 
-    public BigDecimal getPayedAmount() {
-        return payedAmount;
-    }
-
     public BigDecimal getGiveBackAmount() {
         return giveBackAmount;
-    }
-
-    public Account getPaymentAccount() {
-        return paymentAccount;
-    }
-
-    public void setPaymentAccount(Account paymentAccount) {
-        this.paymentAccount = paymentAccount;
     }
 
     public List<Payment> getPayments() {
@@ -195,6 +203,14 @@ public class SaleController implements Serializable {
 
     public List<Item> getFoundItems() {
         return foundItems;
+    }
+
+    public List<Account> getPaymentAccounts() {
+        return paymentAccounts;
+    }
+
+    public Payment getCurrentPayment() {
+        return currentPayment;
     }
 
 }

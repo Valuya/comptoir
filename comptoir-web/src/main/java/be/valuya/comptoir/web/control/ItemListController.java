@@ -42,7 +42,7 @@ public class ItemListController implements Serializable {
 
         itemSearch = new ItemSearch();
         itemSearch.setCompany(company);
-        
+
         itemLazyDataModel.setRowCount(10);
 
         return Views.ITEM_LIST;
@@ -71,9 +71,9 @@ public class ItemListController implements Serializable {
             pagination.setSortings(sortings);
 
             List<Item> items = stockService.findItems(itemSearch, pagination);
-            
+
             setRowCount(items.size());
-            
+
             return items;
         }
     }

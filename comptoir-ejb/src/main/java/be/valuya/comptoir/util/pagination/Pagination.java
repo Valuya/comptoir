@@ -38,5 +38,4 @@ public class Pagination<T, S extends Column<T>> {
         this.sortings = sortings;
     }
 
-
 }

@@ -22,7 +22,8 @@ import javax.validation.constraints.Size;
 @Entity
 public class Account implements Serializable {
 
-    @Id     @GeneratedValue 
+    @Id
+    @GeneratedValue
     private Long id;
     @NotNull
     @Nonnull

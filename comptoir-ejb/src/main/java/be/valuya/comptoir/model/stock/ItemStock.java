@@ -1,21 +1,20 @@
 package be.valuya.comptoir.model.stock;
 
 import be.valuya.comptoir.model.commercial.Item;
-import be.valuya.comptoir.model.commercial.Sale;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.Objects;
+import javax.annotation.Nonnull;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.validation.constraints.NotNull;
 
 /**
  *
@@ -28,25 +27,21 @@ public class ItemStock implements Serializable {
     @Id
     @GeneratedValue
     private Long id;
-    @Column(name = "start_date_time", columnDefinition = "DATETIME")
+    @Column(name = "start_date_time")
+    @Temporal(TemporalType.TIMESTAMP)
     private ZonedDateTime startDateTime;
-    @Column(name = "end_date_time", columnDefinition = "DATETIME")
+    @Column(name = "end_date_time")
+    @Temporal(TemporalType.TIMESTAMP)
     private ZonedDateTime endDateTime;
-    @ManyToOne
+    @ManyToOne(optional = false)
+    @NotNull
+    @Nonnull
     private Stock stock;
     @ManyToOne
     private Item item;
-    @ManyToOne
-    @JoinColumn(name = "previous_item_stock_id")
-    private ItemStock previousItemStock;
     private BigDecimal quantity;
-    @OneToOne
-    @JoinColumn(name = "stock_change_sale_id")
-    private Sale stockChangeSale;
     @Column(columnDefinition = "TEXT")
     private String comment;
-    @Enumerated(EnumType.STRING)
-    private StockChangeType stockChangeType;
 
     public Long getId() {
         return id;
@@ -72,11 +67,12 @@ public class ItemStock implements Serializable {
         this.endDateTime = endDateTime;
     }
 
+    @Nonnull
     public Stock getStock() {
         return stock;
     }
 
-    public void setStock(Stock stock) {
+    public void setStock(@Nonnull Stock stock) {
         this.stock = stock;
     }
 
@@ -88,14 +84,6 @@ public class ItemStock implements Serializable {
         this.item = item;
     }
 
-    public ItemStock getPreviousItemStock() {
-        return previousItemStock;
-    }
-
-    public void setPreviousItemStock(ItemStock previousItemStock) {
-        this.previousItemStock = previousItemStock;
-    }
-
     public BigDecimal getQuantity() {
         return quantity;
     }
@@ -104,28 +92,12 @@ public class ItemStock implements Serializable {
         this.quantity = quantity;
     }
 
-    public Sale getStockChangeSale() {
-        return stockChangeSale;
-    }
-
-    public void setStockChangeSale(Sale stockChangeSale) {
-        this.stockChangeSale = stockChangeSale;
-    }
-
     public String getComment() {
         return comment;
     }
 
     public void setComment(String comment) {
         this.comment = comment;
-    }
-
-    public StockChangeType getStockChangeType() {
-        return stockChangeType;
-    }
-
-    public void setStockChangeType(StockChangeType stockChangeType) {
-        this.stockChangeType = stockChangeType;
     }
 
     @Override

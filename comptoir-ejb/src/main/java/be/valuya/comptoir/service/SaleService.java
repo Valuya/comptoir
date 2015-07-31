@@ -123,6 +123,9 @@ public class SaleService {
         vatAccountingEntry.setAmount(vatCredit);
         vatAccountingEntry.setAccount(vatAccount);
 
+        sale.setVatExclusiveAmout(vatExclusiveTotal);
+        sale.setVatAmount(vatTotal);
+
         return sale;
     }
 
@@ -172,12 +175,18 @@ public class SaleService {
     }
 
     @Nonnull
-    public BigDecimal calcPayBackAmount(@Nonnull Sale sale, @Nonnull List<ItemSale> itemSales, @Nonnull BigDecimal payedAmount) {
+    public BigDecimal calcPayBackAmount(@Nonnull Sale sale, @Nonnull List<ItemSale> itemSales, @Nonnull List<Payment> payments) {
+        BigDecimal totalPayedAmount = BigDecimal.ZERO;
+        for (Payment payment : payments) {
+            BigDecimal payedAmount = payment.getAmount();
+            totalPayedAmount = totalPayedAmount.add(payedAmount);
+        }
+
         Sale adjustedSale = calcSale(sale, itemSales);
         BigDecimal vatExclusiveAmount = adjustedSale.getVatExclusiveAmout();
         BigDecimal vatAmount = adjustedSale.getVatAmount();
         BigDecimal totalAmount = vatExclusiveAmount.add(vatAmount);
-        BigDecimal payBackAmount = totalAmount.subtract(payedAmount);
+        BigDecimal payBackAmount = totalAmount.subtract(totalPayedAmount);
         return payBackAmount;
     }
 

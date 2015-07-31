@@ -13,8 +13,10 @@
                     <p:panel header="Recherche">
                         <h:panelGrid>
                             <cpt:itemSearch id="itemSearch" value="#{saleController.itemSearch}">
-                                <p:ajax event="change" listener="#{saleController.handleSearchChanged}" process=":detailsForm:itemSearch" update=":detailsForm:searchResultTable :detailsForm:itemSalePanel" />
-                                <p:ajax event="itemSelect" listener="#{saleController.handleSearchChanged}" process=":detailsForm:itemSearch" update=":detailsForm:searchResultTable :detailsForm:itemSalePanel" />
+                                <p:ajax event="keyup" listener="#{saleController.handleSearchChanged}" update=":detailsForm:searchResultTable :detailsForm:itemSalePanel" />
+                                <p:ajax event="change" listener="#{saleController.handleSearchChanged}" update=":detailsForm:searchResultTable :detailsForm:itemSalePanel" />
+                                <p:ajax event="itemSelect" listener="#{saleController.handleSearchChanged}" update=":detailsForm:searchResultTable :detailsForm:itemSalePanel" />
+                                <p:ajax event="query" listener="#{saleController.handleSearchChanged}" update=":detailsForm:searchResultTable :detailsForm:itemSalePanel" />
                             </cpt:itemSearch>
                         </h:panelGrid>
                         <p:dataTable id="searchResultTable" value="#{saleController.foundItems}" var="item" selection="#{saleController.itemSale.item}" selectionMode="single" rowKey="#{item.id}">
@@ -30,22 +32,70 @@
                         <cpt:vatRate value="#{saleController.itemSale.price.vatRate}" placeholder="TVA" edit="true" />
                         <cpt:vatInclusive vatExclusive="#{saleController.itemSale.price.vatExclusive}" vatRate="#{saleController.itemSale.price.vatRate}" />
                         <p:spinner value="#{saleController.itemSale.quantity}" placeholder="Quantité" size="5" />
-                        <p:commandButton value="Ajouter" action="#{saleController.actionAddCurrentItemSale()}" />
+                        <p:inputText value="#{saleController.itemSale.comment}" placeholder="Commentaire" />
+                        <p:commandButton value="Ajouter" action="#{saleController.actionAddCurrentItemSale()}" update=":detailsForm :listForm" />
                     </p:panel>
                 </h:panelGrid>
             </h:form>
             <h:form id="listForm">
                 <p:panel header="Panier">
                     <p:dataTable value="#{saleController.itemSales}" var="itemSale">
-                        <p:column headerText="Objet">
+                        <p:column headerText="Produit">
                             <cpt:item value="#{itemSale.item}" />
+                        </p:column>
+                        <p:column headerText="Quantité">
+                            <cpt:item value="#{itemSale.quantity}" />
+                        </p:column>
+                        <p:column headerText="Prix HTVA">
+                            <cpt:amount value="#{itemSale.price.vatExclusive}" />
+                        </p:column>
+                        <p:column headerText="% TVA">
+                            <cpt:vatRate value="#{itemSale.price.vatRate}" />
+                        </p:column>
+                        <p:column headerText="Prix TTC">
+                            <cpt:vatInclusive vatExclusive="#{itemSale.price.vatExclusive}" vatRate="#{itemSale.price.vatRate}" />
+                        </p:column>
+                        <p:column headerText="Commentaire">
+                            <h:outputText value="#{itemSale.comment}" />
                         </p:column>
                     </p:dataTable>
                 </p:panel>
             </h:form>
             <h:form id="payForm">
-                <p:panel header="Payement">
-                </p:panel>
+                <h:panelGrid columns="2">
+                    <p:panel header="Total" rendered="#{!empty saleController.sale.vatExclusiveAmout}">
+                        <h:panelGrid columns="2">
+                            <p:outputLabel value="HTVA" />
+                            <cpt:amount value="#{saleController.sale.vatExclusiveAmout}" />
+
+                            <p:outputLabel value="TVA" />
+                            <cpt:vatRate value="#{itemSale.sale.vatAmount}" />
+
+                            <p:outputLabel value="TTC" />
+                            <cpt:amount value="#{saleController.sale.vatExclusiveAmout.add(saleController.sale.vatAmount)}" />
+                        </h:panelGrid>
+                    </p:panel>
+                    <p:panel header="Payement">
+                        <cpt:amount value="#{saleController.currentPayment.amount}" edit="true" />
+                        <p:selectOneMenu value="#{saleController.currentPayment.account}" converter="#{accountConverter}">
+                            <f:selectItems value="#{saleController.paymentAccounts}" var="account" itemLabel="#{account.accountingNumber} #{account.name}" itemValue="#{account}" />
+                        </p:selectOneMenu>
+                        <p:commandButton value="Ajouter" action="#{saleController.actionAddCurrentPayment()}" process=":payForm" update=":payForm" />
+
+                        <p:dataTable value="#{saleController.payments}" var="payment">
+                            <p:column headerText="Montant">
+                                <cpt:amount value="#{payment.amount}" />
+                            </p:column>
+                            <p:column headerText="Compte">
+                                <h:outputText value="#{payment.account.accountingNumber}" />&nbsp;
+                                <h:outputText value="#{payment.account.name}" />
+                            </p:column>
+                        </p:dataTable>
+
+                        <p:outputLabel value="À rendre" />
+                        <cpt:amount id="giveBackAmount" value="#{saleController.giveBackAmount}" />
+                    </p:panel>
+                </h:panelGrid>
             </h:form>
         </ui:define>
     </ui:composition>

@@ -2,10 +2,12 @@ package be.valuya.comptoir.web.convert;
 
 import be.valuya.comptoir.web.control.LoginController;
 import java.time.DateTimeException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAccessor;
 import java.util.Locale;
+import java.util.TimeZone;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
 import javax.faces.component.UIComponent;
@@ -40,8 +42,10 @@ public class ZonedDateTimeConverter implements Converter {
             if (valueStr == null) {
                 return null;
             }
-            TemporalAccessor temporalAccessor = dateTimeFormatter.parse(valueStr);
-            return ZonedDateTime.from(temporalAccessor);
+            LocalDateTime localDateTime = LocalDateTime.parse(valueStr, dateTimeFormatter);
+            TimeZone userTimeZone = loginController.getUserTimeZone();
+            ZoneId zoneId = userTimeZone.toZoneId();
+            return ZonedDateTime.of(localDateTime, zoneId);
         } catch (DateTimeException dateTimeException) {
             throw new ConverterException("Erreur de conversion : " + valueStr, dateTimeException);
         }

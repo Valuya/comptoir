@@ -1,11 +1,11 @@
 package be.valuya.comptoir.web.control;
 
 import be.valuya.comptoir.model.commercial.Item;
+import be.valuya.comptoir.model.commercial.Price;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.factory.ItemFactory;
 import be.valuya.comptoir.model.stock.ItemStock;
 import be.valuya.comptoir.model.stock.Stock;
-import be.valuya.comptoir.model.stock.StockChangeType;
 import be.valuya.comptoir.model.thirdparty.Employee;
 import be.valuya.comptoir.service.StockService;
 import be.valuya.comptoir.web.view.Views;
@@ -13,10 +13,13 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Map;
 import javax.ejb.EJB;
 import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+import org.primefaces.model.LazyDataModel;
+import org.primefaces.model.SortMeta;
 
 /**
  *
@@ -32,7 +35,7 @@ public class ItemDetailsController implements Serializable {
     private LoginController loginController;
     @Inject
     private ItemListController itemListController;
-    @Inject
+    @EJB
     private ItemFactory itemFactory;
     //
     private Item item;
@@ -80,7 +83,7 @@ public class ItemDetailsController implements Serializable {
 
     public void actionAdaptStock() {
         ZonedDateTime dateTime = ZonedDateTime.now();
-        stockService.adaptStock(dateTime, selectedStock, item, newQuantity, StockChangeType.ADJUSTMENT, comment);
+        stockService.adaptStock(dateTime, selectedStock, item, newQuantity, comment);
     }
 
     //<editor-fold defaultstate="collapsed" desc="get/set...">
@@ -111,6 +114,19 @@ public class ItemDetailsController implements Serializable {
     //</editor-fold>
     private void searchItemStocks() {
         itemStocks = stockService.findItemStocks(item);
+    }
+
+    private void searchPrices() {
+        itemStocks = stockService.findItemStocks(item);
+    }
+    
+    public class PriceLazyDataModel extends LazyDataModel<Price> {
+
+        @Override
+        public List<Price> load(int first, int pageSize, List<SortMeta> multiSortMeta, Map<String, Object> filters) {
+            stockService.
+        }
+        
     }
 
 }

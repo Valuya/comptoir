@@ -17,8 +17,9 @@ public class ItemSearch {
     private String descriptionContains;
     private String reference;
     private String referenceContains;
+    private String multiSearch;
     // size, color, ...
-    private String model; 
+    private String model;
 
     public Company getCompany() {
         return company;
@@ -66,6 +67,14 @@ public class ItemSearch {
 
     public void setModel(String model) {
         this.model = model;
+    }
+
+    public String getMultiSearch() {
+        return multiSearch;
+    }
+
+    public void setMultiSearch(String multiSearch) {
+        this.multiSearch = multiSearch;
     }
 
 }

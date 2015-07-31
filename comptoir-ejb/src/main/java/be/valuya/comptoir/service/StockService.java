@@ -153,14 +153,7 @@ public class StockService {
         // adapt quantities
         BigDecimal newQuantity = oldQuantity.subtract(soldQuantity);
 
-        return adaptStock(fromDateTime, stock, managedItem, newQuantity, managedPreviousItemStock, stockChangeType, comment);
-    }
-
-    public ItemStock adaptStock(ZonedDateTime fromDateTime, Stock stock, Item managedItem, BigDecimal newQuantity, StockChangeType stockChangeType, String comment) {
-        // find previous stock value
-        ItemStock managedPreviousItemStock = findItemStock(managedItem, stock, fromDateTime);
-
-        return adaptStock(fromDateTime, stock, managedItem, newQuantity, managedPreviousItemStock, stockChangeType, comment);
+        return adaptStock(fromDateTime, stock, managedItem, newQuantity, comment);
     }
 
     /**
@@ -170,24 +163,18 @@ public class StockService {
      * @param stock
      * @param managedItem
      * @param newQuantity
-     * @param managedPreviousItemStock
      * @param comment
      * @return
      */
     @Nonnull
-    public ItemStock adaptStock(@Nonnull ZonedDateTime fromDateTime, @Nonnull Stock stock, @Nonnull Item managedItem, @Nonnull BigDecimal newQuantity, @CheckForNull ItemStock managedPreviousItemStock, @Nonnull StockChangeType stockChangeType, @CheckForNull String comment) {
+    public ItemStock adaptStock(@Nonnull ZonedDateTime fromDateTime, @Nonnull Stock stock, @Nonnull Item managedItem, @Nonnull BigDecimal newQuantity, @CheckForNull String comment) {
         // create new stock value
         ItemStock itemStock = new ItemStock();
         itemStock.setStock(stock);
         itemStock.setItem(managedItem);
         itemStock.setStartDateTime(fromDateTime);
-        itemStock.setPreviousItemStock(managedPreviousItemStock);
         itemStock.setQuantity(newQuantity);
         itemStock.setComment(comment);
-
-        if (managedPreviousItemStock != null) {
-            managedPreviousItemStock.setEndDateTime(fromDateTime);
-        }
 
         // persist
         ItemStock managedItemStock = entityManager.merge(itemStock);
@@ -204,7 +191,7 @@ public class StockService {
         List<Predicate> predicates = new ArrayList<>();
 
         Company company = itemStockSearch.getCompany();
-        Join<ItemStock, Item> itemJoin = itemStockRoot.join(ItemStock_.item, JoinType.INNER);
+        Join<ItemStock, Item> itemJoin = itemStockRoot.join(ItemStock_.item, JoinType.LEFT);
         Path<Company> companyPath = itemJoin.get(Item_.company);
         Predicate companyPredicate = criteriaBuilder.equal(companyPath, company);
         predicates.add(companyPredicate);
@@ -225,7 +212,7 @@ public class StockService {
         ZonedDateTime atDateTime = itemStockSearch.getAtDateTime();
         if (atDateTime != null) {
             Path<ZonedDateTime> startDateTimePath = itemStockRoot.get(ItemStock_.startDateTime);
-            Predicate startDateTimePredicate = criteriaBuilder.greaterThanOrEqualTo(startDateTimePath, atDateTime);
+            Predicate startDateTimePredicate = criteriaBuilder.lessThanOrEqualTo(startDateTimePath, atDateTime);
             predicates.add(startDateTimePredicate);
         }
 
@@ -307,7 +294,7 @@ public class StockService {
         Item managedItem = entityManager.merge(item);
         ZonedDateTime dateTime = ZonedDateTime.now();
 
-        adaptStock(dateTime, stock, managedItem, initialQuantity, StockChangeType.INITIAL, null);
+        adaptStock(dateTime, stock, managedItem, initialQuantity, null);
 
         return managedItem;
     }

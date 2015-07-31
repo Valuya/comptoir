@@ -29,6 +29,21 @@ public class ItemSearchController implements Serializable {
     //
     private Item selectedItem;
 
+    public List<Item> completeItem(String multiSearch) {
+        Employee loggedEmployee = loginController.getLoggedEmployee();
+        Company company = loggedEmployee.getCompany();
+
+        ItemSearch itemSearch = new ItemSearch();
+        itemSearch.setCompany(company);
+        itemSearch.setMultiSearch(multiSearch);
+
+        Pagination<Item, ItemColumn> pagination = new Pagination<>();
+        pagination.setMaxResults(10);
+        List<Item> items = stockService.findItems(itemSearch, pagination);
+
+        return items;
+    }
+
     public List<String> completeReference(String reference) {
         Employee loggedEmployee = loginController.getLoggedEmployee();
         Company company = loggedEmployee.getCompany();
