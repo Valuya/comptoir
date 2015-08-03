@@ -1,4 +1,4 @@
-package be.valuya.comptoir.model.misc;
+package be.valuya.comptoir.model.lang;
 
 import java.io.Serializable;
 import java.util.Locale;

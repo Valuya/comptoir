@@ -7,11 +7,16 @@ import java.time.ZonedDateTime;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
  * @author Yannick Majoros <yannick@valuya.be>
  */
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class ItemStockSearch {
 
     @NotNull

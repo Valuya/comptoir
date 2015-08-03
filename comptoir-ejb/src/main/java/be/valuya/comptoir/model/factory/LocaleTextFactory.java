@@ -1,6 +1,6 @@
 package be.valuya.comptoir.model.factory;
 
-import be.valuya.comptoir.model.misc.LocaleText;
+import be.valuya.comptoir.model.lang.LocaleText;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;

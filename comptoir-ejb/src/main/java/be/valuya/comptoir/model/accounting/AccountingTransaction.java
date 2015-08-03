@@ -1,12 +1,10 @@
 package be.valuya.comptoir.model.accounting;
 
-import be.valuya.comptoir.model.commercial.Sale;
 import be.valuya.comptoir.model.company.Company;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.Objects;
 import javax.annotation.Nonnull;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -14,7 +12,6 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -35,8 +32,6 @@ public class AccountingTransaction implements Serializable {
     private Company company;
     @Column(name = "date_time", columnDefinition = "DATETIME")
     private ZonedDateTime dateTime;
-    @OneToOne(cascade = CascadeType.ALL)
-    private Sale sale;
     @NotNull
     @Nonnull
     @Enumerated(EnumType.STRING)
@@ -70,17 +65,6 @@ public class AccountingTransaction implements Serializable {
     public void setDateTime(@NotNull
             @Nonnull ZonedDateTime dateTime) {
         this.dateTime = dateTime;
-    }
-
-    @NotNull
-    @Nonnull
-    public Sale getSale() {
-        return sale;
-    }
-
-    public void setSale(@NotNull
-            @Nonnull Sale sale) {
-        this.sale = sale;
     }
 
     @NotNull

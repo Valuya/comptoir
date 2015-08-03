@@ -1,7 +1,7 @@
 package be.valuya.comptoir.model.commercial;
 
 import be.valuya.comptoir.model.company.Company;
-import be.valuya.comptoir.model.misc.LocaleText;
+import be.valuya.comptoir.model.lang.LocaleText;
 import java.io.Serializable;
 import java.util.Objects;
 import javax.annotation.Nonnull;
@@ -48,6 +48,9 @@ public class Item implements Serializable {
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "current_price_id")
     private Price currentPrice;
+    @ManyToOne
+    @JoinColumn(name = "main_picture")
+    private ItemPicture mainPicture;
 
     public Long getId() {
         return id;
@@ -103,6 +106,14 @@ public class Item implements Serializable {
 
     public void setCurrentPrice(Price currentPrice) {
         this.currentPrice = currentPrice;
+    }
+
+    public ItemPicture getMainPicture() {
+        return mainPicture;
+    }
+
+    public void setMainPicture(ItemPicture mainPicture) {
+        this.mainPicture = mainPicture;
     }
 
     @Override

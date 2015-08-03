@@ -1,7 +1,7 @@
 package be.valuya.comptoir.model.factory;
 
 import be.valuya.comptoir.model.company.Company;
-import be.valuya.comptoir.model.misc.LocaleText;
+import be.valuya.comptoir.model.lang.LocaleText;
 import javax.ejb.Singleton;
 import javax.inject.Inject;
 

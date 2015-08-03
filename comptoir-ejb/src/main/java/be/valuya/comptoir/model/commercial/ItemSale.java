@@ -1,7 +1,7 @@
 package be.valuya.comptoir.model.commercial;
 
 import be.valuya.comptoir.model.accounting.AccountingEntry;
-import be.valuya.comptoir.model.misc.LocaleText;
+import be.valuya.comptoir.model.lang.LocaleText;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;

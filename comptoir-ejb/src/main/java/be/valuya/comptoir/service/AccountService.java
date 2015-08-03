@@ -5,7 +5,7 @@ import be.valuya.comptoir.model.accounting.AccountType;
 import be.valuya.comptoir.model.accounting.Account_;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.factory.LocaleTextFactory;
-import be.valuya.comptoir.model.misc.LocaleText;
+import be.valuya.comptoir.model.lang.LocaleText;
 import be.valuya.comptoir.model.stock.Stock;
 import be.valuya.comptoir.model.thirdparty.Employee;
 import java.util.ArrayList;

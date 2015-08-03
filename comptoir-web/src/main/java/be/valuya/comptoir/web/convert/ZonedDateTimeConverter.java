@@ -1,6 +1,5 @@
 package be.valuya.comptoir.web.convert;
 
-import be.valuya.comptoir.web.control.LoginController;
 import java.time.DateTimeException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -14,7 +13,6 @@ import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.convert.ConverterException;
-import javax.inject.Inject;
 import javax.inject.Named;
 
 /**
@@ -25,14 +23,11 @@ import javax.inject.Named;
 @RequestScoped
 public class ZonedDateTimeConverter implements Converter {
 
-    @Inject
-    private transient LoginController loginController;
-    //
     private DateTimeFormatter dateTimeFormatter;
 
     @PostConstruct
     public void init() {
-        Locale userLocale = loginController.getUserLocale();
+        Locale userLocale = Locale.FRENCH;
         dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss", userLocale);
     }
 
@@ -43,7 +38,7 @@ public class ZonedDateTimeConverter implements Converter {
                 return null;
             }
             LocalDateTime localDateTime = LocalDateTime.parse(valueStr, dateTimeFormatter);
-            TimeZone userTimeZone = loginController.getUserTimeZone();
+            TimeZone userTimeZone = TimeZone.getDefault();
             ZoneId zoneId = userTimeZone.toZoneId();
             return ZonedDateTime.of(localDateTime, zoneId);
         } catch (DateTimeException dateTimeException) {

@@ -1,7 +1,7 @@
 package be.valuya.comptoir.model.accounting;
 
 import be.valuya.comptoir.model.company.Company;
-import be.valuya.comptoir.model.misc.LocaleText;
+import be.valuya.comptoir.model.lang.LocaleText;
 import java.io.Serializable;
 import java.util.Objects;
 import javax.annotation.Nonnull;

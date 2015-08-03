@@ -1,6 +1,6 @@
 package be.valuya.comptoir.model.company;
 
-import be.valuya.comptoir.model.misc.LocaleText;
+import be.valuya.comptoir.model.lang.LocaleText;
 import java.io.Serializable;
 import java.util.Objects;
 import javax.persistence.Entity;

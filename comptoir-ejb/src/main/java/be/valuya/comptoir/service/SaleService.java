@@ -9,11 +9,10 @@ import be.valuya.comptoir.model.accounting.AccountingTransactionType;
 import be.valuya.comptoir.model.commercial.Item;
 import be.valuya.comptoir.model.commercial.ItemSale;
 import be.valuya.comptoir.model.commercial.ItemSale_;
-import be.valuya.comptoir.model.commercial.Payment;
 import be.valuya.comptoir.model.commercial.Price;
 import be.valuya.comptoir.model.commercial.Sale;
 import be.valuya.comptoir.model.company.Company;
-import be.valuya.comptoir.model.misc.LocaleText;
+import be.valuya.comptoir.model.lang.LocaleText;
 import be.valuya.comptoir.model.stock.Stock;
 import be.valuya.comptoir.model.stock.StockChangeType;
 import be.valuya.comptoir.model.thirdparty.Customer;
@@ -87,7 +86,6 @@ public class SaleService {
         accountingTransaction.setCompany(company);
         accountingTransaction.setAccountingTransactionType(AccountingTransactionType.SALE);
         accountingTransaction.setDateTime(dateTime);
-        accountingTransaction.setSale(sale);
 
         sale.setAccountingTransaction(accountingTransaction);
 
@@ -129,12 +127,12 @@ public class SaleService {
         return sale;
     }
 
-    private AccountingEntry createSaleDebitAccountingEntry(Sale sale, Payment payment, ZonedDateTime dateTime) {
+    private AccountingEntry createSaleDebitAccountingEntry(Sale sale, AccountingEntry paymentAccountingEntry, ZonedDateTime dateTime) {
         AccountingTransaction accountingTransaction = sale.getAccountingTransaction();
         Company company = sale.getCompany();
         AccountingEntry vatAccountingEntry = sale.getVatAccountingEntry();
-        Account account = payment.getAccount();
-        BigDecimal amount = payment.getAmount();
+        Account account = paymentAccountingEntry.getAccount();
+        BigDecimal amount = paymentAccountingEntry.getAmount();
 
         AccountingEntry saleDebitAccountingEntry = new AccountingEntry();
         saleDebitAccountingEntry.setAccountingTransaction(accountingTransaction);
@@ -147,14 +145,14 @@ public class SaleService {
         return saleDebitAccountingEntry;
     }
 
-    public Sale pay(Sale sale, List<ItemSale> itemSales, List<Payment> payments, boolean close) {
+    public Sale pay(Sale sale, List<ItemSale> itemSales, List<AccountingEntry> paymentAccountingEntryList, boolean close) {
         calcSale(sale, itemSales);
 
         ZonedDateTime dateTime = ZonedDateTime.now();
 
         BigDecimal totalPayedAmount = BigDecimal.ZERO;
-        for (Payment payment : payments) {
-            AccountingEntry saleDebitAccountingEntry = createSaleDebitAccountingEntry(sale, payment, dateTime);
+        for (AccountingEntry paymentAccountingEntry : paymentAccountingEntryList) {
+            AccountingEntry saleDebitAccountingEntry = createSaleDebitAccountingEntry(sale, paymentAccountingEntry, dateTime);
             AccountingEntry managedSaleDebitAccountingEntry = entityManager.merge(saleDebitAccountingEntry);
             BigDecimal payedAmount = managedSaleDebitAccountingEntry.getAmount();
             totalPayedAmount = totalPayedAmount.add(payedAmount);
@@ -175,10 +173,10 @@ public class SaleService {
     }
 
     @Nonnull
-    public BigDecimal calcPayBackAmount(@Nonnull Sale sale, @Nonnull List<ItemSale> itemSales, @Nonnull List<Payment> payments) {
+    public BigDecimal calcPayBackAmount(@Nonnull Sale sale, @Nonnull List<ItemSale> itemSales, @Nonnull List<AccountingEntry> paymentAccountingEntryList) {
         BigDecimal totalPayedAmount = BigDecimal.ZERO;
-        for (Payment payment : payments) {
-            BigDecimal payedAmount = payment.getAmount();
+        for (AccountingEntry paymentAccountingEntry : paymentAccountingEntryList) {
+            BigDecimal payedAmount = paymentAccountingEntry.getAmount();
             totalPayedAmount = totalPayedAmount.add(payedAmount);
         }
 
