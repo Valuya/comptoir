@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>be.valuya</groupId>
-  <artifactId>comptoir</artifactId>
-  <version>1.0-SNAPSHOT</version>
-  <packaging>pom</packaging>
-  <name>comptoir</name>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>be.valuya.comptoir</groupId>
+    <artifactId>comptoir</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
     <build>
         <plugins>
             <plugin>
@@ -27,10 +26,12 @@
         </plugins>
     </build>
     <modules>
-    <module>comptoir-ear</module>
-    <module>comptoir-web</module>
-    <module>comptoir-ejb</module>
-  </modules>
+        <module>comptoir-ear</module>
+        <module>comptoir-web</module>
+        <module>comptoir-ejb</module>
+        <module>comptoir-api-domain</module>
+        <module>comptoir-ws</module>
+    </modules>
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
