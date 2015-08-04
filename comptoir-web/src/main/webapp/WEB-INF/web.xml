@@ -26,10 +26,6 @@
         <exception-type>javax.faces.application.ViewExpiredException</exception-type>
         <location>/error/viewExpired.jsf</location>
     </error-page>
-<!--    <error-page>
-        <exception-type>be.lapinsoft.gestemps.server.GestempsException</exception-type>
-        <location>/error/gestemps.jsf</location>
-    </error-page>-->
     <error-page>
         <error-code>403</error-code>
         <location>/error/noAccess.jsf</location>
