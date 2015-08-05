@@ -24,8 +24,8 @@ public class ToWsCompanyConverter {
         LocaleText description = company.getDescription();
         LocaleText name = company.getName();
 
-        WsLocaleText wsName = toWsLocaleTextConverter.convertLocaleText(name);
-        WsLocaleText wsDescription = toWsLocaleTextConverter.convertLocaleText(description);
+        WsLocaleText wsName = toWsLocaleTextConverter.convert(name);
+        WsLocaleText wsDescription = toWsLocaleTextConverter.convert(description);
 
         WsCompany wsCompany = new WsCompany();
         wsCompany.setId(id);
@@ -36,7 +36,8 @@ public class ToWsCompanyConverter {
     }
 
     public WsCompanyRef reference(Company company) {
-        WsCompanyRef wsCompanyRef = new WsCompanyRef();
+        Long id = company.getId();
+        WsCompanyRef wsCompanyRef = new WsCompanyRef(id);
         return wsCompanyRef;
     }
 

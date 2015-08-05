@@ -1,8 +1,8 @@
 package be.valuya.comptoir.api.domain.accounting;
 
-import be.valuya.comptoir.model.accounting.AccountType;
-import be.valuya.comptoir.model.company.Company;
+import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.api.domain.lang.WsLocaleText;
+import be.valuya.comptoir.model.accounting.AccountType;
 import java.io.Serializable;
 import java.util.Objects;
 import javax.annotation.Nonnull;
@@ -23,7 +23,7 @@ public class WsAccount implements Serializable {
     private Long id;
     @NotNull
     @Nonnull
-    private Company company;
+    private WsCompanyRef companyRef;
     @Size(max = 32)
     private String accountingNumber;
     @Size(max = 32)
@@ -44,12 +44,12 @@ public class WsAccount implements Serializable {
         this.id = id;
     }
 
-    public Company getCompany() {
-        return company;
+    public WsCompanyRef getCompanyRef() {
+        return companyRef;
     }
 
-    public void setCompany(Company company) {
-        this.company = company;
+    public void setCompanyRef(WsCompanyRef companyRef) {
+        this.companyRef = companyRef;
     }
 
     public String getName() {
