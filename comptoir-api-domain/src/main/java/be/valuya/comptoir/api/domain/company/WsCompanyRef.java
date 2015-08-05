@@ -21,6 +21,13 @@ public class WsCompanyRef {
     @XmlElement
     private Long id;
 
+    public WsCompanyRef() {
+    }
+
+    public WsCompanyRef(Long id) {
+        this.id = id;
+    }
+
     public URI getLink() {
         return link;
     }
