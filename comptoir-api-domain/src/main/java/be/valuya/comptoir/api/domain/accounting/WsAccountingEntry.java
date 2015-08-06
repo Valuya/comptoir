@@ -1,18 +1,13 @@
 package be.valuya.comptoir.api.domain.accounting;
 
-import be.valuya.comptoir.model.thirdparty.Customer;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.api.domain.lang.WsLocaleText;
+import be.valuya.comptoir.api.domain.thirdparty.WsCustomerRef;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.Objects;
 import javax.annotation.Nonnull;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -39,19 +34,13 @@ public class WsAccountingEntry implements Serializable {
     private BigDecimal vatRate;
     @NotNull
     @Nonnull
-    @Column(name = "date_time", columnDefinition = "DATETIME")
     private ZonedDateTime dateTime;
-    @ManyToOne(cascade = CascadeType.ALL)
     private WsLocaleText description;
     @NotNull
     @Nonnull
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "accounting_transaction_id")
     private WsAccountingTransactionRef accountingTransactionRef;
-    @OneToOne(cascade = CascadeType.ALL)
     private WsAccountingEntryRef vatAccountingEntryRef;
-    @ManyToOne
-    private Customer customer;
+    private WsCustomerRef customerRef;
 
     public Long getId() {
         return id;
@@ -67,7 +56,7 @@ public class WsAccountingEntry implements Serializable {
         return companyRef;
     }
 
-    public void setCompany(@NotNull @Nonnull WsCompanyRef companyRef) {
+    public void setCompanyRef(@NotNull @Nonnull WsCompanyRef companyRef) {
         this.companyRef = companyRef;
     }
 
@@ -137,12 +126,12 @@ public class WsAccountingEntry implements Serializable {
         this.vatAccountingEntryRef = vatAccountingEntryRef;
     }
 
-    public Customer getCustomer() {
-        return customer;
+    public WsCustomerRef getCustomerRef() {
+        return customerRef;
     }
 
-    public void setCustomer(Customer customer) {
-        this.customer = customer;
+    public void setCustomerRef(WsCustomerRef customerRef) {
+        this.customerRef = customerRef;
     }
 
     @Override

@@ -1,4 +1,4 @@
-package be.valuya.comptoir.api.domain.accounting;
+package be.valuya.comptoir.api.domain.thirdparty;
 
 import java.net.URI;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -11,20 +11,20 @@ import org.glassfish.jersey.linking.InjectLink;
  *
  * @author Yannick Majoros <yannick@valuya.be>
  */
-@XmlRootElement(name = "accountingTransactionRef")
+@XmlRootElement(name = "employeeRef")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class WsAccountingTransactionRef {
+public class WsEmployeeRef {
 
-    @InjectLink(value = "accountingTransaction/${instance.id}")
+    @InjectLink(value = "employee/${instance.id}")
     @XmlElement
     private URI link;
     @XmlElement
     private Long id;
 
-    public WsAccountingTransactionRef() {
+    public WsEmployeeRef() {
     }
 
-    public WsAccountingTransactionRef(Long id) {
+    public WsEmployeeRef(Long id) {
         this.id = id;
     }
 

@@ -1,14 +1,16 @@
 package be.valuya.comptoir.comptoir.ws.convert.accounting;
 
 import be.valuya.comptoir.api.domain.accounting.WsAccount;
+import be.valuya.comptoir.api.domain.accounting.WsAccountRef;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.api.domain.lang.WsLocaleText;
-import be.valuya.comptoir.comptoir.ws.convert.text.FromWsLocaleTextConverter;
 import be.valuya.comptoir.comptoir.ws.convert.company.FromWsCompanyConverter;
+import be.valuya.comptoir.comptoir.ws.convert.text.FromWsLocaleTextConverter;
 import be.valuya.comptoir.model.accounting.Account;
 import be.valuya.comptoir.model.accounting.AccountType;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.lang.LocaleText;
+import be.valuya.comptoir.service.AccountService;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
@@ -23,6 +25,8 @@ public class FromWsAccountConverter {
     private FromWsLocaleTextConverter fromWsLocaleTextConverter;
     @Inject
     private FromWsCompanyConverter fromWsCompanyConverter;
+    @Inject
+    private AccountService accountService;
 
     public Account convert(WsAccount wsAccount) {
         Long id = wsAccount.getId();
@@ -49,6 +53,11 @@ public class FromWsAccountConverter {
         account.setName(name);
 
         return account;
+    }
+
+    public Account find(WsAccountRef accountRef) {
+        Long id = accountRef.getId();
+        return accountService.findAccountById(id);
     }
 
 }

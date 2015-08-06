@@ -3,6 +3,8 @@ package be.valuya.comptoir.service;
 import be.valuya.comptoir.model.accounting.Account;
 import be.valuya.comptoir.model.accounting.AccountType;
 import be.valuya.comptoir.model.accounting.Account_;
+import be.valuya.comptoir.model.accounting.AccountingEntry;
+import be.valuya.comptoir.model.accounting.AccountingTransaction;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.factory.LocaleTextFactory;
 import be.valuya.comptoir.model.lang.LocaleText;
@@ -83,6 +85,14 @@ public class AccountService {
 
     public Account findAccountById(Long id) {
         return entityManager.find(Account.class, id);
+    }
+
+    public AccountingTransaction findAccountingTransactionById(Long id) {
+        return entityManager.find(AccountingTransaction.class, id);
+    }
+
+    public AccountingEntry findAccountingEntryById(Long id) {
+        return entityManager.find(AccountingEntry.class, id);
     }
 
 }
