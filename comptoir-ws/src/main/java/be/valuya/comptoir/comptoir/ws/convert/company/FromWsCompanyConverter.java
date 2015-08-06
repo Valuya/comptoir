@@ -3,7 +3,7 @@ package be.valuya.comptoir.comptoir.ws.convert.company;
 import be.valuya.comptoir.api.domain.company.WsCompany;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.api.domain.lang.WsLocaleText;
-import be.valuya.comptoir.comptoir.ws.FromWsLocaleTextConverter;
+import be.valuya.comptoir.comptoir.ws.convert.text.FromWsLocaleTextConverter;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.lang.LocaleText;
 import be.valuya.comptoir.service.CompanyService;

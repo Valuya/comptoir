@@ -4,7 +4,7 @@ import be.valuya.comptoir.api.domain.accounting.WsAccount;
 import be.valuya.comptoir.api.domain.accounting.WsAccountRef;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.api.domain.lang.WsLocaleText;
-import be.valuya.comptoir.comptoir.ws.FromWsLocaleTextConverter;
+import be.valuya.comptoir.comptoir.ws.convert.text.FromWsLocaleTextConverter;
 import be.valuya.comptoir.comptoir.ws.convert.company.FromWsCompanyConverter;
 import be.valuya.comptoir.model.accounting.Account;
 import be.valuya.comptoir.model.accounting.AccountType;

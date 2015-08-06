@@ -1,4 +1,4 @@
-package be.valuya.comptoir.comptoir.ws;
+package be.valuya.comptoir.comptoir.ws.convert.text;
 
 import be.valuya.comptoir.api.domain.lang.WsLocaleText;
 import be.valuya.comptoir.model.lang.LocaleText;
