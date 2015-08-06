@@ -28,8 +28,6 @@ public class WsEmployee implements Serializable {
     @Nonnull
     @Size(max = 200)
     private String login;
-    @Size(max = 32)
-    private String passwordHash;
     @Size(max = 200)
     private String firstName;
     @Size(max = 200)
@@ -66,14 +64,6 @@ public class WsEmployee implements Serializable {
 
     public void setLogin(String login) {
         this.login = login;
-    }
-
-    public String getPasswordHash() {
-        return passwordHash;
-    }
-
-    public void setPasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
     }
 
     public String getFirstName() {
