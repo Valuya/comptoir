@@ -22,6 +22,7 @@ public class WsItem {
     @NotNull
     @Nonnull
     private WsCompanyRef companyRef;
+    private WsItemPictureRef mainPictureRef;
     @NotNull
     @Nonnull
     @Size(max = 128)
@@ -55,6 +56,14 @@ public class WsItem {
 
     public void setCompanyRef(WsCompanyRef companyRef) {
         this.companyRef = companyRef;
+    }
+
+    public WsItemPictureRef getMainPictureRef() {
+        return mainPictureRef;
+    }
+
+    public void setMainPictureRef(WsItemPictureRef mainPictureRef) {
+        this.mainPictureRef = mainPictureRef;
     }
 
     public String getReference() {

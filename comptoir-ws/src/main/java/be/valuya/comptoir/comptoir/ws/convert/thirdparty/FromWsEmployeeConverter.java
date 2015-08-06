@@ -1,11 +1,9 @@
 package be.valuya.comptoir.comptoir.ws.convert.thirdparty;
 
-import be.valuya.comptoir.api.domain.accounting.WsAccountRef;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.api.domain.thirdparty.WsEmployee;
 import be.valuya.comptoir.comptoir.ws.convert.company.FromWsCompanyConverter;
 import be.valuya.comptoir.comptoir.ws.convert.text.FromWsLocaleTextConverter;
-import be.valuya.comptoir.model.accounting.Account;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.thirdparty.Employee;
 import java.util.Locale;
@@ -43,11 +41,6 @@ public class FromWsEmployeeConverter {
         employee.setLogin(login);
 
         return employee;
-    }
-
-    public WsAccountRef reference(Account account) {
-        Long id = account.getId();
-        return new WsAccountRef(id);
     }
 
 }

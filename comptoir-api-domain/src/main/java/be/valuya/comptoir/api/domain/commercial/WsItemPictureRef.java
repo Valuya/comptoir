@@ -21,6 +21,13 @@ public class WsItemPictureRef {
     @XmlElement
     private Long id;
 
+    public WsItemPictureRef() {
+    }
+
+    public WsItemPictureRef(Long id) {
+        this.id = id;
+    }
+
     public URI getLink() {
         return link;
     }

@@ -1,6 +1,7 @@
 package be.valuya.comptoir.service;
 
 import be.valuya.comptoir.model.commercial.Item;
+import be.valuya.comptoir.model.commercial.ItemPicture;
 import be.valuya.comptoir.model.commercial.ItemSale;
 import be.valuya.comptoir.model.commercial.Item_;
 import be.valuya.comptoir.model.company.Company;
@@ -301,6 +302,10 @@ public class StockService {
 
     public Item findItemById(Long id) {
         return entityManager.find(Item.class, id);
+    }
+
+    public ItemPicture findItemPictureById(Long id) {
+        return entityManager.find(ItemPicture.class, id);
     }
 
 }

@@ -1,7 +1,6 @@
 package be.valuya.comptoir.comptoir.ws.convert.accounting;
 
 import be.valuya.comptoir.api.domain.accounting.WsAccount;
-import be.valuya.comptoir.api.domain.accounting.WsAccountRef;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.api.domain.lang.WsLocaleText;
 import be.valuya.comptoir.comptoir.ws.convert.text.FromWsLocaleTextConverter;
@@ -50,11 +49,6 @@ public class FromWsAccountConverter {
         account.setName(name);
 
         return account;
-    }
-
-    public WsAccountRef reference(Account account) {
-        Long id = account.getId();
-        return new WsAccountRef(id);
     }
 
 }
