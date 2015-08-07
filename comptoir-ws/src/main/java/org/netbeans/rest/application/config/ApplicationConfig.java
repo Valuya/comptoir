@@ -26,6 +26,7 @@ public class ApplicationConfig extends Application {
     private void addRestResourceClasses(Set<Class<?>> resources) {
         resources.add(be.valuya.comptoir.comptoir.ws.rest.control.AccountResource.class);
         resources.add(be.valuya.comptoir.comptoir.ws.rest.control.CompanyResource.class);
+        resources.add(be.valuya.comptoir.comptoir.ws.rest.control.ItemResource.class);
         resources.add(org.glassfish.jersey.server.wadl.internal.WadlResource.class);
     }
 

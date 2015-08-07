@@ -12,7 +12,16 @@ public class Pagination<T, S extends Column<T>> {
 
     private int offset;
     private int maxResults;
-    private List<Sorting<S>> sortings;
+    private List<Sort<S>> sortings;
+
+    public Pagination() {
+    }
+
+    public Pagination(int offset, int maxResults, List<Sort<S>> sortings) {
+        this.offset = offset;
+        this.maxResults = maxResults;
+        this.sortings = sortings;
+    }
 
     public int getOffset() {
         return offset;
@@ -30,11 +39,11 @@ public class Pagination<T, S extends Column<T>> {
         this.maxResults = maxResults;
     }
 
-    public List<Sorting<S>> getSortings() {
+    public List<Sort<S>> getSortings() {
         return sortings;
     }
 
-    public void setSortings(List<Sorting<S>> sortings) {
+    public void setSortings(List<Sort<S>> sortings) {
         this.sortings = sortings;
     }
 

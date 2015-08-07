@@ -5,15 +5,15 @@ package be.valuya.comptoir.util.pagination;
  * @author Yannick Majoros <yannick@valuya.be>
  * @param <T>
  */
-public class Sorting<T extends Column> {
+public class Sort<T extends Column> {
 
     private T sortColumn;
     private boolean ascending = true;
 
-    public Sorting() {
+    public Sort() {
     }
 
-    public Sorting(T sortColumn, boolean ascending) {
+    public Sort(T sortColumn, boolean ascending) {
         this.sortColumn = sortColumn;
         this.ascending = ascending;
     }

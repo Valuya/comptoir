@@ -1,4 +1,4 @@
-package be.valuya.comptoir.comptoir.ws.rest.control;
+package be.valuya.comptoir.comptoir.ws.rest.validation;
 
 /**
  *

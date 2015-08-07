@@ -1,7 +1,7 @@
 package be.valuya.comptoir.web.pagination;
 
 import be.valuya.comptoir.util.pagination.Column;
-import be.valuya.comptoir.util.pagination.Sorting;
+import be.valuya.comptoir.util.pagination.Sort;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -15,19 +15,18 @@ import org.primefaces.model.SortOrder;
  */
 public class PaginationUtil {
 
-    public static <T, C extends Column<T>> List<Sorting<C>> createSortings(List<SortMeta> multiSortMeta, Function<String, C> conversionFunction) {
-        List<Sorting<C>> sortings = new ArrayList<>();
+    public static <T, C extends Column<T>> List<Sort<C>> createSortings(List<SortMeta> multiSortMeta, Function<String, C> conversionFunction) {
+        List<Sort<C>> sortings = new ArrayList<>();
         if (multiSortMeta == null) {
             return new ArrayList<>();
         }
         multiSortMeta.stream().
-                filter(s -> s.getSortOrder() != SortOrder.UNSORTED).
-                map(
-                        sortMeta -> {
+                filter(s -> s.getSortOrder() != Sort.UNSORTED).
+                map(sortMeta -> {
                             String sortField = sortMeta.getSortField();
                             C sortColumn = conversionFunction.apply(sortField);
-                            SortOrder sortOrder = sortMeta.getSortOrder();
-                            Sorting<C> sorting = new Sorting<>(sortColumn, sortOrder == SortOrder.ASCENDING);
+                            Sort sortOrder = sortMeta.getSortOrder();
+                            Sort<C> sorting = new Sort<>(sortColumn, sortOrder == Sort.ASCENDING);
                             return sorting;
                         }).
                 collect(Collectors.toList());

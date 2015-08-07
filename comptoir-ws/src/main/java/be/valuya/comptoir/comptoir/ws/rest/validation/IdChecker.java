@@ -1,4 +1,4 @@
-package be.valuya.comptoir.comptoir.ws.rest.control;
+package be.valuya.comptoir.comptoir.ws.rest.validation;
 
 import be.valuya.comptoir.api.domain.company.WithId;
 import javax.enterprise.context.ApplicationScoped;

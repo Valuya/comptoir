@@ -1,5 +1,7 @@
 package be.valuya.comptoir.comptoir.ws.rest.control;
 
+import be.valuya.comptoir.comptoir.ws.rest.validation.NoId;
+import be.valuya.comptoir.comptoir.ws.rest.validation.IdChecker;
 import be.valuya.comptoir.api.domain.company.WsCompany;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.comptoir.ws.convert.company.FromWsCompanyConverter;
@@ -13,12 +15,15 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 
 /**
  *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @Path("/company")
+@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 public class CompanyResource {
 
     @EJB

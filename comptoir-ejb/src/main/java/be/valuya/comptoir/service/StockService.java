@@ -16,7 +16,7 @@ import be.valuya.comptoir.model.stock.StockChangeType;
 import be.valuya.comptoir.model.stock.Stock_;
 import be.valuya.comptoir.util.pagination.ItemColumn;
 import be.valuya.comptoir.util.pagination.Pagination;
-import be.valuya.comptoir.util.pagination.Sorting;
+import be.valuya.comptoir.util.pagination.Sort;
 import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.time.ZonedDateTime;
@@ -114,7 +114,7 @@ public class StockService {
         }
 
         if (pagination != null) {
-            List<Sorting<ItemColumn>> sortings = pagination.getSortings();
+            List<Sort<ItemColumn>> sortings = pagination.getSortings();
             List<Order> orders = ItemColumnPersistenceUtil.createOrdersFromSortings(criteriaBuilder, itemRoot, sortings);
             query.orderBy(orders);
         }
@@ -306,6 +306,18 @@ public class StockService {
 
     public ItemPicture findItemPictureById(Long id) {
         return entityManager.find(ItemPicture.class, id);
+    }
+
+    /**
+     * DEPRECATED: see method version with params etc., decide what to do.
+     *
+     * @param item
+     * @return
+     * @deprecated
+     */
+    @Deprecated
+    public Item saveItem(Item item) {
+        return entityManager.merge(item);
     }
 
 }

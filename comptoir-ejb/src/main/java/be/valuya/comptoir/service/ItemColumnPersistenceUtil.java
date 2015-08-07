@@ -3,7 +3,7 @@ package be.valuya.comptoir.service;
 import be.valuya.comptoir.model.commercial.Item;
 import be.valuya.comptoir.model.commercial.Item_;
 import be.valuya.comptoir.util.pagination.ItemColumn;
-import be.valuya.comptoir.util.pagination.Sorting;
+import be.valuya.comptoir.util.pagination.Sort;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,7 +18,7 @@ import javax.persistence.criteria.Root;
  */
 public class ItemColumnPersistenceUtil {
 
-    public static List<Order> createOrdersFromSortings(CriteriaBuilder criteriaBuilder, Root<Item> itemRoot, List<Sorting<ItemColumn>> sortings) {
+    public static List<Order> createOrdersFromSortings(CriteriaBuilder criteriaBuilder, Root<Item> itemRoot, List<Sort<ItemColumn>> sortings) {
         if (sortings == null) {
             return new ArrayList<>();
         }
@@ -29,7 +29,7 @@ public class ItemColumnPersistenceUtil {
         return orders;
     }
 
-    public static Order createOrderFromSorting(CriteriaBuilder criteriaBuilder, Root<Item> itemRoot, Sorting<ItemColumn> sorting) {
+    public static Order createOrderFromSorting(CriteriaBuilder criteriaBuilder, Root<Item> itemRoot, Sort<ItemColumn> sorting) {
         ItemColumn itemColumn = sorting.getSortColumn();
         Path<?> path = getPath(itemRoot, itemColumn);
 
