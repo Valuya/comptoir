@@ -2,6 +2,7 @@ package be.valuya.comptoir.service;
 
 import be.valuya.comptoir.model.commercial.Item;
 import be.valuya.comptoir.model.commercial.ItemPicture;
+import be.valuya.comptoir.model.commercial.ItemPicture_;
 import be.valuya.comptoir.model.commercial.ItemSale;
 import be.valuya.comptoir.model.commercial.Item_;
 import be.valuya.comptoir.model.company.Company;
@@ -318,6 +319,28 @@ public class StockService {
     @Deprecated
     public Item saveItem(Item item) {
         return entityManager.merge(item);
+    }
+
+    public ItemPicture saveItemPicture(ItemPicture itemPicture) {
+        return entityManager.merge(itemPicture);
+    }
+
+    public List<ItemPicture> findItemPictures(@Nonnull Item item) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<ItemPicture> query = criteriaBuilder.createQuery(ItemPicture.class);
+        Root<ItemPicture> itemPictureRoot = query.from(ItemPicture.class);
+
+        List<Predicate> predicates = new ArrayList<>();
+
+        Path<Item> itemPath = itemPictureRoot.get(ItemPicture_.item);
+        Predicate itemPredicate = criteriaBuilder.equal(itemPath, item);
+        predicates.add(itemPredicate);
+
+        Predicate[] predicateArray = predicates.toArray(new Predicate[0]);
+        query.where(predicateArray);
+
+        TypedQuery<ItemPicture> typedQuery = entityManager.createQuery(query);
+        return typedQuery.getResultList();
     }
 
 }

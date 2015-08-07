@@ -21,14 +21,14 @@ public class PaginationUtil {
             return new ArrayList<>();
         }
         multiSortMeta.stream().
-                filter(s -> s.getSortOrder() != Sort.UNSORTED).
+                filter(s -> s.getSortOrder() != SortOrder.UNSORTED).
                 map(sortMeta -> {
-                            String sortField = sortMeta.getSortField();
-                            C sortColumn = conversionFunction.apply(sortField);
-                            Sort sortOrder = sortMeta.getSortOrder();
-                            Sort<C> sorting = new Sort<>(sortColumn, sortOrder == Sort.ASCENDING);
-                            return sorting;
-                        }).
+                    String sortField = sortMeta.getSortField();
+                    C sortColumn = conversionFunction.apply(sortField);
+                    SortOrder sortOrder = sortMeta.getSortOrder();
+                    Sort<C> sorting = new Sort<>(sortColumn, sortOrder == SortOrder.ASCENDING);
+                    return sorting;
+                }).
                 collect(Collectors.toList());
         return sortings;
     }
