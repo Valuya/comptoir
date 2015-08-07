@@ -79,9 +79,8 @@ public class ItemResource {
         List<WsItem> wsItems = items.stream()
                 .map(toWsItemConverter::convert)
                 .collect(Collectors.toList());
-        
-        //response.setHeader("size", 1234);
 
+        //response.setHeader("size", 1234);
         return wsItems;
     }
 
