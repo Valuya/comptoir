@@ -8,6 +8,7 @@ import be.valuya.comptoir.model.accounting.AccountingTransaction;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.factory.LocaleTextFactory;
 import be.valuya.comptoir.model.lang.LocaleText;
+import be.valuya.comptoir.model.search.AccountSearch;
 import be.valuya.comptoir.model.stock.Stock;
 import be.valuya.comptoir.model.thirdparty.Employee;
 import java.util.ArrayList;
@@ -39,17 +40,19 @@ public class AccountService {
     private LocaleTextFactory localeTextFactory;
 
     @Nonnull
-    public List<Account> findAccounts(@Nonnull Company company, AccountType accountType) {
+    public List<Account> findAccounts(@Nonnull AccountSearch accountSearch) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Account> query = criteriaBuilder.createQuery(Account.class);
         Root<Account> accountRoot = query.from(Account.class);
 
         List<Predicate> predicates = new ArrayList<>();
 
+        Company company = accountSearch.getCompany();
         Path<Company> companyPath = accountRoot.get(Account_.company);
         Predicate companyPredicate = criteriaBuilder.equal(companyPath, company);
         predicates.add(companyPredicate);
 
+        AccountType accountType = accountSearch.getAccountType();
         if (accountType != null) {
             Path<AccountType> accountTypePath = accountRoot.get(Account_.accountType);
             Predicate accountTypePredicate = criteriaBuilder.equal(accountTypePath, accountType);

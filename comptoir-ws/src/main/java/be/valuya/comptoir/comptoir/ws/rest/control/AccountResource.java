@@ -5,7 +5,10 @@ import be.valuya.comptoir.api.domain.accounting.WsAccountRef;
 import be.valuya.comptoir.comptoir.ws.convert.accounting.FromWsAccountConverter;
 import be.valuya.comptoir.comptoir.ws.convert.accounting.ToWsAccountConverter;
 import be.valuya.comptoir.model.accounting.Account;
+import be.valuya.comptoir.model.search.AccountSearch;
 import be.valuya.comptoir.service.AccountService;
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -50,6 +53,17 @@ public class AccountResource {
         WsAccount wsAccount = toWsAccountConverter.convert(account);
 
         return wsAccount;
+    }
+
+    @POST
+    public List<WsAccount> findAccounts(AccountSearch accountSearch) {
+        List<Account> accounts = accountService.findAccounts(accountSearch);
+
+        List<WsAccount> wsAccounts = accounts.stream()
+                .map(toWsAccountConverter::convert)
+                .collect(Collectors.toList());
+
+        return wsAccounts;
     }
 
     private WsAccountRef saveAccount(WsAccount wsAccount) {
