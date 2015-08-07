@@ -1,5 +1,6 @@
 package be.valuya.comptoir.api.domain.commercial;
 
+import be.valuya.comptoir.api.domain.company.WithId;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.api.domain.lang.WsLocaleText;
 import java.math.BigDecimal;
@@ -16,7 +17,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement(name = "item")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class WsItem {
+public class WsItem implements WithId {
 
     private Long id;
     @NotNull

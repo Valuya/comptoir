@@ -11,7 +11,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement(name = "company")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class WsCompany {
+public class WsCompany implements WithId {
 
     private Long id;
     private WsLocaleText name;

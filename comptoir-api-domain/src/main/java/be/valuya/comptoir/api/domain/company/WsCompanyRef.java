@@ -13,7 +13,7 @@ import org.glassfish.jersey.linking.InjectLink;
  */
 @XmlRootElement(name = "companyRef")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class WsCompanyRef {
+public class WsCompanyRef implements WithId {
 
     @InjectLink(value = "company/${instance.id}")
     @XmlElement

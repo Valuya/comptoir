@@ -1,5 +1,6 @@
 package be.valuya.comptoir.api.domain.commercial;
 
+import be.valuya.comptoir.api.domain.company.WithId;
 import java.io.Serializable;
 import java.util.Objects;
 import javax.persistence.Column;
@@ -18,7 +19,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement(name = "itemPicture")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class WsItemPicture implements Serializable {
+public class WsItemPicture implements Serializable, WithId {
 
     @Id
     @GeneratedValue

@@ -1,5 +1,6 @@
 package be.valuya.comptoir.api.domain.thirdparty;
 
+import be.valuya.comptoir.api.domain.company.WithId;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import javax.annotation.Nonnull;
 import javax.validation.constraints.NotNull;
@@ -14,7 +15,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement(name = "customer")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class WsCustomer {
+public class WsCustomer implements WithId {
 
     private Long id;
     @NotNull

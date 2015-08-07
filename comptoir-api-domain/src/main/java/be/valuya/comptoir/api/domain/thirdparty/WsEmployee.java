@@ -1,5 +1,6 @@
 package be.valuya.comptoir.api.domain.thirdparty;
 
+import be.valuya.comptoir.api.domain.company.WithId;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import java.io.Serializable;
 import java.util.Locale;
@@ -17,7 +18,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement(name = "employee")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class WsEmployee implements Serializable {
+public class WsEmployee implements Serializable, WithId {
 
     private Long id;
     private boolean active;

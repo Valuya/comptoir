@@ -1,5 +1,6 @@
 package be.valuya.comptoir.api.domain.accounting;
 
+import be.valuya.comptoir.api.domain.company.WithId;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.api.domain.lang.WsLocaleText;
 import be.valuya.comptoir.model.accounting.AccountType;
@@ -18,7 +19,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement(name = "account")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class WsAccount implements Serializable {
+public class WsAccount implements Serializable, WithId {
 
     private Long id;
     @NotNull

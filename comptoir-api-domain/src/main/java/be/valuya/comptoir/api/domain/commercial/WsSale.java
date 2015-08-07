@@ -1,6 +1,7 @@
 package be.valuya.comptoir.api.domain.commercial;
 
 import be.valuya.comptoir.api.domain.accounting.WsAccountingTransactionRef;
+import be.valuya.comptoir.api.domain.company.WithId;
 import be.valuya.comptoir.api.domain.thirdparty.WsCustomerRef;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
@@ -14,7 +15,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement(name = "sale")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class WsSale {
+public class WsSale implements WithId {
 
     private Long id;
     private WsCustomerRef customerRef;

@@ -1,5 +1,6 @@
 package be.valuya.comptoir.api.domain.commercial;
 
+import be.valuya.comptoir.api.domain.company.WithId;
 import java.net.URI;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -13,7 +14,7 @@ import org.glassfish.jersey.linking.InjectLink;
  */
 @XmlRootElement(name = "saleRef")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class WsSaleRef {
+public class WsSaleRef implements WithId {
 
     @InjectLink(value = "sale/${instance.id}")
     @XmlElement

@@ -1,5 +1,6 @@
 package be.valuya.comptoir.api.domain.commercial;
 
+import be.valuya.comptoir.api.domain.company.WithId;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import javax.annotation.Nonnull;
@@ -14,7 +15,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement(name = "price")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class WsPrice {
+public class WsPrice implements WithId {
 
     private Long id;
     private ZonedDateTime startDateTime;

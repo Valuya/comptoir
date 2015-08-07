@@ -1,5 +1,6 @@
 package be.valuya.comptoir.api.domain.accounting;
 
+import be.valuya.comptoir.api.domain.company.WithId;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
@@ -13,7 +14,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement(name = "balance")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class WsBalance implements Serializable {
+public class WsBalance implements Serializable, WithId {
 
     private Long id;
     private WsAccountRef accountRef;

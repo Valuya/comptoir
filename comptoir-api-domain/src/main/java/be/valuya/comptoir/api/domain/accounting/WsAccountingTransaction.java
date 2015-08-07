@@ -1,7 +1,8 @@
 package be.valuya.comptoir.api.domain.accounting;
 
-import be.valuya.comptoir.model.accounting.AccountingTransactionType;
+import be.valuya.comptoir.api.domain.company.WithId;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
+import be.valuya.comptoir.model.accounting.AccountingTransactionType;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.Objects;
@@ -17,7 +18,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement(name = "accounting_transaction")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class WsAccountingTransaction implements Serializable {
+public class WsAccountingTransaction implements Serializable, WithId {
 
     private Long id;
     @NotNull

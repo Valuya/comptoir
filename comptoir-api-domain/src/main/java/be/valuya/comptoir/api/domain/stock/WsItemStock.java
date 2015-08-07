@@ -1,6 +1,7 @@
 package be.valuya.comptoir.api.domain.stock;
 
 import be.valuya.comptoir.api.domain.commercial.WsItemRef;
+import be.valuya.comptoir.api.domain.company.WithId;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
@@ -16,7 +17,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement(name = "ItemStock")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class WsItemStock implements Serializable {
+public class WsItemStock implements Serializable, WithId {
 
     private Long id;
     private ZonedDateTime startDateTime;

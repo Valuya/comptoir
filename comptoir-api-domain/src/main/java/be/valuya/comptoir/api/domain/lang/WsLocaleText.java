@@ -1,5 +1,6 @@
 package be.valuya.comptoir.api.domain.lang;
 
+import be.valuya.comptoir.api.domain.company.WithId;
 import java.io.Serializable;
 import java.util.Locale;
 import java.util.Map;
@@ -14,7 +15,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement(name = "locale_text")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class WsLocaleText implements Serializable {
+public class WsLocaleText implements Serializable, WithId {
 
     private Long id;
     private Map<Locale, String> localeTextMap;
