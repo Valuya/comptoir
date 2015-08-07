@@ -21,7 +21,6 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>comptoir-api-domain</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
