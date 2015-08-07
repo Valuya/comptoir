@@ -1,11 +1,11 @@
 package be.valuya.comptoir.comptoir.ws.rest.control;
 
-import be.valuya.comptoir.api.domain.company.WsCompany;
-import be.valuya.comptoir.api.domain.company.WsCompanyRef;
-import be.valuya.comptoir.comptoir.ws.convert.company.FromWsCompanyConverter;
-import be.valuya.comptoir.comptoir.ws.convert.company.ToWsCompanyConverter;
-import be.valuya.comptoir.model.company.Company;
-import be.valuya.comptoir.service.CompanyService;
+import be.valuya.comptoir.api.domain.accounting.WsAccount;
+import be.valuya.comptoir.api.domain.accounting.WsAccountRef;
+import be.valuya.comptoir.comptoir.ws.convert.accounting.FromWsAccountConverter;
+import be.valuya.comptoir.comptoir.ws.convert.accounting.ToWsAccountConverter;
+import be.valuya.comptoir.model.accounting.Account;
+import be.valuya.comptoir.service.AccountService;
 import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -18,47 +18,47 @@ import javax.ws.rs.PathParam;
  *
  * @author Yannick Majoros <yannick@valuya.be>
  */
-@Path("/company")
-public class CompanyResource {
+@Path("/account")
+public class AccountResource {
 
     @EJB
-    private CompanyService companyService;
+    private AccountService accountService;
     @Inject
-    private FromWsCompanyConverter fromWsCompanyConverter;
+    private FromWsAccountConverter fromWsAccountConverter;
     @Inject
-    private ToWsCompanyConverter toWsCompanyConverter;
+    private ToWsAccountConverter toWsAccountConverter;
     @Inject
     private IdChecker idChecker;
 
     @POST
-    public WsCompanyRef createCompany(@NoId WsCompany wsCompany) {
-        return saveCompany(wsCompany);
+    public WsAccountRef createAccount(@NoId WsAccount wsAccount) {
+        return saveAccount(wsAccount);
     }
 
     @Path("{id}")
     @PUT
-    public WsCompanyRef saveCompany(@PathParam("id") long id, WsCompany wsCompany) {
-        idChecker.checkId(id, wsCompany);
-        return saveCompany(wsCompany);
+    public WsAccountRef saveAccount(@PathParam("id") long id, WsAccount wsAccount) {
+        idChecker.checkId(id, wsAccount);
+        return saveAccount(wsAccount);
     }
 
     @Path("{id}")
     @GET
-    public WsCompany getCompany(@PathParam("id") long id) {
-        Company company = companyService.findCompanyById(id);
+    public WsAccount getAccount(@PathParam("id") long id) {
+        Account account = accountService.findAccountById(id);
 
-        WsCompany wsCompany = toWsCompanyConverter.convert(company);
+        WsAccount wsAccount = toWsAccountConverter.convert(account);
 
-        return wsCompany;
+        return wsAccount;
     }
 
-    private WsCompanyRef saveCompany(WsCompany wsCompany) {
-        Company company = fromWsCompanyConverter.convert(wsCompany);
-        Company savedCompany = companyService.saveCompany(company);
+    private WsAccountRef saveAccount(WsAccount wsAccount) {
+        Account account = fromWsAccountConverter.convert(wsAccount);
+        Account savedAccount = accountService.saveAccount(account);
 
-        WsCompanyRef companyRef = toWsCompanyConverter.reference(savedCompany);
+        WsAccountRef accountRef = toWsAccountConverter.reference(savedAccount);
 
-        return companyRef;
+        return accountRef;
     }
 
 }

@@ -95,4 +95,8 @@ public class AccountService {
         return entityManager.find(AccountingEntry.class, id);
     }
 
+    public Account saveAccount(Account account) {
+        return entityManager.merge(account);
+    }
+
 }
