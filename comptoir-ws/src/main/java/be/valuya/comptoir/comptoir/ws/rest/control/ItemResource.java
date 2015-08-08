@@ -83,6 +83,7 @@ public class ItemResource {
                 .collect(Collectors.toList());
 
         response.setHeader("X-Comptoir-ListTotalCount", "1234");
+
         return wsItems;
     }
 
