@@ -25,11 +25,12 @@ public class FromWsLocaleTextConverter {
 
     public LocaleText update(List<WsLocaleText> wsLocaleTexts, LocaleText existingLocaleText) {
         Map<Locale, String> localeTextMap = wsLocaleTexts.stream()
-                .collect(Collectors.toMap(WsLocaleText::getLocale, WsLocaleText::getText));
+                .collect(Collectors.toMap(WsLocaleText::getLocale, WsLocaleText::getText, throwingMerger()));
 
-        if (existingLocaleText != null) {
-            existingLocaleText.setLocaleTextMap(localeTextMap);
+        if (existingLocaleText == null) {
+            existingLocaleText = new LocaleText();
         }
+        existingLocaleText.setLocaleTextMap(localeTextMap);
 
         return existingLocaleText;
     }

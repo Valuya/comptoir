@@ -3,10 +3,10 @@ package be.valuya.comptoir.ws.convert.company;
 import be.valuya.comptoir.api.domain.company.WsCompany;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.api.domain.lang.WsLocaleText;
-import be.valuya.comptoir.ws.convert.text.FromWsLocaleTextConverter;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.lang.LocaleText;
 import be.valuya.comptoir.service.CompanyService;
+import be.valuya.comptoir.ws.convert.text.FromWsLocaleTextConverter;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.enterprise.context.ApplicationScoped;
@@ -35,15 +35,15 @@ public class FromWsCompanyConverter {
 
         List<WsLocaleText> newName = wsCompany.getName();
         LocaleText existingName = company.getName();
-        LocaleText wsName = fromWsLocaleTextConverter.update(newName, existingName);
+        LocaleText name = fromWsLocaleTextConverter.update(newName, existingName);
 
         List<WsLocaleText> newDescription = wsCompany.getDescription();
         LocaleText existingDescription = company.getDescription();
-        LocaleText wsDescription = fromWsLocaleTextConverter.update(newDescription, existingDescription);
+        LocaleText description = fromWsLocaleTextConverter.update(newDescription, existingDescription);
 
         company.setId(id);
-        company.setDescription(wsDescription);
-        company.setName(wsName);
+        company.setDescription(description);
+        company.setName(name);
 
         return company;
     }

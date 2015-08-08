@@ -2,15 +2,16 @@ package be.valuya.comptoir.ws.rest.control;
 
 import be.valuya.comptoir.api.domain.company.WsCompany;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
+import be.valuya.comptoir.model.company.Company;
+import be.valuya.comptoir.service.CompanyService;
 import be.valuya.comptoir.ws.convert.company.FromWsCompanyConverter;
 import be.valuya.comptoir.ws.convert.company.ToWsCompanyConverter;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
 import be.valuya.comptoir.ws.rest.validation.NoId;
-import be.valuya.comptoir.model.company.Company;
-import be.valuya.comptoir.service.CompanyService;
 import java.util.Optional;
 import javax.ejb.EJB;
 import javax.inject.Inject;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
@@ -26,6 +27,7 @@ import javax.ws.rs.core.MediaType;
  */
 @Path("/company")
 @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 public class CompanyResource {
 
     @EJB
@@ -49,21 +51,22 @@ public class CompanyResource {
 
     @Path("{id}")
     @PUT
-    public WsCompanyRef saveCompany(@PathParam("id") WsCompanyRef companyRef, WsCompany wsCompany) {
-        idChecker.checkId(companyRef, wsCompany);
+    public WsCompanyRef saveCompany(@PathParam("id") long id, WsCompany wsCompany) {
+        idChecker.checkId(id, wsCompany);
 
-        Long id = companyRef.getId();
         Company existingCompany = companyService.findCompanyById(id);
 
         Company company = fromWsCompanyConverter.updateCompany(wsCompany, existingCompany);
         company = companyService.saveCompany(company);
 
-        return companyRef;
+        WsCompanyRef wsCompanyRef = new WsCompanyRef(id);
+
+        return wsCompanyRef;
     }
 
     @Path("{id}")
     @GET
-    public WsCompany getCompany(@PathParam("id") long id) {
+    public WsCompany getCompany(@PathParam("id") Long id) {
         Company company = Optional.ofNullable(companyService.findCompanyById(id))
                 .orElseThrow(NotFoundException::new);
 
