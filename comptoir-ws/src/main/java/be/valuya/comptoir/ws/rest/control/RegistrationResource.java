@@ -5,10 +5,12 @@ import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.api.domain.thirdparty.WsEmployee;
 import be.valuya.comptoir.api.domain.thirdparty.WsRegistration;
 import be.valuya.comptoir.model.company.Company;
+import be.valuya.comptoir.model.thirdparty.Employee;
 import be.valuya.comptoir.service.CompanyService;
 import be.valuya.comptoir.service.EmployeeService;
 import be.valuya.comptoir.ws.convert.company.FromWsCompanyConverter;
 import be.valuya.comptoir.ws.convert.company.ToWsCompanyConverter;
+import be.valuya.comptoir.ws.convert.thirdparty.FromWsEmployeeConverter;
 import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -33,6 +35,8 @@ public class RegistrationResource {
     @Inject
     private FromWsCompanyConverter fromWsCompanyConverter;
     @Inject
+    private FromWsEmployeeConverter fromWsEmployeeConverter;
+    @Inject
     private ToWsCompanyConverter toWsCompanyConverter;
 
     @POST
@@ -44,8 +48,11 @@ public class RegistrationResource {
         Company company = fromWsCompanyConverter.convert(wsCompany);
         Company createdCompany = companyService.saveCompany(company);
 
-//        employeeService.createEmployee(employee);
-//        employeeService.setPassword(employee, employeePassword);
+        Employee employee = fromWsEmployeeConverter.convert(wsEmployee);
+        Employee createdEmployee = employeeService.saveEmployee(employee);
+
+        employeeService.setPassword(createdEmployee, employeePassword);
+
         return toWsCompanyConverter.reference(createdCompany);
     }
 }

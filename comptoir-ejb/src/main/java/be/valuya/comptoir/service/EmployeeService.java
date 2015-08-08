@@ -2,6 +2,10 @@ package be.valuya.comptoir.service;
 
 import be.valuya.comptoir.model.thirdparty.Employee;
 import be.valuya.comptoir.model.thirdparty.Employee_;
+import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.CheckForNull;
@@ -53,6 +57,41 @@ public class EmployeeService {
         } catch (NoResultException noResultException) {
             return null;
         }
+    }
+
+    public Employee saveEmployee(Employee employee) {
+        return entityManager.merge(employee);
+    }
+
+    public void setPassword(Employee employee, String employeePassword) {
+        String hashedPassword = hashPassword(employeePassword);
+
+        Employee managedEmployee = entityManager.merge(employee);
+        managedEmployee.setPasswordHash(hashedPassword);
+    }
+
+    public String hashPassword(String password) {
+        try {
+            MessageDigest messageDigest = MessageDigest.getInstance("MD5");
+            messageDigest.reset();
+            messageDigest.update(password.getBytes(StandardCharsets.UTF_8));
+            byte[] digest = messageDigest.digest();
+            BigInteger bigInteger = new BigInteger(1, digest);
+            String hashedPassword = bigInteger.toString(16);
+
+            // Now we need to zero pad it if you actually want the full 32 chars.
+            while (hashedPassword.length() < 32) {
+                hashedPassword = "0" + hashedPassword;
+            }
+
+            return hashedPassword;
+        } catch (NoSuchAlgorithmException exception) {
+            throw new AssertionError(exception);
+        }
+    }
+
+    public String login(Employee employee, String passwordHash) {
+        return "45678-test-123";
     }
 
 }
