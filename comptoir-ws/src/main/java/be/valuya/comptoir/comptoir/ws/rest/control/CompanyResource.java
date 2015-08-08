@@ -39,14 +39,26 @@ public class CompanyResource {
 
     @POST
     public WsCompanyRef createCompany(@NoId WsCompany wsCompany) {
-        return saveCompany(wsCompany);
+        Company company = fromWsCompanyConverter.convert(wsCompany);
+        Company savedCompany = companyService.saveCompany(company);
+
+        WsCompanyRef companyRef = toWsCompanyConverter.reference(savedCompany);
+
+        return companyRef;
     }
 
     @Path("{id}")
     @PUT
-    public WsCompanyRef saveCompany(@PathParam("id") long id, WsCompany wsCompany) {
-        idChecker.checkId(id, wsCompany);
-        return saveCompany(wsCompany);
+    public WsCompanyRef saveCompany(@PathParam("id") WsCompanyRef companyRef, WsCompany wsCompany) {
+        idChecker.checkId(companyRef, wsCompany);
+
+        Long id = companyRef.getId();
+        Company existingCompany = companyService.findCompanyById(id);
+
+        Company company = fromWsCompanyConverter.updateCompany(wsCompany, existingCompany);
+        company = companyService.saveCompany(company);
+
+        return companyRef;
     }
 
     @Path("{id}")
@@ -54,19 +66,10 @@ public class CompanyResource {
     public WsCompany getCompany(@PathParam("id") long id) {
         Company company = Optional.ofNullable(companyService.findCompanyById(id))
                 .orElseThrow(NotFoundException::new);
-        
+
         WsCompany wsCompany = toWsCompanyConverter.convert(company);
 
         return wsCompany;
-    }
-
-    private WsCompanyRef saveCompany(WsCompany wsCompany) {
-        Company company = fromWsCompanyConverter.convert(wsCompany);
-        Company savedCompany = companyService.saveCompany(company);
-
-        WsCompanyRef companyRef = toWsCompanyConverter.reference(savedCompany);
-
-        return companyRef;
     }
 
 }

@@ -16,13 +16,18 @@ import javax.enterprise.context.ApplicationScoped;
 public class FromWsLocaleTextConverter {
 
     public LocaleText convert(List<WsLocaleText> wsLocaleTexts) {
+        LocaleText localeText = new LocaleText();
+
+        return update(wsLocaleTexts, localeText);
+    }
+
+    public LocaleText update(List<WsLocaleText> wsLocaleTexts, LocaleText existingLocaleText) {
         Map<Locale, String> localeTextMap = wsLocaleTexts.stream()
                 .collect(Collectors.toMap(WsLocaleText::getLocale, WsLocaleText::getText));
 
-        LocaleText localeText = new LocaleText();
-        localeText.setLocaleTextMap(localeTextMap);
+        existingLocaleText.setLocaleTextMap(localeTextMap);
 
-        return localeText;
+        return existingLocaleText;
     }
 
 }

@@ -25,21 +25,29 @@ public class FromWsCompanyConverter {
     private FromWsLocaleTextConverter fromWsLocaleTextConverter;
 
     public Company convert(WsCompany wsCompany) {
-        Long id = wsCompany.getId();
-        List<WsLocaleText> description = wsCompany.getDescription();
-        List<WsLocaleText> name = wsCompany.getName();
-
-        LocaleText wsName = fromWsLocaleTextConverter.convert(name);
-        LocaleText wsDescription = fromWsLocaleTextConverter.convert(description);
-
         Company company = new Company();
+
+        return updateCompany(wsCompany, company);
+    }
+
+    public Company updateCompany(WsCompany wsCompany, Company company) {
+        Long id = wsCompany.getId();
+
+        List<WsLocaleText> newName = wsCompany.getName();
+        LocaleText existingName = company.getName();
+        LocaleText wsName = fromWsLocaleTextConverter.update(newName, existingName);
+
+        List<WsLocaleText> newDescription = wsCompany.getDescription();
+        LocaleText existingDescription = company.getDescription();
+        LocaleText wsDescription = fromWsLocaleTextConverter.update(newDescription, existingDescription);
+
         company.setId(id);
         company.setDescription(wsDescription);
         company.setName(wsName);
 
         return company;
     }
-    
+
     public Company find(WsCompanyRef wsCompanyRef) {
         Long id = wsCompanyRef.getId();
         return companyService.findCompanyById(id);
