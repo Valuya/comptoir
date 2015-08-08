@@ -11,22 +11,20 @@ import be.valuya.comptoir.model.search.ItemSearch;
 import be.valuya.comptoir.service.StockService;
 import be.valuya.comptoir.util.pagination.ItemColumn;
 import be.valuya.comptoir.util.pagination.Pagination;
-import be.valuya.comptoir.util.pagination.Sort;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
 
 /**
  *
@@ -46,9 +44,12 @@ public class ItemResource {
     private IdChecker idChecker;
     @Context
     private HttpServletResponse response;
+    @Context
+    private UriInfo uriInfo;
+    @Inject
+    private RestPaginationUtil restPaginationUtil;
 
     @POST
-
     public WsItemRef createItem(@NoId WsItem wsItem) {
         return saveItem(wsItem);
     }
@@ -72,15 +73,16 @@ public class ItemResource {
 
     @POST
     @Path("search")
-    public List<WsItem> findItems(ItemSearch itemSearch, @QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("maxResults") @DefaultValue("10") int maxResults, @QueryParam("sorts") List<Sort<ItemColumn>> sorts) {
-        Pagination<Item, ItemColumn> pagination = new Pagination(offset, maxResults, sorts);
+    public List<WsItem> findItems(ItemSearch itemSearch) {
+        Pagination<Item, ItemColumn> pagination = restPaginationUtil.extractPagination(uriInfo, ItemColumn::valueOf);
+
         List<Item> items = stockService.findItems(itemSearch, pagination);
 
         List<WsItem> wsItems = items.stream()
                 .map(toWsItemConverter::convert)
                 .collect(Collectors.toList());
 
-        //response.setHeader("size", 1234);
+        response.setHeader("X-Comptoir-ListTotalCount", "1234");
         return wsItems;
     }
 
