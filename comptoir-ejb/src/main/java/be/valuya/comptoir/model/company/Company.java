@@ -3,6 +3,7 @@ package be.valuya.comptoir.model.company;
 import be.valuya.comptoir.model.lang.LocaleText;
 import java.io.Serializable;
 import java.util.Objects;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -18,9 +19,9 @@ public class Company implements Serializable {
     @Id
     @GeneratedValue
     private Long id;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     private LocaleText name;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     private LocaleText description;
 
     public Long getId() {
