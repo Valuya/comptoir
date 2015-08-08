@@ -1,16 +1,18 @@
 package be.valuya.comptoir.comptoir.ws.rest.control;
 
-import be.valuya.comptoir.comptoir.ws.rest.validation.NoId;
-import be.valuya.comptoir.comptoir.ws.rest.validation.IdChecker;
 import be.valuya.comptoir.api.domain.company.WsCompany;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.comptoir.ws.convert.company.FromWsCompanyConverter;
 import be.valuya.comptoir.comptoir.ws.convert.company.ToWsCompanyConverter;
+import be.valuya.comptoir.comptoir.ws.rest.validation.IdChecker;
+import be.valuya.comptoir.comptoir.ws.rest.validation.NoId;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.service.CompanyService;
+import java.util.Optional;
 import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -50,8 +52,9 @@ public class CompanyResource {
     @Path("{id}")
     @GET
     public WsCompany getCompany(@PathParam("id") long id) {
-        Company company = companyService.findCompanyById(id);
-
+        Company company = Optional.ofNullable(companyService.findCompanyById(id))
+                .orElseThrow(NotFoundException::new);
+        
         WsCompany wsCompany = toWsCompanyConverter.convert(company);
 
         return wsCompany;
