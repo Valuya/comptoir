@@ -18,6 +18,7 @@ import be.valuya.comptoir.model.lang.LocaleText;
 import be.valuya.comptoir.model.thirdparty.Customer;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
+import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
@@ -46,7 +47,7 @@ public class ToWsAccountingEntryConverter {
         ZonedDateTime dateTime = accountingEntry.getDateTime();
         BigDecimal vatRate = accountingEntry.getVatRate();
 
-        WsLocaleText wsDescription = toWsLocaleTextConverter.convert(description);
+        List<WsLocaleText> wsDescription = toWsLocaleTextConverter.convert(description);
 
         Company company = accountingEntry.getCompany();
         WsCompanyRef companyRef = toWsCompanyConverter.reference(company);

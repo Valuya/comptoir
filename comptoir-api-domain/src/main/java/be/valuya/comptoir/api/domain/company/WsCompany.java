@@ -1,6 +1,7 @@
 package be.valuya.comptoir.api.domain.company;
 
 import be.valuya.comptoir.api.domain.lang.WsLocaleText;
+import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -14,9 +15,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class WsCompany implements WithId {
 
     private Long id;
-    private WsLocaleText name;
-    private WsLocaleText description;
+    private List<WsLocaleText> name;
+    private List<WsLocaleText> description;
 
+    @Override
     public Long getId() {
         return id;
     }
@@ -25,19 +27,19 @@ public class WsCompany implements WithId {
         this.id = id;
     }
 
-    public WsLocaleText getDescription() {
+    public List<WsLocaleText> getDescription() {
         return description;
     }
 
-    public void setDescription(WsLocaleText description) {
+    public void setDescription(List<WsLocaleText> description) {
         this.description = description;
     }
 
-    public WsLocaleText getName() {
+    public List<WsLocaleText> getName() {
         return name;
     }
 
-    public void setName(WsLocaleText name) {
+    public void setName(List<WsLocaleText> name) {
         this.name = name;
     }
 

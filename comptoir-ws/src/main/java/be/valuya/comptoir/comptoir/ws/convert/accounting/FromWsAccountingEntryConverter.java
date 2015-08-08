@@ -19,6 +19,7 @@ import be.valuya.comptoir.model.thirdparty.Customer;
 import be.valuya.comptoir.service.AccountService;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
+import java.util.List;
 import javax.ejb.EJB;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -45,7 +46,7 @@ public class FromWsAccountingEntryConverter {
 
     public AccountingEntry convert(WsAccountingEntry wsAccountingEntry) {
         Long id = wsAccountingEntry.getId();
-        WsLocaleText description = wsAccountingEntry.getDescription();
+        List<WsLocaleText> description = wsAccountingEntry.getDescription();
         BigDecimal amount = wsAccountingEntry.getAmount();
         ZonedDateTime dateTime = wsAccountingEntry.getDateTime();
         BigDecimal vatRate = wsAccountingEntry.getVatRate();

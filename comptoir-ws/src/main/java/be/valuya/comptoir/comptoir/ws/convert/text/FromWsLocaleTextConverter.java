@@ -2,8 +2,10 @@ package be.valuya.comptoir.comptoir.ws.convert.text;
 
 import be.valuya.comptoir.api.domain.lang.WsLocaleText;
 import be.valuya.comptoir.model.lang.LocaleText;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 
 /**
@@ -13,12 +15,11 @@ import javax.enterprise.context.ApplicationScoped;
 @ApplicationScoped
 public class FromWsLocaleTextConverter {
 
-    public LocaleText convert(WsLocaleText wsLocaleText) {
-        Long id = wsLocaleText.getId();
-        Map<Locale, String> localeTextMap = wsLocaleText.getLocaleTextMap();
+    public LocaleText convert(List<WsLocaleText> wsLocaleTexts) {
+        Map<Locale, String> localeTextMap = wsLocaleTexts.stream()
+                .collect(Collectors.toMap(WsLocaleText::getLocale, WsLocaleText::getText));
 
         LocaleText localeText = new LocaleText();
-        localeText.setId(id);
         localeText.setLocaleTextMap(localeTextMap);
 
         return localeText;

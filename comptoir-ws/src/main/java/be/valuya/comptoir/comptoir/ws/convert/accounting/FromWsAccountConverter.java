@@ -11,6 +11,8 @@ import be.valuya.comptoir.model.accounting.AccountType;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.lang.LocaleText;
 import be.valuya.comptoir.service.AccountService;
+import java.util.List;
+import javax.ejb.EJB;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
@@ -25,7 +27,7 @@ public class FromWsAccountConverter {
     private FromWsLocaleTextConverter fromWsLocaleTextConverter;
     @Inject
     private FromWsCompanyConverter fromWsCompanyConverter;
-    @Inject
+    @EJB
     private AccountService accountService;
 
     public Account convert(WsAccount wsAccount) {
@@ -34,7 +36,7 @@ public class FromWsAccountConverter {
         String accountingNumber = wsAccount.getAccountingNumber();
         String bic = wsAccount.getBic();
         WsCompanyRef companyRef = wsAccount.getCompanyRef();
-        WsLocaleText description = wsAccount.getDescription();
+        List<WsLocaleText> description = wsAccount.getDescription();
         String iban = wsAccount.getIban();
         String name = wsAccount.getName();
 

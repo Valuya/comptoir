@@ -7,6 +7,7 @@ import be.valuya.comptoir.api.domain.thirdparty.WsCustomerRef;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.validation.constraints.NotNull;
@@ -36,13 +37,14 @@ public class WsAccountingEntry implements Serializable, WithId {
     @NotNull
     @Nonnull
     private ZonedDateTime dateTime;
-    private WsLocaleText description;
+    private List<WsLocaleText> description;
     @NotNull
     @Nonnull
     private WsAccountingTransactionRef accountingTransactionRef;
     private WsAccountingEntryRef vatAccountingEntryRef;
     private WsCustomerRef customerRef;
 
+    @Override
     public Long getId() {
         return id;
     }
@@ -101,11 +103,11 @@ public class WsAccountingEntry implements Serializable, WithId {
         this.dateTime = dateTime;
     }
 
-    public WsLocaleText getDescription() {
+    public List<WsLocaleText> getDescription() {
         return description;
     }
 
-    public void setDescription(WsLocaleText description) {
+    public void setDescription(List<WsLocaleText> description) {
         this.description = description;
     }
 

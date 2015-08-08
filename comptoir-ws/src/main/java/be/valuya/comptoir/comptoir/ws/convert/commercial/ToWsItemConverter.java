@@ -13,6 +13,7 @@ import be.valuya.comptoir.model.commercial.Price;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.lang.LocaleText;
 import java.math.BigDecimal;
+import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
@@ -40,8 +41,8 @@ public class ToWsItemConverter {
         String reference = item.getReference();
 
         WsCompanyRef companyRef = toWsCompanyConverter.reference(company);
-        WsLocaleText wsDescription = fromWsLocaleTextConverter.convert(description);
-        WsLocaleText wsName = fromWsLocaleTextConverter.convert(name);
+        List<WsLocaleText> wsDescription = fromWsLocaleTextConverter.convert(description);
+        List<WsLocaleText> wsName = fromWsLocaleTextConverter.convert(name);
 
         ItemPicture mainPicture = item.getMainPicture();
         WsItemPictureRef mainPictureRef = toWsItemPictureConverter.reference(mainPicture);

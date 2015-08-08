@@ -5,6 +5,7 @@ import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.api.domain.lang.WsLocaleText;
 import be.valuya.comptoir.model.accounting.AccountType;
 import java.io.Serializable;
+import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.validation.constraints.NotNull;
@@ -32,11 +33,12 @@ public class WsAccount implements Serializable, WithId {
     @Size(max = 12)
     private String bic;
     private String name;
-    private WsLocaleText description;
+    private List<WsLocaleText> description;
     @NotNull
     @Nonnull
     private AccountType accountType;
 
+    @Override
     public Long getId() {
         return id;
     }
@@ -61,11 +63,11 @@ public class WsAccount implements Serializable, WithId {
         this.name = name;
     }
 
-    public WsLocaleText getDescription() {
+    public List<WsLocaleText> getDescription() {
         return description;
     }
 
-    public void setDescription(WsLocaleText description) {
+    public void setDescription(List<WsLocaleText> description) {
         this.description = description;
     }
 

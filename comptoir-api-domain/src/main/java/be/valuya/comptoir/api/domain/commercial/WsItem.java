@@ -4,6 +4,7 @@ import be.valuya.comptoir.api.domain.company.WithId;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.api.domain.lang.WsLocaleText;
 import java.math.BigDecimal;
+import java.util.List;
 import javax.annotation.Nonnull;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -32,10 +33,10 @@ public class WsItem implements WithId {
     private String model;
     @NotNull
     @Nonnull
-    private WsLocaleText name;
+    private List<WsLocaleText> name;
     @NotNull
     @Nonnull
-    private WsLocaleText description;
+    private List<WsLocaleText> description;
     @NotNull
     @Nonnull
     private BigDecimal vatExclusive;
@@ -43,6 +44,7 @@ public class WsItem implements WithId {
     @Nonnull
     private BigDecimal vatRate;
 
+    @Override
     public Long getId() {
         return id;
     }
@@ -83,19 +85,19 @@ public class WsItem implements WithId {
         this.model = model;
     }
 
-    public WsLocaleText getName() {
+    public List<WsLocaleText> getName() {
         return name;
     }
 
-    public void setName(WsLocaleText name) {
+    public void setName(List<WsLocaleText> name) {
         this.name = name;
     }
 
-    public WsLocaleText getDescription() {
+    public List<WsLocaleText> getDescription() {
         return description;
     }
 
-    public void setDescription(WsLocaleText description) {
+    public void setDescription(List<WsLocaleText> description) {
         this.description = description;
     }
 

@@ -7,6 +7,7 @@ import be.valuya.comptoir.comptoir.ws.convert.text.FromWsLocaleTextConverter;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.lang.LocaleText;
 import be.valuya.comptoir.service.CompanyService;
+import java.util.List;
 import javax.ejb.EJB;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -25,8 +26,8 @@ public class FromWsCompanyConverter {
 
     public Company convert(WsCompany wsCompany) {
         Long id = wsCompany.getId();
-        WsLocaleText description = wsCompany.getDescription();
-        WsLocaleText name = wsCompany.getName();
+        List<WsLocaleText> description = wsCompany.getDescription();
+        List<WsLocaleText> name = wsCompany.getName();
 
         LocaleText wsName = fromWsLocaleTextConverter.convert(name);
         LocaleText wsDescription = fromWsLocaleTextConverter.convert(description);

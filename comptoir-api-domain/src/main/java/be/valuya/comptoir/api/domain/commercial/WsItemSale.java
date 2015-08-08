@@ -4,6 +4,7 @@ import be.valuya.comptoir.api.domain.company.WithId;
 import be.valuya.comptoir.api.domain.lang.WsLocaleText;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
+import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -22,8 +23,9 @@ public class WsItemSale implements WithId {
     private WsPrice price;
     private BigDecimal quantity;
     private WsSaleRef saleRef;
-    private WsLocaleText comment;
+    private List<WsLocaleText> comment;
 
+    @Override
     public Long getId() {
         return id;
     }
@@ -72,11 +74,11 @@ public class WsItemSale implements WithId {
         this.saleRef = saleRef;
     }
 
-    public WsLocaleText getComment() {
+    public List<WsLocaleText> getComment() {
         return comment;
     }
 
-    public void setComment(WsLocaleText comment) {
+    public void setComment(List<WsLocaleText> comment) {
         this.comment = comment;
     }
 

@@ -4,12 +4,13 @@ import be.valuya.comptoir.api.domain.accounting.WsAccount;
 import be.valuya.comptoir.api.domain.accounting.WsAccountRef;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.api.domain.lang.WsLocaleText;
-import be.valuya.comptoir.comptoir.ws.convert.text.ToWsLocaleTextConverter;
 import be.valuya.comptoir.comptoir.ws.convert.company.ToWsCompanyConverter;
+import be.valuya.comptoir.comptoir.ws.convert.text.ToWsLocaleTextConverter;
 import be.valuya.comptoir.model.accounting.Account;
 import be.valuya.comptoir.model.accounting.AccountType;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.lang.LocaleText;
+import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
@@ -35,7 +36,7 @@ public class ToWsAccountConverter {
         String iban = account.getIban();
         String name = account.getName();
 
-        WsLocaleText wsDescription = fromWsLocaleTextConverter.convert(description);
+        List<WsLocaleText> wsDescription = fromWsLocaleTextConverter.convert(description);
         WsCompanyRef companyRef = toWsCompanyConverter.reference(company);
 
         WsAccount wsAccount = new WsAccount();

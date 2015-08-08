@@ -14,6 +14,7 @@ import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.lang.LocaleText;
 import be.valuya.comptoir.service.StockService;
 import java.math.BigDecimal;
+import java.util.List;
 import javax.ejb.EJB;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -42,10 +43,10 @@ public class FromWsItemConverter {
         BigDecimal vatExclusive = wsItem.getVatExclusive();
         BigDecimal vatRate = wsItem.getVatRate();
 
-        WsLocaleText description = wsItem.getDescription();
+        List<WsLocaleText> description = wsItem.getDescription();
         LocaleText wsDescription = fromWsLocaleTextConverter.convert(description);
 
-        WsLocaleText name = wsItem.getName();
+        List<WsLocaleText> name = wsItem.getName();
         LocaleText wsName = fromWsLocaleTextConverter.convert(name);
 
         WsCompanyRef companyRef = wsItem.getCompanyRef();
