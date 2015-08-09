@@ -17,7 +17,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  * @author Yannick Majoros <yannick@valuya.be>
  */
-@XmlRootElement(name = "itemPicture")
+@XmlRootElement(name = "ItemPicture")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class WsItemPicture implements Serializable, WithId {
 

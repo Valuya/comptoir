@@ -18,7 +18,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  * @author Yannick Majoros <yannick@valuya.be>
  */
-@XmlRootElement(name = "account")
+@XmlRootElement(name = "Account")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class WsAccount implements Serializable, WithId {
 

@@ -14,13 +14,14 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  * @author cghislai
  */
- @XmlRootElement
+@XmlRootElement(name = "LoginCredentials")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class WsLoginCredentials {
+
     @XmlElement
-    String login;
+    private String login;
     @XmlElement
-    String passwordHash;
+    private String passwordHash;
 
     public String getLogin() {
         return login;
@@ -38,5 +39,4 @@ public class WsLoginCredentials {
         this.passwordHash = passwordHash;
     }
 
-    
 }

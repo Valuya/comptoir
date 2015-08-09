@@ -12,7 +12,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *
  * @author Yannick Majoros <yannick@valuya.be>
  */
-@XmlRootElement(name = "locale_text")
+@XmlRootElement(name = "LocaleText")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class WsLocaleText implements Serializable {
 

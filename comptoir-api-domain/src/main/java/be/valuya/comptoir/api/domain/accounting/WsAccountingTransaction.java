@@ -16,7 +16,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  * @author Yannick Majoros <yannick@valuya.be>
  */
-@XmlRootElement(name = "accounting_transaction")
+@XmlRootElement(name = "AccountingTransaction")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class WsAccountingTransaction implements Serializable, WithId {
 

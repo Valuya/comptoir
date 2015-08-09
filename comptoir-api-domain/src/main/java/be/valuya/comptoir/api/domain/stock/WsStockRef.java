@@ -12,7 +12,7 @@ import org.glassfish.jersey.linking.InjectLink;
  *
  * @author Yannick Majoros <yannick@valuya.be>
  */
-@XmlRootElement(name = "stockRef")
+@XmlRootElement(name = "StockRef")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class WsStockRef implements WithId {
 

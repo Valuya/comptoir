@@ -7,7 +7,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  * @author Yannick Majoros <yannick@valuya.be>
  */
-@XmlRootElement(name = "loginResponse")
+@XmlRootElement(name = "LoginResponse")
 public class WsLoginResponse {
 
     private WsEmployeeRef employeeRef;

@@ -12,7 +12,7 @@ import org.glassfish.jersey.linking.InjectLink;
  *
  * @author Yannick Majoros <yannick@valuya.be>
  */
-@XmlRootElement(name = "balanceRef")
+@XmlRootElement(name = "BalanceRef")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class WsBalanceRef implements WithId {
 

@@ -15,7 +15,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  * @author Yannick Majoros <yannick@valuya.be>
  */
-@XmlRootElement(name = "money_pile")
+@XmlRootElement(name = "MoneyPile")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class WsMoneyPile implements Serializable, WithId {
 

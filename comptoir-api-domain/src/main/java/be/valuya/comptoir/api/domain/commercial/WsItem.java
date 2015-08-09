@@ -16,7 +16,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  * @author Yannick Majoros <yannick@valuya.be>
  */
-@XmlRootElement(name = "item")
+@XmlRootElement(name = "Item")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class WsItem implements WithId {
 

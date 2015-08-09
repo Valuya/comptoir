@@ -13,7 +13,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  * @author Yannick Majoros <yannick@valuya.be>
  */
-@XmlRootElement(name = "itemSale")
+@XmlRootElement(name = "ItemSale")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class WsItemSale implements WithId {
 

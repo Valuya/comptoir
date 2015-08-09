@@ -13,7 +13,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  * @author Yannick Majoros <yannick@valuya.be>
  */
-@XmlRootElement(name = "ItemStock")
+@XmlRootElement(name = "Stock")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class WsStock implements Serializable, WithId {
 

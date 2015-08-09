@@ -12,7 +12,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  * @author Yannick Majoros <yannick@valuya.be>
  */
-@XmlRootElement(name = "balance")
+@XmlRootElement(name = "Balance")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class WsBalance implements Serializable, WithId {
 
