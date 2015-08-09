@@ -47,12 +47,14 @@ public class RegistrationResource {
 
         Company company = fromWsCompanyConverter.convert(wsCompany);
         Company createdCompany = companyService.saveCompany(company);
+        WsCompanyRef companyRef = toWsCompanyConverter.reference(createdCompany);
 
+        wsEmployee.setCompanyRef(companyRef);
         Employee employee = fromWsEmployeeConverter.convert(wsEmployee);
         Employee createdEmployee = employeeService.saveEmployee(employee);
 
         employeeService.setPassword(createdEmployee, employeePassword);
 
-        return toWsCompanyConverter.reference(createdCompany);
+        return companyRef;
     }
 }

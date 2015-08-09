@@ -1,5 +1,6 @@
 package be.valuya.comptoir.ws.rest.control;
 
+import be.valuya.comptoir.api.domain.auth.WsLoginCredentials;
 import be.valuya.comptoir.api.domain.auth.WsLoginResponse;
 import be.valuya.comptoir.api.domain.thirdparty.WsEmployeeRef;
 import be.valuya.comptoir.model.thirdparty.Employee;
@@ -31,14 +32,15 @@ public class LoginResource {
     @Inject
     private ToWsEmployeeConverter toWsEmployeeConverter;
 
+   
     @POST
-    public WsLoginResponse login(String login, String passwordHash) {
-        Employee employee = employeeService.findEmployeeByLogin(login);
+    public WsLoginResponse login(WsLoginCredentials credentials) {
+        Employee employee = employeeService.findEmployeeByLogin(credentials.getLogin());
         if (employee == null) {
             throw new NotFoundException();
         }
 
-        String token = employeeService.login(employee, passwordHash);
+        String token = employeeService.login(employee, credentials.getPasswordHash());
 
         WsEmployeeRef employeeRef = toWsEmployeeConverter.reference(employee);
 
