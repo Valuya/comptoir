@@ -77,6 +77,12 @@ public class EmployeeResource {
         return wsEmployees;
     }
 
+    @Path("/{employeeId}/{password}")
+    public void setPassword(@PathParam("employeeId") long employeeId, @PathParam("password") String password) {
+        Employee employee = employeeService.findEmployeeById(employeeId);
+        employeeService.setPassword(employee, password);
+    }
+
     private WsEmployeeRef saveEmployee(WsEmployee wsEmployee) {
         Employee employee = fromWsEmployeeConverter.convert(wsEmployee);
         Employee savedEmployee = employeeService.saveEmployee(employee);
