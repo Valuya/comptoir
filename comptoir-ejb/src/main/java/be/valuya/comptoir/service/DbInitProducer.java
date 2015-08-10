@@ -27,7 +27,7 @@ public class DbInitProducer {
 
     private static final Logger LOG = Logger.getLogger(DbInitProducer.class.getName());
 
-    @Resource(name = "jdbc/comptoir")
+    @Resource(lookup = "jdbc/comptoir")
     private DataSource dataSource;
 
     @PostConstruct
