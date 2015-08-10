@@ -78,6 +78,7 @@ public class EmployeeResource {
     }
 
     @Path("/{employeeId}/{password}")
+    @POST
     public void setPassword(@PathParam("employeeId") long employeeId, @PathParam("password") String password) {
         Employee employee = employeeService.findEmployeeById(employeeId);
         employeeService.setPassword(employee, password);
