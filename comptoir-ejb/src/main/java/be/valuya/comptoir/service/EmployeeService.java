@@ -1,5 +1,7 @@
 package be.valuya.comptoir.service;
 
+import be.valuya.comptoir.model.company.Company;
+import be.valuya.comptoir.model.search.EmployeeSearch;
 import be.valuya.comptoir.model.thirdparty.Employee;
 import be.valuya.comptoir.model.thirdparty.Employee_;
 import java.math.BigInteger;
@@ -92,6 +94,28 @@ public class EmployeeService {
 
     public String login(Employee employee, String passwordHash) {
         return "45678-test-123";
+    }
+
+    public Employee findEmployeeById(long id) {
+        return entityManager.find(Employee.class, id);
+    }
+
+    public List<Employee> findEmployees(EmployeeSearch employeeSearch) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Employee> query = criteriaBuilder.createQuery(Employee.class);
+        Root<Employee> employeeRoot = query.from(Employee.class);
+        List<Predicate> predicates = new ArrayList<>();
+
+        Path<Company> companyPath = employeeRoot.get(Employee_.company);
+        Company company = employeeSearch.getCompany();
+        Predicate companyPredicate = criteriaBuilder.equal(companyPath, company);
+        predicates.add(companyPredicate);
+
+        Predicate[] predicateArray = predicates.toArray(new Predicate[0]);
+        query.where(predicateArray);
+
+        TypedQuery<Employee> typedQuery = entityManager.createQuery(query);
+        return typedQuery.getResultList();
     }
 
 }

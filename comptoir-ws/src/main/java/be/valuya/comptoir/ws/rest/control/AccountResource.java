@@ -1,14 +1,16 @@
 package be.valuya.comptoir.ws.rest.control;
 
-import be.valuya.comptoir.ws.rest.validation.NoId;
-import be.valuya.comptoir.ws.rest.validation.IdChecker;
 import be.valuya.comptoir.api.domain.accounting.WsAccount;
 import be.valuya.comptoir.api.domain.accounting.WsAccountRef;
-import be.valuya.comptoir.ws.convert.accounting.FromWsAccountConverter;
-import be.valuya.comptoir.ws.convert.accounting.ToWsAccountConverter;
+import be.valuya.comptoir.api.domain.search.WsAccountSearch;
 import be.valuya.comptoir.model.accounting.Account;
 import be.valuya.comptoir.model.search.AccountSearch;
 import be.valuya.comptoir.service.AccountService;
+import be.valuya.comptoir.ws.convert.accounting.FromWsAccountConverter;
+import be.valuya.comptoir.ws.convert.accounting.ToWsAccountConverter;
+import be.valuya.comptoir.ws.convert.search.FromWsAccountSearchConverter;
+import be.valuya.comptoir.ws.rest.validation.IdChecker;
+import be.valuya.comptoir.ws.rest.validation.NoId;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.ejb.EJB;
@@ -33,6 +35,8 @@ public class AccountResource {
     private AccountService accountService;
     @Inject
     private FromWsAccountConverter fromWsAccountConverter;
+    @Inject
+    private FromWsAccountSearchConverter fromWsAccountSearchConverter;
     @Inject
     private ToWsAccountConverter toWsAccountConverter;
     @Inject
@@ -62,7 +66,8 @@ public class AccountResource {
 
     @POST
     @Path("search")
-    public List<WsAccount> findAccounts(AccountSearch accountSearch) {
+    public List<WsAccount> findAccounts(WsAccountSearch wsAccountSearch) {
+        AccountSearch accountSearch = fromWsAccountSearchConverter.convert(wsAccountSearch);
         List<Account> accounts = accountService.findAccounts(accountSearch);
 
         List<WsAccount> wsAccounts = accounts.stream()
