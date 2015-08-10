@@ -6,12 +6,10 @@ import be.valuya.comptoir.model.accounting.Account_;
 import be.valuya.comptoir.model.accounting.AccountingEntry;
 import be.valuya.comptoir.model.accounting.AccountingTransaction;
 import be.valuya.comptoir.model.company.Company;
-import be.valuya.comptoir.model.factory.LocaleTextFactory;
 import be.valuya.comptoir.model.search.AccountSearch;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nonnull;
-import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -31,8 +29,6 @@ public class AccountService {
 
     @PersistenceContext
     private EntityManager entityManager;
-    @EJB
-    private LocaleTextFactory localeTextFactory;
 
     @Nonnull
     public List<Account> findAccounts(@Nonnull AccountSearch accountSearch) {
