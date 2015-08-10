@@ -2,15 +2,17 @@ package be.valuya.comptoir.ws.rest.control;
 
 import be.valuya.comptoir.api.domain.commercial.WsItem;
 import be.valuya.comptoir.api.domain.commercial.WsItemRef;
-import be.valuya.comptoir.ws.convert.commercial.FromWsItemConverter;
-import be.valuya.comptoir.ws.convert.commercial.ToWsItemConverter;
-import be.valuya.comptoir.ws.rest.validation.IdChecker;
-import be.valuya.comptoir.ws.rest.validation.NoId;
+import be.valuya.comptoir.api.domain.search.WsItemSearch;
 import be.valuya.comptoir.model.commercial.Item;
 import be.valuya.comptoir.model.search.ItemSearch;
 import be.valuya.comptoir.service.StockService;
 import be.valuya.comptoir.util.pagination.ItemColumn;
 import be.valuya.comptoir.util.pagination.Pagination;
+import be.valuya.comptoir.ws.convert.commercial.FromWsItemConverter;
+import be.valuya.comptoir.ws.convert.commercial.ToWsItemConverter;
+import be.valuya.comptoir.ws.convert.search.FromWsItemSearchConverter;
+import be.valuya.comptoir.ws.rest.validation.IdChecker;
+import be.valuya.comptoir.ws.rest.validation.NoId;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.ejb.EJB;
@@ -39,6 +41,8 @@ public class ItemResource {
     @Inject
     private FromWsItemConverter fromWsItemConverter;
     @Inject
+    private FromWsItemSearchConverter fromWsItemSearchConverter;
+    @Inject
     private ToWsItemConverter toWsItemConverter;
     @Inject
     private IdChecker idChecker;
@@ -51,14 +55,24 @@ public class ItemResource {
 
     @POST
     public WsItemRef createItem(@NoId WsItem wsItem) {
-        return saveItem(wsItem);
+        Item item = fromWsItemConverter.convert(wsItem);
+        Item savedItem = stockService.saveItem(item);
+
+        WsItemRef itemRef = toWsItemConverter.reference(savedItem);
+
+        return itemRef;
     }
 
     @Path("{id}")
     @PUT
-    public WsItemRef saveItem(@PathParam("id") long id, WsItem wsItem) {
+    public WsItemRef updateItem(@PathParam("id") long id, WsItem wsItem) {
         idChecker.checkId(id, wsItem);
-        return saveItem(wsItem);
+        Item item = fromWsItemConverter.convert(wsItem);
+        Item savedItem = stockService.saveItem(item);
+
+        WsItemRef itemRef = toWsItemConverter.reference(savedItem);
+
+        return itemRef;
     }
 
     @Path("{id}")
@@ -73,8 +87,10 @@ public class ItemResource {
 
     @POST
     @Path("search")
-    public List<WsItem> findItems(ItemSearch itemSearch) {
+    public List<WsItem> findItems(WsItemSearch wsItemSearch) {
         Pagination<Item, ItemColumn> pagination = restPaginationUtil.extractPagination(uriInfo, ItemColumn::valueOf);
+
+        ItemSearch itemSearch = fromWsItemSearchConverter.convert(wsItemSearch);
 
         List<Item> items = stockService.findItems(itemSearch, pagination);
 
@@ -85,15 +101,6 @@ public class ItemResource {
         response.setHeader("X-Comptoir-ListTotalCount", "1234");
 
         return wsItems;
-    }
-
-    private WsItemRef saveItem(WsItem wsItem) {
-        Item item = fromWsItemConverter.convert(wsItem);
-        Item savedItem = stockService.saveItem(item);
-
-        WsItemRef itemRef = toWsItemConverter.reference(savedItem);
-
-        return itemRef;
     }
 
 }
