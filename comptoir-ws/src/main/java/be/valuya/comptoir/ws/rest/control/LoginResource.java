@@ -4,7 +4,6 @@ import be.valuya.comptoir.api.domain.auth.WsLoginCredentials;
 import be.valuya.comptoir.api.domain.auth.WsLoginResponse;
 import be.valuya.comptoir.api.domain.thirdparty.WsEmployeeRef;
 import be.valuya.comptoir.model.thirdparty.Employee;
-import be.valuya.comptoir.service.CompanyService;
 import be.valuya.comptoir.service.EmployeeService;
 import be.valuya.comptoir.ws.convert.thirdparty.ToWsEmployeeConverter;
 import javax.ejb.EJB;
@@ -26,21 +25,21 @@ import javax.ws.rs.core.MediaType;
 public class LoginResource {
 
     @EJB
-    private CompanyService companyService;
-    @EJB
     private EmployeeService employeeService;
     @Inject
     private ToWsEmployeeConverter toWsEmployeeConverter;
 
-   
     @POST
     public WsLoginResponse login(WsLoginCredentials credentials) {
-        Employee employee = employeeService.findEmployeeByLogin(credentials.getLogin());
+        String login = credentials.getLogin();
+        Employee employee = employeeService.findEmployeeByLogin(login);
         if (employee == null) {
             throw new NotFoundException();
         }
 
-        String token = employeeService.login(employee, credentials.getPasswordHash());
+        String passwordHash = credentials.getPasswordHash();
+
+        String token = employeeService.login(employee, passwordHash);
 
         WsEmployeeRef employeeRef = toWsEmployeeConverter.reference(employee);
 
