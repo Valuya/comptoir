@@ -4,13 +4,13 @@ import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.thirdparty.Employee;
 import java.util.Locale;
 import javax.annotation.Nonnull;
-import javax.ejb.Singleton;
+import javax.ejb.Stateless;
 
 /**
  *
  * @author Yannick Majoros <yannick@valuya.be>
  */
-@Singleton
+@Stateless
 public class EmployeeFactory {
 
     public Employee createEmployee(@Nonnull Company company) {

@@ -2,14 +2,14 @@ package be.valuya.comptoir.model.factory;
 
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.lang.LocaleText;
-import javax.ejb.Singleton;
+import javax.ejb.Stateless;
 import javax.inject.Inject;
 
 /**
  *
  * @author Yannick Majoros <yannick@valuya.be>
  */
-@Singleton
+@Stateless
 public class CompanyFactory {
 
     @Inject

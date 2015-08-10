@@ -4,13 +4,13 @@ import be.valuya.comptoir.model.lang.LocaleText;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import javax.ejb.Singleton;
+import javax.ejb.Stateless;
 
 /**
  *
  * @author Yannick Majoros <yannick@valuya.be>
  */
-@Singleton
+@Stateless
 public class LocaleTextFactory {
 
     public LocaleText createLocaleText() {

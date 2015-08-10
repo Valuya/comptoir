@@ -5,13 +5,13 @@ import be.valuya.comptoir.model.company.Company;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import javax.annotation.Nonnull;
-import javax.ejb.Singleton;
+import javax.ejb.Stateless;
 
 /**
  *
  * @author Yannick Majoros <yannick@valuya.be>
  */
-@Singleton
+@Stateless
 public class PriceFactory {
 
     public Price createPrice(@Nonnull Company company) {
