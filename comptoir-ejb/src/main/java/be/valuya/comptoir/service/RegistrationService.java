@@ -27,11 +27,15 @@ public class RegistrationService {
     private EntityManager entityManager;
     @EJB
     private LocaleTextFactory localeTextFactory;
+    @EJB
+    private EmployeeService employeeService;
 
-    public void register(Company company, Employee employee) {
+    public Company register(Company company, Employee employee, String password) {
         Company managedCompany = entityManager.merge(company);
         Employee managedEmployee = entityManager.merge(employee);
         managedEmployee.setCompany(managedCompany);
+
+        employeeService.setPassword(employee, password);
 
         LocaleText stockDescription = localeTextFactory.createLocaleText();
 
@@ -49,6 +53,8 @@ public class RegistrationService {
 
         accounts.stream()
                 .forEach(entityManager::merge);
+
+        return managedCompany;
     }
 
     public List<Account> createDefaultAccounts(Company managedCompany) {
