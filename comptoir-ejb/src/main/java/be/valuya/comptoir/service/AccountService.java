@@ -7,14 +7,9 @@ import be.valuya.comptoir.model.accounting.AccountingEntry;
 import be.valuya.comptoir.model.accounting.AccountingTransaction;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.factory.LocaleTextFactory;
-import be.valuya.comptoir.model.lang.LocaleText;
 import be.valuya.comptoir.model.search.AccountSearch;
-import be.valuya.comptoir.model.stock.Stock;
-import be.valuya.comptoir.model.thirdparty.Employee;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -67,23 +62,6 @@ public class AccountService {
         List<Account> accounts = typedQuery.getResultList();
 
         return accounts;
-    }
-
-    public void register(Company company, Employee employee) {
-        Company managedCompany = entityManager.merge(company);
-        Employee managedEmployee = entityManager.merge(employee);
-
-        LocaleText stockDescription = localeTextFactory.createLocaleText();
-
-        Map<Locale, String> stockDescriptionLocaleTextMap = stockDescription.getLocaleTextMap();
-        stockDescriptionLocaleTextMap.put(Locale.ENGLISH, "Default stock");
-        stockDescriptionLocaleTextMap.put(Locale.FRENCH, "Stock par défaut");
-
-        Stock stock = new Stock();
-        stock.setDescription(stockDescription);
-        stock.setCompany(managedCompany);
-
-        Stock managedStock = entityManager.merge(stock);
     }
 
     public Account findAccountById(Long id) {

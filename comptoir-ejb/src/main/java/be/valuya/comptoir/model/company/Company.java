@@ -24,6 +24,9 @@ public class Company implements Serializable {
     @ManyToOne(cascade = CascadeType.ALL)
     private LocaleText description;
 
+    public Company() {
+    }
+
     public Long getId() {
         return id;
     }
