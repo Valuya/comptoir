@@ -14,7 +14,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  * @author Yannick Majoros <yannick@valuya.be>
  */
-@XmlRootElement
+@XmlRootElement(name = "ItemStockSearch")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class WsItemStockSearch {
 

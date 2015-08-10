@@ -10,7 +10,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  * @author Yannick Majoros <yannick@valuya.be>
  */
-@XmlRootElement
+@XmlRootElement(name = "WsEmployeeSearch")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class WsEmployeeSearch {
 

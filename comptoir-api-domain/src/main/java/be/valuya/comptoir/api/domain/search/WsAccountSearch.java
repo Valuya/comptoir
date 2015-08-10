@@ -12,7 +12,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  * @author Yannick Majoros <yannick@valuya.be>
  */
-@XmlRootElement
+@XmlRootElement(name = "AccountSearch")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class WsAccountSearch {
 
