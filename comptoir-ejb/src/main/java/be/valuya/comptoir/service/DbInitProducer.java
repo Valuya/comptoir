@@ -37,9 +37,10 @@ public class DbInitProducer {
             Connection connection = dataSource.getConnection();
             JdbcConnection jdbcConnection = new JdbcConnection(connection);
             Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(jdbcConnection);
-            ClassLoaderResourceAccessor classLoaderResourceAccessor = new ClassLoaderResourceAccessor();
+            ClassLoader classLoader = this.getClass().getClassLoader();
+            ClassLoaderResourceAccessor classLoaderResourceAccessor = new ClassLoaderResourceAccessor(classLoader);
 
-            Liquibase liquibase = new Liquibase("db.changelog.xml", classLoaderResourceAccessor, database);
+            Liquibase liquibase = new Liquibase("db/liquibase/main.xml", classLoaderResourceAccessor, database);
             liquibase.update("");
             LOG.info("Liquibase done.");
         } catch (SQLException | LiquibaseException exception) {
