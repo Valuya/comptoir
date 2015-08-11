@@ -1,5 +1,6 @@
 package be.valuya.comptoir.api.domain.search;
 
+import be.valuya.comptoir.api.domain.commercial.WsPosRef;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.model.accounting.AccountType;
 import javax.annotation.Nonnull;
@@ -16,10 +17,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class WsAccountSearch {
 
-    @NotNull
-    private AccountType accountType;
     @Nonnull
+    @NotNull
     private WsCompanyRef companyRef;
+    private AccountType accountType;
+    private WsPosRef posRef;
 
     public WsCompanyRef getCompanyRef() {
         return companyRef;
@@ -35,6 +37,14 @@ public class WsAccountSearch {
 
     public void setAccountType(AccountType accountType) {
         this.accountType = accountType;
+    }
+
+    public WsPosRef getPosRef() {
+        return posRef;
+    }
+
+    public void setPosRef(WsPosRef posRef) {
+        this.posRef = posRef;
     }
 
 }
