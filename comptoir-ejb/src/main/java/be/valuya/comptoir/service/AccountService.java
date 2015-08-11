@@ -5,6 +5,7 @@ import be.valuya.comptoir.model.accounting.AccountType;
 import be.valuya.comptoir.model.accounting.Account_;
 import be.valuya.comptoir.model.accounting.AccountingEntry;
 import be.valuya.comptoir.model.accounting.AccountingTransaction;
+import be.valuya.comptoir.model.commercial.Pos;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.search.AccountSearch;
 import java.util.ArrayList;
@@ -48,6 +49,10 @@ public class AccountService {
             Path<AccountType> accountTypePath = accountRoot.get(Account_.accountType);
             Predicate accountTypePredicate = criteriaBuilder.equal(accountTypePath, accountType);
             predicates.add(accountTypePredicate);
+        }
+        
+        Pos pos = accountSearch.getPos();
+        if (pos != null) {
         }
 
         Predicate[] predicateArray = predicates.toArray(new Predicate[0]);
