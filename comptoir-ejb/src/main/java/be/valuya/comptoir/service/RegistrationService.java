@@ -35,10 +35,10 @@ public class RegistrationService {
 
     public Company register(Company company, Employee employee, String password) {
         Company managedCompany = entityManager.merge(company);
+        employee.setCompany(managedCompany);
         Employee managedEmployee = entityManager.merge(employee);
-        managedEmployee.setCompany(managedCompany);
 
-        employeeService.setPassword(employee, password);
+        employeeService.setPassword(managedEmployee, password);
 
         LocaleText stockDescription = localeTextFactory.createLocaleText();
 

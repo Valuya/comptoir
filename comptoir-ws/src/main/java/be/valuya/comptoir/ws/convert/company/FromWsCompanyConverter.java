@@ -49,6 +49,9 @@ public class FromWsCompanyConverter {
     }
 
     public Company find(WsCompanyRef wsCompanyRef) {
+        if (wsCompanyRef == null) {
+            return null;
+        }
         Long id = wsCompanyRef.getId();
         return companyService.findCompanyById(id);
     }

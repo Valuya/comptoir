@@ -15,4 +15,54 @@
         </createTable>
     </changeSet>
 
+    <changeSet id="2" author="ymajoros">
+        <addForeignKeyConstraint 
+            constraintName="fk_pos_description_text" 
+            baseTableName="pos" 
+            baseColumnNames="description_id" 
+            referencedTableName="locale_text" 
+            referencedColumnNames="id"
+        />
+    </changeSet>
+
+    <changeSet id="3" author="ymajoros">
+        <addForeignKeyConstraint 
+            constraintName="fk_pos_company" 
+            baseTableName="pos" 
+            baseColumnNames="company_id" 
+            referencedTableName="company" 
+            referencedColumnNames="id"
+        />
+    </changeSet>
+
+    <changeSet id="4" author="ymajoros">
+        <createTable tableName="pos_payment_account">
+            <column name="id" type="bigint(20)">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="pos_id" type="bigint(20)" />
+            <column name="account_id" type="bigint(20)" />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="5" author="ymajoros">
+        <addForeignKeyConstraint 
+            constraintName="fk_pos_paccount_account" 
+            baseTableName="pos_payment_account" 
+            baseColumnNames="account_id" 
+            referencedTableName="account" 
+            referencedColumnNames="id"
+        />
+    </changeSet>
+
+    <changeSet id="6" author="ymajoros">
+        <addForeignKeyConstraint 
+            constraintName="fk_pos_paccount_pos" 
+            baseTableName="pos_payment_account" 
+            baseColumnNames="pos_id" 
+            referencedTableName="pos" 
+            referencedColumnNames="id"
+        />
+    </changeSet>
+
 </databaseChangeLog>
