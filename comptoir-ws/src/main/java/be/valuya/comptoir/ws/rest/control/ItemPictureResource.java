@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.ejb.EJB;
 import javax.inject.Inject;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -42,18 +43,23 @@ public class ItemPictureResource {
     private WsItemRef itemRef;
 
     @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
     public WsItemPictureRef createItemPicture(@NoId WsItemPicture wsItemPicture) {
         return saveItemPicture(wsItemPicture);
     }
 
     @Path("{id}")
     @PUT
-    public WsItemPictureRef saveItemPicture(@PathParam("id") long id, WsItemPicture wsItemPicture) {
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public WsItemPictureRef updateItemPicture(@PathParam("id") long id, WsItemPicture wsItemPicture) {
         idChecker.checkId(id, wsItemPicture);
         return saveItemPicture(wsItemPicture);
     }
 
     @GET
+    @Produces(MediaType.APPLICATION_JSON)
     public List<WsItemPicture> findItemPictures() {
         Long itemId = itemRef.getId();
         Item item = stockService.findItemById(itemId);
@@ -68,6 +74,7 @@ public class ItemPictureResource {
 
     @Path("{id}")
     @GET
+    @Produces(MediaType.APPLICATION_JSON)
     public WsItemPicture getItemPicture(@PathParam("id") long id) {
         ItemPicture itemPicture = stockService.findItemPictureById(id);
 
