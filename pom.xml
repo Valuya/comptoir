@@ -27,7 +27,6 @@
     </build>
     <modules>
         <module>comptoir-ear</module>
-        <module>comptoir-web</module>
         <module>comptoir-ejb</module>
         <module>comptoir-api-domain</module>
         <module>comptoir-ws</module>

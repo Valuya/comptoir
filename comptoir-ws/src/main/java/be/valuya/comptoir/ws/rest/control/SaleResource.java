@@ -74,6 +74,7 @@ public class SaleResource {
         return wsSale;
     }
 
+    @POST
     @Path("search")
     public List<WsSale> findSales(WsSaleSearch wsSaleSearch) {
         SaleSearch saleSearch = fromWsSaleSearchConverter.convert(wsSaleSearch);

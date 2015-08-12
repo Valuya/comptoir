@@ -10,8 +10,6 @@
     <artifactId>comptoir-ws</artifactId>
     <packaging>war</packaging>
 
-    <name>comptoir-ws</name>
-
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
