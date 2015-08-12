@@ -10,6 +10,7 @@ import be.valuya.comptoir.ws.rest.validation.NoId;
 import be.valuya.comptoir.model.commercial.Item;
 import be.valuya.comptoir.model.commercial.ItemPicture;
 import be.valuya.comptoir.service.StockService;
+import be.valuya.comptoir.ws.convert.commercial.FromWsItemConverter;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.ejb.EJB;
@@ -37,9 +38,11 @@ public class ItemPictureResource {
     @Inject
     private ToWsItemPictureConverter toWsItemPictureConverter;
     @Inject
+    private FromWsItemConverter fromWsItemConverter;
+    @Inject
     private IdChecker idChecker;
     @PathParam("itemId")
-    private WsItemRef itemRef;
+    private Long itemId;
 
     @POST
     public WsItemPictureRef createItemPicture(@NoId WsItemPicture wsItemPicture) {
@@ -55,7 +58,6 @@ public class ItemPictureResource {
 
     @GET
     public List<WsItemPicture> findItemPictures() {
-        Long itemId = itemRef.getId();
         Item item = stockService.findItemById(itemId);
         List<ItemPicture> itemPictures = stockService.findItemPictures(item);
 
@@ -81,6 +83,11 @@ public class ItemPictureResource {
         ItemPicture savedItemPicture = stockService.saveItemPicture(itemPicture);
 
         WsItemPictureRef itemPictureRef = toWsItemPictureConverter.reference(savedItemPicture);
+
+        WsItemRef itemRef = new WsItemRef(itemId);
+        Item item = fromWsItemConverter.find(itemRef);
+        item.setMainPicture(itemPicture);
+        item = stockService.saveItem(item);
 
         return itemPictureRef;
     }

@@ -6,6 +6,7 @@ import be.valuya.comptoir.api.domain.commercial.WsItemRef;
 import be.valuya.comptoir.model.commercial.Item;
 import be.valuya.comptoir.model.commercial.ItemPicture;
 import be.valuya.comptoir.service.StockService;
+import java.util.Base64;
 import javax.ejb.EJB;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -25,7 +26,8 @@ public class FromWsItemPictureConverter {
     public ItemPicture convert(WsItemPicture wsItemPicture) {
         Long id = wsItemPicture.getId();
         String contentType = wsItemPicture.getContentType();
-        byte[] data = wsItemPicture.getData();
+        String base64Data = wsItemPicture.getBase64Data();
+        byte[] data = Base64.getDecoder().decode(base64Data);
 
         WsItemRef itemRef = wsItemPicture.getItemRef();
         Item item = fromWsItemConverter.find(itemRef);
