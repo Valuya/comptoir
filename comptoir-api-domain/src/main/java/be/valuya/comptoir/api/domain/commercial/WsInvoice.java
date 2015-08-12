@@ -1,37 +1,36 @@
-package be.valuya.comptoir.model.commercial;
+package be.valuya.comptoir.api.domain.commercial;
 
-import be.valuya.comptoir.model.company.Company;
+import be.valuya.comptoir.api.domain.company.WithId;
+import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import java.io.Serializable;
 import java.util.Objects;
 import javax.annotation.Nonnull;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
  * @author Yannick Majoros <yannick@valuya.be>
  */
-@Entity
-public class Invoice implements Serializable {
+@XmlRootElement(name = "Account")
+@XmlAccessorType(XmlAccessType.FIELD)
+public class WsInvoice implements Serializable, WithId {
 
-    @Id
-    @GeneratedValue
     private Long id;
     @NotNull
     @Nonnull
-    @ManyToOne(optional = false)
-    private Company company;
+    private WsCompanyRef companyRef;
     @Size(max = 255)
     private String number;
     private String note;
-    @OneToOne
-    private Sale sale;
+    @NotNull
+    @Nonnull
+    private WsSaleRef saleRef;
 
+    @Override
     public Long getId() {
         return id;
     }
@@ -40,12 +39,12 @@ public class Invoice implements Serializable {
         this.id = id;
     }
 
-    public Company getCompany() {
-        return company;
+    public WsCompanyRef getCompanyRef() {
+        return companyRef;
     }
 
-    public void setCompany(Company company) {
-        this.company = company;
+    public void setCompanyRef(WsCompanyRef companyRef) {
+        this.companyRef = companyRef;
     }
 
     public String getNumber() {
@@ -56,12 +55,12 @@ public class Invoice implements Serializable {
         this.number = number;
     }
 
-    public Sale getSale() {
-        return sale;
+    public WsSaleRef getSaleRef() {
+        return saleRef;
     }
 
-    public void setSale(Sale sale) {
-        this.sale = sale;
+    public void setSaleRef(WsSaleRef saleRef) {
+        this.saleRef = saleRef;
     }
 
     public String getNote() {
@@ -75,7 +74,7 @@ public class Invoice implements Serializable {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 47 * hash + Objects.hashCode(this.id);
+        hash = 59 * hash + Objects.hashCode(this.id);
         return hash;
     }
 
@@ -87,7 +86,7 @@ public class Invoice implements Serializable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final Invoice other = (Invoice) obj;
+        final WsInvoice other = (WsInvoice) obj;
         return Objects.equals(this.id, other.id);
     }
 

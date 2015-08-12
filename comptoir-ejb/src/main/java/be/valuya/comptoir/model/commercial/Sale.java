@@ -1,6 +1,5 @@
 package be.valuya.comptoir.model.commercial;
 
-import be.valuya.comptoir.model.accounting.AccountingEntry;
 import be.valuya.comptoir.model.accounting.AccountingTransaction;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.thirdparty.Customer;
@@ -19,6 +18,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  *
@@ -54,9 +54,8 @@ public class Sale implements Serializable {
     @Column(name = "vat_amount")
     private BigDecimal vatAmount;
     private boolean closed;
-    @OneToOne
-    @JoinColumn(name = "vat_accounting_entry_id")
-    private AccountingEntry vatAccountingEntry;
+    @Size(max = 128)
+    private String reference;
 
     public Long getId() {
         return id;
@@ -136,12 +135,12 @@ public class Sale implements Serializable {
         this.closed = closed;
     }
 
-    public AccountingEntry getVatAccountingEntry() {
-        return vatAccountingEntry;
+    public String getReference() {
+        return reference;
     }
 
-    public void setVatAccountingEntry(AccountingEntry vatAccountingEntry) {
-        this.vatAccountingEntry = vatAccountingEntry;
+    public void setReference(String reference) {
+        this.reference = reference;
     }
 
     @Override

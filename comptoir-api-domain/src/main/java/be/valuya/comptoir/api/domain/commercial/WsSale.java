@@ -2,9 +2,12 @@ package be.valuya.comptoir.api.domain.commercial;
 
 import be.valuya.comptoir.api.domain.accounting.WsAccountingTransactionRef;
 import be.valuya.comptoir.api.domain.company.WithId;
+import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.api.domain.thirdparty.WsCustomerRef;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
+import java.util.Objects;
+import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -18,21 +21,32 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class WsSale implements WithId {
 
     private Long id;
+    private WsCompanyRef companyRef;
     private WsCustomerRef customerRef;
     private ZonedDateTime dateTime;
     private WsInvoiceRef invoiceRef;
     private BigDecimal vatExclusiveAmout;
     private BigDecimal vatAmount;
     private boolean closed;
+    @Size(max = 128)
     private String reference;
     private WsAccountingTransactionRef accountingTransactionRef;
 
+    @Override
     public Long getId() {
         return id;
     }
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public WsCompanyRef getCompanyRef() {
+        return companyRef;
+    }
+
+    public void setCompanyRef(WsCompanyRef companyRef) {
+        this.companyRef = companyRef;
     }
 
     public WsCustomerRef getCustomerRef() {
@@ -97,6 +111,28 @@ public class WsSale implements WithId {
 
     public void setAccountingTransactionRef(WsAccountingTransactionRef accountingTransactionRef) {
         this.accountingTransactionRef = accountingTransactionRef;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 89 * hash + Objects.hashCode(this.id);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final WsSale other = (WsSale) obj;
+        if (!Objects.equals(this.id, other.id)) {
+            return false;
+        }
+        return true;
     }
 
 }

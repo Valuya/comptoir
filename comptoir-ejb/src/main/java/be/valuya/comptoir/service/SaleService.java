@@ -130,7 +130,8 @@ public class SaleService {
     private AccountingEntry createSaleDebitAccountingEntry(Sale sale, AccountingEntry paymentAccountingEntry, ZonedDateTime dateTime) {
         AccountingTransaction accountingTransaction = sale.getAccountingTransaction();
         Company company = sale.getCompany();
-        AccountingEntry vatAccountingEntry = sale.getVatAccountingEntry();
+        //TODO
+//        AccountingEntry vatAccountingEntry = sale.getVatAccountingEntry();
         Account account = paymentAccountingEntry.getAccount();
         BigDecimal amount = paymentAccountingEntry.getAmount();
 
@@ -140,7 +141,7 @@ public class SaleService {
         saleDebitAccountingEntry.setDateTime(dateTime);
         saleDebitAccountingEntry.setAccount(account);
         saleDebitAccountingEntry.setAmount(amount);
-        saleDebitAccountingEntry.setVatAccountingEntry(vatAccountingEntry);
+//        saleDebitAccountingEntry.setVatAccountingEntry(vatAccountingEntry);
 
         return saleDebitAccountingEntry;
     }
@@ -209,5 +210,9 @@ public class SaleService {
 
         TypedQuery<Account> typedQuery = entityManager.createQuery(query);
         return typedQuery.getSingleResult();
+    }
+
+    public Sale findSaleById(Long saleId) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

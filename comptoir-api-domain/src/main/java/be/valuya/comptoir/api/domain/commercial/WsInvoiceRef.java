@@ -22,6 +22,13 @@ public class WsInvoiceRef implements WithId {
     @XmlElement
     private Long id;
 
+    public WsInvoiceRef() {
+    }
+
+    public WsInvoiceRef(Long id) {
+        this.id = id;
+    }
+
     public URI getLink() {
         return link;
     }
@@ -30,6 +37,7 @@ public class WsInvoiceRef implements WithId {
         this.link = link;
     }
 
+    @Override
     public Long getId() {
         return id;
     }
