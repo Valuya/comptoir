@@ -25,6 +25,9 @@ public class FromWsCompanyConverter {
     private FromWsLocaleTextConverter fromWsLocaleTextConverter;
 
     public Company convert(WsCompany wsCompany) {
+        if (wsCompany == null) {
+            return null;
+        }
         Company company = new Company();
 
         return updateCompany(wsCompany, company);

@@ -28,6 +28,9 @@ public class FromWsInvoiceConverter {
     private InvoiceService invoiceService;
 
     public Invoice convert(WsInvoice wsInvoice) {
+        if (wsInvoice == null) {
+            return null;
+        }
         Long id = wsInvoice.getId();
         String number = wsInvoice.getNumber();
         String note = wsInvoice.getNote();

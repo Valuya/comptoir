@@ -23,6 +23,9 @@ public class FromWsItemPictureConverter {
     private FromWsItemConverter fromWsItemConverter;
 
     public ItemPicture convert(WsItemPicture wsItemPicture) {
+        if (wsItemPicture == null) {
+            return null;
+        }
         Long id = wsItemPicture.getId();
         String contentType = wsItemPicture.getContentType();
         byte[] data = wsItemPicture.getData();

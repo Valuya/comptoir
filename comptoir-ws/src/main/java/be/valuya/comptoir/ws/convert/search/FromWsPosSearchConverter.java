@@ -19,6 +19,9 @@ public class FromWsPosSearchConverter {
     private FromWsCompanyConverter fromWsCompanyConverter;
 
     public PosSearch convert(WsPosSearch wsPosSearch) {
+        if (wsPosSearch == null) {
+            return null;
+        }
         WsCompanyRef companyRef = wsPosSearch.getCompanyRef();
 
         Company company = fromWsCompanyConverter.find(companyRef);

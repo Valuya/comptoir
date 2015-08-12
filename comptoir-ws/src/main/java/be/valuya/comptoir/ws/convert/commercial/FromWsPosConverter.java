@@ -30,6 +30,9 @@ public class FromWsPosConverter {
     private PosService posService;
 
     public Pos convert(WsPos wsPos) {
+        if (wsPos == null) {
+            return null;
+        }
         Long id = wsPos.getId();
         WsCompanyRef companyRef = wsPos.getCompanyRef();
         List<WsLocaleText> description = wsPos.getDescription();

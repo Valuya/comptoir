@@ -3,9 +3,9 @@ package be.valuya.comptoir.ws.convert.company;
 import be.valuya.comptoir.api.domain.company.WsCompany;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.api.domain.lang.WsLocaleText;
-import be.valuya.comptoir.ws.convert.text.ToWsLocaleTextConverter;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.lang.LocaleText;
+import be.valuya.comptoir.ws.convert.text.ToWsLocaleTextConverter;
 import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -21,6 +21,9 @@ public class ToWsCompanyConverter {
     private ToWsLocaleTextConverter toWsLocaleTextConverter;
 
     public WsCompany convert(Company company) {
+        if (company == null) {
+            return null;
+        }
         Long id = company.getId();
         LocaleText description = company.getDescription();
         LocaleText name = company.getName();

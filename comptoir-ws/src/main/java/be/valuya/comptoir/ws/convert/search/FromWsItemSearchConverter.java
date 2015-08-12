@@ -19,6 +19,9 @@ public class FromWsItemSearchConverter {
     private FromWsCompanyConverter fromWsCompanyConverter;
 
     public ItemSearch convert(WsItemSearch wsItemSearch) {
+        if (wsItemSearch == null) {
+            return null;
+        }
         WsCompanyRef companyRef = wsItemSearch.getCompanyRef();
         wsItemSearch.getDescriptionContains();
         String model = wsItemSearch.getModel();

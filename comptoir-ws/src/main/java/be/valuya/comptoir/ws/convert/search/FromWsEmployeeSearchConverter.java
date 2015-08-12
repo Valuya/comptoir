@@ -19,6 +19,9 @@ public class FromWsEmployeeSearchConverter {
     private FromWsCompanyConverter fromWsCompanyConverter;
 
     public EmployeeSearch convert(WsEmployeeSearch wsEmployeeSearch) {
+        if (wsEmployeeSearch == null) {
+            return null;
+        }
         WsCompanyRef companyRef = wsEmployeeSearch.getCompanyRef();
 
         Company company = fromWsCompanyConverter.find(companyRef);

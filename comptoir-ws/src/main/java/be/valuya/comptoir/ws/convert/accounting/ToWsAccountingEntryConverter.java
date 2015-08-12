@@ -7,15 +7,15 @@ import be.valuya.comptoir.api.domain.accounting.WsAccountingTransactionRef;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.api.domain.lang.WsLocaleText;
 import be.valuya.comptoir.api.domain.thirdparty.WsCustomerRef;
-import be.valuya.comptoir.ws.convert.company.ToWsCompanyConverter;
-import be.valuya.comptoir.ws.convert.text.ToWsLocaleTextConverter;
-import be.valuya.comptoir.ws.convert.thirdparty.ToWsCustomerConverter;
 import be.valuya.comptoir.model.accounting.Account;
 import be.valuya.comptoir.model.accounting.AccountingEntry;
 import be.valuya.comptoir.model.accounting.AccountingTransaction;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.lang.LocaleText;
 import be.valuya.comptoir.model.thirdparty.Customer;
+import be.valuya.comptoir.ws.convert.company.ToWsCompanyConverter;
+import be.valuya.comptoir.ws.convert.text.ToWsLocaleTextConverter;
+import be.valuya.comptoir.ws.convert.thirdparty.ToWsCustomerConverter;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -41,6 +41,9 @@ public class ToWsAccountingEntryConverter {
     private ToWsAccountingTransactionConverter toWsAccountingTransactionConverter;
 
     public WsAccountingEntry convert(AccountingEntry accountingEntry) {
+        if (accountingEntry == null) {
+            return null;
+        }
         Long id = accountingEntry.getId();
         LocaleText description = accountingEntry.getDescription();
         BigDecimal amount = accountingEntry.getAmount();

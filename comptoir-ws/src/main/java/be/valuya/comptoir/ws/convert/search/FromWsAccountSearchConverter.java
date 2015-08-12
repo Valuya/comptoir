@@ -25,6 +25,9 @@ public class FromWsAccountSearchConverter {
     private FromWsPosConverter fromWsPosConverter;
 
     public AccountSearch convert(WsAccountSearch wsAccountSearch) {
+        if (wsAccountSearch == null) {
+            return null;
+        }
         AccountType accountType = wsAccountSearch.getAccountType();
 
         WsCompanyRef companyRef = wsAccountSearch.getCompanyRef();

@@ -1,14 +1,14 @@
 package be.valuya.comptoir.ws.rest.control;
 
-import be.valuya.comptoir.api.domain.accounting.WsAccount;
-import be.valuya.comptoir.api.domain.accounting.WsAccountRef;
-import be.valuya.comptoir.api.domain.search.WsAccountSearch;
-import be.valuya.comptoir.model.accounting.Account;
-import be.valuya.comptoir.model.search.AccountSearch;
-import be.valuya.comptoir.service.AccountService;
-import be.valuya.comptoir.ws.convert.accounting.FromWsAccountConverter;
-import be.valuya.comptoir.ws.convert.accounting.ToWsAccountConverter;
-import be.valuya.comptoir.ws.convert.search.FromWsAccountSearchConverter;
+import be.valuya.comptoir.api.domain.commercial.WsInvoice;
+import be.valuya.comptoir.api.domain.commercial.WsInvoiceRef;
+import be.valuya.comptoir.api.domain.search.WsInvoiceSearch;
+import be.valuya.comptoir.model.commercial.Invoice;
+import be.valuya.comptoir.model.search.InvoiceSearch;
+import be.valuya.comptoir.service.InvoiceService;
+import be.valuya.comptoir.ws.convert.commercial.FromWsInvoiceConverter;
+import be.valuya.comptoir.ws.convert.commercial.ToWsInvoiceConverter;
+import be.valuya.comptoir.ws.convert.search.FromWsInvoiceSearchConverter;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
 import be.valuya.comptoir.ws.rest.validation.NoId;
 import java.util.List;
@@ -27,63 +27,63 @@ import javax.ws.rs.core.MediaType;
  *
  * @author Yannick Majoros <yannick@valuya.be>
  */
-@Path("/account")
+@Path("/invoice")
 @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-public class AccountResource {
+public class InvoiceResource {
 
     @EJB
-    private AccountService accountService;
+    private InvoiceService invoiceService;
     @Inject
-    private FromWsAccountConverter fromWsAccountConverter;
+    private FromWsInvoiceConverter fromWsInvoiceConverter;
     @Inject
-    private FromWsAccountSearchConverter fromWsAccountSearchConverter;
+    private FromWsInvoiceSearchConverter fromWsInvoiceSearchConverter;
     @Inject
-    private ToWsAccountConverter toWsAccountConverter;
+    private ToWsInvoiceConverter toWsInvoiceConverter;
     @Inject
     private IdChecker idChecker;
 
     @POST
-    public WsAccountRef createAccount(@NoId WsAccount wsAccount) {
-        return saveAccount(wsAccount);
+    public WsInvoiceRef createInvoice(@NoId WsInvoice wsInvoice) {
+        return saveInvoice(wsInvoice);
     }
 
     @Path("{id}")
     @PUT
-    public WsAccountRef saveAccount(@PathParam("id") long id, WsAccount wsAccount) {
-        idChecker.checkId(id, wsAccount);
-        return saveAccount(wsAccount);
+    public WsInvoiceRef saveInvoice(@PathParam("id") long id, WsInvoice wsInvoice) {
+        idChecker.checkId(id, wsInvoice);
+        return saveInvoice(wsInvoice);
     }
 
     @Path("{id}")
     @GET
-    public WsAccount getAccount(@PathParam("id") long id) {
-        Account account = accountService.findAccountById(id);
+    public WsInvoice getInvoice(@PathParam("id") long id) {
+        Invoice invoice = invoiceService.findInvoiceById(id);
 
-        WsAccount wsAccount = toWsAccountConverter.convert(account);
+        WsInvoice wsInvoice = toWsInvoiceConverter.convert(invoice);
 
-        return wsAccount;
+        return wsInvoice;
     }
 
     @POST
     @Path("search")
-    public List<WsAccount> findAccounts(WsAccountSearch wsAccountSearch) {
-        AccountSearch accountSearch = fromWsAccountSearchConverter.convert(wsAccountSearch);
-        List<Account> accounts = accountService.findAccounts(accountSearch);
+    public List<WsInvoice> findInvoices(WsInvoiceSearch wsInvoiceSearch) {
+        InvoiceSearch invoiceSearch = fromWsInvoiceSearchConverter.convert(wsInvoiceSearch);
+        List<Invoice> invoices = invoiceService.findInvoices(invoiceSearch);
 
-        List<WsAccount> wsAccounts = accounts.stream()
-                .map(toWsAccountConverter::convert)
+        List<WsInvoice> wsInvoices = invoices.stream()
+                .map(toWsInvoiceConverter::convert)
                 .collect(Collectors.toList());
 
-        return wsAccounts;
+        return wsInvoices;
     }
 
-    private WsAccountRef saveAccount(WsAccount wsAccount) {
-        Account account = fromWsAccountConverter.convert(wsAccount);
-        Account savedAccount = accountService.saveAccount(account);
+    private WsInvoiceRef saveInvoice(WsInvoice wsInvoice) {
+        Invoice invoice = fromWsInvoiceConverter.convert(wsInvoice);
+        Invoice savedInvoice = invoiceService.saveInvoice(invoice);
 
-        WsAccountRef accountRef = toWsAccountConverter.reference(savedAccount);
+        WsInvoiceRef invoiceRef = toWsInvoiceConverter.reference(savedInvoice);
 
-        return accountRef;
+        return invoiceRef;
     }
 
 }

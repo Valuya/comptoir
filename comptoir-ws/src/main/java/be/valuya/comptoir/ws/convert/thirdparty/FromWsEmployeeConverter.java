@@ -2,10 +2,10 @@ package be.valuya.comptoir.ws.convert.thirdparty;
 
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.api.domain.thirdparty.WsEmployee;
-import be.valuya.comptoir.ws.convert.company.FromWsCompanyConverter;
-import be.valuya.comptoir.ws.convert.text.FromWsLocaleTextConverter;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.thirdparty.Employee;
+import be.valuya.comptoir.ws.convert.company.FromWsCompanyConverter;
+import be.valuya.comptoir.ws.convert.text.FromWsLocaleTextConverter;
 import java.util.Locale;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -23,6 +23,9 @@ public class FromWsEmployeeConverter {
     private FromWsCompanyConverter fromWsCompanyConverter;
 
     public Employee convert(WsEmployee wsEmployee) {
+        if (wsEmployee == null) {
+            return null;
+        }
         Long id = wsEmployee.getId();
         WsCompanyRef companyRef = wsEmployee.getCompanyRef();
         String firstName = wsEmployee.getFirstName();

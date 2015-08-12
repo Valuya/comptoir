@@ -26,6 +26,9 @@ public class ToWsPosConverter {
     private ToWsCompanyConverter toWsCompanyConverter;
 
     public WsPos convert(Pos pos) {
+        if (pos == null) {
+            return null;
+        }
         Long id = pos.getId();
         Company company = pos.getCompany();
         LocaleText description = pos.getDescription();

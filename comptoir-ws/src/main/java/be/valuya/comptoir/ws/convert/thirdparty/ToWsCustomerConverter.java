@@ -3,9 +3,9 @@ package be.valuya.comptoir.ws.convert.thirdparty;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.api.domain.thirdparty.WsCustomer;
 import be.valuya.comptoir.api.domain.thirdparty.WsCustomerRef;
-import be.valuya.comptoir.ws.convert.company.ToWsCompanyConverter;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.thirdparty.Customer;
+import be.valuya.comptoir.ws.convert.company.ToWsCompanyConverter;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
@@ -20,6 +20,9 @@ public class ToWsCustomerConverter {
     private ToWsCompanyConverter toWsCompanyConverter;
 
     public WsCustomer convert(Customer customer) {
+        if (customer == null) {
+            return null;
+        }
         Long id = customer.getId();
         String firstName = customer.getFirstName();
         String lastName = customer.getLastName();

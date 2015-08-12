@@ -36,6 +36,9 @@ public class ToWsSaleConverter {
     private ToWsCompanyConverter toWsCompanyConverter;
 
     public WsSale convert(Sale sale) {
+        if (sale == null) {
+            return null;
+        }
         Long id = sale.getId();
         ZonedDateTime dateTime = sale.getDateTime();
         String reference = sale.getReference();

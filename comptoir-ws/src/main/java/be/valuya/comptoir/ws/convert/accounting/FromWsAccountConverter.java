@@ -4,13 +4,13 @@ import be.valuya.comptoir.api.domain.accounting.WsAccount;
 import be.valuya.comptoir.api.domain.accounting.WsAccountRef;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.api.domain.lang.WsLocaleText;
-import be.valuya.comptoir.ws.convert.company.FromWsCompanyConverter;
-import be.valuya.comptoir.ws.convert.text.FromWsLocaleTextConverter;
 import be.valuya.comptoir.model.accounting.Account;
 import be.valuya.comptoir.model.accounting.AccountType;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.lang.LocaleText;
 import be.valuya.comptoir.service.AccountService;
+import be.valuya.comptoir.ws.convert.company.FromWsCompanyConverter;
+import be.valuya.comptoir.ws.convert.text.FromWsLocaleTextConverter;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.enterprise.context.ApplicationScoped;
@@ -31,6 +31,9 @@ public class FromWsAccountConverter {
     private AccountService accountService;
 
     public Account convert(WsAccount wsAccount) {
+        if (wsAccount == null) {
+            return null;
+        }
         Long id = wsAccount.getId();
         AccountType accountType = wsAccount.getAccountType();
         String accountingNumber = wsAccount.getAccountingNumber();

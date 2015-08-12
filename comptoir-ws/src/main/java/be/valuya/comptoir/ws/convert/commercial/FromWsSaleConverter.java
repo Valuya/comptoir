@@ -40,6 +40,9 @@ public class FromWsSaleConverter {
     private FromWsInvoiceConverter fromWsInvoiceConverter;
 
     public Sale convert(WsSale wsSale) {
+        if (wsSale == null) {
+            return null;
+        }
         Long id = wsSale.getId();
         ZonedDateTime dateTime = wsSale.getDateTime();
         String reference = wsSale.getReference();

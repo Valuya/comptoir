@@ -4,19 +4,21 @@ import be.valuya.comptoir.api.domain.accounting.WsAccount;
 import be.valuya.comptoir.api.domain.accounting.WsAccountRef;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.api.domain.lang.WsLocaleText;
-import be.valuya.comptoir.ws.convert.company.ToWsCompanyConverter;
-import be.valuya.comptoir.ws.convert.text.ToWsLocaleTextConverter;
 import be.valuya.comptoir.model.accounting.Account;
 import be.valuya.comptoir.model.accounting.AccountType;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.lang.LocaleText;
+import be.valuya.comptoir.ws.convert.company.ToWsCompanyConverter;
+import be.valuya.comptoir.ws.convert.text.ToWsLocaleTextConverter;
 import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 /**
  *
- * @author Yannick Majoros <yannick@valuya.be>
+ * @author Yannick Majorimport be.valuya.comptoir.ws.convert.company.ToWsCompanyConverter;
+import be.valuya.comptoir.ws.convert.text.ToWsLocaleTextConverter;
+os <yannick@valuya.be>
  */
 @ApplicationScoped
 public class ToWsAccountConverter {
@@ -27,6 +29,9 @@ public class ToWsAccountConverter {
     private ToWsCompanyConverter toWsCompanyConverter;
 
     public WsAccount convert(Account account) {
+        if (account == null) {
+            return null;
+        }
         Long id = account.getId();
         AccountType accountType = account.getAccountType();
         String accountingNumber = account.getAccountingNumber();

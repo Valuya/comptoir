@@ -11,8 +11,10 @@ import be.valuya.comptoir.model.commercial.ItemSale;
 import be.valuya.comptoir.model.commercial.ItemSale_;
 import be.valuya.comptoir.model.commercial.Price;
 import be.valuya.comptoir.model.commercial.Sale;
+import be.valuya.comptoir.model.commercial.Sale_;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.lang.LocaleText;
+import be.valuya.comptoir.model.search.SaleSearch;
 import be.valuya.comptoir.model.stock.Stock;
 import be.valuya.comptoir.model.stock.StockChangeType;
 import be.valuya.comptoir.model.thirdparty.Customer;
@@ -213,6 +215,33 @@ public class SaleService {
     }
 
     public Sale findSaleById(Long saleId) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return entityManager.find(Sale.class, saleId);
+    }
+
+    @Nonnull
+    public List<Sale> findSales(@Nonnull SaleSearch saleSearch) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Sale> query = criteriaBuilder.createQuery(Sale.class);
+        Root<Sale> saleRoot = query.from(Sale.class);
+
+        List<Predicate> predicates = new ArrayList<>();
+
+        Company company = saleSearch.getCompany();
+        Path<Company> companyPath = saleRoot.get(Sale_.company);
+        Predicate companyPredicate = criteriaBuilder.equal(companyPath, company);
+        predicates.add(companyPredicate);
+
+        Predicate[] predicateArray = predicates.toArray(new Predicate[0]);
+        query.where(predicateArray);
+
+        TypedQuery<Sale> typedQuery = entityManager.createQuery(query);
+
+        List<Sale> sales = typedQuery.getResultList();
+
+        return sales;
+    }
+
+    public Sale saveSale(Sale sale) {
+        return entityManager.merge(sale);
     }
 }

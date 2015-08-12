@@ -5,13 +5,13 @@ import be.valuya.comptoir.api.domain.commercial.WsItemPictureRef;
 import be.valuya.comptoir.api.domain.commercial.WsItemRef;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.api.domain.lang.WsLocaleText;
-import be.valuya.comptoir.ws.convert.company.ToWsCompanyConverter;
-import be.valuya.comptoir.ws.convert.text.ToWsLocaleTextConverter;
 import be.valuya.comptoir.model.commercial.Item;
 import be.valuya.comptoir.model.commercial.ItemPicture;
 import be.valuya.comptoir.model.commercial.Price;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.lang.LocaleText;
+import be.valuya.comptoir.ws.convert.company.ToWsCompanyConverter;
+import be.valuya.comptoir.ws.convert.text.ToWsLocaleTextConverter;
 import java.math.BigDecimal;
 import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
@@ -32,6 +32,9 @@ public class ToWsItemConverter {
     private ToWsItemPictureConverter toWsItemPictureConverter;
 
     public WsItem convert(Item item) {
+        if (item == null) {
+            return null;
+        }
         Long id = item.getId();
         Company company = item.getCompany();
         LocaleText description = item.getDescription();

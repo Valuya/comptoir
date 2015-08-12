@@ -1,14 +1,14 @@
 package be.valuya.comptoir.ws.rest.control;
 
-import be.valuya.comptoir.api.domain.accounting.WsAccount;
-import be.valuya.comptoir.api.domain.accounting.WsAccountRef;
-import be.valuya.comptoir.api.domain.search.WsAccountSearch;
-import be.valuya.comptoir.model.accounting.Account;
-import be.valuya.comptoir.model.search.AccountSearch;
-import be.valuya.comptoir.service.AccountService;
-import be.valuya.comptoir.ws.convert.accounting.FromWsAccountConverter;
-import be.valuya.comptoir.ws.convert.accounting.ToWsAccountConverter;
-import be.valuya.comptoir.ws.convert.search.FromWsAccountSearchConverter;
+import be.valuya.comptoir.api.domain.commercial.WsSale;
+import be.valuya.comptoir.api.domain.commercial.WsSaleRef;
+import be.valuya.comptoir.api.domain.search.WsSaleSearch;
+import be.valuya.comptoir.model.commercial.Sale;
+import be.valuya.comptoir.model.search.SaleSearch;
+import be.valuya.comptoir.service.SaleService;
+import be.valuya.comptoir.ws.convert.commercial.FromWsSaleConverter;
+import be.valuya.comptoir.ws.convert.commercial.ToWsSaleConverter;
+import be.valuya.comptoir.ws.convert.search.FromWsSaleSearchConverter;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
 import be.valuya.comptoir.ws.rest.validation.NoId;
 import java.util.List;
@@ -27,63 +27,63 @@ import javax.ws.rs.core.MediaType;
  *
  * @author Yannick Majoros <yannick@valuya.be>
  */
-@Path("/account")
+@Path("/sale")
 @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-public class AccountResource {
+public class SaleResource {
 
     @EJB
-    private AccountService accountService;
+    private SaleService saleService;
     @Inject
-    private FromWsAccountConverter fromWsAccountConverter;
+    private FromWsSaleConverter fromWsSaleConverter;
     @Inject
-    private FromWsAccountSearchConverter fromWsAccountSearchConverter;
+    private FromWsSaleSearchConverter fromWsSaleSearchConverter;
     @Inject
-    private ToWsAccountConverter toWsAccountConverter;
+    private ToWsSaleConverter toWsSaleConverter;
     @Inject
     private IdChecker idChecker;
 
     @POST
-    public WsAccountRef createAccount(@NoId WsAccount wsAccount) {
-        return saveAccount(wsAccount);
+    public WsSaleRef createSale(@NoId WsSale wsSale) {
+        Sale sale = fromWsSaleConverter.convert(wsSale);
+        Sale savedSale = saleService.saveSale(sale);
+
+        WsSaleRef saleRef = toWsSaleConverter.reference(savedSale);
+
+        return saleRef;
     }
 
     @Path("{id}")
     @PUT
-    public WsAccountRef saveAccount(@PathParam("id") long id, WsAccount wsAccount) {
-        idChecker.checkId(id, wsAccount);
-        return saveAccount(wsAccount);
+    public WsSaleRef saveSale(@PathParam("id") long id, WsSale wsSale) {
+        idChecker.checkId(id, wsSale);
+        Sale sale = fromWsSaleConverter.convert(wsSale);
+        Sale savedSale = saleService.saveSale(sale);
+
+        WsSaleRef saleRef = toWsSaleConverter.reference(savedSale);
+
+        return saleRef;
     }
 
     @Path("{id}")
     @GET
-    public WsAccount getAccount(@PathParam("id") long id) {
-        Account account = accountService.findAccountById(id);
+    public WsSale getSale(@PathParam("id") long id) {
+        Sale sale = saleService.findSaleById(id);
 
-        WsAccount wsAccount = toWsAccountConverter.convert(account);
+        WsSale wsSale = toWsSaleConverter.convert(sale);
 
-        return wsAccount;
+        return wsSale;
     }
 
-    @POST
     @Path("search")
-    public List<WsAccount> findAccounts(WsAccountSearch wsAccountSearch) {
-        AccountSearch accountSearch = fromWsAccountSearchConverter.convert(wsAccountSearch);
-        List<Account> accounts = accountService.findAccounts(accountSearch);
+    public List<WsSale> findSales(WsSaleSearch wsSaleSearch) {
+        SaleSearch saleSearch = fromWsSaleSearchConverter.convert(wsSaleSearch);
+        List<Sale> sales = saleService.findSales(saleSearch);
 
-        List<WsAccount> wsAccounts = accounts.stream()
-                .map(toWsAccountConverter::convert)
+        List<WsSale> wsSales = sales.stream()
+                .map(toWsSaleConverter::convert)
                 .collect(Collectors.toList());
 
-        return wsAccounts;
-    }
-
-    private WsAccountRef saveAccount(WsAccount wsAccount) {
-        Account account = fromWsAccountConverter.convert(wsAccount);
-        Account savedAccount = accountService.saveAccount(account);
-
-        WsAccountRef accountRef = toWsAccountConverter.reference(savedAccount);
-
-        return accountRef;
+        return wsSales;
     }
 
 }

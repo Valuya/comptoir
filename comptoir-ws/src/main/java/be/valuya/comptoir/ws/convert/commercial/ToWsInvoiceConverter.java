@@ -24,19 +24,25 @@ public class ToWsInvoiceConverter {
     private ToWsCompanyConverter toWsCompanyConverter;
 
     public WsInvoice convert(Invoice invoice) {
+        if (invoice == null) {
+            return null;
+        }
         Long id = invoice.getId();
         String note = invoice.getNote();
         String number = invoice.getNumber();
 
         Company company = invoice.getCompany();
         WsCompanyRef companyRef = toWsCompanyConverter.reference(company);
-        
+
         Sale sale = invoice.getSale();
-        WsSaleRef  saleRef = toWsSaleConverter.reference(sale);
+        WsSaleRef saleRef = toWsSaleConverter.reference(sale);
 
         WsInvoice wsInvoice = new WsInvoice();
         wsInvoice.setId(id);
         wsInvoice.setCompanyRef(companyRef);
+        wsInvoice.setNote(note);
+        wsInvoice.setNumber(number);
+        wsInvoice.setSaleRef(saleRef);
 
         return wsInvoice;
     }
