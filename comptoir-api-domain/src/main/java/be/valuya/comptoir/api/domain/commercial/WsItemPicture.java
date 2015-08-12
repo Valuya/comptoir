@@ -3,12 +3,6 @@ package be.valuya.comptoir.api.domain.commercial;
 import be.valuya.comptoir.api.domain.company.WithId;
 import java.io.Serializable;
 import java.util.Objects;
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -21,16 +15,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class WsItemPicture implements Serializable, WithId {
 
-    @Id
-    @GeneratedValue
     private Long id;
-    @ManyToOne
     private WsItemRef itemRef;
-    @Column(name = "picture_data")
-    @Lob
     private byte[] data;
-    @Column(name = "content_type")
-    @Size(min = 1, max = 128)
     private String contentType;
 
     public Long getId() {
