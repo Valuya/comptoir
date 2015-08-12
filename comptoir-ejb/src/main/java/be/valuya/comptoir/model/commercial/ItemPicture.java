@@ -2,6 +2,7 @@ package be.valuya.comptoir.model.commercial;
 
 import java.io.Serializable;
 import java.util.Objects;
+import javax.annotation.Nonnull;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -23,6 +24,7 @@ public class ItemPicture implements Serializable {
     @GeneratedValue
     private Long id;
     @ManyToOne
+    @Nonnull
     private Item item;
     @Column(name = "picture_data")
     @Lob

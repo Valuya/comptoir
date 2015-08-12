@@ -322,7 +322,11 @@ public class StockService {
     }
 
     public ItemPicture saveItemPicture(ItemPicture itemPicture) {
-        return entityManager.merge(itemPicture);
+        Item item = itemPicture.getItem();
+        ItemPicture managedPicture = entityManager.merge(itemPicture);
+        item.setMainPicture(itemPicture);
+        Item managedItem = entityManager.merge(item);
+        return managedPicture;
     }
 
     public List<ItemPicture> findItemPictures(@Nonnull Item item) {
