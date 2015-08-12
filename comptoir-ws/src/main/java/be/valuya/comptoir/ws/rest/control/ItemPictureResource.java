@@ -40,7 +40,7 @@ public class ItemPictureResource {
     @Inject
     private IdChecker idChecker;
     @PathParam("itemId")
-    private WsItemRef itemRef;
+    private Long itemId;
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -61,7 +61,6 @@ public class ItemPictureResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public List<WsItemPicture> findItemPictures() {
-        Long itemId = itemRef.getId();
         Item item = stockService.findItemById(itemId);
         List<ItemPicture> itemPictures = stockService.findItemPictures(item);
 
