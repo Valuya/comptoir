@@ -42,6 +42,9 @@ public class ToWsItemPictureConverter {
     }
 
     public WsItemPictureRef reference(ItemPicture itemPicture) {
+        if (itemPicture == null) {
+            return null;
+        }
         Long id = itemPicture.getId();
         WsItemPictureRef wsItemPictureRef = new WsItemPictureRef(id);
         return wsItemPictureRef;
