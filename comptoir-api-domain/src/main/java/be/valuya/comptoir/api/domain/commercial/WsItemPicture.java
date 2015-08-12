@@ -17,7 +17,7 @@ public class WsItemPicture implements Serializable, WithId {
 
     private Long id;
     private WsItemRef itemRef;
-    private String base64Data;
+    private byte[] data;
     private String contentType;
 
     public Long getId() {
@@ -36,12 +36,12 @@ public class WsItemPicture implements Serializable, WithId {
         this.itemRef = itemRef;
     }
 
-    public String getBase64Data() {
-        return base64Data;
+    public byte[] getData() {
+        return data;
     }
 
-    public void setBase64Data(String base64Data) {
-        this.base64Data = base64Data;
+    public void setData(byte[] data) {
+        this.data = data;
     }
 
     public String getContentType() {

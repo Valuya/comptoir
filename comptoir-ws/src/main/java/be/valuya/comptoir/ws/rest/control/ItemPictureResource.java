@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.ejb.EJB;
 import javax.inject.Inject;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -45,6 +46,7 @@ public class ItemPictureResource {
     private Long itemId;
 
     @POST
+    @Consumes(MediaType.APPLICATION_JSON)
     public WsItemPictureRef createItemPicture(@NoId WsItemPicture wsItemPicture) {
         return saveItemPicture(wsItemPicture);
     }
@@ -57,6 +59,7 @@ public class ItemPictureResource {
     }
 
     @GET
+    @Produces(MediaType.APPLICATION_JSON)
     public List<WsItemPicture> findItemPictures() {
         Item item = stockService.findItemById(itemId);
         List<ItemPicture> itemPictures = stockService.findItemPictures(item);
