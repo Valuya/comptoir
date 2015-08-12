@@ -44,14 +44,24 @@ public class PosResource {
 
     @POST
     public WsPosRef createPos(@NoId WsPos wsPos) {
-        return savePos(wsPos);
+        Pos pos = fromWsPosConverter.convert(wsPos);
+        Pos savedPos = posService.savePos(pos);
+
+        WsPosRef posRef = toWsPosConverter.reference(savedPos);
+
+        return posRef;
     }
 
     @Path("{id}")
     @PUT
     public WsPosRef savePos(@PathParam("id") long id, WsPos wsPos) {
         idChecker.checkId(id, wsPos);
-        return savePos(wsPos);
+        Pos pos = fromWsPosConverter.convert(wsPos);
+        Pos savedPos = posService.savePos(pos);
+
+        WsPosRef posRef = toWsPosConverter.reference(savedPos);
+
+        return posRef;
     }
 
     @Path("{id}")
@@ -75,15 +85,6 @@ public class PosResource {
                 .collect(Collectors.toList());
 
         return wsPoss;
-    }
-
-    private WsPosRef savePos(WsPos wsPos) {
-        Pos pos = fromWsPosConverter.convert(wsPos);
-        Pos savedPos = posService.savePos(pos);
-
-        WsPosRef posRef = toWsPosConverter.reference(savedPos);
-
-        return posRef;
     }
 
 }
