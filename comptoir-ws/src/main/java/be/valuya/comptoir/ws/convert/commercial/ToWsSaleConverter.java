@@ -74,6 +74,9 @@ public class ToWsSaleConverter {
     }
 
     public WsSaleRef reference(Sale sale) {
+        if (sale == null) {
+            return null;
+        }
         Long id = sale.getId();
         return new WsSaleRef(id);
     }

@@ -3,10 +3,10 @@ package be.valuya.comptoir.ws.convert.commercial;
 import be.valuya.comptoir.api.domain.commercial.WsItemPicture;
 import be.valuya.comptoir.api.domain.commercial.WsItemPictureRef;
 import be.valuya.comptoir.api.domain.commercial.WsItemRef;
-import be.valuya.comptoir.ws.convert.company.ToWsCompanyConverter;
-import be.valuya.comptoir.ws.convert.text.ToWsLocaleTextConverter;
 import be.valuya.comptoir.model.commercial.Item;
 import be.valuya.comptoir.model.commercial.ItemPicture;
+import be.valuya.comptoir.ws.convert.company.ToWsCompanyConverter;
+import be.valuya.comptoir.ws.convert.text.ToWsLocaleTextConverter;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
@@ -42,6 +42,9 @@ public class ToWsItemPictureConverter {
     }
 
     public WsItemPictureRef reference(ItemPicture itemPicture) {
+        if (itemPicture == null) {
+            return null;
+        }
         Long id = itemPicture.getId();
         WsItemPictureRef wsItemPictureRef = new WsItemPictureRef(id);
         return wsItemPictureRef;

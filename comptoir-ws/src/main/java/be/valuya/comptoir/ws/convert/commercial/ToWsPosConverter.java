@@ -56,6 +56,9 @@ public class ToWsPosConverter {
     }
 
     public WsPosRef reference(Pos pos) {
+        if (pos == null) {
+            return null;
+        }
         Long id = pos.getId();
         WsPosRef wsPosRef = new WsPosRef(id);
         return wsPosRef;

@@ -48,6 +48,9 @@ public class ToWsInvoiceConverter {
     }
 
     public WsInvoiceRef reference(Invoice invoice) {
+        if (invoice == null) {
+            return null;
+        }
         Long id = invoice.getId();
         WsInvoiceRef wsInvoiceRef = new WsInvoiceRef(id);
         return wsInvoiceRef;

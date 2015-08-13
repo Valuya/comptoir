@@ -68,6 +68,9 @@ public class ToWsItemConverter {
     }
 
     public WsItemRef reference(Item item) {
+        if (item == null) {
+            return null;
+        }
         Long id = item.getId();
         WsItemRef wsItemRef = new WsItemRef(id);
         return wsItemRef;

@@ -56,6 +56,9 @@ public class ToWsCustomerConverter {
     }
 
     public WsCustomerRef reference(Customer customer) {
+        if (customer == null) {
+            return null;
+        }
         Long id = customer.getId();
         WsCustomerRef wsCustomerRef = new WsCustomerRef(id);
         return wsCustomerRef;
