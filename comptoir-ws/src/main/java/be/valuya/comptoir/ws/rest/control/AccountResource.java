@@ -6,6 +6,7 @@ import be.valuya.comptoir.api.domain.search.WsAccountSearch;
 import be.valuya.comptoir.model.accounting.Account;
 import be.valuya.comptoir.model.search.AccountSearch;
 import be.valuya.comptoir.service.AccountService;
+import be.valuya.comptoir.ws.config.HeadersConfig;
 import be.valuya.comptoir.ws.convert.accounting.FromWsAccountConverter;
 import be.valuya.comptoir.ws.convert.accounting.ToWsAccountConverter;
 import be.valuya.comptoir.ws.convert.search.FromWsAccountSearchConverter;
@@ -15,12 +16,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.ejb.EJB;
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 /**
@@ -41,6 +44,8 @@ public class AccountResource {
     private ToWsAccountConverter toWsAccountConverter;
     @Inject
     private IdChecker idChecker;
+    @Context
+    private HttpServletResponse response;
 
     @POST
     public WsAccountRef createAccount(@NoId WsAccount wsAccount) {
@@ -74,6 +79,7 @@ public class AccountResource {
                 .map(toWsAccountConverter::convert)
                 .collect(Collectors.toList());
 
+        response.setHeader(HeadersConfig.LIST_RESULTS_COUNT_HEADER, "101");
         return wsAccounts;
     }
 
