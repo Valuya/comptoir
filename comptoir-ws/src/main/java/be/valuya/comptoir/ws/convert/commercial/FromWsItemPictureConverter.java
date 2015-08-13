@@ -40,6 +40,9 @@ public class FromWsItemPictureConverter {
     }
 
     public ItemPicture find(WsItemPictureRef itemPictureRef) {
+        if (itemPictureRef == null) {
+            return null;
+        }
         Long id = itemPictureRef.getId();
         return stockService.findItemPictureById(id);
     }
