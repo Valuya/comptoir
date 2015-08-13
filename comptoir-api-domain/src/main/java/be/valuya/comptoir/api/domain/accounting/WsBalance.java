@@ -21,6 +21,7 @@ public class WsBalance implements Serializable, WithId {
     private ZonedDateTime dateTime;
     private BigDecimal balance;
 
+    @Override
     public Long getId() {
         return id;
     }
