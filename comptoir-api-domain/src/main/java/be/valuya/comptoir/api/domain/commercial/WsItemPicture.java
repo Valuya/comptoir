@@ -3,6 +3,7 @@ package be.valuya.comptoir.api.domain.commercial;
 import be.valuya.comptoir.api.domain.company.WithId;
 import java.io.Serializable;
 import java.util.Objects;
+import javax.annotation.Nonnull;
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -25,6 +26,7 @@ public class WsItemPicture implements Serializable, WithId {
     @GeneratedValue
     private Long id;
     @ManyToOne
+    @Nonnull
     private WsItemRef itemRef;
     @Column(name = "picture_data")
     @Lob

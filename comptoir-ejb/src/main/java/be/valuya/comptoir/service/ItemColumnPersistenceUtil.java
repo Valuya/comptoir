@@ -23,8 +23,7 @@ public class ItemColumnPersistenceUtil {
             return new ArrayList<>();
         }
         List<Order> orders = sortings.stream().map(
-                sorting
-                -> createOrderFromSorting(criteriaBuilder, itemRoot, sorting))
+                sorting -> createOrderFromSorting(criteriaBuilder, itemRoot, sorting))
                 .collect(Collectors.toList());
         return orders;
     }
