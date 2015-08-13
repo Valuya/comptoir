@@ -8,6 +8,7 @@ import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.factory.LocaleTextFactory;
 import be.valuya.comptoir.model.lang.LocaleText;
 import be.valuya.comptoir.model.stock.Stock;
+import be.valuya.comptoir.model.thirdparty.Customer;
 import be.valuya.comptoir.model.thirdparty.Employee;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,9 +71,17 @@ public class RegistrationService {
         pos.setDescription(posDescription);
 
         Pos managedPos = entityManager.merge(pos);
+
         paymentAccounts.stream()
                 .map(paymentAccount -> createPosPaymentAccount(managedPos, paymentAccount))
                 .map(entityManager::merge);
+
+        Customer defaultPosCustomer = new Customer();
+        defaultPosCustomer.setCompany(managedCompany);
+        defaultPosCustomer.setFirstName("default");
+        
+        Customer managedCustomer = entityManager.merge(defaultPosCustomer);
+        pos.setDefaultCustomer(managedCustomer);
 
         return managedCompany;
     }

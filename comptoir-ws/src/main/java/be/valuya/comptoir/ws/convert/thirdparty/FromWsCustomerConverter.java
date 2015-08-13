@@ -60,6 +60,9 @@ public class FromWsCustomerConverter {
     }
 
     public Customer find(WsCustomerRef customerRef) {
+        if (customerRef == null) {
+            return null;
+        }
         Long id = customerRef.getId();
         return customerService.findCustomerById(id);
     }

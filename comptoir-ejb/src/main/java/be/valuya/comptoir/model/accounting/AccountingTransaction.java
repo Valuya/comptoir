@@ -35,6 +35,7 @@ public class AccountingTransaction implements Serializable {
     @NotNull
     @Nonnull
     @Enumerated(EnumType.STRING)
+    @Column(name = "type")
     private AccountingTransactionType accountingTransactionType;
 
     public Long getId() {

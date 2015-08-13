@@ -3,6 +3,7 @@ package be.valuya.comptoir.api.domain.commercial;
 import be.valuya.comptoir.api.domain.company.WithId;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.api.domain.lang.WsLocaleText;
+import be.valuya.comptoir.api.domain.thirdparty.WsCustomerRef;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
@@ -26,6 +27,7 @@ public class WsPos implements Serializable, WithId {
     private WsCompanyRef companyRef;
     private String name;
     private List<WsLocaleText> description;
+    private WsCustomerRef defaultCustomerRef;
 
     @Override
     public Long getId() {
@@ -58,6 +60,14 @@ public class WsPos implements Serializable, WithId {
 
     public void setDescription(List<WsLocaleText> description) {
         this.description = description;
+    }
+
+    public WsCustomerRef getDefaultCustomerRef() {
+        return defaultCustomerRef;
+    }
+
+    public void setDefaultCustomerRef(WsCustomerRef defaultCustomerRef) {
+        this.defaultCustomerRef = defaultCustomerRef;
     }
 
     @Override

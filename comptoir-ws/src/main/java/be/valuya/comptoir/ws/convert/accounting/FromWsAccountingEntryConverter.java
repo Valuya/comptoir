@@ -87,6 +87,9 @@ public class FromWsAccountingEntryConverter {
     }
 
     public AccountingEntry find(WsAccountingEntryRef accountingEntryRef) {
+        if (accountingEntryRef == null) {
+            return null;
+        }
         Long id = accountingEntryRef.getId();
         return accountService.findAccountingEntryById(id);
     }

@@ -52,6 +52,9 @@ public class FromWsInvoiceConverter {
     }
 
     public Invoice find(WsInvoiceRef invoiceRef) {
+        if (invoiceRef == null) {
+            return null;
+        }
         Long id = invoiceRef.getId();
         return invoiceService.findInvoiceById(id);
     }

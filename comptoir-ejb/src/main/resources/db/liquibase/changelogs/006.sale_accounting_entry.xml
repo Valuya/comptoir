@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
+    <changeSet id="1" author="ymajoros">
+        <dropForeignKeyConstraint baseTableName="sale" constraintName="FK_SALE_accounting_transaction_id" />
+    </changeSet>
+
+    <changeSet id="2" author="ymajoros">
+        <addForeignKeyConstraint 
+            constraintName="fk_sale_accounting_transaction_id" 
+            baseTableName="sale" 
+            baseColumnNames="accounting_transaction_id" 
+            referencedTableName="accounting_transaction" 
+            referencedColumnNames="id" />
+    </changeSet>
+
+</databaseChangeLog>

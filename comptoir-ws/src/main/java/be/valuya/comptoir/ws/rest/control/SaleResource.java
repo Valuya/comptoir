@@ -30,7 +30,7 @@ import javax.ws.rs.core.MediaType;
 @Path("/sale")
 @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 public class SaleResource {
-
+    
     @EJB
     private SaleService saleService;
     @Inject
@@ -41,50 +41,51 @@ public class SaleResource {
     private ToWsSaleConverter toWsSaleConverter;
     @Inject
     private IdChecker idChecker;
-
+    
     @POST
     public WsSaleRef createSale(@NoId WsSale wsSale) {
         Sale sale = fromWsSaleConverter.convert(wsSale);
+        
         Sale savedSale = saleService.saveSale(sale);
-
+        
         WsSaleRef saleRef = toWsSaleConverter.reference(savedSale);
-
+        
         return saleRef;
     }
-
+    
     @Path("{id}")
     @PUT
     public WsSaleRef saveSale(@PathParam("id") long id, WsSale wsSale) {
         idChecker.checkId(id, wsSale);
         Sale sale = fromWsSaleConverter.convert(wsSale);
         Sale savedSale = saleService.saveSale(sale);
-
+        
         WsSaleRef saleRef = toWsSaleConverter.reference(savedSale);
-
+        
         return saleRef;
     }
-
+    
     @Path("{id}")
     @GET
     public WsSale getSale(@PathParam("id") long id) {
         Sale sale = saleService.findSaleById(id);
-
+        
         WsSale wsSale = toWsSaleConverter.convert(sale);
-
+        
         return wsSale;
     }
-
+    
     @POST
     @Path("search")
     public List<WsSale> findSales(WsSaleSearch wsSaleSearch) {
         SaleSearch saleSearch = fromWsSaleSearchConverter.convert(wsSaleSearch);
         List<Sale> sales = saleService.findSales(saleSearch);
-
+        
         List<WsSale> wsSales = sales.stream()
                 .map(toWsSaleConverter::convert)
                 .collect(Collectors.toList());
-
+        
         return wsSales;
     }
-
+    
 }

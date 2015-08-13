@@ -241,7 +241,36 @@ public class SaleService {
         return sales;
     }
 
+    @SuppressWarnings("null")
     public Sale saveSale(Sale sale) {
+        Company company = sale.getCompany();
+
+        ZonedDateTime dateTime = sale.getDateTime();
+        if (dateTime == null) {
+            dateTime = ZonedDateTime.now();
+            sale.setDateTime(dateTime);
+        }
+
+        AccountingTransaction accountingTransaction = sale.getAccountingTransaction();
+        if (accountingTransaction == null) {
+            accountingTransaction = new AccountingTransaction();
+            accountingTransaction.setCompany(company);
+            accountingTransaction.setDateTime(dateTime);
+            accountingTransaction.setAccountingTransactionType(AccountingTransactionType.SALE);
+
+            sale.setAccountingTransaction(accountingTransaction);
+        }
+
+        BigDecimal vatAmount = sale.getVatAmount();
+        if (vatAmount == null) {
+            sale.setVatAmount(BigDecimal.ZERO);
+        }
+
+        BigDecimal vatExclusiveAmout = sale.getVatExclusiveAmout();
+        if (vatExclusiveAmout == null) {
+            sale.setVatExclusiveAmout(BigDecimal.ZERO);
+        }
+
         return entityManager.merge(sale);
     }
 }

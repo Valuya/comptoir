@@ -61,6 +61,9 @@ public class FromWsAccountConverter {
     }
 
     public Account find(WsAccountRef accountRef) {
+        if (accountRef == null) {
+            return null;
+        }
         Long id = accountRef.getId();
         return accountService.findAccountById(id);
     }

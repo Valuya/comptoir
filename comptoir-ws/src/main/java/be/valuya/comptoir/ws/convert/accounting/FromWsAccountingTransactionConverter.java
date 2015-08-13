@@ -46,6 +46,9 @@ public class FromWsAccountingTransactionConverter {
     }
 
     public AccountingTransaction find(WsAccountingTransactionRef accountingTransactionRef) {
+        if (accountingTransactionRef == null) {
+            return null;
+        }
         Long id = accountingTransactionRef.getId();
         return accountService.findAccountingTransactionById(id);
     }

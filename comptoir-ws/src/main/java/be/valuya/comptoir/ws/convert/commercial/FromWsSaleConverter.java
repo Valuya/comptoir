@@ -78,6 +78,9 @@ public class FromWsSaleConverter {
     }
 
     public Sale find(WsSaleRef saleRef) {
+        if (saleRef == null) {
+            return null;
+        }
         Long saleId = saleRef.getId();
         Sale sale = saleService.findSaleById(saleId);
         return sale;

@@ -77,6 +77,9 @@ public class FromWsItemConverter {
     }
 
     public Item find(WsItemRef itemRef) {
+        if (itemRef == null) {
+            return null;
+        }
         Long itemId = itemRef.getId();
         Item item = stockService.findItemById(itemId);
         return item;
