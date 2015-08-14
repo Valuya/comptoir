@@ -14,6 +14,7 @@ import be.valuya.comptoir.model.commercial.Sale;
 import be.valuya.comptoir.model.commercial.Sale_;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.lang.LocaleText;
+import be.valuya.comptoir.model.search.ItemSaleSearch;
 import be.valuya.comptoir.model.search.SaleSearch;
 import be.valuya.comptoir.model.stock.Stock;
 import be.valuya.comptoir.model.stock.StockChangeType;
@@ -30,6 +31,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
@@ -280,5 +282,44 @@ public class SaleService {
 
     public ItemSale saveItemSale(ItemSale itemSale) {
         return entityManager.merge(itemSale);
+    }
+
+    @Nonnull
+    public List<ItemSale> findItemSales(@Nonnull ItemSaleSearch itemSaleSearch) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<ItemSale> query = criteriaBuilder.createQuery(ItemSale.class);
+        Root<ItemSale> itemSaleRoot = query.from(ItemSale.class);
+
+        List<Predicate> predicates = new ArrayList<>();
+
+        Join<ItemSale, Sale> saleJoin = itemSaleRoot.join(ItemSale_.sale);
+        Join<ItemSale, Item> itemJoin = itemSaleRoot.join(ItemSale_.item);
+
+        Company company = itemSaleSearch.getCompany();
+
+        Path<Company> companyPath = saleJoin.get(Sale_.company);
+        Predicate companyPredicate = criteriaBuilder.equal(companyPath, company);
+        predicates.add(companyPredicate);
+
+        Sale sale = itemSaleSearch.getSale();
+        if (sale != null) {
+            Predicate salePredicate = criteriaBuilder.equal(saleJoin, sale);
+            predicates.add(salePredicate);
+        }
+
+        Item item = itemSaleSearch.getItem();
+        if (item != null) {
+            Predicate itemPredicate = criteriaBuilder.equal(itemJoin, item);
+            predicates.add(itemPredicate);
+        }
+
+        Predicate[] predicateArray = predicates.toArray(new Predicate[0]);
+        query.where(predicateArray);
+
+        TypedQuery<ItemSale> typedQuery = entityManager.createQuery(query);
+
+        List<ItemSale> itemSales = typedQuery.getResultList();
+
+        return itemSales;
     }
 }
