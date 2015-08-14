@@ -218,6 +218,10 @@ public class SaleService {
         return entityManager.find(Sale.class, saleId);
     }
 
+    public ItemSale findItemSaleById(Long saleId) {
+        return entityManager.find(ItemSale.class, saleId);
+    }
+
     @Nonnull
     public List<Sale> findSales(@Nonnull SaleSearch saleSearch) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
@@ -272,5 +276,9 @@ public class SaleService {
         }
 
         return entityManager.merge(sale);
+    }
+
+    public ItemSale saveItemSale(ItemSale itemSale) {
+        return entityManager.merge(itemSale);
     }
 }

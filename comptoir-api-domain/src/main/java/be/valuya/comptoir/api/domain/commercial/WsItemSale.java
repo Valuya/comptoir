@@ -5,6 +5,8 @@ import be.valuya.comptoir.api.domain.lang.WsLocaleText;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.List;
+import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -20,10 +22,15 @@ public class WsItemSale implements WithId {
     private Long id;
     private ZonedDateTime dateTime;
     private WsItemRef itemRef;
-    private WsPrice price;
     private BigDecimal quantity;
     private WsSaleRef saleRef;
     private List<WsLocaleText> comment;
+    @NotNull
+    @Nonnull
+    private BigDecimal vatExclusive;
+    @NotNull
+    @Nonnull
+    private BigDecimal vatRate;
 
     @Override
     public Long getId() {
@@ -50,12 +57,20 @@ public class WsItemSale implements WithId {
         this.itemRef = itemRef;
     }
 
-    public WsPrice getPrice() {
-        return price;
+    public BigDecimal getVatExclusive() {
+        return vatExclusive;
     }
 
-    public void setPrice(WsPrice price) {
-        this.price = price;
+    public void setVatExclusive(BigDecimal vatExclusive) {
+        this.vatExclusive = vatExclusive;
+    }
+
+    public BigDecimal getVatRate() {
+        return vatRate;
+    }
+
+    public void setVatRate(BigDecimal vatRate) {
+        this.vatRate = vatRate;
     }
 
     public BigDecimal getQuantity() {

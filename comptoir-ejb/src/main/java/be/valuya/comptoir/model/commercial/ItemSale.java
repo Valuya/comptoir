@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.Objects;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -29,7 +30,7 @@ public class ItemSale implements Serializable {
     private ZonedDateTime dateTime;
     @ManyToOne
     private Item item;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     private Price price;
     private BigDecimal quantity;
     @ManyToOne
