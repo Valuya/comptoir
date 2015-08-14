@@ -32,6 +32,7 @@ public class Employee implements Serializable {
     @Nonnull
     @Column(length = 200)
     @Size(max = 200)
+    
     private String login;
     @Column(name = "password_hash", length = 32)
     @Size(max = 32)
