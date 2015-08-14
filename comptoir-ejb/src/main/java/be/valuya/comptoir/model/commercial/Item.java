@@ -49,7 +49,7 @@ public class Item implements Serializable {
     @JoinColumn(name = "current_price_id")
     private Price currentPrice;
     @ManyToOne
-    @JoinColumn(name = "main_picture")
+    @JoinColumn(name = "main_picture_id")
     private ItemPicture mainPicture;
 
     public Long getId() {

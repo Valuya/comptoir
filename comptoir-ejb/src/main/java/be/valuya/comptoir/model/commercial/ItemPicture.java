@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 /**
@@ -28,6 +29,7 @@ public class ItemPicture implements Serializable {
     private Item item;
     @Column(name = "picture_data")
     @Lob
+    @NotNull
     private byte[] data;
     @Column(name = "content_type")
     @Size(min = 1, max = 128)
