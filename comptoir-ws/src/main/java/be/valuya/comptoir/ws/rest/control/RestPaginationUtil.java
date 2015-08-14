@@ -17,22 +17,40 @@ import javax.ws.rs.core.UriInfo;
 @ApplicationScoped
 public class RestPaginationUtil {
 
+    private static final String SORT_PARAMETER = "sort";
+    private static final String LENGTH_PARAMETR = "length";
+    private static final String OFFSET_PARAMETER = "offset";
+
     public <T, C extends Column<T>> Pagination<T, C> extractPagination(UriInfo uriInfo, Function<String, C> conversionFunction) {
-        MultivaluedMap<String, String> pathParameters = uriInfo.getPathParameters();
-        int offset = pathParameters.get("offset").stream()
-                .findFirst()
-                .map(Integer::parseInt)
-                .orElse(0);
-        int maxResults = pathParameters.get("offset").stream()
-                .findFirst()
-                .map(Integer::parseInt)
-                .orElse(0);
+        MultivaluedMap<String, String> pathParameters = uriInfo.getQueryParameters();
 
-        List<Sort<C>> sorts = pathParameters.get("sort").stream()
-                .map(sortDef -> parseSort(sortDef, conversionFunction))
-                .collect(Collectors.toList());
+        int offset = 0;
+        if (pathParameters.containsKey(OFFSET_PARAMETER)) {
+            List<String> offsetValues = pathParameters.get(OFFSET_PARAMETER);
+            offset = offsetValues.stream()
+                    .findFirst()
+                    .map(Integer::parseInt)
+                    .orElse(0);
+        }
 
-        return new Pagination<>(offset, maxResults, sorts);
+        int length = 0;
+        if (pathParameters.containsKey(LENGTH_PARAMETR)) {
+            List<String> lengthValues = pathParameters.get(LENGTH_PARAMETR);
+            length = lengthValues.stream()
+                    .findFirst()
+                    .map(Integer::parseInt)
+                    .orElse(0);
+        }
+        List<Sort<C>> sorts = null;
+        if (pathParameters.containsKey(SORT_PARAMETER)) {
+            List<String> sortValues = pathParameters.get(SORT_PARAMETER);
+            sorts = sortValues.stream()
+                    .filter((String key) -> SORT_PARAMETER.equals(key))
+                    .map(sortDef -> parseSort(sortDef, conversionFunction))
+                    .collect(Collectors.toList());
+        }
+
+        return new Pagination<>(offset, length, sorts);
     }
 
     private <T, C extends Column<T>> Sort<C> parseSort(String sortDef, Function<String, C> conversionFunction) {

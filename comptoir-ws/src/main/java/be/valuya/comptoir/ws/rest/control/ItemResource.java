@@ -8,6 +8,7 @@ import be.valuya.comptoir.model.search.ItemSearch;
 import be.valuya.comptoir.service.StockService;
 import be.valuya.comptoir.util.pagination.ItemColumn;
 import be.valuya.comptoir.util.pagination.Pagination;
+import be.valuya.comptoir.ws.config.HeadersConfig;
 import be.valuya.comptoir.ws.convert.commercial.FromWsItemConverter;
 import be.valuya.comptoir.ws.convert.commercial.ToWsItemConverter;
 import be.valuya.comptoir.ws.convert.search.FromWsItemSearchConverter;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -54,6 +56,8 @@ public class ItemResource {
     private RestPaginationUtil restPaginationUtil;
 
     @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
     public WsItemRef createItem(@NoId WsItem wsItem) {
         Item item = fromWsItemConverter.convert(wsItem);
         Item savedItem = stockService.saveItem(item);
@@ -65,6 +69,8 @@ public class ItemResource {
 
     @Path("{id}")
     @PUT
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
     public WsItemRef updateItem(@PathParam("id") long id, WsItem wsItem) {
         idChecker.checkId(id, wsItem);
         Item item = fromWsItemConverter.convert(wsItem);
@@ -77,6 +83,7 @@ public class ItemResource {
 
     @Path("{id}")
     @GET
+    @Produces(MediaType.APPLICATION_JSON)
     public WsItem getItem(@PathParam("id") long id) {
         Item item = stockService.findItemById(id);
 
@@ -87,6 +94,8 @@ public class ItemResource {
 
     @POST
     @Path("search")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
     public List<WsItem> findItems(WsItemSearch wsItemSearch) {
         Pagination<Item, ItemColumn> pagination = restPaginationUtil.extractPagination(uriInfo, ItemColumn::valueOf);
 
@@ -98,7 +107,7 @@ public class ItemResource {
                 .map(toWsItemConverter::convert)
                 .collect(Collectors.toList());
 
-        response.setHeader("X-Comptoir-ListTotalCount", "1234");
+        response.setHeader(HeadersConfig.LIST_RESULTS_COUNT_HEADER, "1234");
 
         return wsItems;
     }
