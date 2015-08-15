@@ -347,8 +347,8 @@ public class SaleService {
             dateTime = ZonedDateTime.now();
             itemSale.setDateTime(dateTime);
         }
-
-        return itemSale;
+        ItemSale managedItem = entityManager.merge(itemSale);
+        return managedItem;
     }
 
     @Nonnull
