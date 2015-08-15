@@ -57,7 +57,7 @@ public class FromWsItemSaleConverter {
         BigDecimal vatRate = wsItemSale.getVatRate();
         Price price = new Price();
         price.setVatExclusive(vatExclusive);
-        price.setVatExclusive(vatRate);
+        price.setVatRate(vatRate);
 
         ItemSale itemSale = new ItemSale();
         itemSale.setId(id);

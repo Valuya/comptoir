@@ -43,7 +43,7 @@ public class ToWsSaleConverter {
         ZonedDateTime dateTime = sale.getDateTime();
         String reference = sale.getReference();
         BigDecimal vatAmount = sale.getVatAmount();
-        BigDecimal vatExclusiveAmout = sale.getVatExclusiveAmout();
+        BigDecimal vatExclusiveAmout = sale.getVatExclusiveAmount();
         boolean closed = sale.isClosed();
 
         AccountingTransaction accountingTransaction = sale.getAccountingTransaction();
@@ -68,7 +68,7 @@ public class ToWsSaleConverter {
         wsSale.setDateTime(dateTime);
         wsSale.setInvoiceRef(invoiceRef);
         wsSale.setVatAmount(vatAmount);
-        wsSale.setVatExclusiveAmout(vatExclusiveAmout);
+        wsSale.setVatExclusiveAmount(vatExclusiveAmout);
 
         return wsSale;
     }

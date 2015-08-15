@@ -25,7 +25,7 @@ public class WsSale implements WithId {
     private WsCustomerRef customerRef;
     private ZonedDateTime dateTime;
     private WsInvoiceRef invoiceRef;
-    private BigDecimal vatExclusiveAmout;
+    private BigDecimal vatExclusiveAmount;
     private BigDecimal vatAmount;
     private boolean closed;
     @Size(max = 128)
@@ -73,12 +73,12 @@ public class WsSale implements WithId {
         this.invoiceRef = invoiceRef;
     }
 
-    public BigDecimal getVatExclusiveAmout() {
-        return vatExclusiveAmout;
+    public BigDecimal getVatExclusiveAmount() {
+        return vatExclusiveAmount;
     }
 
-    public void setVatExclusiveAmout(BigDecimal vatExclusiveAmout) {
-        this.vatExclusiveAmout = vatExclusiveAmout;
+    public void setVatExclusiveAmount(BigDecimal vatExclusiveAmount) {
+        this.vatExclusiveAmount = vatExclusiveAmount;
     }
 
     public BigDecimal getVatAmount() {

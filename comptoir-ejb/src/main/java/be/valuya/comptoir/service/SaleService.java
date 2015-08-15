@@ -125,7 +125,7 @@ public class SaleService {
         vatAccountingEntry.setAmount(vatCredit);
         vatAccountingEntry.setAccount(vatAccount);
 
-        sale.setVatExclusiveAmout(vatExclusiveTotal);
+        sale.setVatExclusiveAmount(vatExclusiveTotal);
         sale.setVatAmount(vatTotal);
 
         return sale;
@@ -165,7 +165,7 @@ public class SaleService {
 
         if (close) {
             BigDecimal vatAmount = sale.getVatAmount();
-            BigDecimal vatExclusiveAmout = sale.getVatExclusiveAmout();
+            BigDecimal vatExclusiveAmout = sale.getVatExclusiveAmount();
             BigDecimal vatInclusiveAmount = vatAmount.add(vatExclusiveAmout);
 
             if (vatInclusiveAmount.compareTo(totalPayedAmount) == 0) {
@@ -186,7 +186,7 @@ public class SaleService {
         }
 
         Sale adjustedSale = calcSale(sale, itemSales);
-        BigDecimal vatExclusiveAmount = adjustedSale.getVatExclusiveAmout();
+        BigDecimal vatExclusiveAmount = adjustedSale.getVatExclusiveAmount();
         BigDecimal vatAmount = adjustedSale.getVatAmount();
         BigDecimal totalAmount = vatExclusiveAmount.add(vatAmount);
         BigDecimal payBackAmount = totalAmount.subtract(totalPayedAmount);
@@ -272,16 +272,24 @@ public class SaleService {
             sale.setVatAmount(BigDecimal.ZERO);
         }
 
-        BigDecimal vatExclusiveAmout = sale.getVatExclusiveAmout();
+        BigDecimal vatExclusiveAmout = sale.getVatExclusiveAmount();
         if (vatExclusiveAmout == null) {
-            sale.setVatExclusiveAmout(BigDecimal.ZERO);
+            sale.setVatExclusiveAmount(BigDecimal.ZERO);
         }
 
         return entityManager.merge(sale);
     }
 
     public ItemSale saveItemSale(ItemSale itemSale) {
-        return entityManager.merge(itemSale);
+        Sale sale = itemSale.getSale();
+
+        ZonedDateTime dateTime = itemSale.getDateTime();
+        if (dateTime == null) {
+            dateTime = ZonedDateTime.now();
+            itemSale.setDateTime(dateTime);
+        }
+
+        return itemSale;
     }
 
     @Nonnull
