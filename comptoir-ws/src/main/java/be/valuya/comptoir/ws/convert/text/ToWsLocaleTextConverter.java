@@ -14,6 +14,9 @@ import javax.enterprise.context.ApplicationScoped;
 public class ToWsLocaleTextConverter {
 
     public List<WsLocaleText> convert(LocaleText localeText) {
+        if (localeText == null) {
+            return null;
+        }
         List<WsLocaleText> localeTextList = localeText.getLocaleTextMap()
                 .entrySet()
                 .stream()

@@ -83,6 +83,11 @@ public class SaleService {
         return typedQuery.getResultList();
     }
 
+    public Sale calcSale(Sale sale) {
+        List<ItemSale> saleItemList = findSaleItems(sale);
+        return calcSale(sale, saleItemList);
+    }
+
     public Sale calcSale(Sale sale, List<ItemSale> itemSales) {
         Company company = sale.getCompany();
         ZonedDateTime dateTime = ZonedDateTime.now();
@@ -237,7 +242,7 @@ public class SaleService {
         Root<Sale> saleRoot = query.from(Sale.class);
 
         query.select(saleRoot);
-        
+
         List<Predicate> predicates = applySaleSearch(saleSearch, saleRoot, criteriaBuilder);
         Predicate[] predicateArray = predicates.toArray(new Predicate[0]);
         query.where(predicateArray);
@@ -249,7 +254,7 @@ public class SaleService {
         }
 
         TypedQuery<Sale> typedQuery = entityManager.createQuery(query);
-        
+
         if (pagination != null) {
             int offset = pagination.getOffset();
             int maxResults = pagination.getMaxResults();
@@ -260,7 +265,7 @@ public class SaleService {
         List<Sale> sales = typedQuery.getResultList();
         return sales;
     }
-    
+
     @Nonnull
     public Long countSales(@Nonnull SaleSearch saleSearch) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
@@ -273,7 +278,6 @@ public class SaleService {
         List<Predicate> predicates = applySaleSearch(saleSearch, saleRoot, criteriaBuilder);
         Predicate[] predicateArray = predicates.toArray(new Predicate[0]);
         query.where(predicateArray);
-        
 
         TypedQuery<Long> typedQuery = entityManager.createQuery(query);
         Long saleCount = typedQuery.getSingleResult();
@@ -286,7 +290,7 @@ public class SaleService {
         Path<Company> companyPath = saleRoot.get(Sale_.company);
         Predicate companyPredicate = criteriaBuilder.equal(companyPath, company);
         predicates.add(companyPredicate);
-       
+
         Boolean closed = saleSearch.getClosed();
         if (closed != null) {
             Path<Boolean> closedPath = saleRoot.get(Sale_.closed);
@@ -328,14 +332,14 @@ public class SaleService {
 
         return entityManager.merge(sale);
     }
-    
+
     public void cancelOpenSale(Sale sale) {
         if (sale.isClosed()) {
             throw new IllegalArgumentException("The sale is closed");
         }
         List<ItemSale> itemSaleList = findSaleItems(sale);
         for (ItemSale itemSale : itemSaleList) {
-            entityManager.remove(itemSale);
+            removeItemSale(itemSale);
         }
         Sale managedSale = entityManager.merge(sale);
         entityManager.remove(managedSale);
@@ -347,8 +351,30 @@ public class SaleService {
             dateTime = ZonedDateTime.now();
             itemSale.setDateTime(dateTime);
         }
+        // Update price
+        BigDecimal quantity = itemSale.getQuantity();
+        Price price = itemSale.getPrice();
+        Price itemPrice = itemSale.getItem().getCurrentPrice();
+        if (price == null || price.getVatExclusive() == null) {
+            price = new Price();
+        }
+        BigDecimal vatExclusiveTotal = itemPrice.getVatExclusive().multiply(quantity);
+        BigDecimal vatRate = itemPrice.getVatRate();
+        price.setVatExclusive(vatExclusiveTotal);
+        price.setVatRate(vatRate);
+        itemSale.setPrice(price);
+        
         ItemSale managedItem = entityManager.merge(itemSale);
         return managedItem;
+    }
+
+    public void removeItemSale(ItemSale itemSale) {
+        Sale sale = itemSale.getSale();
+        if (sale.isClosed()) {
+            throw new IllegalArgumentException("The sale is closed");
+        }
+        ItemSale managedSale = entityManager.merge(itemSale);
+        entityManager.remove(managedSale);
     }
 
     @Nonnull

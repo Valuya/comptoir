@@ -86,7 +86,7 @@ public class SaleResource {
     @GET
     public WsSale getSale(@PathParam("id") long id) {
         Sale sale = saleService.findSaleById(id);
-        
+        sale = saleService.calcSale(sale);
         WsSale wsSale = toWsSaleConverter.convert(sale);
         
         return wsSale;
@@ -102,6 +102,7 @@ public class SaleResource {
         Long count = saleService.countSales(saleSearch);
         
         List<WsSale> wsSales = sales.stream()
+                .map(saleService::calcSale)
                 .map(toWsSaleConverter::convert)
                 .collect(Collectors.toList());
         response.setHeader(HeadersConfig.LIST_RESULTS_COUNT_HEADER, count.toString());
