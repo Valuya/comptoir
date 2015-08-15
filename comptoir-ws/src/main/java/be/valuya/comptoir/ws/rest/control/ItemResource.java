@@ -56,7 +56,6 @@ public class ItemResource {
     private RestPaginationUtil restPaginationUtil;
 
     @POST
-    @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public WsItemRef createItem(@NoId WsItem wsItem) {
         Item item = fromWsItemConverter.convert(wsItem);
@@ -69,7 +68,6 @@ public class ItemResource {
 
     @Path("{id}")
     @PUT
-    @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public WsItemRef updateItem(@PathParam("id") long id, WsItem wsItem) {
         idChecker.checkId(id, wsItem);
@@ -83,7 +81,6 @@ public class ItemResource {
 
     @Path("{id}")
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
     public WsItem getItem(@PathParam("id") long id) {
         Item item = stockService.findItemById(id);
 
@@ -94,7 +91,6 @@ public class ItemResource {
 
     @POST
     @Path("search")
-    @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public List<WsItem> findItems(WsItemSearch wsItemSearch) {
         Pagination<Item, ItemColumn> pagination = restPaginationUtil.extractPagination(uriInfo, ItemColumn::valueOf);

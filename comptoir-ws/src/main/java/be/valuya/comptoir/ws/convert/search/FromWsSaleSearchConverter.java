@@ -24,9 +24,11 @@ public class FromWsSaleSearchConverter {
         }
         WsCompanyRef companyRef = wsSaleSearch.getCompanyRef();
         Company company = fromWsCompanyConverter.find(companyRef);
+        Boolean closed = wsSaleSearch.getClosed();
 
         SaleSearch saleSearch = new SaleSearch();
         saleSearch.setCompany(company);
+        saleSearch.setClosed(closed);
 
         return saleSearch;
     }
