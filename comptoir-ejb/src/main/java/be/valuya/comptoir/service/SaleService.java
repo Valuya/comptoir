@@ -23,6 +23,7 @@ import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -63,7 +64,7 @@ public class SaleService {
     }
 
     @Nonnull
-    public List<ItemSale> findSaleItems(@Nonnull Sale sale) {
+    public List<ItemSale> findItemSales(@Nonnull Sale sale) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<ItemSale> query = criteriaBuilder.createQuery(ItemSale.class);
 
@@ -77,46 +78,34 @@ public class SaleService {
         return typedQuery.getResultList();
     }
 
-    public Sale calcSale(Sale sale, List<ItemSale> itemSales) {
+    public Sale calcSale(Sale sale) {
+        List<ItemSale> itemSales = findItemSales(sale);
+
+        return calcSale(sale, itemSales);
+    }
+
+    public void createSaleAccountingEntries(Sale sale, List<ItemSale> itemSales) {
+        List<AccountingEntry> productAccountingEntries = itemSales.stream()
+                .map(this::createItemSaleAccountingEntry)
+                .collect(Collectors.toList());
+
+        productAccountingEntries.forEach(entityManager::merge);
+
+        AccountingEntry vatAccountingEntry = createSaleVatAccountingEntry(sale);
+        entityManager.merge(vatAccountingEntry);
+    }
+
+    private AccountingEntry createSaleVatAccountingEntry(Sale sale) {
+        AccountingTransaction accountingTransaction = sale.getAccountingTransaction();
         Company company = sale.getCompany();
-        ZonedDateTime dateTime = ZonedDateTime.now();
-
-        BigDecimal vatExclusiveTotal = BigDecimal.ZERO;
-        BigDecimal vatTotal = BigDecimal.ZERO;
-
-        Customer customer = sale.getCustomer();
-
-        AccountingTransaction accountingTransaction = new AccountingTransaction();
-        accountingTransaction.setCompany(company);
-        accountingTransaction.setAccountingTransactionType(AccountingTransactionType.SALE);
-        accountingTransaction.setDateTime(dateTime);
-
-        sale.setAccountingTransaction(accountingTransaction);
-
-        for (ItemSale itemSale : itemSales) {
-            Price price = itemSale.getPrice();
-            BigDecimal vatExclusive = price.getVatExclusive();
-            BigDecimal vatRate = price.getVatRate();
-            BigDecimal vatAmount = VatUtils.calcVatAmount(price);
-            vatExclusiveTotal = vatExclusiveTotal.add(vatExclusive);
-            vatTotal = vatTotal.add(vatAmount);
-            BigDecimal productCredit = vatExclusive.negate();
-
-            Item item = itemSale.getItem();
-            LocaleText description = item.getDescription();
-
-            AccountingEntry productAccountingEntry = new AccountingEntry();
-            productAccountingEntry.setCompany(company);
-            productAccountingEntry.setCustomer(customer);
-            productAccountingEntry.setDateTime(dateTime);
-            productAccountingEntry.setAmount(productCredit);
-            productAccountingEntry.setVatRate(vatRate);
-            productAccountingEntry.setDescription(description);
-            productAccountingEntry.setAccountingTransaction(accountingTransaction);
-        }
 
         Account vatAccount = findAccountByType(company, AccountType.VAT);
-        BigDecimal vatCredit = vatTotal.negate();
+        BigDecimal vatAmount = sale.getVatAmount();
+        BigDecimal vatCredit = vatAmount.negate();
+
+        ZonedDateTime dateTime = ZonedDateTime.now();
+
+        Customer customer = sale.getCustomer();
 
         AccountingEntry vatAccountingEntry = new AccountingEntry();
         vatAccountingEntry.setAccountingTransaction(accountingTransaction);
@@ -124,6 +113,50 @@ public class SaleService {
         vatAccountingEntry.setDateTime(dateTime);
         vatAccountingEntry.setAmount(vatCredit);
         vatAccountingEntry.setAccount(vatAccount);
+        vatAccountingEntry.setCustomer(customer);
+
+        return vatAccountingEntry;
+    }
+
+    private AccountingEntry createItemSaleAccountingEntry(ItemSale itemSale) {
+        Sale sale = itemSale.getSale();
+        Company company = sale.getCompany();
+        ZonedDateTime dateTime = ZonedDateTime.now();
+
+        Customer customer = sale.getCustomer();
+        AccountingTransaction accountingTransaction = sale.getAccountingTransaction();
+
+        Price price = itemSale.getPrice();
+        BigDecimal vatExclusive = price.getVatExclusive();
+        BigDecimal vatRate = price.getVatRate();
+        BigDecimal productCredit = vatExclusive.negate();
+
+        Item item = itemSale.getItem();
+        LocaleText description = item.getDescription();
+        AccountingEntry productAccountingEntry = new AccountingEntry();
+        productAccountingEntry.setCompany(company);
+        productAccountingEntry.setCustomer(customer);
+        productAccountingEntry.setDateTime(dateTime);
+        productAccountingEntry.setAmount(productCredit);
+        productAccountingEntry.setVatRate(vatRate);
+        productAccountingEntry.setDescription(description);
+        productAccountingEntry.setAccountingTransaction(accountingTransaction);
+
+        return productAccountingEntry;
+    }
+
+    public Sale calcSale(Sale sale, List<ItemSale> itemSales) {
+        BigDecimal vatExclusiveTotal = BigDecimal.ZERO;
+        BigDecimal vatTotal = BigDecimal.ZERO;
+
+        for (ItemSale itemSale : itemSales) {
+            Price price = itemSale.getPrice();
+            BigDecimal vatExclusive = price.getVatExclusive();
+            BigDecimal vatAmount = VatUtils.calcVatAmount(price);
+
+            vatExclusiveTotal = vatExclusiveTotal.add(vatExclusive);
+            vatTotal = vatTotal.add(vatAmount);
+        }
 
         sale.setVatExclusiveAmout(vatExclusiveTotal);
         sale.setVatAmount(vatTotal);
@@ -277,11 +310,18 @@ public class SaleService {
             sale.setVatExclusiveAmout(BigDecimal.ZERO);
         }
 
+        if (sale.getId() != null) {
+            calcSale(sale);
+        }
+
         return entityManager.merge(sale);
     }
 
     public ItemSale saveItemSale(ItemSale itemSale) {
-        return entityManager.merge(itemSale);
+        ItemSale managedItemSale = entityManager.merge(itemSale);
+        Sale managedSale = managedItemSale.getSale();
+        managedSale = calcSale(managedSale);
+        return managedItemSale;
     }
 
     @Nonnull

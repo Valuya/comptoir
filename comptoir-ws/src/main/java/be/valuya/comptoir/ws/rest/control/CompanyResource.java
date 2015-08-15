@@ -67,12 +67,18 @@ public class CompanyResource {
     @Path("{id}")
     @GET
     public WsCompany getCompany(@PathParam("id") Long id) {
-        Company company = Optional.ofNullable(companyService.findCompanyById(id))
+        WsCompany wsCompany = Optional.ofNullable(companyService.findCompanyById(id))
+                .map(toWsCompanyConverter::convert)
                 .orElseThrow(NotFoundException::new);
-
-        WsCompany wsCompany = toWsCompanyConverter.convert(company);
 
         return wsCompany;
     }
 
+    @POST
+    @Path("{id}/import")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    public void importItems(@PathParam("id") Long companyId, byte[] data) {
+        Company company = Optional.ofNullable(companyService.findCompanyById(companyId))
+                .orElseThrow(NotFoundException::new);
+    }
 }
