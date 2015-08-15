@@ -328,10 +328,20 @@ public class SaleService {
 
         return entityManager.merge(sale);
     }
+    
+    public void cancelOpenSale(Sale sale) {
+        if (sale.isClosed()) {
+            throw new IllegalArgumentException("The sale is closed");
+        }
+        List<ItemSale> itemSaleList = findSaleItems(sale);
+        for (ItemSale itemSale : itemSaleList) {
+            entityManager.remove(itemSale);
+        }
+        Sale managedSale = entityManager.merge(sale);
+        entityManager.remove(managedSale);
+    }
 
     public ItemSale saveItemSale(ItemSale itemSale) {
-        Sale sale = itemSale.getSale();
-
         ZonedDateTime dateTime = itemSale.getDateTime();
         if (dateTime == null) {
             dateTime = ZonedDateTime.now();

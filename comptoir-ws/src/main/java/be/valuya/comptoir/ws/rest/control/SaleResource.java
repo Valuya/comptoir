@@ -14,11 +14,13 @@ import be.valuya.comptoir.ws.convert.commercial.ToWsSaleConverter;
 import be.valuya.comptoir.ws.convert.search.FromWsSaleSearchConverter;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
 import be.valuya.comptoir.ws.rest.validation.NoId;
+import be.valuya.comptoir.ws.rest.validation.SaleStateChecker;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -48,6 +50,8 @@ public class SaleResource {
     @Inject
     private IdChecker idChecker;
     @Inject
+    private SaleStateChecker saleStateChecker;
+    @Inject
     private RestPaginationUtil restPaginationUtil;
     @Context
     private HttpServletResponse response;
@@ -68,7 +72,7 @@ public class SaleResource {
     
     @Path("{id}")
     @PUT
-    public WsSaleRef saveSale(@PathParam("id") long id, WsSale wsSale) {
+    public WsSaleRef updateSale(@PathParam("id") long id, WsSale wsSale) {
         idChecker.checkId(id, wsSale);
         Sale sale = fromWsSaleConverter.convert(wsSale);
         Sale savedSale = saleService.saveSale(sale);
@@ -104,4 +108,12 @@ public class SaleResource {
         return wsSales;
     }
     
+    @DELETE
+    @Path("{id}/state/OPEN")
+    public void deleteSale(@PathParam("id") long id) {
+        Sale sale = saleService.findSaleById(id);
+        saleStateChecker.checkState(SaleStateChecker.SaleState.OPEN, sale);
+        saleService.cancelOpenSale(sale);
+    }
+            
 }
