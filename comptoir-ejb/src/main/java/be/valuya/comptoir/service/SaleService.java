@@ -360,9 +360,12 @@ public class SaleService {
 
         if (sale.getId() != null) {
             calcSale(sale);
-        }
 
-        return entityManager.merge(sale);
+        }
+        Sale managedSale = entityManager.merge(sale);
+        managedSale = calcSale(sale);
+
+        return managedSale;
     }
 
     public void cancelOpenSale(Sale sale) {
@@ -396,8 +399,11 @@ public class SaleService {
         price.setVatRate(vatRate);
         itemSale.setPrice(price);
 
-        ItemSale managedItem = entityManager.merge(itemSale);
-        return managedItem;
+        ItemSale managedItemSale = entityManager.merge(itemSale);
+        Sale managedSale = managedItemSale.getSale();
+        managedSale = calcSale(managedSale);
+
+        return managedItemSale;
     }
 
     public void removeItemSale(ItemSale itemSale) {

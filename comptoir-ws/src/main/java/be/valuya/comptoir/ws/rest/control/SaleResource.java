@@ -102,7 +102,6 @@ public class SaleResource {
         Long count = saleService.countSales(saleSearch);
         
         List<WsSale> wsSales = sales.stream()
-                .map(saleService::calcSale)
                 .map(toWsSaleConverter::convert)
                 .collect(Collectors.toList());
         response.setHeader(HeadersConfig.LIST_RESULTS_COUNT_HEADER, count.toString());
