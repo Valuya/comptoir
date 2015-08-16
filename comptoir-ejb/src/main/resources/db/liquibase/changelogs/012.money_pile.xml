@@ -28,7 +28,7 @@
         />
     </changeSet>
 
-    <changeSet id="2" author="ymajoros">
+    <changeSet id="3" author="ymajoros">
         <addForeignKeyConstraint 
             constraintName="fk_money_pile_balance" 
             baseTableName="money_pile" 
