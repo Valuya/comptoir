@@ -31,6 +31,7 @@ public class FromWsBalanceConverter {
         Long id = wsBalance.getId();
         BigDecimal balanceAmount = wsBalance.getBalance();
         ZonedDateTime dateTime = wsBalance.getDateTime();
+        boolean closed = wsBalance.isClosed();
 
         WsAccountRef accountRef = wsBalance.getAccountRef();
         Account account = fromWsAccountConverter.find(accountRef);
@@ -40,6 +41,7 @@ public class FromWsBalanceConverter {
         balance.setAccount(account);
         balance.setBalance(balanceAmount);
         balance.setDateTime(dateTime);
+        balance.setClosed(closed);
 
         return balance;
     }

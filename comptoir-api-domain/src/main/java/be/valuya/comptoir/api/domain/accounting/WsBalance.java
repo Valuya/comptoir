@@ -21,6 +21,7 @@ public class WsBalance implements Serializable, WithId {
     private ZonedDateTime dateTime;
     private BigDecimal balance;
     private String comment;
+    private boolean closed;
 
     @Override
     public Long getId() {
@@ -61,5 +62,13 @@ public class WsBalance implements Serializable, WithId {
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public boolean isClosed() {
+        return closed;
+    }
+
+    public void setClosed(boolean closed) {
+        this.closed = closed;
     }
 }

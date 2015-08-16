@@ -28,6 +28,7 @@ public class ToWsBalanceConverter {
         BigDecimal balanceAmount = balance.getBalance();
         String comment = balance.getComment();
         ZonedDateTime dateTime = balance.getDateTime();
+        boolean closed = balance.isClosed();
 
         Account account = balance.getAccount();
         WsAccountRef accountRef = toWsAccountConverter.reference(account);
@@ -38,6 +39,7 @@ public class ToWsBalanceConverter {
         wsBalance.setBalance(balanceAmount);
         wsBalance.setComment(comment);
         wsBalance.setDateTime(dateTime);
+        wsBalance.setClosed(closed);
 
         return wsBalance;
     }

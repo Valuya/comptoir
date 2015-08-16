@@ -28,6 +28,7 @@ public class Balance implements Serializable {
     private ZonedDateTime dateTime;
     private BigDecimal balance;
     private String comment;
+    private boolean closed;
 
     public Long getId() {
         return id;
@@ -67,5 +68,13 @@ public class Balance implements Serializable {
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public boolean isClosed() {
+        return closed;
+    }
+
+    public void setClosed(boolean closed) {
+        this.closed = closed;
     }
 }
