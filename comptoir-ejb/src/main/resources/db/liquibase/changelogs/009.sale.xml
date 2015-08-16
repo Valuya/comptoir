@@ -5,16 +5,8 @@
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
 
     <changeSet id="1" author="ymajoros">
-        <dropForeignKeyConstraint baseTableName="sale" constraintName="FK_SALE_vat_accounting_entry_id" />
-    </changeSet>
-
-    <changeSet id="2" author="ymajoros">
-        <dropColumn tableName="sale" columnName="vat_accounting_entry_id" />
-    </changeSet>
-
-    <changeSet id="3" author="ymajoros">
-        <addColumn tableName="sale">
-            <column name="reference" type="varchar(128)" />
+        <addColumn tableName="item_sale">
+            <column name="discount_ratio" type="decimal(38,0)" />
         </addColumn>
     </changeSet>
 
