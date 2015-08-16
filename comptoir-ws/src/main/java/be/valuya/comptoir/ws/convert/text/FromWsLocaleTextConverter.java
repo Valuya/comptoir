@@ -18,11 +18,6 @@ import javax.ws.rs.BadRequestException;
 public class FromWsLocaleTextConverter {
 
     public LocaleText convert(List<WsLocaleText> wsLocaleTexts) {
-        
-        if (wsLocaleTexts == null || wsLocaleTexts.isEmpty()) {
-            return null;
-        }
-
         LocaleText localeText = new LocaleText();
         return update(wsLocaleTexts, localeText);
     }
