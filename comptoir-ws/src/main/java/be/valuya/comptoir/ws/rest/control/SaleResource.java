@@ -85,7 +85,6 @@ public class SaleResource {
     @GET
     public WsSale getSale(@PathParam("id") long id) {
         Sale sale = saleService.findSaleById(id);
-        sale = saleService.calcSale(sale);
         WsSale wsSale = toWsSaleConverter.convert(sale);
 
         return wsSale;
@@ -115,6 +114,16 @@ public class SaleResource {
      */
     public void deleteOpenSale(@PathParam("id") long id) {
         deleteSale(id);
+    }
+
+    @PUT
+    @Path("{id}/state/CLOSED")
+    public WsSaleRef closeSale(@PathParam("id") long id) {
+        Sale sale = saleService.findSaleById(id);
+        sale = saleService.closeSale(sale);
+        WsSaleRef saleRef = toWsSaleConverter.reference(sale);
+
+        return saleRef;
     }
 
     @DELETE

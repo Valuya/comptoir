@@ -453,4 +453,9 @@ public class SaleService {
 
         return itemSales;
     }
+
+    public Sale closeSale(Sale sale) {
+        sale.setClosed(true);
+        return saveSale(sale);
+    }
 }
