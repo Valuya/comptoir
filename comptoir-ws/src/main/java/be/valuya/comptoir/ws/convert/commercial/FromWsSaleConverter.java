@@ -62,6 +62,9 @@ public class FromWsSaleConverter {
         WsCompanyRef companyRef = wsSale.getCompanyRef();
         Company company = fromWsCompanyConverter.find(companyRef);
 
+        BigDecimal discountAmount = wsSale.getDiscountAmount();
+        BigDecimal discountRatio = wsSale.getDiscountRatio();
+
         Sale sale = new Sale();
         sale.setId(id);
         sale.setCompany(company);
@@ -73,6 +76,8 @@ public class FromWsSaleConverter {
         sale.setInvoice(invoice);
         sale.setVatAmount(vatAmount);
         sale.setVatExclusiveAmount(vatExclusiveAmount);
+        sale.setDiscountAmount(discountAmount);
+        sale.setDiscountRatio(discountRatio);
 
         return sale;
     }

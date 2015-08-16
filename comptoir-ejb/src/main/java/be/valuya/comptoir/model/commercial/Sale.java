@@ -56,6 +56,10 @@ public class Sale implements Serializable {
     private boolean closed;
     @Size(max = 128)
     private String reference;
+    @Column(name = "discount_ratio")
+    private BigDecimal discountRatio;
+    @Column(name = "discount_amount")
+    private BigDecimal discountAmount;
 
     public Long getId() {
         return id;
@@ -141,6 +145,22 @@ public class Sale implements Serializable {
 
     public void setReference(String reference) {
         this.reference = reference;
+    }
+
+    public BigDecimal getDiscountRatio() {
+        return discountRatio;
+    }
+
+    public void setDiscountRatio(BigDecimal discountRatio) {
+        this.discountRatio = discountRatio;
+    }
+
+    public BigDecimal getDiscountAmount() {
+        return discountAmount;
+    }
+
+    public void setDiscountAmount(BigDecimal discountAmount) {
+        this.discountAmount = discountAmount;
     }
 
     @Override

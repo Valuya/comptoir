@@ -34,6 +34,8 @@ public class WsSale implements WithId {
     @Size(max = 128)
     private String reference;
     private WsAccountingTransactionRef accountingTransactionRef;
+    private BigDecimal discountRatio;
+    private BigDecimal discountAmount;
 
     @Override
     public Long getId() {
@@ -116,6 +118,22 @@ public class WsSale implements WithId {
         this.accountingTransactionRef = accountingTransactionRef;
     }
 
+    public BigDecimal getDiscountRatio() {
+        return discountRatio;
+    }
+
+    public void setDiscountRatio(BigDecimal discountRatio) {
+        this.discountRatio = discountRatio;
+    }
+
+    public BigDecimal getDiscountAmount() {
+        return discountAmount;
+    }
+
+    public void setDiscountAmount(BigDecimal discountAmount) {
+        this.discountAmount = discountAmount;
+    }
+
     @Override
     public int hashCode() {
         int hash = 5;
@@ -132,10 +150,7 @@ public class WsSale implements WithId {
             return false;
         }
         final WsSale other = (WsSale) obj;
-        if (!Objects.equals(this.id, other.id)) {
-            return false;
-        }
-        return true;
+        return Objects.equals(this.id, other.id);
     }
 
 }

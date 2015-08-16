@@ -10,4 +10,11 @@
         </addColumn>
     </changeSet>
 
+    <changeSet id="2" author="ymajoros">
+        <addColumn tableName="sale">
+            <column name="discount_ratio" type="decimal(14,4)" />
+            <column name="discount_amount" type="decimal(14,4)" />
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

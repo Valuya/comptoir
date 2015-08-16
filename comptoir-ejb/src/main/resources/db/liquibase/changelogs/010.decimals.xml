@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
+    <changeSet id="1" author="ymajoros">
+        <modifyDataType tableName="accounting_entry" columnName="amount" newDataType="decimal(14,4)" />
+        <modifyDataType tableName="accounting_entry" columnName="vatrate" newDataType="decimal(14,4)" />
+    </changeSet>
+
+    <changeSet id="2" author="ymajoros">
+        <modifyDataType tableName="price" columnName="vatexclusive" newDataType="decimal(14,4)" />
+        <modifyDataType tableName="price" columnName="vatrate" newDataType="decimal(14,4)" />
+    </changeSet>
+
+    <changeSet id="3" author="ymajoros">
+        <modifyDataType tableName="sale" columnName="vat_exclusive_amount" newDataType="decimal(14,4)" />
+        <modifyDataType tableName="sale" columnName="vat_amount" newDataType="decimal(14,4)" />
+    </changeSet>
+
+    <changeSet id="4" author="ymajoros">
+        <modifyDataType tableName="item_sale" columnName="discount_ratio" newDataType="decimal(14,4)" />
+    </changeSet>
+</databaseChangeLog>
