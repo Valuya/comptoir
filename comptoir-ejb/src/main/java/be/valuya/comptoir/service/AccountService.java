@@ -204,4 +204,19 @@ public class AccountService {
         return entityManager.merge(moneyPile);
     }
 
+    public Balance closeBalance(Balance balance) {
+        balance.setClosed(true);
+        return saveBalance(balance);
+    }
+
+    public void cancelOpenBalance(Balance balance) {
+        if (balance.isClosed()) {
+            throw new IllegalArgumentException("The balance is closed");
+        }
+//        List<MoneyPile> moneyPiles = findMoneyPiles();
+//        moneyPiles.forEach(thid::deleteMoneyPile);
+        Balance managedBalance = entityManager.merge(balance);
+        entityManager.remove(managedBalance);
+    }
+
 }

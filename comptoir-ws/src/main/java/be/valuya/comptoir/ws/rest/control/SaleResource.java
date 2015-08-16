@@ -116,22 +116,26 @@ public class SaleResource {
         deleteSale(id);
     }
 
-    @PUT
-    @Path("{id}/state/CLOSED")
-    public WsSaleRef closeSale(@PathParam("id") long id) {
-        Sale sale = saleService.findSaleById(id);
-        sale = saleService.closeSale(sale);
-        WsSaleRef saleRef = toWsSaleConverter.reference(sale);
-
-        return saleRef;
-    }
-
     @DELETE
     @Path("{id}")
     public void deleteSale(@PathParam("id") long id) {
         Sale sale = saleService.findSaleById(id);
         saleStateChecker.checkState(sale, false); // TODO: replace with bean validation
+
         saleService.cancelOpenSale(sale);
+    }
+
+    @PUT
+    @Path("{id}/state/CLOSED")
+    public WsSaleRef closeSale(@PathParam("id") long id) {
+        Sale sale = saleService.findSaleById(id);
+        saleStateChecker.checkState(sale, false); // TODO: replace with bean validation
+
+        sale = saleService.closeSale(sale);
+
+        WsSaleRef saleRef = toWsSaleConverter.reference(sale);
+
+        return saleRef;
     }
 
 }

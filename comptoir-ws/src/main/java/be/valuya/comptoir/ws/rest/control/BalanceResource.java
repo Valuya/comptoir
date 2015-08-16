@@ -10,6 +10,7 @@ import be.valuya.comptoir.ws.config.HeadersConfig;
 import be.valuya.comptoir.ws.convert.accounting.FromWsBalanceConverter;
 import be.valuya.comptoir.ws.convert.balanceing.ToWsBalanceConverter;
 import be.valuya.comptoir.ws.convert.search.FromWsBalanceSearchConverter;
+import be.valuya.comptoir.ws.rest.validation.BalanceStateChecker;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
 import be.valuya.comptoir.ws.rest.validation.NoId;
 import java.util.List;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -44,19 +46,31 @@ public class BalanceResource {
     private ToWsBalanceConverter toWsBalanceConverter;
     @Inject
     private IdChecker idChecker;
+    @Inject
+    private BalanceStateChecker balanceStateChecker;
     @Context
     private HttpServletResponse response;
 
     @POST
     public WsBalanceRef createBalance(@NoId WsBalance wsBalance) {
-        return saveBalance(wsBalance);
+        Balance balance = fromWsBalanceConverter.convert(wsBalance);
+        Balance savedBalance = accountService.saveBalance(balance);
+
+        WsBalanceRef balanceRef = toWsBalanceConverter.reference(savedBalance);
+
+        return balanceRef;
     }
 
     @Path("{id}")
     @PUT
     public WsBalanceRef saveBalance(@PathParam("id") long id, WsBalance wsBalance) {
         idChecker.checkId(id, wsBalance);
-        return saveBalance(wsBalance);
+        Balance balance = fromWsBalanceConverter.convert(wsBalance);
+        Balance savedBalance = accountService.saveBalance(balance);
+
+        WsBalanceRef balanceRef = toWsBalanceConverter.reference(savedBalance);
+
+        return balanceRef;
     }
 
     @Path("{id}")
@@ -83,11 +97,21 @@ public class BalanceResource {
         return wsBalances;
     }
 
-    private WsBalanceRef saveBalance(WsBalance wsBalance) {
-        Balance balance = fromWsBalanceConverter.convert(wsBalance);
-        Balance savedBalance = accountService.saveBalance(balance);
+    @DELETE
+    @Path("{id}")
+    public void deleteBalance(@PathParam("id") long id) {
+        Balance balance = accountService.findBalanceById(id);
+        balanceStateChecker.checkState(balance, false); // TODO: replace with bean validation
+        accountService.cancelOpenBalance(balance);
+    }
 
-        WsBalanceRef balanceRef = toWsBalanceConverter.reference(savedBalance);
+    @PUT
+    @Path("{id}/state/CLOSED")
+    public WsBalanceRef closeBalance(@PathParam("id") long id) {
+        Balance balance = accountService.findBalanceById(id);
+        balanceStateChecker.checkState(balance, false); // TODO: replace with bean validation
+        balance = accountService.closeBalance(balance);
+        WsBalanceRef balanceRef = toWsBalanceConverter.reference(balance);
 
         return balanceRef;
     }
