@@ -47,7 +47,7 @@ public class FromWsSaleConverter {
         ZonedDateTime dateTime = wsSale.getDateTime();
         String reference = wsSale.getReference();
         BigDecimal vatAmount = wsSale.getVatAmount();
-        BigDecimal vatExclusiveAmout = wsSale.getVatExclusiveAmout();
+        BigDecimal vatExclusiveAmount = wsSale.getVatExclusiveAmount();
         boolean closed = wsSale.isClosed();
 
         WsAccountingTransactionRef accountingTransactionRef = wsSale.getAccountingTransactionRef();
@@ -72,7 +72,7 @@ public class FromWsSaleConverter {
         sale.setDateTime(dateTime);
         sale.setInvoice(invoice);
         sale.setVatAmount(vatAmount);
-        sale.setVatExclusiveAmout(vatExclusiveAmout);
+        sale.setVatExclusiveAmount(vatExclusiveAmount);
 
         return sale;
     }

@@ -19,10 +19,14 @@ import be.valuya.comptoir.model.search.SaleSearch;
 import be.valuya.comptoir.model.stock.Stock;
 import be.valuya.comptoir.model.stock.StockChangeType;
 import be.valuya.comptoir.model.thirdparty.Customer;
+import be.valuya.comptoir.util.pagination.Pagination;
+import be.valuya.comptoir.util.pagination.SaleColumn;
+import be.valuya.comptoir.util.pagination.Sort;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -31,7 +35,9 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Join;
+import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
@@ -75,6 +81,11 @@ public class SaleService {
 
         TypedQuery<ItemSale> typedQuery = entityManager.createQuery(query);
         return typedQuery.getResultList();
+    }
+
+    public Sale calcSale(Sale sale) {
+        List<ItemSale> saleItemList = findSaleItems(sale);
+        return calcSale(sale, saleItemList);
     }
 
     public Sale calcSale(Sale sale, List<ItemSale> itemSales) {
@@ -125,7 +136,7 @@ public class SaleService {
         vatAccountingEntry.setAmount(vatCredit);
         vatAccountingEntry.setAccount(vatAccount);
 
-        sale.setVatExclusiveAmout(vatExclusiveTotal);
+        sale.setVatExclusiveAmount(vatExclusiveTotal);
         sale.setVatAmount(vatTotal);
 
         return sale;
@@ -165,7 +176,7 @@ public class SaleService {
 
         if (close) {
             BigDecimal vatAmount = sale.getVatAmount();
-            BigDecimal vatExclusiveAmout = sale.getVatExclusiveAmout();
+            BigDecimal vatExclusiveAmout = sale.getVatExclusiveAmount();
             BigDecimal vatInclusiveAmount = vatAmount.add(vatExclusiveAmout);
 
             if (vatInclusiveAmount.compareTo(totalPayedAmount) == 0) {
@@ -186,7 +197,7 @@ public class SaleService {
         }
 
         Sale adjustedSale = calcSale(sale, itemSales);
-        BigDecimal vatExclusiveAmount = adjustedSale.getVatExclusiveAmout();
+        BigDecimal vatExclusiveAmount = adjustedSale.getVatExclusiveAmount();
         BigDecimal vatAmount = adjustedSale.getVatAmount();
         BigDecimal totalAmount = vatExclusiveAmount.add(vatAmount);
         BigDecimal payBackAmount = totalAmount.subtract(totalPayedAmount);
@@ -225,26 +236,68 @@ public class SaleService {
     }
 
     @Nonnull
-    public List<Sale> findSales(@Nonnull SaleSearch saleSearch) {
+    public List<Sale> findSales(@Nonnull SaleSearch saleSearch, @CheckForNull Pagination<Sale, SaleColumn> pagination) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Sale> query = criteriaBuilder.createQuery(Sale.class);
         Root<Sale> saleRoot = query.from(Sale.class);
 
-        List<Predicate> predicates = new ArrayList<>();
+        query.select(saleRoot);
 
+        List<Predicate> predicates = applySaleSearch(saleSearch, saleRoot, criteriaBuilder);
+        Predicate[] predicateArray = predicates.toArray(new Predicate[0]);
+        query.where(predicateArray);
+
+        if (pagination != null) {
+            List<Sort<SaleColumn>> sortings = pagination.getSortings();
+            List<Order> orders = SaleColumnPersistenceUtils.createOrdersFromSortings(criteriaBuilder, saleRoot, sortings);
+            query.orderBy(orders);
+        }
+
+        TypedQuery<Sale> typedQuery = entityManager.createQuery(query);
+
+        if (pagination != null) {
+            int offset = pagination.getOffset();
+            int maxResults = pagination.getMaxResults();
+            typedQuery.setFirstResult(offset);
+            typedQuery.setMaxResults(maxResults);
+        }
+
+        List<Sale> sales = typedQuery.getResultList();
+        return sales;
+    }
+
+    @Nonnull
+    public Long countSales(@Nonnull SaleSearch saleSearch) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Long> query = criteriaBuilder.createQuery(Long.class);
+        Root<Sale> saleRoot = query.from(Sale.class);
+
+        Expression<Long> saleCountExpression = criteriaBuilder.count(saleRoot);
+        query.select(saleCountExpression);
+
+        List<Predicate> predicates = applySaleSearch(saleSearch, saleRoot, criteriaBuilder);
+        Predicate[] predicateArray = predicates.toArray(new Predicate[0]);
+        query.where(predicateArray);
+
+        TypedQuery<Long> typedQuery = entityManager.createQuery(query);
+        Long saleCount = typedQuery.getSingleResult();
+        return saleCount;
+    }
+
+    private List<Predicate> applySaleSearch(SaleSearch saleSearch, Path<Sale> saleRoot, CriteriaBuilder criteriaBuilder) {
+        List<Predicate> predicates = new ArrayList<>();
         Company company = saleSearch.getCompany();
         Path<Company> companyPath = saleRoot.get(Sale_.company);
         Predicate companyPredicate = criteriaBuilder.equal(companyPath, company);
         predicates.add(companyPredicate);
 
-        Predicate[] predicateArray = predicates.toArray(new Predicate[0]);
-        query.where(predicateArray);
-
-        TypedQuery<Sale> typedQuery = entityManager.createQuery(query);
-
-        List<Sale> sales = typedQuery.getResultList();
-
-        return sales;
+        Boolean closed = saleSearch.getClosed();
+        if (closed != null) {
+            Path<Boolean> closedPath = saleRoot.get(Sale_.closed);
+            Predicate closedPredicate = criteriaBuilder.equal(closedPath, closed);
+            predicates.add(closedPredicate);
+        }
+        return predicates;
     }
 
     @SuppressWarnings("null")
@@ -272,16 +325,56 @@ public class SaleService {
             sale.setVatAmount(BigDecimal.ZERO);
         }
 
-        BigDecimal vatExclusiveAmout = sale.getVatExclusiveAmout();
+        BigDecimal vatExclusiveAmout = sale.getVatExclusiveAmount();
         if (vatExclusiveAmout == null) {
-            sale.setVatExclusiveAmout(BigDecimal.ZERO);
+            sale.setVatExclusiveAmount(BigDecimal.ZERO);
         }
 
         return entityManager.merge(sale);
     }
 
+    public void cancelOpenSale(Sale sale) {
+        if (sale.isClosed()) {
+            throw new IllegalArgumentException("The sale is closed");
+        }
+        List<ItemSale> itemSaleList = findSaleItems(sale);
+        for (ItemSale itemSale : itemSaleList) {
+            removeItemSale(itemSale);
+        }
+        Sale managedSale = entityManager.merge(sale);
+        entityManager.remove(managedSale);
+    }
+
     public ItemSale saveItemSale(ItemSale itemSale) {
-        return entityManager.merge(itemSale);
+        ZonedDateTime dateTime = itemSale.getDateTime();
+        if (dateTime == null) {
+            dateTime = ZonedDateTime.now();
+            itemSale.setDateTime(dateTime);
+        }
+        // Update price
+        BigDecimal quantity = itemSale.getQuantity();
+        Price price = itemSale.getPrice();
+        Price itemPrice = itemSale.getItem().getCurrentPrice();
+        if (price == null) {
+            price = new Price();
+        }
+        BigDecimal vatExclusiveTotal = itemPrice.getVatExclusive().multiply(quantity);
+        BigDecimal vatRate = itemPrice.getVatRate();
+        price.setVatExclusive(vatExclusiveTotal);
+        price.setVatRate(vatRate);
+        itemSale.setPrice(price);
+        
+        ItemSale managedItem = entityManager.merge(itemSale);
+        return managedItem;
+    }
+
+    public void removeItemSale(ItemSale itemSale) {
+        Sale sale = itemSale.getSale();
+        if (sale.isClosed()) {
+            throw new IllegalArgumentException("The sale is closed");
+        }
+        ItemSale managedSale = entityManager.merge(itemSale);
+        entityManager.remove(managedSale);
     }
 
     @Nonnull

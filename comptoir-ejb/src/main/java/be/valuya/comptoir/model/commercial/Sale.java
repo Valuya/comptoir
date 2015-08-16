@@ -48,7 +48,7 @@ public class Sale implements Serializable {
     @NotNull
     @Nonnull
     @Column(name = "vat_exclusive_amount")
-    private BigDecimal vatExclusiveAmout;
+    private BigDecimal vatExclusiveAmount;
     @NotNull
     @Nonnull
     @Column(name = "vat_amount")
@@ -109,12 +109,12 @@ public class Sale implements Serializable {
 
     @NotNull
     @Nonnull
-    public BigDecimal getVatExclusiveAmout() {
-        return vatExclusiveAmout;
+    public BigDecimal getVatExclusiveAmount() {
+        return vatExclusiveAmount;
     }
 
-    public void setVatExclusiveAmout(@NotNull @Nonnull BigDecimal vatExclusiveAmout) {
-        this.vatExclusiveAmout = vatExclusiveAmout;
+    public void setVatExclusiveAmount(@NotNull @Nonnull BigDecimal vatExclusiveAmount) {
+        this.vatExclusiveAmount = vatExclusiveAmount;
     }
 
     @NotNull

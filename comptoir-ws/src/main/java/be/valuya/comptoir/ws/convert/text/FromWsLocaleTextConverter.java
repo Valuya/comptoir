@@ -19,7 +19,6 @@ public class FromWsLocaleTextConverter {
 
     public LocaleText convert(List<WsLocaleText> wsLocaleTexts) {
         LocaleText localeText = new LocaleText();
-
         return update(wsLocaleTexts, localeText);
     }
 

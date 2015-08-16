@@ -1,5 +1,6 @@
 package be.valuya.comptoir.api.domain.commercial;
 
+import be.valuya.comptoir.api.utils.DateFormatter;
 import be.valuya.comptoir.api.domain.accounting.WsAccountingTransactionRef;
 import be.valuya.comptoir.api.domain.company.WithId;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
@@ -11,6 +12,7 @@ import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  *
@@ -23,9 +25,10 @@ public class WsSale implements WithId {
     private Long id;
     private WsCompanyRef companyRef;
     private WsCustomerRef customerRef;
+    @XmlJavaTypeAdapter(DateFormatter.class)
     private ZonedDateTime dateTime;
     private WsInvoiceRef invoiceRef;
-    private BigDecimal vatExclusiveAmout;
+    private BigDecimal vatExclusiveAmount;
     private BigDecimal vatAmount;
     private boolean closed;
     @Size(max = 128)
@@ -73,12 +76,12 @@ public class WsSale implements WithId {
         this.invoiceRef = invoiceRef;
     }
 
-    public BigDecimal getVatExclusiveAmout() {
-        return vatExclusiveAmout;
+    public BigDecimal getVatExclusiveAmount() {
+        return vatExclusiveAmount;
     }
 
-    public void setVatExclusiveAmout(BigDecimal vatExclusiveAmout) {
-        this.vatExclusiveAmout = vatExclusiveAmout;
+    public void setVatExclusiveAmount(BigDecimal vatExclusiveAmount) {
+        this.vatExclusiveAmount = vatExclusiveAmount;
     }
 
     public BigDecimal getVatAmount() {

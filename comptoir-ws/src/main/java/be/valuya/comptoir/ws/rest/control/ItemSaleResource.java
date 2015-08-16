@@ -4,6 +4,7 @@ import be.valuya.comptoir.api.domain.commercial.WsItemSale;
 import be.valuya.comptoir.api.domain.commercial.WsItemSaleRef;
 import be.valuya.comptoir.api.domain.search.WsItemSaleSearch;
 import be.valuya.comptoir.model.commercial.ItemSale;
+import be.valuya.comptoir.model.commercial.Sale;
 import be.valuya.comptoir.model.search.ItemSaleSearch;
 import be.valuya.comptoir.service.SaleService;
 import be.valuya.comptoir.ws.config.HeadersConfig;
@@ -12,11 +13,14 @@ import be.valuya.comptoir.ws.convert.commercial.ToWsItemSaleConverter;
 import be.valuya.comptoir.ws.convert.search.FromWsItemSaleSearchConverter;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
 import be.valuya.comptoir.ws.rest.validation.NoId;
+import be.valuya.comptoir.ws.rest.validation.SaleStateChecker;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -44,19 +48,25 @@ public class ItemSaleResource {
     private ToWsItemSaleConverter toWsItemSaleConverter;
     @Inject
     private IdChecker idChecker;
+    @Inject
+    private SaleStateChecker saleStateChecker;
     @Context
     private HttpServletResponse response;
 
     @POST
+    @Consumes(MediaType.APPLICATION_JSON)
     public WsItemSaleRef createItemSale(@NoId WsItemSale wsItemSale) {
-        return saveItemSale(wsItemSale);
+        WsItemSaleRef savedItemSaleRef = saveItemSale(wsItemSale);
+        return savedItemSaleRef;
     }
 
     @Path("{id}")
     @PUT
-    public WsItemSaleRef saveItemSale(@PathParam("id") long id, WsItemSale wsItemSale) {
+    @Consumes(MediaType.APPLICATION_JSON)
+    public WsItemSaleRef updateItemSale(@PathParam("id") long id, WsItemSale wsItemSale) {
         idChecker.checkId(id, wsItemSale);
-        return saveItemSale(wsItemSale);
+        WsItemSaleRef savedItemSaleRef = saveItemSale(wsItemSale);
+        return savedItemSaleRef;
     }
 
     @Path("{id}")
@@ -71,6 +81,7 @@ public class ItemSaleResource {
 
     @POST
     @Path("search")
+    @Consumes(MediaType.APPLICATION_JSON)
     public List<WsItemSale> findItemSales(WsItemSaleSearch wsItemSaleSearch) {
         ItemSaleSearch itemSaleSearch = fromWsItemSaleSearchConverter.convert(wsItemSaleSearch);
         List<ItemSale> itemSales = saleService.findItemSales(itemSaleSearch);
@@ -81,6 +92,16 @@ public class ItemSaleResource {
 
         response.setHeader(HeadersConfig.LIST_RESULTS_COUNT_HEADER, "101");
         return wsItemSales;
+    }
+
+    @DELETE
+    @Path("{id}")
+    public void deleteItemSale(@PathParam("id") long id) {
+        ItemSale itemSale = saleService.findItemSaleById(id);
+        Sale sale = itemSale.getSale();
+        saleStateChecker.checkState(SaleStateChecker.SaleState.OPEN, sale);
+
+        saleService.removeItemSale(itemSale);
     }
 
     private WsItemSaleRef saveItemSale(WsItemSale wsItemSale) {
