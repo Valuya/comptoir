@@ -7,6 +7,7 @@ package be.valuya.comptoir.ws.rest.validation;
 
 import be.valuya.comptoir.model.commercial.Sale;
 import javax.enterprise.context.ApplicationScoped;
+import javax.ws.rs.BadRequestException;
 
 /**
  *
@@ -15,22 +16,10 @@ import javax.enterprise.context.ApplicationScoped;
 @ApplicationScoped
 public class SaleStateChecker {
 
-    public enum SaleState {
-
-        OPEN,
-        CLOSED
-    }
-
-    public boolean checkState(SaleState expected, Sale sale) {
-        SaleState state = getState(sale);
-        return state == expected;
-    }
-
-    private SaleState getState(Sale sale) {
-        if (sale.isClosed()) {
-            return SaleState.CLOSED;
-        } else {
-            return SaleState.OPEN;
+    public void checkState(Sale sale, boolean expectedClosedState) {
+        boolean closed = sale.isClosed();
+        if (closed != expectedClosedState) {
+            throw new BadRequestException("Unexpected sale state");
         }
     }
 

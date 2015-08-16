@@ -38,7 +38,7 @@ import javax.ws.rs.core.UriInfo;
 @Path("/sale")
 @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 public class SaleResource {
-    
+
     @EJB
     private SaleService saleService;
     @Inject
@@ -57,41 +57,40 @@ public class SaleResource {
     private HttpServletResponse response;
     @Context
     private UriInfo uriInfo;
-    
-    
+
     @POST
     public WsSaleRef createSale(@NoId WsSale wsSale) {
         Sale sale = fromWsSaleConverter.convert(wsSale);
-        
+
         Sale savedSale = saleService.saveSale(sale);
-        
+
         WsSaleRef saleRef = toWsSaleConverter.reference(savedSale);
-        
+
         return saleRef;
     }
-    
+
     @Path("{id}")
     @PUT
     public WsSaleRef updateSale(@PathParam("id") long id, WsSale wsSale) {
         idChecker.checkId(id, wsSale);
         Sale sale = fromWsSaleConverter.convert(wsSale);
         Sale savedSale = saleService.saveSale(sale);
-        
+
         WsSaleRef saleRef = toWsSaleConverter.reference(savedSale);
-        
+
         return saleRef;
     }
-    
+
     @Path("{id}")
     @GET
     public WsSale getSale(@PathParam("id") long id) {
         Sale sale = saleService.findSaleById(id);
         sale = saleService.calcSale(sale);
         WsSale wsSale = toWsSaleConverter.convert(sale);
-        
+
         return wsSale;
     }
-    
+
     @POST
     @Path("search")
     public List<WsSale> findSales(WsSaleSearch wsSaleSearch) {
@@ -100,20 +99,30 @@ public class SaleResource {
 
         List<Sale> sales = saleService.findSales(saleSearch, pagination);
         Long count = saleService.countSales(saleSearch);
-        
+
         List<WsSale> wsSales = sales.stream()
                 .map(toWsSaleConverter::convert)
                 .collect(Collectors.toList());
         response.setHeader(HeadersConfig.LIST_RESULTS_COUNT_HEADER, count.toString());
         return wsSales;
     }
-    
+
     @DELETE
     @Path("{id}/state/OPEN")
+    @Deprecated
+    /**
+     * @Deprecated: just call deleteSale(id)
+     */
+    public void deleteOpenSale(@PathParam("id") long id) {
+        deleteSale(id);
+    }
+
+    @DELETE
+    @Path("{id}")
     public void deleteSale(@PathParam("id") long id) {
         Sale sale = saleService.findSaleById(id);
-        saleStateChecker.checkState(SaleStateChecker.SaleState.OPEN, sale);
+        saleStateChecker.checkState(sale, false); // TODO: replace with bean validation
         saleService.cancelOpenSale(sale);
     }
-            
+
 }

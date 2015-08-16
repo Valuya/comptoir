@@ -99,7 +99,7 @@ public class ItemSaleResource {
     public void deleteItemSale(@PathParam("id") long id) {
         ItemSale itemSale = saleService.findItemSaleById(id);
         Sale sale = itemSale.getSale();
-        saleStateChecker.checkState(SaleStateChecker.SaleState.OPEN, sale);
+        saleStateChecker.checkState(sale, false); // TODO: replace with bean validation
 
         saleService.removeItemSale(itemSale);
     }
