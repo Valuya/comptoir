@@ -8,6 +8,7 @@ import be.valuya.comptoir.model.accounting.AccountingEntry_;
 import be.valuya.comptoir.model.accounting.AccountingTransaction;
 import be.valuya.comptoir.model.cash.Balance;
 import be.valuya.comptoir.model.cash.Balance_;
+import be.valuya.comptoir.model.cash.MoneyPile;
 import be.valuya.comptoir.model.commercial.Pos;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.search.AccountSearch;
@@ -193,6 +194,14 @@ public class AccountService {
 
     public Balance saveBalance(Balance balance) {
         return entityManager.merge(balance);
+    }
+
+    public MoneyPile findMoneyPileById(long id) {
+        return entityManager.find(MoneyPile.class, id);
+    }
+
+    public MoneyPile saveMoneyPile(MoneyPile moneyPile) {
+        return entityManager.merge(moneyPile);
     }
 
 }

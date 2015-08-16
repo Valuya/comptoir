@@ -1,4 +1,4 @@
-package be.valuya.comptoir.api.domain.accounting;
+package be.valuya.comptoir.api.domain.cash;
 
 import be.valuya.comptoir.api.domain.company.WithId;
 import java.net.URI;
@@ -12,20 +12,20 @@ import org.glassfish.jersey.linking.InjectLink;
  *
  * @author Yannick Majoros <yannick@valuya.be>
  */
-@XmlRootElement(name = "BalanceRef")
+@XmlRootElement(name = "MoneyPileRef")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class WsBalanceRef implements WithId {
+public class WsMoneyPileRef implements WithId {
 
-    @InjectLink(value = "balance/${instance.id}", style = InjectLink.Style.RELATIVE_PATH)
+    @InjectLink(value = "moneyPile/${instance.id}")
     @XmlElement
     private URI link;
     @XmlElement
     private Long id;
 
-    public WsBalanceRef() {
+    public WsMoneyPileRef() {
     }
 
-    public WsBalanceRef(Long id) {
+    public WsMoneyPileRef(Long id) {
         this.id = id;
     }
 

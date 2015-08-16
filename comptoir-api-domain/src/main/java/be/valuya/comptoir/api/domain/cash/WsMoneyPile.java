@@ -27,6 +27,7 @@ public class WsMoneyPile implements Serializable, WithId {
     private BigDecimal total;
     private WsBalanceRef balanceRef;
 
+    @Override
     public Long getId() {
         return id;
     }

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
+    <changeSet id="1" author="ymajoros">
+        <createTable tableName="money_pile">
+            <column name="id" type="bigint(20)">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="account_id" type="bigint(20)" />
+            <column name="balance_id" type="bigint(20)" />
+            <column name="datetime" type="varchar(64)" />
+            <column name="unit_amount" type="decimal(20,4)" />
+            <column name="unit_count" type="decimal(20,4)" />
+            <column name="total" type="decimal(20,4)" />
+        </createTable>
+    </changeSet>
+    
+    <changeSet id="2" author="ymajoros">
+        <addForeignKeyConstraint 
+            constraintName="fk_money_pile_account" 
+            baseTableName="money_pile" 
+            baseColumnNames="account_id" 
+            referencedTableName="account" 
+            referencedColumnNames="id"
+        />
+    </changeSet>
+
+    <changeSet id="2" author="ymajoros">
+        <addForeignKeyConstraint 
+            constraintName="fk_money_pile_balance" 
+            baseTableName="money_pile" 
+            baseColumnNames="balance_id" 
+            referencedTableName="balance" 
+            referencedColumnNames="id"
+        />
+    </changeSet>
+
+</databaseChangeLog>

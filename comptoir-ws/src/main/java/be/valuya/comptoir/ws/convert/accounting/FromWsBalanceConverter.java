@@ -2,6 +2,7 @@ package be.valuya.comptoir.ws.convert.accounting;
 
 import be.valuya.comptoir.api.domain.accounting.WsAccountRef;
 import be.valuya.comptoir.api.domain.accounting.WsBalance;
+import be.valuya.comptoir.api.domain.accounting.WsBalanceRef;
 import be.valuya.comptoir.model.accounting.Account;
 import be.valuya.comptoir.model.cash.Balance;
 import be.valuya.comptoir.service.AccountService;
@@ -43,12 +44,12 @@ public class FromWsBalanceConverter {
         return balance;
     }
 
-    public Account find(WsAccountRef accountRef) {
-        if (accountRef == null) {
+    public Balance find(WsBalanceRef balanceRef) {
+        if (balanceRef == null) {
             return null;
         }
-        Long id = accountRef.getId();
-        return accountService.findAccountById(id);
+        Long id = balanceRef.getId();
+        return accountService.findBalanceById(id);
     }
 
 }
