@@ -164,7 +164,7 @@ public class SaleService {
             vatTotal = vatTotal.add(vatAmount);
         }
 
-        sale.setVatExclusiveAmout(vatExclusiveTotal);
+        sale.setVatExclusiveAmount(vatExclusiveTotal);
         sale.setVatAmount(vatTotal);
 
         return sale;
@@ -369,7 +369,7 @@ public class SaleService {
         if (sale.isClosed()) {
             throw new IllegalArgumentException("The sale is closed");
         }
-        List<ItemSale> itemSaleList = findSaleItems(sale);
+        List<ItemSale> itemSaleList = findItemSales(sale);
         for (ItemSale itemSale : itemSaleList) {
             removeItemSale(itemSale);
         }
@@ -382,7 +382,7 @@ public class SaleService {
         if (dateTime == null) {
             dateTime = ZonedDateTime.now();
             itemSale.setDateTime(dateTime);
-    }
+        }
         // Update price
         BigDecimal quantity = itemSale.getQuantity();
         Price price = itemSale.getPrice();
