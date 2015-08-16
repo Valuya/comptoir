@@ -6,10 +6,13 @@ import be.valuya.comptoir.model.accounting.Account_;
 import be.valuya.comptoir.model.accounting.AccountingEntry;
 import be.valuya.comptoir.model.accounting.AccountingEntry_;
 import be.valuya.comptoir.model.accounting.AccountingTransaction;
+import be.valuya.comptoir.model.cash.Balance;
+import be.valuya.comptoir.model.cash.Balance_;
 import be.valuya.comptoir.model.commercial.Pos;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.search.AccountSearch;
 import be.valuya.comptoir.model.search.AccountingEntrySearch;
+import be.valuya.comptoir.model.search.BalanceSearch;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -142,6 +145,54 @@ public class AccountService {
         List<AccountingEntry> accountingEntries = typedQuery.getResultList();
 
         return accountingEntries;
+    }
+
+    public Balance findBalanceById(long id) {
+        return entityManager.find(Balance.class, id);
+    }
+
+    public List<Balance> findBalances(BalanceSearch balanceSearch) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Balance> query = criteriaBuilder.createQuery(Balance.class);
+        Root<Balance> balanceRoot = query.from(Balance.class);
+
+        List<Predicate> predicates = new ArrayList<>();
+
+        Company company = balanceSearch.getCompany();
+        AccountSearch accountSearch = balanceSearch.getAccountSearch();
+        if (accountSearch == null) {
+            accountSearch = new AccountSearch();
+            accountSearch.setCompany(company);
+        }
+        Join<Balance, Account> accountJoin = balanceRoot.join(Balance_.account);
+        List<Predicate> accountPredicates = createAccountPredicates(accountSearch, accountJoin);
+        predicates.addAll(accountPredicates);
+
+        Path<ZonedDateTime> dateTimePath = balanceRoot.get(Balance_.dateTime);
+        ZonedDateTime fromDateTime = balanceSearch.getFromDateTime();
+        if (fromDateTime != null) {
+            Predicate fromDateTimePredicate = criteriaBuilder.greaterThanOrEqualTo(dateTimePath, fromDateTime);
+            predicates.add(fromDateTimePredicate);
+        }
+        ZonedDateTime toDateTime = balanceSearch.getToDateTime();
+        if (toDateTime != null) {
+            Predicate toDateTimePredicate = criteriaBuilder.lessThan(dateTimePath, toDateTime);
+            predicates.add(toDateTimePredicate);
+        }
+
+        Predicate[] predicateArray = predicates.toArray(new Predicate[0]);
+        query.where(predicateArray);
+
+        TypedQuery<Balance> typedQuery = entityManager.createQuery(query);
+
+        List<Balance> balances = typedQuery.getResultList();
+
+        return balances;
+
+    }
+
+    public Balance saveBalance(Balance balance) {
+        return entityManager.merge(balance);
     }
 
 }

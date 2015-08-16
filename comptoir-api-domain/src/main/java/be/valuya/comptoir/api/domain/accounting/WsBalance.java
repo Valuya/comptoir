@@ -20,6 +20,7 @@ public class WsBalance implements Serializable, WithId {
     private WsAccountRef accountRef;
     private ZonedDateTime dateTime;
     private BigDecimal balance;
+    private String comment;
 
     @Override
     public Long getId() {
@@ -52,5 +53,13 @@ public class WsBalance implements Serializable, WithId {
 
     public void setBalance(BigDecimal balance) {
         this.balance = balance;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 }

@@ -2,6 +2,7 @@ package be.valuya.comptoir.ws.convert.search;
 
 import be.valuya.comptoir.api.domain.accounting.WsAccountingTransactionRef;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
+import be.valuya.comptoir.api.domain.search.WsAccountSearch;
 import be.valuya.comptoir.api.domain.search.WsAccountingEntrySearch;
 import be.valuya.comptoir.model.accounting.AccountingTransaction;
 import be.valuya.comptoir.model.company.Company;
@@ -37,7 +38,9 @@ public class FromWsAccountingEntrySearchConverter {
         WsAccountingTransactionRef accountingTransactionRef = wsAccountingEntrySearch.getAccountingTransactionRef();
         AccountingTransaction accountingTransaction = fromWsAccountingTransactionConverter.find(accountingTransactionRef);
 
-        AccountSearch accountSearch = wsAccountingEntrySearch.getAccountSearch();
+        WsAccountSearch wsAccountSearch = wsAccountingEntrySearch.getAccountSearch();
+        AccountSearch accountSearch = fromWsAccountSearchConverter.convert(wsAccountSearch);
+
         ZonedDateTime fromDateTime = wsAccountingEntrySearch.getFromDateTime();
         ZonedDateTime toDateTime = wsAccountingEntrySearch.getToDateTime();
 

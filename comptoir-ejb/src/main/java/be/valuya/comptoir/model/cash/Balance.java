@@ -27,6 +27,7 @@ public class Balance implements Serializable {
     @Column(name = "date_time")
     private ZonedDateTime dateTime;
     private BigDecimal balance;
+    private String comment;
 
     public Long getId() {
         return id;
@@ -58,5 +59,13 @@ public class Balance implements Serializable {
 
     public void setBalance(BigDecimal balance) {
         this.balance = balance;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 }

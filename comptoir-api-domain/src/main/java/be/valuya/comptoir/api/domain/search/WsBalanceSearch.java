@@ -1,6 +1,5 @@
 package be.valuya.comptoir.api.domain.search;
 
-import be.valuya.comptoir.api.domain.accounting.WsAccountingTransactionRef;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import java.time.ZonedDateTime;
 import javax.annotation.Nonnull;
@@ -15,12 +14,11 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement(name = "AccountingEntrySearch")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class WsAccountingEntrySearch {
+public class WsBalanceSearch {
 
     @Nonnull
     @NotNull
     private WsCompanyRef companyRef;
-    private WsAccountingTransactionRef accountingTransactionRef;
     private WsAccountSearch accountSearch;
     private ZonedDateTime fromDateTime;
     private ZonedDateTime toDateTime;
@@ -31,14 +29,6 @@ public class WsAccountingEntrySearch {
 
     public void setCompanyRef(WsCompanyRef companyRef) {
         this.companyRef = companyRef;
-    }
-
-    public WsAccountingTransactionRef getAccountingTransactionRef() {
-        return accountingTransactionRef;
-    }
-
-    public void setAccountingTransactionRef(WsAccountingTransactionRef accountingTransactionRef) {
-        this.accountingTransactionRef = accountingTransactionRef;
     }
 
     public WsAccountSearch getAccountSearch() {
