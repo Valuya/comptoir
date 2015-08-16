@@ -58,6 +58,8 @@ public class FromWsItemSaleConverter {
         Price price = new Price();
         price.setVatExclusive(vatExclusive);
         price.setVatExclusive(vatRate);
+        
+        BigDecimal discountRatio = wsItemSale.getDiscountRatio();
 
         ItemSale itemSale = new ItemSale();
         itemSale.setId(id);
@@ -67,6 +69,7 @@ public class FromWsItemSaleConverter {
         itemSale.setComment(comment);
         itemSale.setDateTime(dateTime);
         itemSale.setPrice(price);
+        itemSale.setDiscountRatio(discountRatio);
 
         return itemSale;
     }

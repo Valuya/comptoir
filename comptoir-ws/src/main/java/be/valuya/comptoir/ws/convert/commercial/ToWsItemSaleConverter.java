@@ -41,6 +41,7 @@ public class ToWsItemSaleConverter {
         Long id = itemSale.getId();
         ZonedDateTime dateTime = itemSale.getDateTime();
         BigDecimal quantity = itemSale.getQuantity();
+        BigDecimal discountRatio = itemSale.getDiscountRatio();
 
         AccountingEntry accountingEntry = itemSale.getAccountingEntry();
 
@@ -66,6 +67,7 @@ public class ToWsItemSaleConverter {
         wsItemSale.setVatExclusive(vatExclusive);
         wsItemSale.setVatRate(vatRate);
         wsItemSale.setSaleRef(saleRef);
+        wsItemSale.setDiscountRatio(discountRatio);
 
         return wsItemSale;
     }
