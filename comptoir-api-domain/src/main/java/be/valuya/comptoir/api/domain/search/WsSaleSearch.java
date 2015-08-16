@@ -18,6 +18,7 @@ public class WsSaleSearch {
     @Nonnull
     @NotNull
     private WsCompanyRef companyRef;
+    private Boolean closed;
 
     public WsCompanyRef getCompanyRef() {
         return companyRef;
@@ -25,6 +26,14 @@ public class WsSaleSearch {
 
     public void setCompanyRef(WsCompanyRef companyRef) {
         this.companyRef = companyRef;
+    }
+
+    public Boolean getClosed() {
+        return closed;
+    }
+
+    public void setClosed(Boolean closed) {
+        this.closed = closed;
     }
 
 }
