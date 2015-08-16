@@ -35,6 +35,8 @@ public class ItemSale implements Serializable {
     private BigDecimal quantity;
     @ManyToOne
     private Sale sale;
+    @Column(name = "discount_ratio")
+    private BigDecimal discountRatio;
     @ManyToOne
     private LocaleText comment;
     @OneToOne
@@ -102,6 +104,14 @@ public class ItemSale implements Serializable {
 
     public void setAccountingEntry(AccountingEntry accountingEntry) {
         this.accountingEntry = accountingEntry;
+    }
+
+    public BigDecimal getDiscountRatio() {
+        return discountRatio;
+    }
+
+    public void setDiscountRatio(BigDecimal discountRatio) {
+        this.discountRatio = discountRatio;
     }
 
     @Override
