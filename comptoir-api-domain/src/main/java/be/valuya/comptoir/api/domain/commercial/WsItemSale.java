@@ -31,6 +31,7 @@ public class WsItemSale implements WithId {
     @NotNull
     @Nonnull
     private BigDecimal vatRate;
+    private BigDecimal discountRatio;
 
     @Override
     public Long getId() {
@@ -95,6 +96,14 @@ public class WsItemSale implements WithId {
 
     public void setComment(List<WsLocaleText> comment) {
         this.comment = comment;
+    }
+
+    public BigDecimal getDiscountRatio() {
+        return discountRatio;
+    }
+
+    public void setDiscountRatio(BigDecimal discountRatio) {
+        this.discountRatio = discountRatio;
     }
 
 }
