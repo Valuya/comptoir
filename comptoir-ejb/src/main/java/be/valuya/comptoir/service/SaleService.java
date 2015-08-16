@@ -355,7 +355,7 @@ public class SaleService {
         BigDecimal quantity = itemSale.getQuantity();
         Price price = itemSale.getPrice();
         Price itemPrice = itemSale.getItem().getCurrentPrice();
-        if (price == null || price.getVatExclusive() == null) {
+        if (price == null) {
             price = new Price();
         }
         BigDecimal vatExclusiveTotal = itemPrice.getVatExclusive().multiply(quantity);
