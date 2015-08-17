@@ -55,7 +55,8 @@ public class EmployeeService {
         TypedQuery<Employee> typedQuery = entityManager.createQuery(query);
 
         try {
-            return typedQuery.getSingleResult();
+            Employee employee = typedQuery.getSingleResult();
+            return employee;
         } catch (NoResultException noResultException) {
             return null;
         }
@@ -90,10 +91,6 @@ public class EmployeeService {
         } catch (NoSuchAlgorithmException exception) {
             throw new AssertionError(exception);
         }
-    }
-
-    public String login(Employee employee, String passwordHash) {
-        return "45678-test-123";
     }
 
     public Employee findEmployeeById(long id) {
