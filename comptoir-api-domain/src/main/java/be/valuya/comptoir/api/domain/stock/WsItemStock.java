@@ -2,6 +2,7 @@ package be.valuya.comptoir.api.domain.stock;
 
 import be.valuya.comptoir.api.domain.commercial.WsItemRef;
 import be.valuya.comptoir.api.domain.company.WithId;
+import be.valuya.comptoir.api.utils.ZonedDateTimeXmlAdapter;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
@@ -10,6 +11,7 @@ import javax.annotation.Nonnull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  *
@@ -20,7 +22,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class WsItemStock implements Serializable, WithId {
 
     private Long id;
+    @XmlJavaTypeAdapter(ZonedDateTimeXmlAdapter.class)
     private ZonedDateTime startDateTime;
+    @XmlJavaTypeAdapter(ZonedDateTimeXmlAdapter.class)
     private ZonedDateTime endDateTime;
     private WsStockRef stockRef;
     private WsItemRef itemRef;

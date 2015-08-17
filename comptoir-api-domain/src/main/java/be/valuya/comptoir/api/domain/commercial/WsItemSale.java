@@ -2,6 +2,7 @@ package be.valuya.comptoir.api.domain.commercial;
 
 import be.valuya.comptoir.api.domain.company.WithId;
 import be.valuya.comptoir.api.domain.lang.WsLocaleText;
+import be.valuya.comptoir.api.utils.ZonedDateTimeXmlAdapter;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -10,6 +11,7 @@ import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  *
@@ -20,6 +22,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class WsItemSale implements WithId {
 
     private Long id;
+    @XmlJavaTypeAdapter(ZonedDateTimeXmlAdapter.class)
     private ZonedDateTime dateTime;
     private WsItemRef itemRef;
     private BigDecimal quantity;

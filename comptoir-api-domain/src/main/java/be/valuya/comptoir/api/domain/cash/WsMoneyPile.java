@@ -3,12 +3,14 @@ package be.valuya.comptoir.api.domain.cash;
 import be.valuya.comptoir.api.domain.accounting.WsAccountRef;
 import be.valuya.comptoir.api.domain.accounting.WsBalanceRef;
 import be.valuya.comptoir.api.domain.company.WithId;
+import be.valuya.comptoir.api.utils.ZonedDateTimeXmlAdapter;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  * Counted pile of money (e.g.: 53 x 0.10 € = 5.3 €) that can be part of a balance.
@@ -21,6 +23,7 @@ public class WsMoneyPile implements Serializable, WithId {
 
     private Long id;
     private WsAccountRef accountRef;
+    @XmlJavaTypeAdapter(ZonedDateTimeXmlAdapter.class)
     private ZonedDateTime dateTime;
     private BigDecimal unitAmount;
     private BigDecimal count;

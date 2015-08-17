@@ -2,6 +2,7 @@ package be.valuya.comptoir.api.domain.accounting;
 
 import be.valuya.comptoir.api.domain.company.WithId;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
+import be.valuya.comptoir.api.utils.ZonedDateTimeXmlAdapter;
 import be.valuya.comptoir.model.accounting.AccountingTransactionType;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
@@ -11,6 +12,7 @@ import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  *
@@ -24,6 +26,7 @@ public class WsAccountingTransaction implements Serializable, WithId {
     @NotNull
     @Nonnull
     private WsCompanyRef companyRef;
+    @XmlJavaTypeAdapter(ZonedDateTimeXmlAdapter.class)
     private ZonedDateTime dateTime;
     @NotNull
     @Nonnull

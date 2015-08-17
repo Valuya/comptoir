@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package be.valuya.comptoir.api.utils;
 
 import java.time.ZonedDateTime;
@@ -13,7 +8,7 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
  *
  * @author cghislai
  */
-public class DateFormatter extends XmlAdapter<String, ZonedDateTime>{
+public class ZonedDateTimeXmlAdapter extends XmlAdapter<String, ZonedDateTime>{
 
     @Override
     public ZonedDateTime unmarshal(String string) throws Exception {
