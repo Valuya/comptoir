@@ -363,7 +363,7 @@ public class SaleService {
 
         }
         Sale managedSale = entityManager.merge(sale);
-        managedSale = calcSale(sale);
+        managedSale = calcSale(managedSale);
 
         return managedSale;
     }

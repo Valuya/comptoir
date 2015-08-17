@@ -42,4 +42,8 @@
         <modifyDataType tableName="money_pile" columnName="datetime" newDataType="datetime" />
     </changeSet>
 
+    <changeSet id="5" author="ymajoros">
+        <renameColumn tableName="money_pile" oldColumnName="datetime" newColumnName="date_time"
+                      columnDataType="datetime" />
+    </changeSet>
 </databaseChangeLog>

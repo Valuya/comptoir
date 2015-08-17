@@ -25,5 +25,11 @@
             referencedColumnNames="id"
         />
     </changeSet>
+    
+    <changeSet id="3" author="cghislai">
+        <renameColumn tableName="balance"
+                      oldColumnName="datetime" newColumnName="date_time"
+                      columnDataType="datetime"/>
+    </changeSet>
 
 </databaseChangeLog>
