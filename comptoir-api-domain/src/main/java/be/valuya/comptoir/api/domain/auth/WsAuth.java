@@ -1,9 +1,11 @@
 package be.valuya.comptoir.api.domain.auth;
 
 import be.valuya.comptoir.api.domain.thirdparty.WsEmployeeRef;
+import be.valuya.comptoir.api.utils.DateFormatter;
 import java.time.ZonedDateTime;
 import java.util.Objects;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  *
@@ -16,6 +18,7 @@ public class WsAuth {
     private WsEmployeeRef employeeRef;
     private String token;
     private String refreshToken;
+    @XmlJavaTypeAdapter(DateFormatter.class)
     private ZonedDateTime expirationDateTime;
 
     public Long getId() {
