@@ -10,7 +10,6 @@ import be.valuya.comptoir.ws.convert.auth.ToWsAuthConverter;
 import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -34,7 +33,7 @@ public class AuthResource {
     @Inject
     private ToWsAuthConverter toWsAuthConverter;
 
-    @GET
+    @POST
     @Path("/refresh/{refreshToken}")
     public WsAuth refreshAuth(@PathParam("refreshToken") String refreshToken) {
         Auth auth = authService.refreshAuth(refreshToken);
