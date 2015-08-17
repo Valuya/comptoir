@@ -4,6 +4,8 @@ import be.valuya.comptoir.api.domain.thirdparty.WsEmployeeRef;
 import be.valuya.comptoir.api.utils.DateFormatter;
 import java.time.ZonedDateTime;
 import java.util.Objects;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
@@ -12,6 +14,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @XmlRootElement(name = "LoginResponse")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class WsAuth {
 
     private Long id;
