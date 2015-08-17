@@ -38,4 +38,8 @@
         />
     </changeSet>
 
+    <changeSet id="4" author="ymajoros">
+        <modifyDataType tableName="money_pile" columnName="datetime" newDataType="datetime" />
+    </changeSet>
+
 </databaseChangeLog>

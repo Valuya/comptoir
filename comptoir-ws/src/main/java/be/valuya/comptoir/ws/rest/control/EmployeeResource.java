@@ -77,8 +77,8 @@ public class EmployeeResource {
         return wsEmployees;
     }
 
-    @Path("/{employeeId}/{password}")
-    @POST
+    @Path("/{employeeId}/password/{password}")
+    @PUT
     public void setPassword(@PathParam("employeeId") long employeeId, @PathParam("password") String password) {
         Employee employee = employeeService.findEmployeeById(employeeId);
         employeeService.setPassword(employee, password);
