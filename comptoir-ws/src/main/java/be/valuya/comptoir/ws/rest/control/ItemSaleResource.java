@@ -98,6 +98,9 @@ public class ItemSaleResource {
     @Path("{id}")
     public void deleteItemSale(@PathParam("id") long id) {
         ItemSale itemSale = saleService.findItemSaleById(id);
+        if (itemSale == null) {
+            return;
+        }
         Sale sale = itemSale.getSale();
         saleStateChecker.checkState(sale, false); // TODO: replace with bean validation
 

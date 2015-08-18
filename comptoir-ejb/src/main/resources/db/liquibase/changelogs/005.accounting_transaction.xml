@@ -24,5 +24,21 @@
             referencedColumnNames="id"
         />
     </changeSet>
+    
+    <changeSet id="3" author="cghislai">
+        <dropForeignKeyConstraint baseTableName="accounting_entry"
+                                  constraintName="FK_accounting_entry_accounting_transaction_id"/>
+    </changeSet>
+    <changeSet id="4" author="cghislai">
+        <addForeignKeyConstraint 
+            constraintName="FK_accounting_entry_accounting_transaction_id" 
+            baseTableName="accounting_entry" 
+            baseColumnNames="accounting_transaction_id" 
+            referencedTableName="accounting_transaction" 
+            referencedColumnNames="id"
+        />
+    </changeSet>
+
+
 
 </databaseChangeLog>

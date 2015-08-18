@@ -13,7 +13,7 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
  *
  * @author cghislai
  */
-public class DateFormatter extends XmlAdapter<String, ZonedDateTime>{
+public class ZonedDateTimeXmlAdapter extends XmlAdapter<String, ZonedDateTime>{
 
     @Override
     public ZonedDateTime unmarshal(String string) throws Exception {
