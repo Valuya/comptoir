@@ -411,8 +411,11 @@ public class SaleService {
         if (sale.isClosed()) {
             throw new IllegalArgumentException("The sale is closed");
         }
-        ItemSale managedSale = entityManager.merge(itemSale);
-        entityManager.remove(managedSale);
+        ItemSale managedItemSale = entityManager.merge(itemSale);
+        Sale managedSale = managedItemSale.getSale();
+        entityManager.remove(managedItemSale);
+        
+        managedSale = calcSale(managedSale);
     }
 
     @Nonnull

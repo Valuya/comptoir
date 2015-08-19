@@ -1,6 +1,6 @@
 package be.valuya.comptoir.api.domain.commercial;
 
-import be.valuya.comptoir.api.utils.DateFormatter;
+import be.valuya.comptoir.api.utils.ZonedDateTimeXmlAdapter;
 import be.valuya.comptoir.api.domain.accounting.WsAccountingTransactionRef;
 import be.valuya.comptoir.api.domain.company.WithId;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
@@ -25,7 +25,7 @@ public class WsSale implements WithId {
     private Long id;
     private WsCompanyRef companyRef;
     private WsCustomerRef customerRef;
-    @XmlJavaTypeAdapter(DateFormatter.class)
+    @XmlJavaTypeAdapter(ZonedDateTimeXmlAdapter.class)
     private ZonedDateTime dateTime;
     private WsInvoiceRef invoiceRef;
     private BigDecimal vatExclusiveAmount;
