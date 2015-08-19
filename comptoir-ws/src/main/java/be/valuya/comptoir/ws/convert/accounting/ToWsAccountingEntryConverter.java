@@ -83,6 +83,9 @@ public class ToWsAccountingEntryConverter {
     }
 
     public WsAccountingEntryRef reference(AccountingEntry accountingEntry) {
+        if (accountingEntry == null) {
+            return null;
+        }
         Long id = accountingEntry.getId();
         WsAccountingEntryRef wsAccountRef = new WsAccountingEntryRef(id);
         return wsAccountRef;
