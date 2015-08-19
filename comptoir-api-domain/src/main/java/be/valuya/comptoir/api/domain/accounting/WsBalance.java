@@ -1,12 +1,14 @@
 package be.valuya.comptoir.api.domain.accounting;
 
 import be.valuya.comptoir.api.domain.company.WithId;
+import be.valuya.comptoir.api.utils.ZonedDateTimeXmlAdapter;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  *
@@ -18,6 +20,7 @@ public class WsBalance implements Serializable, WithId {
 
     private Long id;
     private WsAccountRef accountRef;
+    @XmlJavaTypeAdapter(ZonedDateTimeXmlAdapter.class)
     private ZonedDateTime dateTime;
     private BigDecimal balance;
     private String comment;
