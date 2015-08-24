@@ -26,6 +26,7 @@ public class WsItemSale implements WithId {
     private ZonedDateTime dateTime;
     private WsItemRef itemRef;
     private BigDecimal quantity;
+    private BigDecimal total;
     private WsSaleRef saleRef;
     private List<WsLocaleText> comment;
     @NotNull
@@ -83,6 +84,14 @@ public class WsItemSale implements WithId {
 
     public void setQuantity(BigDecimal quantity) {
         this.quantity = quantity;
+    }
+
+    public BigDecimal getTotal() {
+        return total;
+    }
+
+    public void setTotal(BigDecimal total) {
+        this.total = total;
     }
 
     public WsSaleRef getSaleRef() {

@@ -33,6 +33,8 @@ public class Price implements Serializable {
     @NotNull
     @Nonnull
     private BigDecimal vatRate;
+    @Column(name = "discount_ratio")
+    private BigDecimal discountRatio;
 
     public Long getId() {
         return id;
@@ -76,6 +78,14 @@ public class Price implements Serializable {
 
     public void setVatRate(@NotNull @Nonnull BigDecimal vatRate) {
         this.vatRate = vatRate;
+    }
+
+    public BigDecimal getDiscountRatio() {
+        return discountRatio;
+    }
+
+    public void setDiscountRatio(BigDecimal discountRatio) {
+        this.discountRatio = discountRatio;
     }
 
     @Override

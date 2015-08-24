@@ -33,10 +33,9 @@ public class ItemSale implements Serializable {
     @ManyToOne(cascade = CascadeType.ALL)
     private Price price;
     private BigDecimal quantity;
+    private BigDecimal total;
     @ManyToOne
     private Sale sale;
-    @Column(name = "discount_ratio")
-    private BigDecimal discountRatio;
     @ManyToOne
     private LocaleText comment;
     @OneToOne
@@ -106,12 +105,12 @@ public class ItemSale implements Serializable {
         this.accountingEntry = accountingEntry;
     }
 
-    public BigDecimal getDiscountRatio() {
-        return discountRatio;
+    public BigDecimal getTotal() {
+        return total;
     }
 
-    public void setDiscountRatio(BigDecimal discountRatio) {
-        this.discountRatio = discountRatio;
+    public void setTotal(BigDecimal total) {
+        this.total = total;
     }
 
     @Override

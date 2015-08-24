@@ -55,11 +55,16 @@ public class FromWsItemSaleConverter {
 
         BigDecimal vatExclusive = wsItemSale.getVatExclusive();
         BigDecimal vatRate = wsItemSale.getVatRate();
+        
+        BigDecimal total = wsItemSale.getTotal();
+        
+        BigDecimal discountRatio = wsItemSale.getDiscountRatio();
+        
         Price price = new Price();
         price.setVatExclusive(vatExclusive);
         price.setVatRate(vatRate);
+        price.setDiscountRatio(discountRatio);
         
-        BigDecimal discountRatio = wsItemSale.getDiscountRatio();
 
         ItemSale itemSale = new ItemSale();
         itemSale.setId(id);
@@ -69,7 +74,7 @@ public class FromWsItemSaleConverter {
         itemSale.setComment(comment);
         itemSale.setDateTime(dateTime);
         itemSale.setPrice(price);
-        itemSale.setDiscountRatio(discountRatio);
+        itemSale.setTotal(total);
 
         return itemSale;
     }
