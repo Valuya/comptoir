@@ -15,6 +15,7 @@ import be.valuya.comptoir.model.commercial.SalePrice;
 import be.valuya.comptoir.model.commercial.Sale_;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.lang.LocaleText;
+import be.valuya.comptoir.model.search.AccountingEntrySearch;
 import be.valuya.comptoir.model.search.ItemSaleSearch;
 import be.valuya.comptoir.model.search.SaleSearch;
 import be.valuya.comptoir.model.stock.Stock;
@@ -56,6 +57,8 @@ public class SaleService {
     private EntityManager entityManager;
     @EJB
     private StockService stockService;
+    @EJB
+    private AccountService accountService;
 
     public Sale createSale(Stock stock, Sale sale, List<ItemSale> itemSales) {
         Sale managedSale = entityManager.merge(sale);
@@ -445,7 +448,29 @@ public class SaleService {
 
     public Sale closeSale(Sale sale) {
         sale.setClosed(true);
-        return saveSale(sale);
+        Sale managedSale = saveSale(sale);
+
+        return managedSale;
+
+    }
+
+    public BigDecimal getSaleTotalPayed(Sale sale) {
+        AccountingTransaction accountingTransaction = sale.getAccountingTransaction();
+        Company company = accountingTransaction.getCompany();
+
+        AccountingEntrySearch accountingEntrySearch = new AccountingEntrySearch();
+        accountingEntrySearch.setAccountingTransaction(accountingTransaction);
+        accountingEntrySearch.setCompany(company);
+
+        List<AccountingEntry> paymentAccountingEntries = accountService.findAccountingEntries(accountingEntrySearch);
+
+        BigDecimal totalPayed = paymentAccountingEntries.stream()
+                .map(AccountingEntry::getAmount)
+                .reduce(BigDecimal::add)
+                .orElse(BigDecimal.ZERO)
+                .setScale(2);
+
+        return totalPayed;
     }
 
 }

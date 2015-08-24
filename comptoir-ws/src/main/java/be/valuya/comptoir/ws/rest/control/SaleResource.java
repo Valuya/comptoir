@@ -15,6 +15,7 @@ import be.valuya.comptoir.ws.convert.search.FromWsSaleSearchConverter;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
 import be.valuya.comptoir.ws.rest.validation.NoId;
 import be.valuya.comptoir.ws.rest.validation.SaleStateChecker;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.ejb.EJB;
@@ -137,6 +138,15 @@ public class SaleResource {
         WsSaleRef saleRef = toWsSaleConverter.reference(sale);
 
         return saleRef;
+    }
+
+    @GET
+    @Path("{id}/payed")
+    public BigDecimal getSaleTotalPayed(@PathParam("id") long id) {
+        Sale sale = saleService.findSaleById(id);
+        saleStateChecker.checkState(sale, false); // TODO: replace with bean validation
+
+        return saleService.getSaleTotalPayed(sale);
     }
 
 }
