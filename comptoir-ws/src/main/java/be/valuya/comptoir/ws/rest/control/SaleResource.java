@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -59,7 +60,7 @@ public class SaleResource {
     private UriInfo uriInfo;
 
     @POST
-    public WsSaleRef createSale(@NoId WsSale wsSale) {
+    public WsSaleRef createSale(@NoId @Valid WsSale wsSale) {
         Sale sale = fromWsSaleConverter.convert(wsSale);
 
         Sale savedSale = saleService.saveSale(sale);
@@ -71,7 +72,7 @@ public class SaleResource {
 
     @Path("{id}")
     @PUT
-    public WsSaleRef updateSale(@PathParam("id") long id, WsSale wsSale) {
+    public WsSaleRef updateSale(@PathParam("id") long id, @Valid WsSale wsSale) {
         idChecker.checkId(id, wsSale);
         Sale sale = fromWsSaleConverter.convert(wsSale);
         Sale savedSale = saleService.saveSale(sale);
@@ -92,7 +93,7 @@ public class SaleResource {
 
     @POST
     @Path("search")
-    public List<WsSale> findSales(WsSaleSearch wsSaleSearch) {
+    public List<WsSale> findSales(@Valid WsSaleSearch wsSaleSearch) {
         Pagination<Sale, SaleColumn> pagination = restPaginationUtil.extractPagination(uriInfo, SaleColumn::valueOf);
         SaleSearch saleSearch = fromWsSaleSearchConverter.convert(wsSaleSearch);
 

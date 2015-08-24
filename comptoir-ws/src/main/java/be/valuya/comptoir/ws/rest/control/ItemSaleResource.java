@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -55,7 +56,7 @@ public class ItemSaleResource {
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public WsItemSaleRef createItemSale(@NoId WsItemSale wsItemSale) {
+    public WsItemSaleRef createItemSale(@NoId @Valid WsItemSale wsItemSale) {
         WsItemSaleRef savedItemSaleRef = saveItemSale(wsItemSale);
         return savedItemSaleRef;
     }
@@ -63,7 +64,7 @@ public class ItemSaleResource {
     @Path("{id}")
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
-    public WsItemSaleRef updateItemSale(@PathParam("id") long id, WsItemSale wsItemSale) {
+    public WsItemSaleRef updateItemSale(@PathParam("id") long id, @Valid WsItemSale wsItemSale) {
         idChecker.checkId(id, wsItemSale);
         WsItemSaleRef savedItemSaleRef = saveItemSale(wsItemSale);
         return savedItemSaleRef;
@@ -82,7 +83,7 @@ public class ItemSaleResource {
     @POST
     @Path("search")
     @Consumes(MediaType.APPLICATION_JSON)
-    public List<WsItemSale> findItemSales(WsItemSaleSearch wsItemSaleSearch) {
+    public List<WsItemSale> findItemSales(@Valid WsItemSaleSearch wsItemSaleSearch) {
         ItemSaleSearch itemSaleSearch = fromWsItemSaleSearchConverter.convert(wsItemSaleSearch);
         List<ItemSale> itemSales = saleService.findItemSales(itemSaleSearch);
 
@@ -107,7 +108,7 @@ public class ItemSaleResource {
         saleService.removeItemSale(itemSale);
     }
 
-    private WsItemSaleRef saveItemSale(WsItemSale wsItemSale) {
+    private WsItemSaleRef saveItemSale(@Valid WsItemSale wsItemSale) {
         ItemSale itemSale = fromWsItemSaleConverter.convert(wsItemSale);
         ItemSale savedItemSale = saleService.saveItemSale(itemSale);
 
