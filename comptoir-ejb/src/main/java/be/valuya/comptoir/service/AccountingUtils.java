@@ -7,6 +7,7 @@ import be.valuya.comptoir.model.commercial.SalePrice;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import java.util.Optional;
 
 /**
  *
@@ -22,6 +23,9 @@ public class AccountingUtils {
     }
 
     public static BigDecimal calcVatAmount(BigDecimal vatExclusive, BigDecimal vatRate) {
+        //TODO: remove when ItemSale is correctly validated
+        vatRate = Optional.ofNullable(vatRate).orElse(BigDecimal.valueOf(2100, 2));
+
         BigDecimal vatAmount = vatExclusive.multiply(vatRate);
         return vatAmount;
     }
@@ -51,8 +55,9 @@ public class AccountingUtils {
     }
 
     public static BigDecimal calcEffectivePriceWithoutTaxes(Price price) {
-        BigDecimal vatExclusive = price.getVatExclusive().setScale(2, RoundingMode.HALF_UP);
-        BigDecimal discountRatio = price.getDiscountRatio().setScale(2, RoundingMode.HALF_UP);
+        // TODO: shouldn't happen
+        BigDecimal vatExclusive = Optional.ofNullable(price.getVatExclusive()).orElse(BigDecimal.ZERO).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal discountRatio = Optional.ofNullable(price.getDiscountRatio()).orElse(BigDecimal.ZERO).setScale(2, RoundingMode.HALF_UP);
         BigDecimal ratio = BigDecimal.valueOf(1, 00).subtract(discountRatio);
         BigDecimal effectiveVatExclusive = vatExclusive.multiply(ratio).setScale(2, RoundingMode.HALF_UP);
         return effectiveVatExclusive;
