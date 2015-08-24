@@ -2,14 +2,17 @@ package be.valuya.comptoir.service;
 
 import be.valuya.comptoir.model.accounting.Account;
 import be.valuya.comptoir.model.accounting.AccountType;
+import be.valuya.comptoir.model.commercial.Item;
 import be.valuya.comptoir.model.commercial.Pos;
 import be.valuya.comptoir.model.commercial.PosPaymentAccount;
+import be.valuya.comptoir.model.commercial.Price;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.factory.LocaleTextFactory;
 import be.valuya.comptoir.model.lang.LocaleText;
 import be.valuya.comptoir.model.stock.Stock;
 import be.valuya.comptoir.model.thirdparty.Customer;
 import be.valuya.comptoir.model.thirdparty.Employee;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -79,9 +82,34 @@ public class RegistrationService {
         Customer defaultPosCustomer = new Customer();
         defaultPosCustomer.setCompany(managedCompany);
         defaultPosCustomer.setFirstName("default");
-        
+
         Customer managedCustomer = entityManager.merge(defaultPosCustomer);
         pos.setDefaultCustomer(managedCustomer);
+
+        // unknown item
+        Price unknownItemPrice = new Price();
+        unknownItemPrice.setVatExclusive(BigDecimal.valueOf(100, 2));
+        unknownItemPrice.setVatRate(BigDecimal.valueOf(21, 2));
+
+        Item unkownItem = new Item();
+        unkownItem.setCompany(managedCompany);
+
+        LocaleText unkownItemDescription = localeTextFactory.createLocaleText();
+        unkownItemDescription.put(Locale.ENGLISH, "Unknown item");
+        unkownItemDescription.put(Locale.FRENCH, "Objet inconnu");
+
+        unkownItem.setDescription(unkownItemDescription);
+        unkownItem.setCurrentPrice(unknownItemPrice);
+
+        LocaleText unkownItemName = localeTextFactory.createLocaleText();
+        unkownItemName.put(Locale.ENGLISH, "unknown");
+        unkownItemName.put(Locale.FRENCH, "inconnu");
+
+        unkownItem.setName(unkownItemName);
+
+        unkownItem.setReference("?");
+
+        Item managedUnkownItem = entityManager.merge(unkownItem);
 
         return managedCompany;
     }
