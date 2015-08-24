@@ -10,6 +10,8 @@ import be.valuya.comptoir.model.cash.Balance;
 import be.valuya.comptoir.model.cash.Balance_;
 import be.valuya.comptoir.model.cash.MoneyPile;
 import be.valuya.comptoir.model.commercial.Pos;
+import be.valuya.comptoir.model.commercial.PosPaymentAccount;
+import be.valuya.comptoir.model.commercial.PosPaymentAccount_;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.search.AccountSearch;
 import be.valuya.comptoir.model.search.AccountingEntrySearch;
@@ -29,6 +31,7 @@ import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Subquery;
 
 /**
  *
@@ -46,7 +49,7 @@ public class AccountService {
         CriteriaQuery<Account> query = criteriaBuilder.createQuery(Account.class);
         Root<Account> accountRoot = query.from(Account.class);
 
-        List<Predicate> predicates = createAccountPredicates(accountSearch, accountRoot);
+        List<Predicate> predicates = createAccountPredicates(query, accountSearch, accountRoot);
 
         Predicate[] predicateArray = predicates.toArray(new Predicate[0]);
         query.where(predicateArray);
@@ -58,7 +61,7 @@ public class AccountService {
         return accounts;
     }
 
-    private List<Predicate> createAccountPredicates(AccountSearch accountSearch, From<?, Account> accountPath) {
+    private List<Predicate> createAccountPredicates(CriteriaQuery<?> query, AccountSearch accountSearch, From<?, Account> accountPath) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         List<Predicate> predicates = new ArrayList<>();
         Company company = accountSearch.getCompany();
@@ -76,6 +79,19 @@ public class AccountService {
 
         Pos pos = accountSearch.getPos();
         if (pos != null) {
+            Subquery<PosPaymentAccount> posPaymentAccountSubquery = query.subquery(PosPaymentAccount.class);
+            Root<PosPaymentAccount> posPaymentAccountRoot = posPaymentAccountSubquery.from(PosPaymentAccount.class);
+
+            Join<PosPaymentAccount, Pos> posPaymentAccountPosJoin = posPaymentAccountRoot.join(PosPaymentAccount_.pointOfSale);
+            Predicate posPaymentAccountPosPredicate = criteriaBuilder.equal(posPaymentAccountPosJoin, pos);
+
+            Join<PosPaymentAccount, Account> posPaymentAccountAccountJoin = posPaymentAccountRoot.join(PosPaymentAccount_.account);
+            Predicate posPaymentAccountAccountPredicate = criteriaBuilder.equal(posPaymentAccountAccountJoin, accountPath);
+
+            posPaymentAccountSubquery.where(posPaymentAccountPosPredicate, posPaymentAccountAccountPredicate);
+
+            Predicate posPredicate = criteriaBuilder.exists(posPaymentAccountSubquery);
+            predicates.add(posPredicate);
         }
 
         return predicates;
@@ -116,7 +132,7 @@ public class AccountService {
         AccountSearch accountSearch = accountingEntrySearch.getAccountSearch();
         if (accountSearch != null) {
             Join<AccountingEntry, Account> accountJoin = accountingEntryRoot.join(AccountingEntry_.account);
-            List<Predicate> accountPredicates = createAccountPredicates(accountSearch, accountJoin);
+            List<Predicate> accountPredicates = createAccountPredicates(query, accountSearch, accountJoin);
             predicates.addAll(accountPredicates);
         }
 
@@ -166,7 +182,7 @@ public class AccountService {
             accountSearch.setCompany(company);
         }
         Join<Balance, Account> accountJoin = balanceRoot.join(Balance_.account);
-        List<Predicate> accountPredicates = createAccountPredicates(accountSearch, accountJoin);
+        List<Predicate> accountPredicates = createAccountPredicates(query, accountSearch, accountJoin);
         predicates.addAll(accountPredicates);
 
         Path<ZonedDateTime> dateTimePath = balanceRoot.get(Balance_.dateTime);

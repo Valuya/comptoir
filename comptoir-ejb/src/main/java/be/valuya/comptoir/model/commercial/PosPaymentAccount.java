@@ -7,6 +7,7 @@ import javax.annotation.Nonnull;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
@@ -25,6 +26,7 @@ public class PosPaymentAccount implements Serializable {
     @NotNull
     @Nonnull
     @ManyToOne(optional = false)
+    @JoinColumn(name = "pos_id")
     private Pos pointOfSale;
     @NotNull
     @Nonnull
