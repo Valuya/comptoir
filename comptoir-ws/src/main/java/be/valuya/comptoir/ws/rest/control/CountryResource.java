@@ -29,7 +29,7 @@ public class CountryResource {
 
         WsCountry belgiumWsCountry = new WsCountry();
         belgiumWsCountry.setCode("be");
-        belgiumWsCountry.setDefaultVatRate(BigDecimal.valueOf(2100, 2));
+        belgiumWsCountry.setDefaultVatRate(BigDecimal.valueOf(21, 2));
         return belgiumWsCountry;
     }
 }
