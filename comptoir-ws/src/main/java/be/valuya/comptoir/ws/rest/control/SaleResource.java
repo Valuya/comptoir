@@ -61,6 +61,7 @@ public class SaleResource {
     private UriInfo uriInfo;
 
     @POST
+    @Valid
     public WsSaleRef createSale(@NoId @Valid WsSale wsSale) {
         Sale sale = fromWsSaleConverter.convert(wsSale);
 
@@ -73,6 +74,7 @@ public class SaleResource {
 
     @Path("{id}")
     @PUT
+    @Valid
     public WsSaleRef updateSale(@PathParam("id") long id, @Valid WsSale wsSale) {
         idChecker.checkId(id, wsSale);
         Sale sale = fromWsSaleConverter.convert(wsSale);
@@ -85,6 +87,7 @@ public class SaleResource {
 
     @Path("{id}")
     @GET
+    @Valid
     public WsSale getSale(@PathParam("id") long id) {
         Sale sale = saleService.findSaleById(id);
         WsSale wsSale = toWsSaleConverter.convert(sale);
@@ -94,6 +97,7 @@ public class SaleResource {
 
     @POST
     @Path("search")
+    @Valid
     public List<WsSale> findSales(@Valid WsSaleSearch wsSaleSearch) {
         Pagination<Sale, SaleColumn> pagination = restPaginationUtil.extractPagination(uriInfo, SaleColumn::valueOf);
         SaleSearch saleSearch = fromWsSaleSearchConverter.convert(wsSaleSearch);
@@ -129,6 +133,7 @@ public class SaleResource {
 
     @PUT
     @Path("{id}/state/CLOSED")
+    @Valid
     public WsSaleRef closeSale(@PathParam("id") long id) {
         Sale sale = saleService.findSaleById(id);
         saleStateChecker.checkState(sale, false); // TODO: replace with bean validation
