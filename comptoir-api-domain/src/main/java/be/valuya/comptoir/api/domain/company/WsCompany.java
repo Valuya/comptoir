@@ -17,6 +17,7 @@ public class WsCompany implements WithId {
     private Long id;
     private List<WsLocaleText> name;
     private List<WsLocaleText> description;
+    private WsCountryRef countryRef;
 
     @Override
     public Long getId() {
@@ -25,6 +26,14 @@ public class WsCompany implements WithId {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public WsCountryRef getCountryRef() {
+        return countryRef;
+    }
+
+    public void setCountryRef(WsCountryRef countryRef) {
+        this.countryRef = countryRef;
     }
 
     public List<WsLocaleText> getDescription() {

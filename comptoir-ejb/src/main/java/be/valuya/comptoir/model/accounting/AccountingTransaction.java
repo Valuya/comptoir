@@ -52,8 +52,7 @@ public class AccountingTransaction implements Serializable {
         return company;
     }
 
-    public void setCompany(@NotNull
-            @Nonnull Company company) {
+    public void setCompany(@NotNull @Nonnull Company company) {
         this.company = company;
     }
 
@@ -63,8 +62,7 @@ public class AccountingTransaction implements Serializable {
         return dateTime;
     }
 
-    public void setDateTime(@NotNull
-            @Nonnull ZonedDateTime dateTime) {
+    public void setDateTime(@NotNull @Nonnull ZonedDateTime dateTime) {
         this.dateTime = dateTime;
     }
 
@@ -74,8 +72,7 @@ public class AccountingTransaction implements Serializable {
         return accountingTransactionType;
     }
 
-    public void setAccountingTransactionType(@NotNull
-            @Nonnull AccountingTransactionType accountingTransactionType) {
+    public void setAccountingTransactionType(@NotNull @Nonnull AccountingTransactionType accountingTransactionType) {
         this.accountingTransactionType = accountingTransactionType;
     }
 
