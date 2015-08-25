@@ -44,14 +44,23 @@ public class EmployeeResource {
 
     @POST
     public WsEmployeeRef createEmployee(@NoId WsEmployee wsEmployee) {
-        return saveEmployee(wsEmployee);
+        Employee employee = fromWsEmployeeConverter.convert(wsEmployee);
+        Employee savedEmployee = employeeService.saveEmployee(employee);
+        
+        WsEmployeeRef employeeRef = toWsEmployeeConverter.reference(savedEmployee);
+        return employeeRef;
     }
 
     @Path("{id}")
     @PUT
-    public WsEmployeeRef saveEmployee(@PathParam("id") long id, WsEmployee wsEmployee) {
+    public WsEmployeeRef updateEmployee(@PathParam("id") long id, WsEmployee wsEmployee) {
         idChecker.checkId(id, wsEmployee);
-        return saveEmployee(wsEmployee);
+        Employee existingEmployee = employeeService.findEmployeeById(id);
+        Employee updatedEmployee = fromWsEmployeeConverter.update(existingEmployee, wsEmployee);
+        Employee savedEmployee = employeeService.saveEmployee(updatedEmployee);
+        
+        WsEmployeeRef employeeRef = toWsEmployeeConverter.reference(savedEmployee);
+        return employeeRef;
     }
 
     @Path("{id}")
@@ -83,21 +92,4 @@ public class EmployeeResource {
         Employee employee = employeeService.findEmployeeById(employeeId);
         employeeService.setPassword(employee, password);
     }
-
-    private WsEmployeeRef saveEmployee(WsEmployee wsEmployee) {
-        Employee employee = fromWsEmployeeConverter.convert(wsEmployee);
-
-        // Prevent clearing password
-        if (employee.getPasswordHash() == null) {
-            Employee persistedEmployee = employeeService.findEmployeeById(employee.getId());
-            employee.setPasswordHash(persistedEmployee.getPasswordHash());
-        }
-
-        Employee savedEmployee = employeeService.saveEmployee(employee);
-
-        WsEmployeeRef employeeRef = toWsEmployeeConverter.reference(savedEmployee);
-
-        return employeeRef;
-    }
-
 }
