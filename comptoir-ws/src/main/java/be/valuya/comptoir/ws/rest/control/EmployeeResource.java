@@ -86,6 +86,13 @@ public class EmployeeResource {
 
     private WsEmployeeRef saveEmployee(WsEmployee wsEmployee) {
         Employee employee = fromWsEmployeeConverter.convert(wsEmployee);
+
+        // Prevent clearing password
+        if (employee.getPasswordHash() == null) {
+            Employee persistedEmployee = employeeService.findEmployeeById(employee.getId());
+            employee.setPasswordHash(persistedEmployee.getPasswordHash());
+        }
+
         Employee savedEmployee = employeeService.saveEmployee(employee);
 
         WsEmployeeRef employeeRef = toWsEmployeeConverter.reference(savedEmployee);
