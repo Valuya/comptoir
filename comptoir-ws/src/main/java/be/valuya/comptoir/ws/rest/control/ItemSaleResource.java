@@ -69,8 +69,8 @@ public class ItemSaleResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public WsItemSaleRef updateItemSale(@PathParam("id") long id, @Valid WsItemSale wsItemSale) {
         idChecker.checkId(id, wsItemSale);
-        ItemSale existinItemSale = saleService.findItemSaleById(id);
-        ItemSale updatedItemSale = fromWsItemSaleConverter.update(existinItemSale, wsItemSale);
+        ItemSale existingItemSale = saleService.findItemSaleById(id);
+        ItemSale updatedItemSale = fromWsItemSaleConverter.update(existingItemSale, wsItemSale);
         ItemSale savedItemSale = saleService.saveItemSale(updatedItemSale);
 
         WsItemSaleRef itemSaleRef = toWsItemSaleConverter.reference(savedItemSale);
