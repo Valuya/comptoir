@@ -61,10 +61,17 @@ public class FromWsItemSaleConverter {
         BigDecimal discountRatio = wsItemSale.getDiscountRatio();
         
         Price price = new Price();
+        if (vatExclusive == null) {
+            BigDecimal itemVatExclusive = item.getCurrentPrice().getVatExclusive();
+            vatExclusive = itemVatExclusive;
+        }
+        if (vatRate == null) {
+            BigDecimal itemVatRate = item.getCurrentPrice().getVatRate();
+            vatRate = itemVatRate;
+        }
         price.setVatExclusive(vatExclusive);
         price.setVatRate(vatRate);
         price.setDiscountRatio(discountRatio);
-        
 
         ItemSale itemSale = new ItemSale();
         itemSale.setId(id);
@@ -77,6 +84,36 @@ public class FromWsItemSaleConverter {
         itemSale.setTotal(total);
 
         return itemSale;
+    }
+    
+    public ItemSale update(ItemSale existingItemSale, WsItemSale wsItemSale) {
+         if (wsItemSale == null) {
+            return existingItemSale;
+        }
+        ZonedDateTime dateTime = wsItemSale.getDateTime();
+        BigDecimal quantity = wsItemSale.getQuantity();
+
+        List<WsLocaleText> wsComment = wsItemSale.getComment();
+        LocaleText comment = fromWsLocaleTextConverter.convert(wsComment);
+
+        BigDecimal vatExclusive = wsItemSale.getVatExclusive();
+        BigDecimal vatRate = wsItemSale.getVatRate();        
+        BigDecimal total = wsItemSale.getTotal();
+        BigDecimal discountRatio = wsItemSale.getDiscountRatio();
+        
+        Price price = new Price();
+        price.setVatExclusive(vatExclusive);
+        price.setVatRate(vatRate);
+        price.setDiscountRatio(discountRatio);
+       
+        // Makes no sense to update itemRef/saleRef
+        existingItemSale.setQuantity(quantity);
+        existingItemSale.setComment(comment);
+        existingItemSale.setDateTime(dateTime);
+        existingItemSale.setPrice(price);
+        existingItemSale.setTotal(total);
+        
+        return existingItemSale;
     }
 
     public ItemSale find(WsItemSaleRef itemSaleRef) {

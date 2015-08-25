@@ -57,8 +57,11 @@ public class ItemSaleResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public WsItemSaleRef createItemSale(@NoId @Valid WsItemSale wsItemSale) {
-        WsItemSaleRef savedItemSaleRef = saveItemSale(wsItemSale);
-        return savedItemSaleRef;
+        ItemSale itemSale = fromWsItemSaleConverter.convert(wsItemSale);
+        ItemSale savedItemSale = saleService.saveItemSale(itemSale);
+
+        WsItemSaleRef itemSaleRef = toWsItemSaleConverter.reference(savedItemSale);
+        return itemSaleRef;
     }
 
     @Path("{id}")
@@ -66,8 +69,12 @@ public class ItemSaleResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public WsItemSaleRef updateItemSale(@PathParam("id") long id, @Valid WsItemSale wsItemSale) {
         idChecker.checkId(id, wsItemSale);
-        WsItemSaleRef savedItemSaleRef = saveItemSale(wsItemSale);
-        return savedItemSaleRef;
+        ItemSale existinItemSale = saleService.findItemSaleById(id);
+        ItemSale updatedItemSale = fromWsItemSaleConverter.update(existinItemSale, wsItemSale);
+        ItemSale savedItemSale = saleService.saveItemSale(updatedItemSale);
+
+        WsItemSaleRef itemSaleRef = toWsItemSaleConverter.reference(savedItemSale);
+        return itemSaleRef;
     }
 
     @Path("{id}")
@@ -107,14 +114,4 @@ public class ItemSaleResource {
 
         saleService.removeItemSale(itemSale);
     }
-
-    private WsItemSaleRef saveItemSale(@Valid WsItemSale wsItemSale) {
-        ItemSale itemSale = fromWsItemSaleConverter.convert(wsItemSale);
-        ItemSale savedItemSale = saleService.saveItemSale(itemSale);
-
-        WsItemSaleRef itemSaleRef = toWsItemSaleConverter.reference(savedItemSale);
-
-        return itemSaleRef;
-    }
-
 }
