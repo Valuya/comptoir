@@ -2,6 +2,7 @@ package be.valuya.comptoir.ws.convert.thirdparty;
 
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.api.domain.thirdparty.WsEmployee;
+import be.valuya.comptoir.api.domain.thirdparty.WsEmployeeRef;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.thirdparty.Employee;
 import be.valuya.comptoir.ws.convert.company.FromWsCompanyConverter;
@@ -42,8 +43,28 @@ public class FromWsEmployeeConverter {
         employee.setLastName(lastName);
         employee.setLocale(locale);
         employee.setLogin(login);
-
+       
         return employee;
+    }
+    
+    public Employee update(Employee existingEmployee, WsEmployee wsEmployee) {
+         if (wsEmployee == null) {
+            return existingEmployee;
+        }
+        WsCompanyRef companyRef = wsEmployee.getCompanyRef();
+        String firstName = wsEmployee.getFirstName();
+        String lastName = wsEmployee.getLastName();
+        Locale locale = wsEmployee.getLocale();
+        String login = wsEmployee.getLogin();
+        Company company = fromWsCompanyConverter.find(companyRef);
+
+        existingEmployee.setCompany(company);
+        existingEmployee.setFirstName(firstName);
+        existingEmployee.setLastName(lastName);
+        existingEmployee.setLocale(locale);
+        existingEmployee.setLogin(login);
+        
+        return existingEmployee;
     }
 
 }

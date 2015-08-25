@@ -77,14 +77,14 @@ public class RegistrationService {
 
         paymentAccounts.stream()
                 .map(paymentAccount -> createPosPaymentAccount(managedPos, paymentAccount))
-                .map(entityManager::merge);
+                .forEach(entityManager::merge);
 
         Customer defaultPosCustomer = new Customer();
         defaultPosCustomer.setCompany(managedCompany);
         defaultPosCustomer.setFirstName("default");
 
         Customer managedCustomer = entityManager.merge(defaultPosCustomer);
-        pos.setDefaultCustomer(managedCustomer);
+        managedPos.setDefaultCustomer(managedCustomer);
 
         // unknown item
         Price unknownItemPrice = new Price();

@@ -371,19 +371,19 @@ public class SaleService {
         Price price = itemSale.getPrice();
         Item item = itemSale.getItem();
         Price itemPrice = item.getCurrentPrice();
+        
         if (price == null) {
+            BigDecimal vatExclusive = itemPrice.getVatExclusive();
+            BigDecimal vatRate = itemPrice.getVatRate();
+            // TODO: create a new price if necessary... or clean up on sale save?
             price = new Price();
+            price.setVatExclusive(vatExclusive);
+            price.setVatRate(vatRate);
         }
 
         SalePrice salePrice = AccountingUtils.calcSalePrice(price, quantity);
 
-        BigDecimal vatExclusive = itemPrice.getVatExclusive();
         BigDecimal total = salePrice.getBase();
-        BigDecimal vatRate = itemPrice.getVatRate();
-
-        // TODO: create a new price if necessary... or clean up on sale save?
-        price.setVatExclusive(vatExclusive);
-        price.setVatRate(vatRate);
 
         itemSale.setPrice(price);
         itemSale.setTotal(total);
