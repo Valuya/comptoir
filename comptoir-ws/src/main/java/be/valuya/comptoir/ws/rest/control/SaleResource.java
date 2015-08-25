@@ -112,15 +112,6 @@ public class SaleResource {
         return wsSales;
     }
 
-    @DELETE
-    @Path("{id}/state/OPEN")
-    @Deprecated
-    /**
-     * @Deprecated: just call deleteSale(id)
-     */
-    public void deleteOpenSale(@PathParam("id") long id) {
-        deleteSale(id);
-    }
 
     @DELETE
     @Path("{id}")
