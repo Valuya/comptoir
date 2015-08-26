@@ -43,6 +43,12 @@ public class FromWsSaleConverter {
         if (wsSale == null) {
             return null;
         }
+        Sale sale = new Sale();
+
+        return patch(sale, wsSale);
+    }
+
+    public Sale patch(Sale sale, WsSale wsSale) {
         Long id = wsSale.getId();
         ZonedDateTime dateTime = wsSale.getDateTime();
         String reference = wsSale.getReference();
@@ -65,7 +71,6 @@ public class FromWsSaleConverter {
         BigDecimal discountAmount = wsSale.getDiscountAmount();
         BigDecimal discountRatio = wsSale.getDiscountRatio();
 
-        Sale sale = new Sale();
         sale.setId(id);
         sale.setCompany(company);
         sale.setReference(reference);

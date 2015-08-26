@@ -79,8 +79,11 @@ public class SaleResource {
     @Valid
     public WsSaleRef updateSale(@PathParam("id") long id, @Valid WsSale wsSale) {
         idChecker.checkId(id, wsSale);
-        Sale sale = fromWsSaleConverter.convert(wsSale);
-        Sale savedSale = saleService.saveSale(sale);
+
+        Sale existingSale = saleService.findSaleById(id);
+        Sale updatedSale = fromWsSaleConverter.patch(existingSale, wsSale);
+
+        Sale savedSale = saleService.saveSale(updatedSale);
 
         WsSaleRef saleRef = toWsSaleConverter.reference(savedSale);
 
