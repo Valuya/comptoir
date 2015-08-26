@@ -51,7 +51,12 @@ public class AccountingEntryResource {
     @POST
     @Valid
     public WsAccountingEntryRef createAccountingEntry(@NoId @Valid WsAccountingEntry wsAccountingEntry) {
-        return saveAccountingEntry(wsAccountingEntry);
+        AccountingEntry accountingEntry = fromWsAccountingEntryConverter.convert(wsAccountingEntry);
+        AccountingEntry savedAccountingEntry = accountingEntryService.saveAccountingEntry(accountingEntry);
+
+        WsAccountingEntryRef accountingEntryRef = toWsAccountingEntryConverter.reference(savedAccountingEntry);
+
+        return accountingEntryRef;
     }
 
     @Path("{id}")
@@ -59,7 +64,12 @@ public class AccountingEntryResource {
     @Valid
     public WsAccountingEntryRef saveAccountingEntry(@PathParam("id") long id, @Valid WsAccountingEntry wsAccountingEntry) {
         idChecker.checkId(id, wsAccountingEntry);
-        return saveAccountingEntry(wsAccountingEntry);
+        AccountingEntry accountingEntry = fromWsAccountingEntryConverter.convert(wsAccountingEntry);
+        AccountingEntry savedAccountingEntry = accountingEntryService.saveAccountingEntry(accountingEntry);
+
+        WsAccountingEntryRef accountingEntryRef = toWsAccountingEntryConverter.reference(savedAccountingEntry);
+
+        return accountingEntryRef;
     }
 
     @Path("{id}")
@@ -86,15 +96,6 @@ public class AccountingEntryResource {
 
         response.setHeader(HeadersConfig.LIST_RESULTS_COUNT_HEADER, "101");
         return wsAccountingEntrys;
-    }
-
-    private WsAccountingEntryRef saveAccountingEntry(WsAccountingEntry wsAccountingEntry) {
-        AccountingEntry accountingEntry = fromWsAccountingEntryConverter.convert(wsAccountingEntry);
-        AccountingEntry savedAccountingEntry = accountingEntryService.saveAccountingEntry(accountingEntry);
-
-        WsAccountingEntryRef accountingEntryRef = toWsAccountingEntryConverter.reference(savedAccountingEntry);
-
-        return accountingEntryRef;
     }
 
 }

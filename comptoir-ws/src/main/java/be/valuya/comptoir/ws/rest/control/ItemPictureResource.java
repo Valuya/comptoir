@@ -46,7 +46,10 @@ public class ItemPictureResource {
     @POST
     @Valid
     public WsItemPictureRef createItemPicture(@NoId @Valid WsItemPicture wsItemPicture) {
-        return saveItemPicture(wsItemPicture);
+        ItemPicture itemPicture = fromWsItemPictureConverter.convert(wsItemPicture);
+        ItemPicture savedItemPicture = stockService.saveItemPicture(itemPicture);
+        WsItemPictureRef itemPictureRef = toWsItemPictureConverter.reference(savedItemPicture);
+        return itemPictureRef;
     }
 
     @Path("{id}")
@@ -54,7 +57,10 @@ public class ItemPictureResource {
     @Valid
     public WsItemPictureRef updateItemPicture(@PathParam("id") long id, WsItemPicture wsItemPicture) {
         idChecker.checkId(id, wsItemPicture);
-        return saveItemPicture(wsItemPicture);
+        ItemPicture itemPicture = fromWsItemPictureConverter.convert(wsItemPicture);
+        ItemPicture savedItemPicture = stockService.saveItemPicture(itemPicture);
+        WsItemPictureRef itemPictureRef = toWsItemPictureConverter.reference(savedItemPicture);
+        return itemPictureRef;
     }
 
     @GET
@@ -79,15 +85,6 @@ public class ItemPictureResource {
         WsItemPicture wsItemPicture = toWsItemPictureConverter.convert(itemPicture);
 
         return wsItemPicture;
-    }
-
-    private WsItemPictureRef saveItemPicture(WsItemPicture wsItemPicture) {
-        ItemPicture itemPicture = fromWsItemPictureConverter.convert(wsItemPicture);
-        ItemPicture savedItemPicture = stockService.saveItemPicture(itemPicture);
-
-        WsItemPictureRef itemPictureRef = toWsItemPictureConverter.reference(savedItemPicture);
-
-        return itemPictureRef;
     }
 
 }

@@ -45,7 +45,10 @@ public class MoneyPileResource {
     @POST
     @Valid
     public WsMoneyPileRef createMoneyPile(@NoId @Valid WsMoneyPile wsMoneyPile) {
-        return saveMoneyPile(wsMoneyPile);
+        MoneyPile moneyPile = fromWsMoneyPileConverter.convert(wsMoneyPile);
+        MoneyPile savedMoneyPile = accountService.saveMoneyPile(moneyPile);
+        WsMoneyPileRef moneyPileRef = toWsMoneyPileConverter.reference(savedMoneyPile);
+        return moneyPileRef;
     }
 
     @Path("{id}")
@@ -53,7 +56,10 @@ public class MoneyPileResource {
     @Valid
     public WsMoneyPileRef saveMoneyPile(@PathParam("id") long id, @Valid WsMoneyPile wsMoneyPile) {
         idChecker.checkId(id, wsMoneyPile);
-        return saveMoneyPile(wsMoneyPile);
+        MoneyPile moneyPile = fromWsMoneyPileConverter.convert(wsMoneyPile);
+        MoneyPile savedMoneyPile = accountService.saveMoneyPile(moneyPile);
+        WsMoneyPileRef moneyPileRef = toWsMoneyPileConverter.reference(savedMoneyPile);
+        return moneyPileRef;
     }
 
     @Path("{id}")
@@ -65,15 +71,6 @@ public class MoneyPileResource {
         WsMoneyPile wsMoneyPile = toWsMoneyPileConverter.convert(moneyPile);
 
         return wsMoneyPile;
-    }
-
-    private WsMoneyPileRef saveMoneyPile(WsMoneyPile wsMoneyPile) {
-        MoneyPile moneyPile = fromWsMoneyPileConverter.convert(wsMoneyPile);
-        MoneyPile savedMoneyPile = accountService.saveMoneyPile(moneyPile);
-
-        WsMoneyPileRef moneyPileRef = toWsMoneyPileConverter.reference(savedMoneyPile);
-
-        return moneyPileRef;
     }
 
 }

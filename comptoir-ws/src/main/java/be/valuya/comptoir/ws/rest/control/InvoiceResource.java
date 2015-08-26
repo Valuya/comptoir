@@ -45,7 +45,10 @@ public class InvoiceResource {
 
     @POST
     public WsInvoiceRef createInvoice(@NoId WsInvoice wsInvoice) {
-        return saveInvoice(wsInvoice);
+        Invoice invoice = fromWsInvoiceConverter.convert(wsInvoice);
+        Invoice savedInvoice = invoiceService.saveInvoice(invoice);
+        WsInvoiceRef invoiceRef = toWsInvoiceConverter.reference(savedInvoice);
+        return invoiceRef;
     }
 
     @Valid
@@ -53,7 +56,10 @@ public class InvoiceResource {
     @PUT
     public WsInvoiceRef saveInvoice(@PathParam("id") long id, @Valid WsInvoice wsInvoice) {
         idChecker.checkId(id, wsInvoice);
-        return saveInvoice(wsInvoice);
+        Invoice invoice = fromWsInvoiceConverter.convert(wsInvoice);
+        Invoice savedInvoice = invoiceService.saveInvoice(invoice);
+        WsInvoiceRef invoiceRef = toWsInvoiceConverter.reference(savedInvoice);
+        return invoiceRef;
     }
 
     @Valid
@@ -79,15 +85,6 @@ public class InvoiceResource {
                 .collect(Collectors.toList());
 
         return wsInvoices;
-    }
-
-    private WsInvoiceRef saveInvoice(WsInvoice wsInvoice) {
-        Invoice invoice = fromWsInvoiceConverter.convert(wsInvoice);
-        Invoice savedInvoice = invoiceService.saveInvoice(invoice);
-
-        WsInvoiceRef invoiceRef = toWsInvoiceConverter.reference(savedInvoice);
-
-        return invoiceRef;
     }
 
 }

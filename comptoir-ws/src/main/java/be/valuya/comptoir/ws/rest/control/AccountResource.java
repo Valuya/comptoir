@@ -51,7 +51,12 @@ public class AccountResource {
     @POST
     @Valid
     public WsAccountRef createAccount(@NoId @Valid WsAccount wsAccount) {
-        return saveAccount(wsAccount);
+        Account account = fromWsAccountConverter.convert(wsAccount);
+        Account savedAccount = accountService.saveAccount(account);
+
+        WsAccountRef accountRef = toWsAccountConverter.reference(savedAccount);
+
+        return accountRef;
     }
 
     @Path("{id}")
@@ -59,7 +64,12 @@ public class AccountResource {
     @Valid
     public WsAccountRef saveAccount(@PathParam("id") long id, @Valid WsAccount wsAccount) {
         idChecker.checkId(id, wsAccount);
-        return saveAccount(wsAccount);
+        Account account = fromWsAccountConverter.convert(wsAccount);
+        Account savedAccount = accountService.saveAccount(account);
+
+        WsAccountRef accountRef = toWsAccountConverter.reference(savedAccount);
+
+        return accountRef;
     }
 
     @Path("{id}")
@@ -85,15 +95,6 @@ public class AccountResource {
 
         response.setHeader(HeadersConfig.LIST_RESULTS_COUNT_HEADER, "101");
         return wsAccounts;
-    }
-
-    private WsAccountRef saveAccount(WsAccount wsAccount) {
-        Account account = fromWsAccountConverter.convert(wsAccount);
-        Account savedAccount = accountService.saveAccount(account);
-
-        WsAccountRef accountRef = toWsAccountConverter.reference(savedAccount);
-
-        return accountRef;
     }
 
 }

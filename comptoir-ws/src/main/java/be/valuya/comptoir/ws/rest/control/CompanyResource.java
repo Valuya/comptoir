@@ -81,8 +81,9 @@ public class CompanyResource {
     @POST
     @Path("{id}/import")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public void importItems(@PathParam("id") Long companyId, byte[] data) {
-        Company company = Optional.ofNullable(companyService.findCompanyById(companyId))
+    public WsCompanyRef importItems(@PathParam("id") Long companyId, byte[] data) {
+        return Optional.ofNullable(companyService.findCompanyById(companyId))
+                .map(toWsCompanyConverter::reference)
                 .orElseThrow(NotFoundException::new);
     }
 }

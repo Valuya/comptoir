@@ -58,7 +58,10 @@ public class ItemSaleResource {
     @POST
     @Valid
     public WsItemSaleRef createItemSale(@NoId @Valid WsItemSale wsItemSale) {
-        WsItemSaleRef savedItemSaleRef = saveItemSale(wsItemSale);
+        ItemSale itemSale = fromWsItemSaleConverter.convert(wsItemSale);
+        ItemSale savedItemSale = saleService.saveItemSale(itemSale);
+        WsItemSaleRef itemSaleRef = toWsItemSaleConverter.reference(savedItemSale);
+        WsItemSaleRef savedItemSaleRef = itemSaleRef;
         return savedItemSaleRef;
     }
 
@@ -67,7 +70,10 @@ public class ItemSaleResource {
     @Valid
     public WsItemSaleRef updateItemSale(@PathParam("id") long id, @Valid WsItemSale wsItemSale) {
         idChecker.checkId(id, wsItemSale);
-        WsItemSaleRef savedItemSaleRef = saveItemSale(wsItemSale);
+        ItemSale itemSale = fromWsItemSaleConverter.convert(wsItemSale);
+        ItemSale savedItemSale = saleService.saveItemSale(itemSale);
+        WsItemSaleRef itemSaleRef = toWsItemSaleConverter.reference(savedItemSale);
+        WsItemSaleRef savedItemSaleRef = itemSaleRef;
         return savedItemSaleRef;
     }
 
@@ -110,13 +116,5 @@ public class ItemSaleResource {
         saleService.removeItemSale(itemSale);
     }
 
-    private WsItemSaleRef saveItemSale(@Valid WsItemSale wsItemSale) {
-        ItemSale itemSale = fromWsItemSaleConverter.convert(wsItemSale);
-        ItemSale savedItemSale = saleService.saveItemSale(itemSale);
-
-        WsItemSaleRef itemSaleRef = toWsItemSaleConverter.reference(savedItemSale);
-
-        return itemSaleRef;
-    }
 
 }

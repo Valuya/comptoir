@@ -45,7 +45,12 @@ public class EmployeeResource {
 
     @POST
     public WsEmployeeRef createEmployee(@NoId WsEmployee wsEmployee) {
-        return saveEmployee(wsEmployee);
+        Employee employee = fromWsEmployeeConverter.convert(wsEmployee);
+        Employee savedEmployee = employeeService.saveEmployee(employee);
+
+        WsEmployeeRef employeeRef = toWsEmployeeConverter.reference(savedEmployee);
+
+        return employeeRef;
     }
 
     @Path("{id}")
@@ -53,7 +58,12 @@ public class EmployeeResource {
     @PUT
     public WsEmployeeRef saveEmployee(@PathParam("id") long id, @Valid WsEmployee wsEmployee) {
         idChecker.checkId(id, wsEmployee);
-        return saveEmployee(wsEmployee);
+        Employee employee = fromWsEmployeeConverter.convert(wsEmployee);
+        Employee savedEmployee = employeeService.saveEmployee(employee);
+
+        WsEmployeeRef employeeRef = toWsEmployeeConverter.reference(savedEmployee);
+
+        return employeeRef;
     }
 
     @Path("{id}")
@@ -87,15 +97,6 @@ public class EmployeeResource {
     public void setPassword(@PathParam("employeeId") long employeeId, @PathParam("password") String password) {
         Employee employee = employeeService.findEmployeeById(employeeId);
         employeeService.setPassword(employee, password);
-    }
-
-    private WsEmployeeRef saveEmployee(WsEmployee wsEmployee) {
-        Employee employee = fromWsEmployeeConverter.convert(wsEmployee);
-        Employee savedEmployee = employeeService.saveEmployee(employee);
-
-        WsEmployeeRef employeeRef = toWsEmployeeConverter.reference(savedEmployee);
-
-        return employeeRef;
     }
 
 }
