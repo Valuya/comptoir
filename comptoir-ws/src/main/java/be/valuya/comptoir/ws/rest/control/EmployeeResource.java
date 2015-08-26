@@ -93,7 +93,6 @@ public class EmployeeResource {
         return wsEmployees;
     }
 
-    @Valid
     @Path("/{employeeId}/password/{password}")
     @PUT
     public void setPassword(@PathParam("employeeId") long employeeId, @PathParam("password") String password) {
