@@ -5,7 +5,6 @@ import be.valuya.comptoir.api.domain.thirdparty.WsEmployee;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.thirdparty.Employee;
 import be.valuya.comptoir.ws.convert.company.FromWsCompanyConverter;
-import be.valuya.comptoir.ws.convert.text.FromWsLocaleTextConverter;
 import java.util.Locale;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -18,14 +17,17 @@ import javax.inject.Inject;
 public class FromWsEmployeeConverter {
 
     @Inject
-    private FromWsLocaleTextConverter fromWsLocaleTextConverter;
-    @Inject
     private FromWsCompanyConverter fromWsCompanyConverter;
 
     public Employee convert(WsEmployee wsEmployee) {
         if (wsEmployee == null) {
             return null;
         }
+        Employee employee = new Employee();
+        return patchEmployee(employee, wsEmployee);
+    }
+
+    public Employee patchEmployee(Employee employee, WsEmployee wsEmployee) {
         Long id = wsEmployee.getId();
         WsCompanyRef companyRef = wsEmployee.getCompanyRef();
         String firstName = wsEmployee.getFirstName();
@@ -35,7 +37,6 @@ public class FromWsEmployeeConverter {
 
         Company company = fromWsCompanyConverter.find(companyRef);
 
-        Employee employee = new Employee();
         employee.setId(id);
         employee.setCompany(company);
         employee.setFirstName(firstName);

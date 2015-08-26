@@ -58,9 +58,11 @@ public class EmployeeResource {
     @PUT
     public WsEmployeeRef saveEmployee(@PathParam("id") long id, @Valid WsEmployee wsEmployee) {
         idChecker.checkId(id, wsEmployee);
-        Employee employee = fromWsEmployeeConverter.convert(wsEmployee);
-        Employee savedEmployee = employeeService.saveEmployee(employee);
 
+        Employee existingEmployee = employeeService.findEmployeeById(id);
+        Employee employee = fromWsEmployeeConverter.patchEmployee(existingEmployee, wsEmployee);
+
+        Employee savedEmployee = employeeService.saveEmployee(employee);
         WsEmployeeRef employeeRef = toWsEmployeeConverter.reference(savedEmployee);
 
         return employeeRef;

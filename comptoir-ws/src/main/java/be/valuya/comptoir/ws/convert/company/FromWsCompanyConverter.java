@@ -30,10 +30,10 @@ public class FromWsCompanyConverter {
         }
         Company company = new Company();
 
-        return updateCompany(wsCompany, company);
+        return patchCompany(company, wsCompany);
     }
 
-    public Company updateCompany(WsCompany wsCompany, Company company) {
+    public Company patchCompany(Company company, WsCompany wsCompany) {
         Long id = wsCompany.getId();
 
         List<WsLocaleText> newName = wsCompany.getName();

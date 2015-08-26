@@ -58,11 +58,10 @@ public class CompanyResource {
         idChecker.checkId(id, wsCompany);
 
         Company existingCompany = companyService.findCompanyById(id);
+        Company company = fromWsCompanyConverter.patchCompany(existingCompany, wsCompany);
 
-        Company company = fromWsCompanyConverter.updateCompany(wsCompany, existingCompany);
-        company = companyService.saveCompany(company);
-
-        WsCompanyRef wsCompanyRef = new WsCompanyRef(id);
+        Company savedCompany = companyService.saveCompany(company);
+        WsCompanyRef wsCompanyRef = toWsCompanyConverter.reference(savedCompany);
 
         return wsCompanyRef;
     }
