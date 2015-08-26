@@ -45,7 +45,6 @@ public class RestPaginationUtil {
         if (pathParameters.containsKey(SORT_PARAMETER)) {
             List<String> sortValues = pathParameters.get(SORT_PARAMETER);
             sorts = sortValues.stream()
-                    .filter((String key) -> SORT_PARAMETER.equals(key))
                     .map(sortDef -> parseSort(sortDef, conversionFunction))
                     .collect(Collectors.toList());
         }
@@ -58,7 +57,7 @@ public class RestPaginationUtil {
         if (sortDefs.length != 2) {
             return null;
         }
-        return new Sort<>(conversionFunction.apply(sortDefs[1]), sortDefs[2].equals("asc"));
+        return new Sort<>(conversionFunction.apply(sortDefs[0]), sortDefs[1].equals("asc"));
     }
 
 }
