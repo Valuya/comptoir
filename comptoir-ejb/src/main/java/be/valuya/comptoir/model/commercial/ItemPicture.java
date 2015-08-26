@@ -2,11 +2,11 @@ package be.valuya.comptoir.model.commercial;
 
 import java.io.Serializable;
 import java.util.Objects;
-import javax.annotation.Nonnull;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -18,15 +18,15 @@ import javax.validation.constraints.Size;
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @Entity
-@Table(name = "item_picture")
+@Table(name = "itemvariant_picture")
 public class ItemPicture implements Serializable {
 
     @Id
     @GeneratedValue
     private Long id;
-    @ManyToOne
-    @Nonnull
-    private Item item;
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "itemvariant_id")
+    private ItemVariant itemVariant;
     @Column(name = "picture_data")
     @Lob
     @NotNull
@@ -43,12 +43,12 @@ public class ItemPicture implements Serializable {
         this.id = id;
     }
 
-    public Item getItem() {
-        return item;
+    public ItemVariant getItemVariant() {
+        return itemVariant;
     }
 
-    public void setItem(Item item) {
-        this.item = item;
+    public void setItemVariant(ItemVariant itemVariant) {
+        this.itemVariant = itemVariant;
     }
 
     public byte[] getData() {

@@ -1,6 +1,6 @@
 package be.valuya.comptoir.web.convert;
 
-import be.valuya.comptoir.model.commercial.Item;
+import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.service.StockService;
 import javax.enterprise.context.RequestScoped;
 import javax.faces.component.UIComponent;
@@ -21,7 +21,7 @@ public class ItemConverter implements Converter {
     private StockService stockService;
 
     @Override
-    public Item getAsObject(FacesContext context, UIComponent component, String valueStr) {
+    public ItemVariant getAsObject(FacesContext context, UIComponent component, String valueStr) {
         if (valueStr == null || valueStr.trim().isEmpty()) {
             return null;
         }
@@ -34,7 +34,7 @@ public class ItemConverter implements Converter {
         if (value == null) {
             return null;
         }
-        Item item = (Item) value;
+        ItemVariant item = (ItemVariant) value;
         Long id = item.getId();
         String idStr = Long.toString(id);
         return idStr;

@@ -1,6 +1,6 @@
 package be.valuya.comptoir.ws.rest.validation;
 
-import be.valuya.comptoir.api.domain.company.WithId;
+import be.valuya.comptoir.model.common.WithId;
 import javax.enterprise.context.ApplicationScoped;
 
 /**

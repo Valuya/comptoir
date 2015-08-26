@@ -1,6 +1,6 @@
 package be.valuya.comptoir.model.search;
 
-import be.valuya.comptoir.model.commercial.Item;
+import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.stock.Stock;
 import java.time.ZonedDateTime;
@@ -23,7 +23,7 @@ public class ItemStockSearch {
     @Nonnull
     private Company company;
     @CheckForNull
-    private Item item;
+    private ItemVariant itemVariant;
     @CheckForNull
     private Stock stock;
     @CheckForNull
@@ -40,12 +40,12 @@ public class ItemStockSearch {
     }
 
     @CheckForNull
-    public Item getItem() {
-        return item;
+    public ItemVariant getItemVariant() {
+        return itemVariant;
     }
 
-    public void setItem(Item item) {
-        this.item = item;
+    public void setItemVariant(ItemVariant itemVariant) {
+        this.itemVariant = itemVariant;
     }
 
     @CheckForNull

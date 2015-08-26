@@ -1,0 +1,328 @@
+package be.valuya.comptoir.service;
+
+import be.valuya.comptoir.model.commercial.AttributeDefinition;
+import be.valuya.comptoir.model.commercial.AttributeValue;
+import be.valuya.comptoir.model.commercial.ItemVariant;
+import be.valuya.comptoir.model.commercial.Price;
+import be.valuya.comptoir.model.company.Company;
+import be.valuya.comptoir.model.lang.LocaleText;
+import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Properties;
+
+/**
+ *
+ * @author Yannick Majoros <yannick@valuya.be>
+ */
+public class PrestashopImportUtil {
+
+    private final ExternalEntityStore<Long, ItemVariant> itemStore = new ExternalEntityStore<>();
+    private final ExternalEntityStore<Long, ItemVariant> itemModelStore = new ExternalEntityStore<>();
+    private final ExternalEntityStore<Long, AttributeDefinition> attributeDefinitionStore = new ExternalEntityStore<>();
+    private final ExternalEntityStore<Long, AttributeValue> attributeValueStore = new ExternalEntityStore<>();
+    private final ExternalEntityStore<Long, Locale> localeStore = new ExternalEntityStore<>();
+    private final Company company;
+    private final PrestashopImportParams prestashopImportParams;
+    private Connection connection;
+
+    public PrestashopImportUtil(Company company, PrestashopImportParams prestashopImportParams) {
+        this.company = company;
+        this.prestashopImportParams = prestashopImportParams;
+    }
+
+    public void importAll() {
+        try (Connection newConnection = getConnection()) {
+            this.connection = newConnection;
+            loadLangs();
+            importAttributeDefinitions();
+            importAttributeValues();
+            importItems();
+            importItemTexts();
+            importItemVariants();
+        } catch (SQLException | ClassNotFoundException | InstantiationException | IllegalAccessException exception) {
+            throw new RuntimeException(exception);
+        }
+    }
+
+    private void importAttributeDefinitions() throws SQLException {
+        // AttributeDefinitions = ps_attribute_group in Prestashop
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "SELECT \n"
+                + "    ag.id_attribute_group,\n"
+                + "    agl.id_lang,\n"
+                + "    agl.name\n"
+                + "FROM\n"
+                + "    ps_attribute_group ag\n"
+                + "        LEFT JOIN\n"
+                + "    ps_attribute_group_lang agl ON ag.id_attribute_group = agl.id_attribute_group;"
+        )) {
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    long idAttributeGroup = resultSet.getLong("ag.id_attribute_group");
+                    long idLang = resultSet.getLong("agl.id_lang");
+                    String localizedName = resultSet.getString("agl.name");
+
+                    AttributeDefinition attributeDefinition = attributeDefinitionStore.computeIfAbsent(idAttributeGroup, id -> createAttributeDefinition());
+
+                    Locale locale = localeStore.get(idLang);
+                    attributeDefinition.getName().put(locale, localizedName);
+                }
+            }
+        }
+
+    }
+
+    public void importAttributeValues() throws SQLException {
+        // AttributeDefinitions = ps_attribute_group in Prestashop
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "SELECT \n"
+                + "    a.id_attribute,\n"
+                + "    a.id_attribute_group,\n"
+                + "    al.id_lang,\n"
+                + "    al.name\n"
+                + "FROM\n"
+                + "    ps_attribute a\n"
+                + "        LEFT JOIN\n"
+                + "    ps_attribute_lang al ON a.id_attribute = al.id_attribute;"
+        )) {
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    long idAttributeGroup = resultSet.getLong("a.id_attribute_group");
+                    long idAttribute = resultSet.getLong("a.id_attribute");
+                    long idLang = resultSet.getLong("al.id_lang");
+                    String localizedName = resultSet.getString("al.name");
+
+                    Locale locale = localeStore.get(idLang);
+                    AttributeDefinition attributeDefinition = attributeDefinitionStore.get(idAttributeGroup);
+                    AttributeValue attributeValue = attributeValueStore.computeIfAbsent(idAttribute, id -> createAttributeValue(attributeDefinition));
+                    attributeValue.getValue().put(locale, localizedName);
+                }
+            }
+        }
+
+    }
+
+    public void importItems() throws SQLException {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "SELECT \n"
+                + "    p.id_product,\n"
+                + "    p.price,\n"
+                + "    p.reference\n"
+                + "FROM\n"
+                + "    ps_product p;"
+        )) {
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    String productReference = resultSet.getString("p.reference");
+                    BigDecimal vatExclusive = resultSet.getBigDecimal("p.price");
+                    Long idProduct = resultSet.getLong("p.id_product");
+
+                    ItemVariant itemVariant = itemStore.computeIfAbsent(idProduct, id -> createItemVariant());
+                    itemVariant.setReference(productReference);
+                    itemVariant.getCurrentPrice().setVatExclusive(vatExclusive);
+                    itemVariant.getCurrentPrice().setVatRate(BigDecimal.valueOf(21, 2)); // TODO: get correct tax rate
+                }
+            }
+        }
+
+    }
+
+    public void importItemVariants() throws SQLException {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "SELECT \n"
+                + "    pa.id_product,\n"
+                + "    pac.id_product_attribute,\n"
+                + "    pac.id_attribute,\n"
+                + "    pa.reference\n"
+                + "FROM\n"
+                + "    ps_product_attribute pa\n"
+                + "        LEFT JOIN\n"
+                + "    ps_product_attribute_combination pac ON pa.id_product_attribute = pac.id_product_attribute;"
+        )) {
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    String reference = resultSet.getString("pa.reference");
+                    Long idProduct = resultSet.getLong("pa.id_product");
+                    Long idAttribute = resultSet.getLong("pac.id_attribute");
+                    Long idProductAttribute = resultSet.getLong("pac.id_product_attribute");
+
+                    AttributeValue attributeValue = attributeValueStore.get(idAttribute);
+
+                    ItemVariant parentItem = itemStore.get(idProduct);
+
+                    ItemVariant itemVariant = itemModelStore.computeIfAbsent(idProductAttribute, id -> createItemVariant(parentItem));
+                    if (reference != null) {
+                        itemVariant.setReference(reference);
+                    }
+
+                    itemVariant.getAttributeValues().add(attributeValue);
+                }
+            }
+        }
+
+    }
+
+    public void importItemTexts() throws SQLException {
+        try (PreparedStatement preparedStatement = connection.prepareStatement("select * from ps_product_lang")) {
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    long idLang = resultSet.getLong("id_lang");
+                    long idProduct = resultSet.getLong("id_product");
+                    String itemName = resultSet.getString("name");
+                    String itemDescription = resultSet.getString("description_short");
+
+                    ItemVariant itemVariant = itemStore.get(idProduct);
+                    Locale locale = localeStore.get(idLang);
+
+                    LocaleText name = itemVariant.getName();
+                    name.put(locale, itemName);
+
+                    LocaleText description = itemVariant.getDescription();
+                    description.put(locale, itemDescription);
+                }
+            }
+        }
+    }
+
+    private void loadLangs() throws SQLException {
+        try (PreparedStatement preparedStatement = connection.prepareStatement("select * from ps_lang where active")) {
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    long idLang = resultSet.getLong("id_lang");
+                    String isoCode = resultSet.getString("iso_code");
+                    Locale locale = new Locale(isoCode);
+                    localeStore.put(idLang, locale);
+                }
+            }
+        }
+    }
+
+    private Connection getConnection() throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+        String driverClassName = prestashopImportParams.getDriverClassName();
+        Class<?> driverClass = Class.forName(driverClassName);
+        driverClass.newInstance();
+
+        String database = prestashopImportParams.getDatabase();
+        String username = prestashopImportParams.getUsername();
+        String password = prestashopImportParams.getPassword();
+        String host = prestashopImportParams.getHost();
+        int port = prestashopImportParams.getPort();
+
+        Properties connectionProperties = new Properties();
+        connectionProperties.put("user", username);
+        connectionProperties.put("password", password);
+
+        Connection newConnection = DriverManager.getConnection(
+                "jdbc:mysql://"
+                + host
+                + ":" + port + "/" + database,
+                connectionProperties);
+        return newConnection;
+    }
+
+    private AttributeDefinition createAttributeDefinition() {
+        LocaleText localeText = createLocaleText();
+
+        AttributeDefinition attributeDefinition = new AttributeDefinition();
+        attributeDefinition.setName(localeText);
+        attributeDefinition.setCompany(company);
+
+        return attributeDefinition;
+    }
+
+    private AttributeValue createAttributeValue(AttributeDefinition attributeDefinition) {
+        LocaleText localeText = createLocaleText();
+
+        AttributeValue attributeValue = new AttributeValue();
+        attributeValue.setValue(localeText);
+        attributeValue.setAttributeDefinition(attributeDefinition);
+
+        return attributeValue;
+    }
+
+    private ItemVariant createItemVariant() {
+        LocaleText name = createLocaleText();
+
+        LocaleText description = createLocaleText();
+
+        Price price = new Price();
+
+        ItemVariant itemVariant = new ItemVariant();
+        itemVariant.setCompany(company);
+        itemVariant.setName(name);
+        itemVariant.setDescription(description);
+        itemVariant.setCurrentPrice(price);
+
+        return itemVariant;
+    }
+
+    private ItemVariant createItemVariant(ItemVariant parentItem) {
+        String reference = parentItem.getReference();
+
+        LocaleText parentName = parentItem.getName();
+        LocaleText parentDescription = parentItem.getDescription();
+
+        LocaleText name = copyLocaleText(parentName);
+        LocaleText description = copyLocaleText(parentDescription);
+
+        Price price = new Price();
+
+        List<AttributeValue> attributeValues = new ArrayList<>();
+
+        ItemVariant item = new ItemVariant();
+        item.setCompany(company);
+        item.setReference(reference);
+        item.setName(name);
+        item.setDescription(description);
+        item.setCurrentPrice(price);
+        item.setAttributeValues(attributeValues);
+
+        return item;
+    }
+
+    private LocaleText copyLocaleText(LocaleText sourceLocaleText) {
+        Map<Locale, String> sourceLocaleTextMap = sourceLocaleText.getLocaleTextMap();
+
+        LocaleText targetLocaleText = createLocaleText();
+
+        Map<Locale, String> targetLocaleTextMap = targetLocaleText.getLocaleTextMap();
+        targetLocaleTextMap.putAll(sourceLocaleTextMap);
+
+        return targetLocaleText;
+    }
+
+    private LocaleText createLocaleText() {
+        LocaleText localeText = new LocaleText();
+
+        Map<Locale, String> localeTextMap = new HashMap<>();
+        localeText.setLocaleTextMap(localeTextMap);
+
+        return localeText;
+    }
+
+    public ExternalEntityStore<Long, ItemVariant> getItemStore() {
+        return itemStore;
+    }
+
+    public ExternalEntityStore<Long, ItemVariant> getItemVariantStore() {
+        return itemModelStore;
+    }
+
+    public ExternalEntityStore<Long, AttributeDefinition> getAttributeDefinitionStore() {
+        return attributeDefinitionStore;
+    }
+
+    public ExternalEntityStore<Long, AttributeValue> getAttributeValueStore() {
+        return attributeValueStore;
+    }
+
+}

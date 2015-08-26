@@ -1,6 +1,6 @@
 package be.valuya.comptoir.api.domain.commercial;
 
-import be.valuya.comptoir.api.domain.company.WithId;
+import be.valuya.comptoir.model.common.WithId;
 import java.io.Serializable;
 import java.util.Objects;
 import javax.validation.constraints.NotNull;
@@ -18,7 +18,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class WsItemPicture implements Serializable, WithId {
 
     private Long id;
-    private WsItemRef itemRef;
+    private WsItemVariantRef itemVariantRef;
     @NotNull
     private byte[] data;
     @Size(min = 1, max = 128)
@@ -33,12 +33,12 @@ public class WsItemPicture implements Serializable, WithId {
         this.id = id;
     }
 
-    public WsItemRef getItemRef() {
-        return itemRef;
+    public WsItemVariantRef getItemVariantRef() {
+        return itemVariantRef;
     }
 
-    public void setItemRef(WsItemRef itemRef) {
-        this.itemRef = itemRef;
+    public void setItemVariantRef(WsItemVariantRef itemVariantRef) {
+        this.itemVariantRef = itemVariantRef;
     }
 
     public byte[] getData() {

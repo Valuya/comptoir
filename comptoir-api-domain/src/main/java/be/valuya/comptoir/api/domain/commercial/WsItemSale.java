@@ -1,6 +1,6 @@
 package be.valuya.comptoir.api.domain.commercial;
 
-import be.valuya.comptoir.api.domain.company.WithId;
+import be.valuya.comptoir.model.common.WithId;
 import be.valuya.comptoir.api.domain.lang.WsLocaleText;
 import be.valuya.comptoir.api.utils.ZonedDateTimeXmlAdapter;
 import java.math.BigDecimal;
@@ -24,7 +24,7 @@ public class WsItemSale implements WithId {
     private Long id;
     @XmlJavaTypeAdapter(ZonedDateTimeXmlAdapter.class)
     private ZonedDateTime dateTime;
-    private WsItemRef itemRef;
+    private WsItemVariantRef itemVariantRef;
     private BigDecimal quantity;
     private BigDecimal total;
     private WsSaleRef saleRef;
@@ -54,12 +54,12 @@ public class WsItemSale implements WithId {
         this.dateTime = dateTime;
     }
 
-    public WsItemRef getItemRef() {
-        return itemRef;
+    public WsItemVariantRef getItemVariantRef() {
+        return itemVariantRef;
     }
 
-    public void setItemRef(WsItemRef itemRef) {
-        this.itemRef = itemRef;
+    public void setItemVariantRef(WsItemVariantRef itemVariantRef) {
+        this.itemVariantRef = itemVariantRef;
     }
 
     public BigDecimal getVatExclusive() {

@@ -1,6 +1,6 @@
 package be.valuya.comptoir.api.domain.commercial;
 
-import be.valuya.comptoir.api.domain.company.WithId;
+import be.valuya.comptoir.model.common.WithId;
 import be.valuya.comptoir.api.utils.ZonedDateTimeXmlAdapter;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;

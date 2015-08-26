@@ -1,10 +1,11 @@
 package be.valuya.comptoir.api.domain.commercial;
 
-import be.valuya.comptoir.api.domain.company.WithId;
+import be.valuya.comptoir.model.common.WithId;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.api.domain.lang.WsLocaleText;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -16,9 +17,9 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  * @author Yannick Majoros <yannick@valuya.be>
  */
-@XmlRootElement(name = "Item")
+@XmlRootElement(name = "ItemVariant")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class WsItem implements WithId {
+public class WsItemVariant implements WithId {
 
     private Long id;
     @NotNull
@@ -43,6 +44,7 @@ public class WsItem implements WithId {
     @NotNull
     @Nonnull
     private BigDecimal vatRate;
+    private List<WsAttributeValue> attributeValues;
 
     @Override
     public Long getId() {
@@ -115,6 +117,36 @@ public class WsItem implements WithId {
 
     public void setVatRate(BigDecimal vatRate) {
         this.vatRate = vatRate;
+    }
+
+    public List<WsAttributeValue> getAttributeValues() {
+        return attributeValues;
+    }
+
+    public void setAttributeValues(List<WsAttributeValue> attributeValues) {
+        this.attributeValues = attributeValues;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 17 * hash + Objects.hashCode(this.id);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final WsItemVariant other = (WsItemVariant) obj;
+        return Objects.equals(this.id, other.id);
     }
 
 }

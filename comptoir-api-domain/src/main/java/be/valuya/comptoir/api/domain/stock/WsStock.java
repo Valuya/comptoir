@@ -1,6 +1,6 @@
 package be.valuya.comptoir.api.domain.stock;
 
-import be.valuya.comptoir.api.domain.company.WithId;
+import be.valuya.comptoir.model.common.WithId;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.lang.LocaleText;
 import java.io.Serializable;

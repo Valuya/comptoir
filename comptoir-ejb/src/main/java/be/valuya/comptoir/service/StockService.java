@@ -1,10 +1,10 @@
 package be.valuya.comptoir.service;
 
-import be.valuya.comptoir.model.commercial.Item;
 import be.valuya.comptoir.model.commercial.ItemPicture;
 import be.valuya.comptoir.model.commercial.ItemPicture_;
 import be.valuya.comptoir.model.commercial.ItemSale;
-import be.valuya.comptoir.model.commercial.Item_;
+import be.valuya.comptoir.model.commercial.ItemVariant;
+import be.valuya.comptoir.model.commercial.ItemVariant_;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.lang.LocaleText;
 import be.valuya.comptoir.model.lang.LocaleText_;
@@ -52,19 +52,19 @@ public class StockService {
     private EntityManager entityManager;
 
     @Nonnull
-    public List<Item> findItems(@Nonnull ItemSearch itemSearch, @CheckForNull Pagination<Item, ItemColumn> pagination) {
+    public List<ItemVariant> findItems(@Nonnull ItemSearch itemSearch, @CheckForNull Pagination<ItemVariant, ItemColumn> pagination) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Item> query = criteriaBuilder.createQuery(Item.class);
-        Root<Item> itemRoot = query.from(Item.class);
+        CriteriaQuery<ItemVariant> query = criteriaBuilder.createQuery(ItemVariant.class);
+        Root<ItemVariant> itemRoot = query.from(ItemVariant.class);
 
         List<Predicate> predicates = new ArrayList<>();
 
         Company company = itemSearch.getCompany();
-        Path<Company> companyPath = itemRoot.get(Item_.company);
+        Path<Company> companyPath = itemRoot.get(ItemVariant_.company);
         Predicate companyPredicate = criteriaBuilder.equal(companyPath, company);
         predicates.add(companyPredicate);
 
-        Path<String> referencePath = itemRoot.get(Item_.reference);
+        Path<String> referencePath = itemRoot.get(ItemVariant_.reference);
 
         String multiSearch = itemSearch.getMultiSearch();
         if (multiSearch != null && !multiSearch.isEmpty()) {
@@ -95,7 +95,7 @@ public class StockService {
         String model = itemSearch.getModel();
         if (model != null && !model.trim().isEmpty()) {
             model = model.trim();
-            Path<String> modelPath = itemRoot.get(Item_.model);
+            Path<String> modelPath = itemRoot.get(ItemVariant_.model);
             Predicate modelPredicate = criteriaBuilder.equal(modelPath, model);
             predicates.add(modelPredicate);
         }
@@ -124,7 +124,7 @@ public class StockService {
         query.where(predicateArray);
         query.distinct(true);
 
-        TypedQuery<Item> typedQuery = entityManager.createQuery(query);
+        TypedQuery<ItemVariant> typedQuery = entityManager.createQuery(query);
 
         if (pagination != null) {
             int offset = pagination.getOffset();
@@ -133,13 +133,13 @@ public class StockService {
             typedQuery.setMaxResults(maxResults);
         }
 
-        List<Item> items = typedQuery.getResultList();
+        List<ItemVariant> items = typedQuery.getResultList();
 
         return items;
     }
 
-    private Predicate createReferenceContainsPredicate(Root<Item> itemRoot, String referenceContains) {
-        Path<String> referencePath = itemRoot.get(Item_.reference);
+    private Predicate createReferenceContainsPredicate(Root<ItemVariant> itemRoot, String referenceContains) {
+        Path<String> referencePath = itemRoot.get(ItemVariant_.reference);
 
         return createContainsPredicate(referencePath, referenceContains);
     }
@@ -152,16 +152,16 @@ public class StockService {
         return referenceContainsPredicate;
     }
 
-    private Predicate createDescriptionContainsPredicate(Root<Item> itemRoot, String descriptionContains) {
-        Join<Item, LocaleText> descriptionJoin = itemRoot.join(Item_.description);
+    private Predicate createDescriptionContainsPredicate(Root<ItemVariant> itemRoot, String descriptionContains) {
+        Join<ItemVariant, LocaleText> descriptionJoin = itemRoot.join(ItemVariant_.description);
         MapJoin<LocaleText, Locale, String> localeTextMapJoin = descriptionJoin.join(LocaleText_.localeTextMap);
         Path<String> textPath = localeTextMapJoin.value();
         Predicate descriptionPredicate = createContainsPredicate(textPath, descriptionContains);
         return descriptionPredicate;
     }
 
-    private Predicate createNameContainsPredicate(Root<Item> itemRoot, String nameContains) {
-        Join<Item, LocaleText> nameJoin = itemRoot.join(Item_.name);
+    private Predicate createNameContainsPredicate(Root<ItemVariant> itemRoot, String nameContains) {
+        Join<ItemVariant, LocaleText> nameJoin = itemRoot.join(ItemVariant_.name);
         MapJoin<LocaleText, Locale, String> localeTextMapJoin = nameJoin.join(LocaleText_.localeTextMap);
         Path<String> textPath = localeTextMapJoin.value();
         Predicate namePredicate = createContainsPredicate(textPath, nameContains);
@@ -169,7 +169,7 @@ public class StockService {
     }
 
     public ItemStock adaptStockFromItemSale(ZonedDateTime fromDateTime, Stock stock, ItemSale managedItemSale, StockChangeType stockChangeType, String comment) {
-        Item managedItem = managedItemSale.getItem();
+        ItemVariant managedItem = managedItemSale.getItemVariant();
         BigDecimal soldQuantity = managedItemSale.getQuantity();
 
         // find previous stock value
@@ -200,11 +200,11 @@ public class StockService {
      * @return
      */
     @Nonnull
-    public ItemStock adaptStock(@Nonnull ZonedDateTime fromDateTime, @Nonnull Stock stock, @Nonnull Item managedItem, @Nonnull BigDecimal newQuantity, @CheckForNull String comment) {
+    public ItemStock adaptStock(@Nonnull ZonedDateTime fromDateTime, @Nonnull Stock stock, @Nonnull ItemVariant managedItem, @Nonnull BigDecimal newQuantity, @CheckForNull String comment) {
         // create new stock value
         ItemStock itemStock = new ItemStock();
         itemStock.setStock(stock);
-        itemStock.setItem(managedItem);
+        itemStock.setItemVariant(managedItem);
         itemStock.setStartDateTime(fromDateTime);
         itemStock.setQuantity(newQuantity);
         itemStock.setComment(comment);
@@ -224,8 +224,8 @@ public class StockService {
         List<Predicate> predicates = new ArrayList<>();
 
         Company company = itemStockSearch.getCompany();
-        Join<ItemStock, Item> itemJoin = itemStockRoot.join(ItemStock_.item, JoinType.LEFT);
-        Path<Company> companyPath = itemJoin.get(Item_.company);
+        Join<ItemStock, ItemVariant> itemJoin = itemStockRoot.join(ItemStock_.itemVariant, JoinType.LEFT);
+        Path<Company> companyPath = itemJoin.get(ItemVariant_.company);
         Predicate companyPredicate = criteriaBuilder.equal(companyPath, company);
         predicates.add(companyPredicate);
 
@@ -236,7 +236,7 @@ public class StockService {
             predicates.add(stockPredicate);
         }
 
-        Item item = itemStockSearch.getItem();
+        ItemVariant item = itemStockSearch.getItemVariant();
         if (item != null) {
             Predicate itemPredicate = criteriaBuilder.equal(itemJoin, item);
             predicates.add(itemPredicate);
@@ -264,18 +264,18 @@ public class StockService {
     }
 
     @Nonnull
-    public List<ItemStock> findItemStocks(@Nonnull Item item, @Nonnull ZonedDateTime atDateTime) {
+    public List<ItemStock> findItemStocks(@Nonnull ItemVariant item, @Nonnull ZonedDateTime atDateTime) {
         Company company = item.getCompany();
         ItemStockSearch itemStockSearch = new ItemStockSearch();
         itemStockSearch.setCompany(company);
-        itemStockSearch.setItem(item);
+        itemStockSearch.setItemVariant(item);
         itemStockSearch.setAtDateTime(atDateTime);
 
         return findItemStocks(itemStockSearch);
     }
 
     @Nonnull
-    public List<ItemStock> findItemStocks(Item item) {
+    public List<ItemStock> findItemStocks(ItemVariant item) {
         ZonedDateTime dateTime = ZonedDateTime.now();
         return findItemStocks(item, dateTime);
     }
@@ -289,12 +289,12 @@ public class StockService {
      * @return
      */
     @CheckForNull
-    public ItemStock findItemStock(@Nonnull Item item, @Nonnull Stock stock, @Nonnull ZonedDateTime atDateTime) {
+    public ItemStock findItemStock(@Nonnull ItemVariant item, @Nonnull Stock stock, @Nonnull ZonedDateTime atDateTime) {
         Company company = item.getCompany();
         ItemStockSearch itemStockSearch = new ItemStockSearch();
         itemStockSearch.setCompany(company);
         itemStockSearch.setStock(stock);
-        itemStockSearch.setItem(item);
+        itemStockSearch.setItemVariant(item);
         itemStockSearch.setAtDateTime(atDateTime);
 
         List<ItemStock> itemStocks = findItemStocks(itemStockSearch);
@@ -323,8 +323,8 @@ public class StockService {
         return typedQuery.getResultList();
     }
 
-    public Item saveItem(Item item, Stock stock, BigDecimal initialQuantity) {
-        Item managedItem = entityManager.merge(item);
+    public ItemVariant saveItem(ItemVariant item, Stock stock, BigDecimal initialQuantity) {
+        ItemVariant managedItem = entityManager.merge(item);
         ZonedDateTime dateTime = ZonedDateTime.now();
 
         adaptStock(dateTime, stock, managedItem, initialQuantity, null);
@@ -332,8 +332,8 @@ public class StockService {
         return managedItem;
     }
 
-    public Item findItemById(Long id) {
-        return entityManager.find(Item.class, id);
+    public ItemVariant findItemById(Long id) {
+        return entityManager.find(ItemVariant.class, id);
     }
 
     public ItemPicture findItemPictureById(Long id) {
@@ -348,26 +348,26 @@ public class StockService {
      * @deprecated
      */
     @Deprecated
-    public Item saveItem(Item item) {
+    public ItemVariant saveItem(ItemVariant item) {
         return entityManager.merge(item);
     }
 
     public ItemPicture saveItemPicture(ItemPicture itemPicture) {
-        Item item = itemPicture.getItem();
+        ItemVariant item = itemPicture.getItemVariant();
         ItemPicture managedPicture = entityManager.merge(itemPicture);
         item.setMainPicture(itemPicture);
-        Item managedItem = entityManager.merge(item);
+        ItemVariant managedItem = entityManager.merge(item);
         return managedPicture;
     }
 
-    public List<ItemPicture> findItemPictures(@Nonnull Item item) {
+    public List<ItemPicture> findItemPictures(@Nonnull ItemVariant item) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<ItemPicture> query = criteriaBuilder.createQuery(ItemPicture.class);
         Root<ItemPicture> itemPictureRoot = query.from(ItemPicture.class);
 
         List<Predicate> predicates = new ArrayList<>();
 
-        Path<Item> itemPath = itemPictureRoot.get(ItemPicture_.item);
+        Path<ItemVariant> itemPath = itemPictureRoot.get(ItemPicture_.itemVariant);
         Predicate itemPredicate = criteriaBuilder.equal(itemPath, item);
         predicates.add(itemPredicate);
 

@@ -6,9 +6,9 @@ import be.valuya.comptoir.model.accounting.Account_;
 import be.valuya.comptoir.model.accounting.AccountingEntry;
 import be.valuya.comptoir.model.accounting.AccountingTransaction;
 import be.valuya.comptoir.model.accounting.AccountingTransactionType;
-import be.valuya.comptoir.model.commercial.Item;
 import be.valuya.comptoir.model.commercial.ItemSale;
 import be.valuya.comptoir.model.commercial.ItemSale_;
+import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.model.commercial.Price;
 import be.valuya.comptoir.model.commercial.Sale;
 import be.valuya.comptoir.model.commercial.SalePrice;
@@ -147,7 +147,7 @@ public class SaleService {
         BigDecimal vatRate = price.getVatRate();
         BigDecimal productCredit = vatExclusive.negate();
 
-        Item item = itemSale.getItem();
+        ItemVariant item = itemSale.getItemVariant();
         LocaleText description = item.getDescription();
         AccountingEntry productAccountingEntry = new AccountingEntry();
         productAccountingEntry.setCompany(company);
@@ -367,7 +367,7 @@ public class SaleService {
             itemSale.setDateTime(dateTime);
         }
         // Update price
-        Item item = itemSale.getItem();
+        ItemVariant item = itemSale.getItemVariant();
 
         // TODO: create a new price if necessary... or clean up on sale save?
         Price specificPrice = itemSale.getPrice();
@@ -416,7 +416,7 @@ public class SaleService {
         List<Predicate> predicates = new ArrayList<>();
 
         Join<ItemSale, Sale> saleJoin = itemSaleRoot.join(ItemSale_.sale);
-        Join<ItemSale, Item> itemJoin = itemSaleRoot.join(ItemSale_.item);
+        Join<ItemSale, ItemVariant> itemJoin = itemSaleRoot.join(ItemSale_.itemVariant);
 
         Company company = itemSaleSearch.getCompany();
 
@@ -430,7 +430,7 @@ public class SaleService {
             predicates.add(salePredicate);
         }
 
-        Item item = itemSaleSearch.getItem();
+        ItemVariant item = itemSaleSearch.getItemVariant();
         if (item != null) {
             Predicate itemPredicate = criteriaBuilder.equal(itemJoin, item);
             predicates.add(itemPredicate);

@@ -1,6 +1,6 @@
 package be.valuya.comptoir.api.domain.accounting;
 
-import be.valuya.comptoir.api.domain.company.WithId;
+import be.valuya.comptoir.model.common.WithId;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.api.utils.ZonedDateTimeXmlAdapter;
 import be.valuya.comptoir.model.accounting.AccountingTransactionType;

@@ -2,7 +2,7 @@ package be.valuya.comptoir.service;
 
 import be.valuya.comptoir.model.accounting.Account;
 import be.valuya.comptoir.model.accounting.AccountType;
-import be.valuya.comptoir.model.commercial.Item;
+import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.model.commercial.Pos;
 import be.valuya.comptoir.model.commercial.PosPaymentAccount;
 import be.valuya.comptoir.model.commercial.Price;
@@ -92,7 +92,7 @@ public class RegistrationService {
         unknownItemPrice.setVatExclusive(BigDecimal.valueOf(100, 2));
         unknownItemPrice.setVatRate(BigDecimal.valueOf(21, 2));
 
-        Item unkownItem = new Item();
+        ItemVariant unkownItem = new ItemVariant();
         unkownItem.setCompany(managedCompany);
 
         LocaleText unkownItemDescription = localeTextFactory.createLocaleText();
@@ -110,7 +110,7 @@ public class RegistrationService {
 
         unkownItem.setReference("?");
 
-        Item managedUnkownItem = entityManager.merge(unkownItem);
+        ItemVariant managedUnkownItem = entityManager.merge(unkownItem);
 
         return managedCompany;
     }

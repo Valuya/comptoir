@@ -1,6 +1,6 @@
 package be.valuya.comptoir.api.domain.search;
 
-import be.valuya.comptoir.api.domain.commercial.WsItemRef;
+import be.valuya.comptoir.api.domain.commercial.WsItemVariantRef;
 import be.valuya.comptoir.api.domain.commercial.WsSaleRef;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import javax.annotation.Nonnull;
@@ -20,7 +20,7 @@ public class WsItemSaleSearch {
     @Nonnull
     @NotNull
     private WsCompanyRef companyRef;
-    private WsItemRef itemRef;
+    private WsItemVariantRef itemVariantRef;
     private WsSaleRef saleRef;
 
     public WsCompanyRef getCompanyRef() {
@@ -31,12 +31,12 @@ public class WsItemSaleSearch {
         this.companyRef = companyRef;
     }
 
-    public WsItemRef getItemRef() {
-        return itemRef;
+    public WsItemVariantRef getItemVariantRef() {
+        return itemVariantRef;
     }
 
-    public void setItemRef(WsItemRef itemRef) {
-        this.itemRef = itemRef;
+    public void setItemVariantRef(WsItemVariantRef itemVariantRef) {
+        this.itemVariantRef = itemVariantRef;
     }
 
     public WsSaleRef getSaleRef() {

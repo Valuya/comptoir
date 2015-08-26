@@ -20,7 +20,7 @@ import javax.persistence.Table;
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @Entity
-@Table(name = "item_sale")
+@Table(name = "itemvariant_sale")
 public class ItemSale implements Serializable {
 
     @Id
@@ -29,7 +29,7 @@ public class ItemSale implements Serializable {
     @Column(name = "date_time", columnDefinition = "DATETIME")
     private ZonedDateTime dateTime;
     @ManyToOne
-    private Item item;
+    private ItemVariant itemVariant;
     @ManyToOne(cascade = CascadeType.ALL)
     private Price price;
     private BigDecimal quantity;
@@ -57,12 +57,12 @@ public class ItemSale implements Serializable {
         this.dateTime = dateTime;
     }
 
-    public Item getItem() {
-        return item;
+    public ItemVariant getItemVariant() {
+        return itemVariant;
     }
 
-    public void setItem(Item item) {
-        this.item = item;
+    public void setItemVariant(ItemVariant itemVariant) {
+        this.itemVariant = itemVariant;
     }
 
     public Price getPrice() {

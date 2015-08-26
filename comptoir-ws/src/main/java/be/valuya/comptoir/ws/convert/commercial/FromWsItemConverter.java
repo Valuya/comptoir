@@ -1,12 +1,12 @@
 package be.valuya.comptoir.ws.convert.commercial;
 
-import be.valuya.comptoir.api.domain.commercial.WsItem;
 import be.valuya.comptoir.api.domain.commercial.WsItemPictureRef;
-import be.valuya.comptoir.api.domain.commercial.WsItemRef;
+import be.valuya.comptoir.api.domain.commercial.WsItemVariant;
+import be.valuya.comptoir.api.domain.commercial.WsItemVariantRef;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.api.domain.lang.WsLocaleText;
-import be.valuya.comptoir.model.commercial.Item;
 import be.valuya.comptoir.model.commercial.ItemPicture;
+import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.model.commercial.Price;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.lang.LocaleText;
@@ -35,7 +35,7 @@ public class FromWsItemConverter {
     @Inject
     private FromWsItemPictureConverter fromWsItemPictureConverter;
 
-    public Item convert(WsItem wsItem) {
+    public ItemVariant convert(WsItemVariant wsItem) {
         if (wsItem == null) {
             return null;
         }
@@ -63,7 +63,7 @@ public class FromWsItemConverter {
         price.setVatExclusive(vatExclusive);
         price.setVatRate(vatRate);
 
-        Item item = new Item();
+        ItemVariant item = new ItemVariant();
         item.setId(id);
         item.setCompany(company);
         item.setDescription(wsDescription);
@@ -76,12 +76,12 @@ public class FromWsItemConverter {
         return item;
     }
 
-    public Item find(WsItemRef itemRef) {
-        if (itemRef == null) {
+    public ItemVariant find(WsItemVariantRef itemVariantRef) {
+        if (itemVariantRef == null) {
             return null;
         }
-        Long itemId = itemRef.getId();
-        Item item = stockService.findItemById(itemId);
+        Long itemId = itemVariantRef.getId();
+        ItemVariant item = stockService.findItemById(itemId);
         return item;
     }
 

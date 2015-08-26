@@ -5,7 +5,7 @@
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
 
     <changeSet id="1" author="ymajoros">
-        <addColumn tableName="item_sale">
+        <addColumn tableName="itemvariant_sale">
             <column name="discount_ratio" type="decimal(38,0)" />
         </addColumn>
     </changeSet>

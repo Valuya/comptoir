@@ -1,7 +1,7 @@
 package be.valuya.comptoir.api.domain.stock;
 
-import be.valuya.comptoir.api.domain.commercial.WsItemRef;
-import be.valuya.comptoir.api.domain.company.WithId;
+import be.valuya.comptoir.api.domain.commercial.WsItemVariantRef;
+import be.valuya.comptoir.model.common.WithId;
 import be.valuya.comptoir.api.utils.ZonedDateTimeXmlAdapter;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -27,10 +27,11 @@ public class WsItemStock implements Serializable, WithId {
     @XmlJavaTypeAdapter(ZonedDateTimeXmlAdapter.class)
     private ZonedDateTime endDateTime;
     private WsStockRef stockRef;
-    private WsItemRef itemRef;
+    private WsItemVariantRef itemVariantRef;
     private BigDecimal quantity;
     private String comment;
 
+    @Override
     public Long getId() {
         return id;
     }
@@ -64,12 +65,12 @@ public class WsItemStock implements Serializable, WithId {
         this.stockRef = stockRef;
     }
 
-    public WsItemRef getItemRef() {
-        return itemRef;
+    public WsItemVariantRef getItemVariantRef() {
+        return itemVariantRef;
     }
 
-    public void setItemRef(WsItemRef itemRef) {
-        this.itemRef = itemRef;
+    public void setItemVariantRef(WsItemVariantRef itemVariantRef) {
+        this.itemVariantRef = itemVariantRef;
     }
 
     public BigDecimal getQuantity() {

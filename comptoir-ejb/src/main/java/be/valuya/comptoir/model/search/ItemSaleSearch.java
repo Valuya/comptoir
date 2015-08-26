@@ -1,6 +1,6 @@
 package be.valuya.comptoir.model.search;
 
-import be.valuya.comptoir.model.commercial.Item;
+import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.model.commercial.Sale;
 import be.valuya.comptoir.model.company.Company;
 import javax.annotation.Nonnull;
@@ -20,7 +20,7 @@ public class ItemSaleSearch {
     @NotNull
     @Nonnull
     private Company company;
-    private Item item;
+    private ItemVariant itemVariant;
     private Sale sale;
 
     public Company getCompany() {
@@ -31,12 +31,12 @@ public class ItemSaleSearch {
         this.company = company;
     }
 
-    public Item getItem() {
-        return item;
+    public ItemVariant getItemVariant() {
+        return itemVariant;
     }
 
-    public void setItem(Item item) {
-        this.item = item;
+    public void setItemVariant(ItemVariant itemVariant) {
+        this.itemVariant = itemVariant;
     }
 
     public Sale getSale() {

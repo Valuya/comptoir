@@ -2,7 +2,7 @@ package be.valuya.comptoir.api.domain.cash;
 
 import be.valuya.comptoir.api.domain.accounting.WsAccountRef;
 import be.valuya.comptoir.api.domain.accounting.WsBalanceRef;
-import be.valuya.comptoir.api.domain.company.WithId;
+import be.valuya.comptoir.model.common.WithId;
 import be.valuya.comptoir.api.utils.ZonedDateTimeXmlAdapter;
 import java.io.Serializable;
 import java.math.BigDecimal;

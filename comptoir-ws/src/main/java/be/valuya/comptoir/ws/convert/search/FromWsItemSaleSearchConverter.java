@@ -1,10 +1,10 @@
 package be.valuya.comptoir.ws.convert.search;
 
-import be.valuya.comptoir.api.domain.commercial.WsItemRef;
+import be.valuya.comptoir.api.domain.commercial.WsItemVariantRef;
 import be.valuya.comptoir.api.domain.commercial.WsSaleRef;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.api.domain.search.WsItemSaleSearch;
-import be.valuya.comptoir.model.commercial.Item;
+import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.model.commercial.Sale;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.search.ItemSaleSearch;
@@ -36,8 +36,8 @@ public class FromWsItemSaleSearchConverter {
         WsCompanyRef companyRef = wsItemSaleSearch.getCompanyRef();
         Company company = fromWsCompanyConverter.find(companyRef);
 
-        WsItemRef itemRef = wsItemSaleSearch.getItemRef();
-        Item item = fromWsItemConverter.find(itemRef);
+        WsItemVariantRef itemVariantRef = wsItemSaleSearch.getItemVariantRef();
+        ItemVariant item = fromWsItemConverter.find(itemVariantRef);
 
         WsSaleRef saleRef = wsItemSaleSearch.getSaleRef();
         Sale sale = fromWsSaleConverter.find(saleRef);
@@ -45,7 +45,7 @@ public class FromWsItemSaleSearchConverter {
         ItemSaleSearch itemSaleSearch = new ItemSaleSearch();
         itemSaleSearch.setCompany(company);
         itemSaleSearch.setSale(sale);
-        itemSaleSearch.setItem(item);
+        itemSaleSearch.setItemVariant(item);
 
         return itemSaleSearch;
     }

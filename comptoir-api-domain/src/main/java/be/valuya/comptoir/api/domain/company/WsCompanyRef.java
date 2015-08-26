@@ -1,5 +1,6 @@
 package be.valuya.comptoir.api.domain.company;
 
+import be.valuya.comptoir.model.common.WithId;
 import java.net.URI;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;

@@ -1,4 +1,4 @@
-package be.valuya.comptoir.api.domain.company;
+package be.valuya.comptoir.model.common;
 
 /**
  *
@@ -7,4 +7,6 @@ package be.valuya.comptoir.api.domain.company;
 public interface WithId {
 
     Long getId();
+
+    void setId(Long id);
 }

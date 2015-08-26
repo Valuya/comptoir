@@ -2,7 +2,7 @@ package be.valuya.comptoir.api.domain.search;
 
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.api.utils.ZonedDateTimeXmlAdapter;
-import be.valuya.comptoir.model.commercial.Item;
+import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.model.stock.Stock;
 import java.time.ZonedDateTime;
 import javax.annotation.CheckForNull;
@@ -21,7 +21,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 public class WsItemStockSearch {
 
     @CheckForNull
-    private Item item;
+    private ItemVariant item;
     @CheckForNull
     private Stock stock;
     @CheckForNull
@@ -39,11 +39,11 @@ public class WsItemStockSearch {
     }
 
     @CheckForNull
-    public Item getItem() {
+    public ItemVariant getItem() {
         return item;
     }
 
-    public void setItem(Item item) {
+    public void setItem(ItemVariant item) {
         this.item = item;
     }
 

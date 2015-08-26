@@ -1,5 +1,6 @@
 package be.valuya.comptoir.api.domain.company;
 
+import be.valuya.comptoir.model.common.WithId;
 import be.valuya.comptoir.api.domain.lang.WsLocaleText;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;

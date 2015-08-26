@@ -1,12 +1,12 @@
 package be.valuya.comptoir.ws.convert.commercial;
 
-import be.valuya.comptoir.api.domain.commercial.WsItemRef;
 import be.valuya.comptoir.api.domain.commercial.WsItemSale;
 import be.valuya.comptoir.api.domain.commercial.WsItemSaleRef;
+import be.valuya.comptoir.api.domain.commercial.WsItemVariantRef;
 import be.valuya.comptoir.api.domain.commercial.WsSaleRef;
 import be.valuya.comptoir.api.domain.lang.WsLocaleText;
-import be.valuya.comptoir.model.commercial.Item;
 import be.valuya.comptoir.model.commercial.ItemSale;
+import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.model.commercial.Price;
 import be.valuya.comptoir.model.commercial.Sale;
 import be.valuya.comptoir.model.lang.LocaleText;
@@ -53,8 +53,8 @@ public class FromWsItemSaleConverter {
         List<WsLocaleText> wsComment = wsItemSale.getComment();
         LocaleText comment = fromWsLocaleTextConverter.convert(wsComment);
 
-        WsItemRef itemRef = wsItemSale.getItemRef();
-        Item item = fromWsItemConverter.find(itemRef);
+        WsItemVariantRef itemVariantRef = wsItemSale.getItemVariantRef();
+        ItemVariant itemVariant = fromWsItemConverter.find(itemVariantRef);
 
         WsSaleRef saleRef = wsItemSale.getSaleRef();
         Sale sale = fromWsSaleConverter.find(saleRef);
@@ -72,7 +72,7 @@ public class FromWsItemSaleConverter {
         price.setDiscountRatio(discountRatio);
 
         itemSale.setId(id);
-        itemSale.setItem(item);
+        itemSale.setItemVariant(itemVariant);
         itemSale.setQuantity(quantity);
         itemSale.setSale(sale);
         itemSale.setComment(comment);

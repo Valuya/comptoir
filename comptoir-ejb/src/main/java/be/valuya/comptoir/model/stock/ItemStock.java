@@ -1,6 +1,6 @@
 package be.valuya.comptoir.model.stock;
 
-import be.valuya.comptoir.model.commercial.Item;
+import be.valuya.comptoir.model.commercial.ItemVariant;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
@@ -21,7 +21,7 @@ import javax.validation.constraints.NotNull;
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @Entity
-@Table(name = "item_stock")
+@Table(name = "itemvariant_stock")
 public class ItemStock implements Serializable {
 
     @Id
@@ -38,7 +38,7 @@ public class ItemStock implements Serializable {
     @Nonnull
     private Stock stock;
     @ManyToOne
-    private Item item;
+    private ItemVariant itemVariant;
     private BigDecimal quantity;
     @Column(columnDefinition = "TEXT")
     private String comment;
@@ -76,12 +76,12 @@ public class ItemStock implements Serializable {
         this.stock = stock;
     }
 
-    public Item getItem() {
-        return item;
+    public ItemVariant getItemVariant() {
+        return itemVariant;
     }
 
-    public void setItem(Item item) {
-        this.item = item;
+    public void setItemVariant(ItemVariant itemVariant) {
+        this.itemVariant = itemVariant;
     }
 
     public BigDecimal getQuantity() {

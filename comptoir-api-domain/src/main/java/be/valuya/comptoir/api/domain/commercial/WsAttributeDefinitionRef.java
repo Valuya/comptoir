@@ -1,6 +1,6 @@
 package be.valuya.comptoir.api.domain.commercial;
 
-import be.valuya.comptoir.api.domain.company.WithId;
+import be.valuya.comptoir.model.common.WithId;
 import java.net.URI;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -12,20 +12,20 @@ import org.glassfish.jersey.linking.InjectLink;
  *
  * @author Yannick Majoros <yannick@valuya.be>
  */
-@XmlRootElement(name = "ItemRef")
+@XmlRootElement(name = "AttributeDefinitionRef")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class WsItemRef implements WithId {
+public class WsAttributeDefinitionRef implements WithId {
 
-    @InjectLink(value = "item/${instance.id}")
+    @InjectLink(value = "attributeDefinition/${instance.id}")
     @XmlElement
     private URI link;
     @XmlElement
     private Long id;
 
-    public WsItemRef() {
+    public WsAttributeDefinitionRef() {
     }
 
-    public WsItemRef(Long id) {
+    public WsAttributeDefinitionRef(Long id) {
         this.id = id;
     }
 
@@ -37,6 +37,7 @@ public class WsItemRef implements WithId {
         this.link = link;
     }
 
+    @Override
     public Long getId() {
         return id;
     }

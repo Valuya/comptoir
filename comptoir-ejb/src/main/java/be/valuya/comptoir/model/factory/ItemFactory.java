@@ -1,6 +1,6 @@
 package be.valuya.comptoir.model.factory;
 
-import be.valuya.comptoir.model.commercial.Item;
+import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.model.commercial.Price;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.lang.LocaleText;
@@ -20,18 +20,18 @@ public class ItemFactory {
     @Inject
     private PriceFactory priceFactory;
 
-    public Item createItem(@Nonnull Company company) {
+    public ItemVariant createItem(@Nonnull Company company) {
         LocaleText descriptionLocaleText = localeTextFactory.createLocaleText();
         LocaleText nameLocaleText = localeTextFactory.createLocaleText();
         Price price = priceFactory.createPrice(company);
 
-        Item item = new Item();
-        item.setCompany(company);
-        item.setDescription(descriptionLocaleText);
-        item.setName(nameLocaleText);
-        item.setCurrentPrice(price);
+        ItemVariant itemVariant = new ItemVariant();
+        itemVariant.setCompany(company);
+        itemVariant.setDescription(descriptionLocaleText);
+        itemVariant.setName(nameLocaleText);
+        itemVariant.setCurrentPrice(price);
 
-        return item;
+        return itemVariant;
     }
 
 }
