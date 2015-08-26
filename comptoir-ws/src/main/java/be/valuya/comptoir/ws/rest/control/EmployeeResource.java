@@ -60,7 +60,7 @@ public class EmployeeResource {
         idChecker.checkId(id, wsEmployee);
 
         Employee existingEmployee = employeeService.findEmployeeById(id);
-        Employee employee = fromWsEmployeeConverter.patchEmployee(existingEmployee, wsEmployee);
+        Employee employee = fromWsEmployeeConverter.patch(existingEmployee, wsEmployee);
 
         Employee savedEmployee = employeeService.saveEmployee(employee);
         WsEmployeeRef employeeRef = toWsEmployeeConverter.reference(savedEmployee);

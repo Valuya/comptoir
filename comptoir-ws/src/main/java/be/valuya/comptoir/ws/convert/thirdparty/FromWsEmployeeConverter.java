@@ -24,10 +24,10 @@ public class FromWsEmployeeConverter {
             return null;
         }
         Employee employee = new Employee();
-        return patchEmployee(employee, wsEmployee);
+        return patch(employee, wsEmployee);
     }
 
-    public Employee patchEmployee(Employee employee, WsEmployee wsEmployee) {
+    public Employee patch(Employee employee, WsEmployee wsEmployee) {
         Long id = wsEmployee.getId();
         WsCompanyRef companyRef = wsEmployee.getCompanyRef();
         String firstName = wsEmployee.getFirstName();
