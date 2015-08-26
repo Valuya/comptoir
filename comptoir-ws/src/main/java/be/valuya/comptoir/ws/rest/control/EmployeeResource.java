@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.ejb.EJB;
 import javax.inject.Inject;
+import javax.validation.Valid;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -48,13 +49,15 @@ public class EmployeeResource {
     }
 
     @Path("{id}")
+    @Valid
     @PUT
-    public WsEmployeeRef saveEmployee(@PathParam("id") long id, WsEmployee wsEmployee) {
+    public WsEmployeeRef saveEmployee(@PathParam("id") long id, @Valid WsEmployee wsEmployee) {
         idChecker.checkId(id, wsEmployee);
         return saveEmployee(wsEmployee);
     }
 
     @Path("{id}")
+    @Valid
     @GET
     public WsEmployee getEmployee(@PathParam("id") long id) {
         Employee employee = employeeService.findEmployeeById(id);
@@ -64,9 +67,10 @@ public class EmployeeResource {
         return wsEmployee;
     }
 
+    @Valid
     @POST
     @Path("/search")
-    public List<WsEmployee> findEmployees(WsEmployeeSearch wsEmployeeSearch) {
+    public List<WsEmployee> findEmployees(@Valid WsEmployeeSearch wsEmployeeSearch) {
         EmployeeSearch employeeSearch = fromWsEmployeeSearchConverter.convert(wsEmployeeSearch);
         List<Employee> employees = employeeService.findEmployees(employeeSearch);
 
@@ -77,6 +81,7 @@ public class EmployeeResource {
         return wsEmployees;
     }
 
+    @Valid
     @Path("/{employeeId}/password/{password}")
     @PUT
     public void setPassword(@PathParam("employeeId") long employeeId, @PathParam("password") String password) {

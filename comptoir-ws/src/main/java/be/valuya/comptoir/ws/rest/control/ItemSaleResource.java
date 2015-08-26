@@ -37,6 +37,7 @@ import javax.ws.rs.core.MediaType;
  */
 @Path("/itemSale")
 @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 public class ItemSaleResource {
 
     @EJB
@@ -55,7 +56,7 @@ public class ItemSaleResource {
     private HttpServletResponse response;
 
     @POST
-    @Consumes(MediaType.APPLICATION_JSON)
+    @Valid
     public WsItemSaleRef createItemSale(@NoId @Valid WsItemSale wsItemSale) {
         WsItemSaleRef savedItemSaleRef = saveItemSale(wsItemSale);
         return savedItemSaleRef;
@@ -63,7 +64,7 @@ public class ItemSaleResource {
 
     @Path("{id}")
     @PUT
-    @Consumes(MediaType.APPLICATION_JSON)
+    @Valid
     public WsItemSaleRef updateItemSale(@PathParam("id") long id, @Valid WsItemSale wsItemSale) {
         idChecker.checkId(id, wsItemSale);
         WsItemSaleRef savedItemSaleRef = saveItemSale(wsItemSale);
@@ -72,6 +73,7 @@ public class ItemSaleResource {
 
     @Path("{id}")
     @GET
+    @Valid
     public WsItemSale getItemSale(@PathParam("id") long id) {
         ItemSale itemSale = saleService.findItemSaleById(id);
 
@@ -82,7 +84,7 @@ public class ItemSaleResource {
 
     @POST
     @Path("search")
-    @Consumes(MediaType.APPLICATION_JSON)
+    @Valid
     public List<WsItemSale> findItemSales(@Valid WsItemSaleSearch wsItemSaleSearch) {
         ItemSaleSearch itemSaleSearch = fromWsItemSaleSearchConverter.convert(wsItemSaleSearch);
         List<ItemSale> itemSales = saleService.findItemSales(itemSaleSearch);

@@ -2,6 +2,7 @@ package be.valuya.comptoir.ws.rest.control;
 
 import be.valuya.comptoir.api.domain.company.WsCountry;
 import java.math.BigDecimal;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
@@ -21,6 +22,7 @@ import javax.ws.rs.core.MediaType;
 public class CountryResource {
 
     @Path("{code}")
+    @Valid
     @GET
     public WsCountry getCountry(@NotNull @PathParam("code") String code) {
         if (!code.equals("be")) {

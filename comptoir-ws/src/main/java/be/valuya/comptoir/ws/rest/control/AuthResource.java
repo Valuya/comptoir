@@ -9,6 +9,7 @@ import be.valuya.comptoir.service.EmployeeService;
 import be.valuya.comptoir.ws.convert.auth.ToWsAuthConverter;
 import javax.ejb.EJB;
 import javax.inject.Inject;
+import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
@@ -35,6 +36,7 @@ public class AuthResource {
 
     @POST
     @Path("/refresh/{refreshToken}")
+    @Valid
     public WsAuth refreshAuth(@PathParam("refreshToken") String refreshToken) {
         Auth auth = authService.refreshAuth(refreshToken);
 
@@ -44,7 +46,8 @@ public class AuthResource {
     }
 
     @POST
-    public WsAuth login(WsLoginCredentials credentials) {
+    @Valid
+    public WsAuth login(@Valid WsLoginCredentials credentials) {
         String login = credentials.getLogin();
         Employee employee = employeeService.findEmployeeByLogin(login);
         if (employee == null) {

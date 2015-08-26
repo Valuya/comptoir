@@ -11,6 +11,8 @@ import be.valuya.comptoir.ws.rest.validation.NoId;
 import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -26,6 +28,7 @@ import javax.ws.rs.core.MediaType;
  */
 @Path("/moneyPile")
 @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 public class MoneyPileResource {
 
     @EJB
@@ -40,19 +43,22 @@ public class MoneyPileResource {
     private HttpServletResponse response;
 
     @POST
-    public WsMoneyPileRef createMoneyPile(@NoId WsMoneyPile wsMoneyPile) {
+    @Valid
+    public WsMoneyPileRef createMoneyPile(@NoId @Valid WsMoneyPile wsMoneyPile) {
         return saveMoneyPile(wsMoneyPile);
     }
 
     @Path("{id}")
     @PUT
-    public WsMoneyPileRef saveMoneyPile(@PathParam("id") long id, WsMoneyPile wsMoneyPile) {
+    @Valid
+    public WsMoneyPileRef saveMoneyPile(@PathParam("id") long id, @Valid WsMoneyPile wsMoneyPile) {
         idChecker.checkId(id, wsMoneyPile);
         return saveMoneyPile(wsMoneyPile);
     }
 
     @Path("{id}")
     @GET
+    @Valid
     public WsMoneyPile getMoneyPile(@PathParam("id") long id) {
         MoneyPile moneyPile = accountService.findMoneyPileById(id);
 

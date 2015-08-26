@@ -2,18 +2,18 @@ package be.valuya.comptoir.ws.rest.control;
 
 import be.valuya.comptoir.api.domain.commercial.WsItemPicture;
 import be.valuya.comptoir.api.domain.commercial.WsItemPictureRef;
-import be.valuya.comptoir.api.domain.commercial.WsItemRef;
+import be.valuya.comptoir.model.commercial.Item;
+import be.valuya.comptoir.model.commercial.ItemPicture;
+import be.valuya.comptoir.service.StockService;
 import be.valuya.comptoir.ws.convert.commercial.FromWsItemPictureConverter;
 import be.valuya.comptoir.ws.convert.commercial.ToWsItemPictureConverter;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
 import be.valuya.comptoir.ws.rest.validation.NoId;
-import be.valuya.comptoir.model.commercial.Item;
-import be.valuya.comptoir.model.commercial.ItemPicture;
-import be.valuya.comptoir.service.StockService;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.ejb.EJB;
 import javax.inject.Inject;
+import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -29,6 +29,7 @@ import javax.ws.rs.core.MediaType;
  */
 @Path("/item/{itemId}/picture")
 @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 public class ItemPictureResource {
 
     @EJB
@@ -43,23 +44,21 @@ public class ItemPictureResource {
     private Long itemId;
 
     @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public WsItemPictureRef createItemPicture(@NoId WsItemPicture wsItemPicture) {
+    @Valid
+    public WsItemPictureRef createItemPicture(@NoId @Valid WsItemPicture wsItemPicture) {
         return saveItemPicture(wsItemPicture);
     }
 
     @Path("{id}")
     @PUT
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
+    @Valid
     public WsItemPictureRef updateItemPicture(@PathParam("id") long id, WsItemPicture wsItemPicture) {
         idChecker.checkId(id, wsItemPicture);
         return saveItemPicture(wsItemPicture);
     }
 
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
+    @Valid
     public List<WsItemPicture> findItemPictures() {
         Item item = stockService.findItemById(itemId);
         List<ItemPicture> itemPictures = stockService.findItemPictures(item);
@@ -73,7 +72,7 @@ public class ItemPictureResource {
 
     @Path("{id}")
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
+    @Valid
     public WsItemPicture getItemPicture(@PathParam("id") long id) {
         ItemPicture itemPicture = stockService.findItemPictureById(id);
 

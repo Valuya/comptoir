@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -48,13 +49,15 @@ public class AccountResource {
     private HttpServletResponse response;
 
     @POST
-    public WsAccountRef createAccount(@NoId WsAccount wsAccount) {
+    @Valid
+    public WsAccountRef createAccount(@NoId @Valid WsAccount wsAccount) {
         return saveAccount(wsAccount);
     }
 
     @Path("{id}")
     @PUT
-    public WsAccountRef saveAccount(@PathParam("id") long id, WsAccount wsAccount) {
+    @Valid
+    public WsAccountRef saveAccount(@PathParam("id") long id, @Valid WsAccount wsAccount) {
         idChecker.checkId(id, wsAccount);
         return saveAccount(wsAccount);
     }
@@ -71,7 +74,8 @@ public class AccountResource {
 
     @POST
     @Path("search")
-    public List<WsAccount> findAccounts(WsAccountSearch wsAccountSearch) {
+    @Valid
+    public List<WsAccount> findAccounts(@Valid WsAccountSearch wsAccountSearch) {
         AccountSearch accountSearch = fromWsAccountSearchConverter.convert(wsAccountSearch);
         List<Account> accounts = accountService.findAccounts(accountSearch);
 

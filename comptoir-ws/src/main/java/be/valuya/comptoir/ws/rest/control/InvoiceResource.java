@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.ejb.EJB;
 import javax.inject.Inject;
+import javax.validation.Valid;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -47,13 +48,15 @@ public class InvoiceResource {
         return saveInvoice(wsInvoice);
     }
 
+    @Valid
     @Path("{id}")
     @PUT
-    public WsInvoiceRef saveInvoice(@PathParam("id") long id, WsInvoice wsInvoice) {
+    public WsInvoiceRef saveInvoice(@PathParam("id") long id, @Valid WsInvoice wsInvoice) {
         idChecker.checkId(id, wsInvoice);
         return saveInvoice(wsInvoice);
     }
 
+    @Valid
     @Path("{id}")
     @GET
     public WsInvoice getInvoice(@PathParam("id") long id) {
@@ -64,9 +67,10 @@ public class InvoiceResource {
         return wsInvoice;
     }
 
-    @POST
     @Path("search")
-    public List<WsInvoice> findInvoices(WsInvoiceSearch wsInvoiceSearch) {
+    @Valid
+    @POST
+    public List<WsInvoice> findInvoices(@Valid WsInvoiceSearch wsInvoiceSearch) {
         InvoiceSearch invoiceSearch = fromWsInvoiceSearchConverter.convert(wsInvoiceSearch);
         List<Invoice> invoices = invoiceService.findInvoices(invoiceSearch);
 

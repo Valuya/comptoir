@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -48,19 +49,22 @@ public class AccountingEntryResource {
     private HttpServletResponse response;
 
     @POST
-    public WsAccountingEntryRef createAccountingEntry(@NoId WsAccountingEntry wsAccountingEntry) {
+    @Valid
+    public WsAccountingEntryRef createAccountingEntry(@NoId @Valid WsAccountingEntry wsAccountingEntry) {
         return saveAccountingEntry(wsAccountingEntry);
     }
 
     @Path("{id}")
     @PUT
-    public WsAccountingEntryRef saveAccountingEntry(@PathParam("id") long id, WsAccountingEntry wsAccountingEntry) {
+    @Valid
+    public WsAccountingEntryRef saveAccountingEntry(@PathParam("id") long id, @Valid WsAccountingEntry wsAccountingEntry) {
         idChecker.checkId(id, wsAccountingEntry);
         return saveAccountingEntry(wsAccountingEntry);
     }
 
     @Path("{id}")
     @GET
+    @Valid
     public WsAccountingEntry getAccountingEntry(@PathParam("id") long id) {
         AccountingEntry accountingEntry = accountingEntryService.findAccountingEntryById(id);
 
@@ -71,7 +75,8 @@ public class AccountingEntryResource {
 
     @POST
     @Path("search")
-    public List<WsAccountingEntry> findAccountingEntrys(WsAccountingEntrySearch wsAccountingEntrySearch) {
+    @Valid
+    public List<WsAccountingEntry> findAccountingEntrys(@Valid WsAccountingEntrySearch wsAccountingEntrySearch) {
         AccountingEntrySearch accountingEntrySearch = fromWsAccountingEntrySearchConverter.convert(wsAccountingEntrySearch);
         List<AccountingEntry> accountingEntrys = accountingEntryService.findAccountingEntries(accountingEntrySearch);
 

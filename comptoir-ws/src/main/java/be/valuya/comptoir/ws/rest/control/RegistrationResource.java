@@ -12,6 +12,7 @@ import be.valuya.comptoir.ws.convert.company.ToWsCompanyConverter;
 import be.valuya.comptoir.ws.convert.thirdparty.FromWsEmployeeConverter;
 import javax.ejb.EJB;
 import javax.inject.Inject;
+import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -37,7 +38,8 @@ public class RegistrationResource {
     private ToWsCompanyConverter toWsCompanyConverter;
 
     @POST
-    public WsCompanyRef register(WsRegistration registration) {
+    @Valid
+    public WsCompanyRef register(@Valid WsRegistration registration) {
         WsCompany wsCompany = registration.getCompany();
         WsEmployee wsEmployee = registration.getEmployee();
         String employeePassword = registration.getEmployeePassword();

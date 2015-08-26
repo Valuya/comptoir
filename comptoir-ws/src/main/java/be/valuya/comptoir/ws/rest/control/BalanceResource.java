@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -52,7 +53,8 @@ public class BalanceResource {
     private HttpServletResponse response;
 
     @POST
-    public WsBalanceRef createBalance(@NoId WsBalance wsBalance) {
+    @Valid
+    public WsBalanceRef createBalance(@Valid @NoId WsBalance wsBalance) {
         Balance balance = fromWsBalanceConverter.convert(wsBalance);
         Balance savedBalance = accountService.saveBalance(balance);
 
@@ -63,7 +65,8 @@ public class BalanceResource {
 
     @Path("{id}")
     @PUT
-    public WsBalanceRef saveBalance(@PathParam("id") long id, WsBalance wsBalance) {
+    @Valid
+    public WsBalanceRef saveBalance(@PathParam("id") long id, @Valid WsBalance wsBalance) {
         idChecker.checkId(id, wsBalance);
         Balance balance = fromWsBalanceConverter.convert(wsBalance);
         Balance savedBalance = accountService.saveBalance(balance);
@@ -75,6 +78,7 @@ public class BalanceResource {
 
     @Path("{id}")
     @GET
+    @Valid
     public WsBalance getBalance(@PathParam("id") long id) {
         Balance balance = accountService.findBalanceById(id);
 
@@ -84,8 +88,9 @@ public class BalanceResource {
     }
 
     @POST
+    @Valid
     @Path("search")
-    public List<WsBalance> findBalances(WsBalanceSearch wsBalanceSearch) {
+    public List<WsBalance> findBalances(@Valid WsBalanceSearch wsBalanceSearch) {
         BalanceSearch balanceSearch = fromWsBalanceSearchConverter.convert(wsBalanceSearch);
         List<Balance> balances = accountService.findBalances(balanceSearch);
 
@@ -106,6 +111,7 @@ public class BalanceResource {
     }
 
     @PUT
+    @Valid
     @Path("{id}/state/CLOSED")
     public WsBalanceRef closeBalance(@PathParam("id") long id) {
         Balance balance = accountService.findBalanceById(id);

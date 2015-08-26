@@ -11,6 +11,7 @@ import be.valuya.comptoir.ws.rest.validation.NoId;
 import java.util.Optional;
 import javax.ejb.EJB;
 import javax.inject.Inject;
+import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
@@ -40,7 +41,8 @@ public class CompanyResource {
     private IdChecker idChecker;
 
     @POST
-    public WsCompanyRef createCompany(@NoId WsCompany wsCompany) {
+    @Valid
+    public WsCompanyRef createCompany(@NoId @Valid WsCompany wsCompany) {
         Company company = fromWsCompanyConverter.convert(wsCompany);
         Company savedCompany = companyService.saveCompany(company);
 
@@ -51,7 +53,8 @@ public class CompanyResource {
 
     @Path("{id}")
     @PUT
-    public WsCompanyRef saveCompany(@PathParam("id") long id, WsCompany wsCompany) {
+    @Valid
+    public WsCompanyRef saveCompany(@PathParam("id") long id, @Valid WsCompany wsCompany) {
         idChecker.checkId(id, wsCompany);
 
         Company existingCompany = companyService.findCompanyById(id);
@@ -65,6 +68,7 @@ public class CompanyResource {
     }
 
     @Path("{id}")
+    @Valid
     @GET
     public WsCompany getCompany(@PathParam("id") Long id) {
         WsCompany wsCompany = Optional.ofNullable(companyService.findCompanyById(id))

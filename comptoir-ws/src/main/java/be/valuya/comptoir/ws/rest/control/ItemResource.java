@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -36,6 +37,7 @@ import javax.ws.rs.core.UriInfo;
  */
 @Path("/item")
 @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 public class ItemResource {
 
     @EJB
@@ -56,8 +58,8 @@ public class ItemResource {
     private RestPaginationUtil restPaginationUtil;
 
     @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    public WsItemRef createItem(@NoId WsItem wsItem) {
+    @Valid
+    public WsItemRef createItem(@NoId @Valid WsItem wsItem) {
         Item item = fromWsItemConverter.convert(wsItem);
         Item savedItem = stockService.saveItem(item);
 
@@ -68,8 +70,8 @@ public class ItemResource {
 
     @Path("{id}")
     @PUT
-    @Consumes(MediaType.APPLICATION_JSON)
-    public WsItemRef updateItem(@PathParam("id") long id, WsItem wsItem) {
+    @Valid
+    public WsItemRef updateItem(@PathParam("id") long id, @Valid WsItem wsItem) {
         idChecker.checkId(id, wsItem);
         Item item = fromWsItemConverter.convert(wsItem);
         Item savedItem = stockService.saveItem(item);
@@ -81,6 +83,7 @@ public class ItemResource {
 
     @Path("{id}")
     @GET
+    @Valid
     public WsItem getItem(@PathParam("id") long id) {
         Item item = stockService.findItemById(id);
 
@@ -91,8 +94,8 @@ public class ItemResource {
 
     @POST
     @Path("search")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public List<WsItem> findItems(WsItemSearch wsItemSearch) {
+    @Valid
+    public List<WsItem> findItems(@Valid WsItemSearch wsItemSearch) {
         Pagination<Item, ItemColumn> pagination = restPaginationUtil.extractPagination(uriInfo, ItemColumn::valueOf);
 
         ItemSearch itemSearch = fromWsItemSearchConverter.convert(wsItemSearch);
