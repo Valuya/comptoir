@@ -367,25 +367,25 @@ public class SaleService {
             itemSale.setDateTime(dateTime);
         }
         // Update price
-        BigDecimal quantity = itemSale.getQuantity();
-        Price price = itemSale.getPrice();
         Item item = itemSale.getItem();
-        Price itemPrice = item.getCurrentPrice();
-        if (price == null) {
-            price = new Price();
-        }
-
-        SalePrice salePrice = AccountingUtils.calcSalePrice(price, quantity);
-
-        BigDecimal vatExclusive = itemPrice.getVatExclusive();
-        BigDecimal total = salePrice.getBase();
-        BigDecimal vatRate = itemPrice.getVatRate();
 
         // TODO: create a new price if necessary... or clean up on sale save?
-        price.setVatExclusive(vatExclusive);
-        price.setVatRate(vatRate);
+        Price specificPrice = itemSale.getPrice();
+        if (specificPrice == null) {
+            Price defaultItemPrice = item.getCurrentPrice();
+            specificPrice = new Price();
+            BigDecimal vatExclusive = defaultItemPrice.getVatExclusive();
+            BigDecimal vatRate = defaultItemPrice.getVatRate();
+            specificPrice.setVatExclusive(vatExclusive);
+            specificPrice.setVatRate(vatRate);
+        }
 
-        itemSale.setPrice(price);
+        BigDecimal quantity = itemSale.getQuantity();
+        SalePrice salePrice = AccountingUtils.calcSalePrice(specificPrice, quantity);
+
+        BigDecimal total = salePrice.getBase();
+
+        itemSale.setPrice(specificPrice);
         itemSale.setTotal(total);
 
         ItemSale managedItemSale = entityManager.merge(itemSale);
