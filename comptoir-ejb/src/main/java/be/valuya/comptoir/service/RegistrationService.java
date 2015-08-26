@@ -75,9 +75,10 @@ public class RegistrationService {
 
         Pos managedPos = entityManager.merge(pos);
 
-        paymentAccounts.stream()
+        List<PosPaymentAccount> posPaymentAccounts = paymentAccounts.stream()
                 .map(paymentAccount -> createPosPaymentAccount(managedPos, paymentAccount))
-                .map(entityManager::merge);
+                .map(entityManager::merge)
+                .collect(Collectors.toList());
 
         Customer defaultPosCustomer = new Customer();
         defaultPosCustomer.setCompany(managedCompany);
