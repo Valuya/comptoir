@@ -70,11 +70,14 @@ public class ItemSaleResource {
     @Valid
     public WsItemSaleRef updateItemSale(@PathParam("id") long id, @Valid WsItemSale wsItemSale) {
         idChecker.checkId(id, wsItemSale);
-        ItemSale itemSale = fromWsItemSaleConverter.convert(wsItemSale);
-        ItemSale savedItemSale = saleService.saveItemSale(itemSale);
+
+        ItemSale existingItemSale = saleService.findItemSaleById(id);
+        ItemSale updatedItemSale = fromWsItemSaleConverter.patch(existingItemSale, wsItemSale);
+
+        ItemSale savedItemSale = saleService.saveItemSale(updatedItemSale);
         WsItemSaleRef itemSaleRef = toWsItemSaleConverter.reference(savedItemSale);
-        WsItemSaleRef savedItemSaleRef = itemSaleRef;
-        return savedItemSaleRef;
+
+        return itemSaleRef;
     }
 
     @Path("{id}")
@@ -115,6 +118,5 @@ public class ItemSaleResource {
 
         saleService.removeItemSale(itemSale);
     }
-
 
 }

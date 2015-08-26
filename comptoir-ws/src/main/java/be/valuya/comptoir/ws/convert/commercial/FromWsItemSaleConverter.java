@@ -39,6 +39,12 @@ public class FromWsItemSaleConverter {
         if (wsItemSale == null) {
             return null;
         }
+        ItemSale itemSale = new ItemSale();
+
+        return patch(itemSale, wsItemSale);
+    }
+
+    public ItemSale patch(ItemSale itemSale, WsItemSale wsItemSale) {
         Long id = wsItemSale.getId();
 
         ZonedDateTime dateTime = wsItemSale.getDateTime();
@@ -55,18 +61,16 @@ public class FromWsItemSaleConverter {
 
         BigDecimal vatExclusive = wsItemSale.getVatExclusive();
         BigDecimal vatRate = wsItemSale.getVatRate();
-        
+
         BigDecimal total = wsItemSale.getTotal();
-        
+
         BigDecimal discountRatio = wsItemSale.getDiscountRatio();
-        
+
         Price price = new Price();
         price.setVatExclusive(vatExclusive);
         price.setVatRate(vatRate);
         price.setDiscountRatio(discountRatio);
-        
 
-        ItemSale itemSale = new ItemSale();
         itemSale.setId(id);
         itemSale.setItem(item);
         itemSale.setQuantity(quantity);
