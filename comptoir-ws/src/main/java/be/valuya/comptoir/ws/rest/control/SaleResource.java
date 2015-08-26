@@ -141,7 +141,7 @@ public class SaleResource {
     @Path("{id}/payed")
     public BigDecimal getSaleTotalPayed(@PathParam("id") long id) {
         Sale sale = saleService.findSaleById(id);
-        saleStateChecker.checkState(sale, false); // TODO: replace with bean validation
+        //saleStateChecker.checkState(sale, false); // TODO: replace with bean validation
 
         return saleService.getSaleTotalPayed(sale);
     }
