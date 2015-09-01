@@ -67,10 +67,12 @@ public class ItemVariant implements Serializable, WithId {
     @JoinColumn(name = "parent_itemvariant_id")
     private ItemVariant parentItem;
 
+    @Override
     public Long getId() {
         return id;
     }
 
+    @Override
     public void setId(Long id) {
         this.id = id;
     }

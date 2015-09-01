@@ -21,7 +21,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 public class WsItemStockSearch {
 
     @CheckForNull
-    private ItemVariant item;
+    private ItemVariant itemVariant;
     @CheckForNull
     private Stock stock;
     @CheckForNull
@@ -39,12 +39,12 @@ public class WsItemStockSearch {
     }
 
     @CheckForNull
-    public ItemVariant getItem() {
-        return item;
+    public ItemVariant getItemVariant() {
+        return itemVariant;
     }
 
-    public void setItem(ItemVariant item) {
-        this.item = item;
+    public void setItemVariant(ItemVariant itemVariant) {
+        this.itemVariant = itemVariant;
     }
 
     @CheckForNull
