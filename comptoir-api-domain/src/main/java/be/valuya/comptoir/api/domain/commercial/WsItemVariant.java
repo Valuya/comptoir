@@ -27,7 +27,7 @@ public class WsItemVariant implements WithId {
     @NotNull
     private Pricing pricing;
     private BigDecimal pricingAmount;
-    private List<WsAttributeValue> attributeValues;
+    private List<WsAttributeValueRef> attributeValueRefs;
     private WsItemRef itemRef;
 
     @Override
@@ -72,12 +72,12 @@ public class WsItemVariant implements WithId {
         this.pricingAmount = pricingAmount;
     }
 
-    public List<WsAttributeValue> getAttributeValues() {
-        return attributeValues;
+    public List<WsAttributeValueRef> getAttributeValueRefs() {
+        return attributeValueRefs;
     }
 
-    public void setAttributeValues(List<WsAttributeValue> attributeValues) {
-        this.attributeValues = attributeValues;
+    public void setAttributeValueRefs(List<WsAttributeValueRef> attributeValueRefs) {
+        this.attributeValueRefs = attributeValueRefs;
     }
 
     public WsItemRef getItemRef() {

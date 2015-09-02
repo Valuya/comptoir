@@ -1,14 +1,15 @@
 package be.valuya.comptoir.ws.convert.commercial;
 
+import be.valuya.comptoir.api.domain.commercial.WsAttributeValueRef;
 import be.valuya.comptoir.api.domain.commercial.WsItemPictureRef;
 import be.valuya.comptoir.api.domain.commercial.WsItemVariant;
 import be.valuya.comptoir.api.domain.commercial.WsItemVariantRef;
 import be.valuya.comptoir.model.commercial.ItemPicture;
 import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.model.commercial.Pricing;
-import be.valuya.comptoir.ws.convert.company.ToWsCompanyConverter;
-import be.valuya.comptoir.ws.convert.text.ToWsLocaleTextConverter;
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
@@ -20,9 +21,7 @@ import javax.inject.Inject;
 public class ToWsItemVariantConverter {
 
     @Inject
-    private ToWsLocaleTextConverter fromWsLocaleTextConverter;
-    @Inject
-    private ToWsCompanyConverter toWsCompanyConverter;
+    private ToWsAttributeValueConverter toWsAttributeValueConverter;
     @Inject
     private ToWsItemPictureConverter toWsItemPictureConverter;
 
@@ -39,12 +38,18 @@ public class ToWsItemVariantConverter {
         Pricing pricing = itemVariant.getPricing();
         BigDecimal pricingAmount = itemVariant.getPricingAmount();
 
+        List<WsAttributeValueRef> attributeValueRefs = itemVariant.getAttributeValues()
+                .stream()
+                .map(toWsAttributeValueConverter::reference)
+                .collect(Collectors.toList());
+
         WsItemVariant wsItem = new WsItemVariant();
         wsItem.setId(id);
         wsItem.setMainPictureRef(mainPictureRef);
         wsItem.setVariantReference(variantReference);
         wsItem.setPricing(pricing);
         wsItem.setPricingAmount(pricingAmount);
+        wsItem.setAttributeValueRefs(attributeValueRefs);
 
         return wsItem;
     }

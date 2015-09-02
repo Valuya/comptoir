@@ -4,14 +4,15 @@ import be.valuya.comptoir.api.domain.commercial.WsItemPictureRef;
 import be.valuya.comptoir.api.domain.commercial.WsItemRef;
 import be.valuya.comptoir.api.domain.commercial.WsItemVariant;
 import be.valuya.comptoir.api.domain.commercial.WsItemVariantRef;
+import be.valuya.comptoir.model.commercial.AttributeValue;
 import be.valuya.comptoir.model.commercial.Item;
 import be.valuya.comptoir.model.commercial.ItemPicture;
 import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.model.commercial.Pricing;
 import be.valuya.comptoir.service.StockService;
-import be.valuya.comptoir.ws.convert.company.FromWsCompanyConverter;
-import be.valuya.comptoir.ws.convert.text.FromWsLocaleTextConverter;
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.ejb.EJB;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -26,9 +27,7 @@ public class FromWsItemVariantConverter {
     @EJB
     private StockService stockService;
     @Inject
-    private FromWsLocaleTextConverter fromWsLocaleTextConverter;
-    @Inject
-    private FromWsCompanyConverter fromWsCompanyConverter;
+    private FromWsAttributeValueConverter fromWsAttributeValueConverter;
     @Inject
     private FromWsItemConverter fromWsItemConverter;
     @Inject
@@ -47,9 +46,14 @@ public class FromWsItemVariantConverter {
         WsItemPictureRef mainPictureRef = wsItemVariant.getMainPictureRef();
 
         ItemPicture mainPicture = fromWsItemPictureConverter.find(mainPictureRef);
-        
+
         WsItemRef itemRef = wsItemVariant.getItemRef();
         Item item = fromWsItemConverter.find(itemRef);
+
+        List<AttributeValue> attributeValues = wsItemVariant.getAttributeValueRefs()
+                .stream()
+                .map(fromWsAttributeValueConverter::find)
+                .collect(Collectors.toList());
 
         ItemVariant itemVariant = new ItemVariant();
         itemVariant.setId(id);
@@ -58,6 +62,7 @@ public class FromWsItemVariantConverter {
         itemVariant.setPricing(pricing);
         itemVariant.setPricingAmount(pricingAmount);
         itemVariant.setItem(item);
+        itemVariant.setAttributeValues(attributeValues);
 
         return itemVariant;
     }
