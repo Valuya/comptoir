@@ -1,9 +1,10 @@
 package be.valuya.comptoir.api.domain.commercial;
 
-import be.valuya.comptoir.model.common.WithId;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.api.domain.lang.WsLocaleText;
+import be.valuya.comptoir.model.common.WithId;
 import java.io.Serializable;
+import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.validation.constraints.NotNull;
@@ -23,7 +24,7 @@ public class WsAttributeDefinition implements Serializable, WithId {
     @NotNull
     @Nonnull
     private WsCompanyRef companyRef;
-    private WsLocaleText name;
+    private List<WsLocaleText> name;
 
     @Override
     public Long getId() {
@@ -43,11 +44,11 @@ public class WsAttributeDefinition implements Serializable, WithId {
         this.companyRef = companyRef;
     }
 
-    public WsLocaleText getName() {
+    public List<WsLocaleText> getName() {
         return name;
     }
 
-    public void setName(WsLocaleText name) {
+    public void setName(List<WsLocaleText> name) {
         this.name = name;
     }
 

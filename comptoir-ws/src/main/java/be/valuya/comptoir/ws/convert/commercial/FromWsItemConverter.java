@@ -32,8 +32,6 @@ public class FromWsItemConverter {
     @Inject
     private FromWsCompanyConverter fromWsCompanyConverter;
     @Inject
-    private FromWsItemConverter fromWsItemConverter;
-    @Inject
     private FromWsItemPictureConverter fromWsItemPictureConverter;
 
     public Item convert(WsItem wsItem) {

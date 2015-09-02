@@ -1,5 +1,7 @@
 package be.valuya.comptoir.service;
 
+import be.valuya.comptoir.model.commercial.AttributeDefinition;
+import be.valuya.comptoir.model.commercial.AttributeValue;
 import be.valuya.comptoir.model.commercial.Item;
 import be.valuya.comptoir.model.commercial.ItemPicture;
 import be.valuya.comptoir.model.commercial.ItemPicture_;
@@ -402,6 +404,14 @@ public class StockService {
 
         TypedQuery<ItemPicture> typedQuery = entityManager.createQuery(query);
         return typedQuery.getResultList();
+    }
+
+    public AttributeDefinition findAttributeDefinitionById(long id) {
+        return entityManager.find(AttributeDefinition.class, id);
+    }
+
+    public AttributeValue findAttributeValueById(long id) {
+        return entityManager.find(AttributeValue.class, id);
     }
 
 }

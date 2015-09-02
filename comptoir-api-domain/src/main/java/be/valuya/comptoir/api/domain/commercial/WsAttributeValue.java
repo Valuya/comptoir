@@ -3,6 +3,7 @@ package be.valuya.comptoir.api.domain.commercial;
 import be.valuya.comptoir.api.domain.lang.WsLocaleText;
 import be.valuya.comptoir.model.common.WithId;
 import java.io.Serializable;
+import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.validation.constraints.NotNull;
@@ -22,7 +23,7 @@ public class WsAttributeValue implements Serializable, WithId {
     @NotNull
     @Nonnull
     private WsAttributeDefinitionRef attributeDefinitionRef;
-    private WsLocaleText value;
+    private List<WsLocaleText> value;
 
     @Override
     public Long getId() {
@@ -42,11 +43,11 @@ public class WsAttributeValue implements Serializable, WithId {
         this.attributeDefinitionRef = attributeDefinitionRef;
     }
 
-    public WsLocaleText getValue() {
+    public List<WsLocaleText> getValue() {
         return value;
     }
 
-    public void setValue(WsLocaleText value) {
+    public void setValue(List<WsLocaleText> value) {
         this.value = value;
     }
 
