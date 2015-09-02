@@ -2,6 +2,7 @@ package be.valuya.comptoir.service;
 
 import be.valuya.comptoir.model.commercial.AttributeDefinition;
 import be.valuya.comptoir.model.commercial.AttributeValue;
+import be.valuya.comptoir.model.commercial.Item;
 import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.model.commercial.Price;
 import be.valuya.comptoir.model.company.Company;
@@ -25,7 +26,7 @@ import java.util.Properties;
  */
 public class PrestashopImportUtil {
 
-    private final ExternalEntityStore<Long, ItemVariant> itemStore = new ExternalEntityStore<>();
+    private final ExternalEntityStore<Long, Item> itemStore = new ExternalEntityStore<>();
     private final ExternalEntityStore<Long, ItemVariant> itemModelStore = new ExternalEntityStore<>();
     private final ExternalEntityStore<Long, AttributeDefinition> attributeDefinitionStore = new ExternalEntityStore<>();
     private final ExternalEntityStore<Long, AttributeValue> attributeValueStore = new ExternalEntityStore<>();
@@ -126,10 +127,10 @@ public class PrestashopImportUtil {
                     BigDecimal vatExclusive = resultSet.getBigDecimal("p.price");
                     Long idProduct = resultSet.getLong("p.id_product");
 
-                    ItemVariant itemVariant = itemStore.computeIfAbsent(idProduct, id -> createItemVariant());
-                    itemVariant.setReference(productReference);
-                    itemVariant.getCurrentPrice().setVatExclusive(vatExclusive);
-                    itemVariant.getCurrentPrice().setVatRate(BigDecimal.valueOf(21, 2)); // TODO: get correct tax rate
+                    Item item = itemStore.computeIfAbsent(idProduct, id -> createItem());
+                    item.setReference(productReference);
+                    item.getCurrentPrice().setVatExclusive(vatExclusive);
+                    item.getCurrentPrice().setVatRate(BigDecimal.valueOf(21, 2)); // TODO: get correct tax rate
                 }
             }
         }
@@ -150,21 +151,19 @@ public class PrestashopImportUtil {
         )) {
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
-                    String reference = resultSet.getString("pa.reference");
+                    String variantReference = resultSet.getString("pa.reference");
                     Long idProduct = resultSet.getLong("pa.id_product");
                     Long idAttribute = resultSet.getLong("pac.id_attribute");
                     Long idProductAttribute = resultSet.getLong("pac.id_product_attribute");
 
                     AttributeValue attributeValue = attributeValueStore.get(idAttribute);
 
-                    ItemVariant parentItem = itemStore.get(idProduct);
+                    Item item = itemStore.get(idProduct);
 
-                    ItemVariant itemVariant = itemModelStore.computeIfAbsent(idProductAttribute, id -> createItemVariant(parentItem));
-                    if (reference != null) {
-                        itemVariant.setReference(reference);
-                    }
-
-                    itemVariant.getAttributeValues().add(attributeValue);
+                    ItemVariant itemVariant = itemModelStore.computeIfAbsent(idProductAttribute, id -> createItemVariant(item));
+                    List<AttributeValue> attributeValues = itemVariant.getAttributeValues();
+                    itemVariant.setVariantReference(variantReference);
+                    attributeValues.add(attributeValue);
                 }
             }
         }
@@ -180,13 +179,13 @@ public class PrestashopImportUtil {
                     String itemName = resultSet.getString("name");
                     String itemDescription = resultSet.getString("description_short");
 
-                    ItemVariant itemVariant = itemStore.get(idProduct);
+                    Item item = itemStore.get(idProduct);
                     Locale locale = localeStore.get(idLang);
 
-                    LocaleText name = itemVariant.getName();
+                    LocaleText name = item.getName();
                     name.put(locale, itemName);
 
-                    LocaleText description = itemVariant.getDescription();
+                    LocaleText description = item.getDescription();
                     description.put(locale, itemDescription);
                 }
             }
@@ -249,55 +248,30 @@ public class PrestashopImportUtil {
         return attributeValue;
     }
 
-    private ItemVariant createItemVariant() {
+    private Item createItem() {
         LocaleText name = createLocaleText();
 
         LocaleText description = createLocaleText();
 
         Price price = new Price();
 
-        ItemVariant itemVariant = new ItemVariant();
-        itemVariant.setCompany(company);
-        itemVariant.setName(name);
-        itemVariant.setDescription(description);
-        itemVariant.setCurrentPrice(price);
-
-        return itemVariant;
-    }
-
-    private ItemVariant createItemVariant(ItemVariant parentItem) {
-        String reference = parentItem.getReference();
-
-        LocaleText parentName = parentItem.getName();
-        LocaleText parentDescription = parentItem.getDescription();
-
-        LocaleText name = copyLocaleText(parentName);
-        LocaleText description = copyLocaleText(parentDescription);
-
-        Price price = new Price();
-
-        List<AttributeValue> attributeValues = new ArrayList<>();
-
-        ItemVariant item = new ItemVariant();
+        Item item = new Item();
         item.setCompany(company);
-        item.setReference(reference);
         item.setName(name);
         item.setDescription(description);
         item.setCurrentPrice(price);
-        item.setAttributeValues(attributeValues);
 
         return item;
     }
 
-    private LocaleText copyLocaleText(LocaleText sourceLocaleText) {
-        Map<Locale, String> sourceLocaleTextMap = sourceLocaleText.getLocaleTextMap();
+    private ItemVariant createItemVariant(Item item) {
+        List<AttributeValue> attributeValues = new ArrayList<>();
 
-        LocaleText targetLocaleText = createLocaleText();
+        ItemVariant itemVariant = new ItemVariant();
+        itemVariant.setAttributeValues(attributeValues);
+        itemVariant.setItem(item);
 
-        Map<Locale, String> targetLocaleTextMap = targetLocaleText.getLocaleTextMap();
-        targetLocaleTextMap.putAll(sourceLocaleTextMap);
-
-        return targetLocaleText;
+        return itemVariant;
     }
 
     private LocaleText createLocaleText() {
@@ -309,7 +283,7 @@ public class PrestashopImportUtil {
         return localeText;
     }
 
-    public ExternalEntityStore<Long, ItemVariant> getItemStore() {
+    public ExternalEntityStore<Long, Item> getItemStore() {
         return itemStore;
     }
 

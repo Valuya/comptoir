@@ -6,6 +6,8 @@ import be.valuya.comptoir.model.accounting.Account_;
 import be.valuya.comptoir.model.accounting.AccountingEntry;
 import be.valuya.comptoir.model.accounting.AccountingTransaction;
 import be.valuya.comptoir.model.accounting.AccountingTransactionType;
+import be.valuya.comptoir.model.commercial.AttributeValue;
+import be.valuya.comptoir.model.commercial.Item;
 import be.valuya.comptoir.model.commercial.ItemSale;
 import be.valuya.comptoir.model.commercial.ItemSale_;
 import be.valuya.comptoir.model.commercial.ItemVariant;
@@ -147,8 +149,14 @@ public class SaleService {
         BigDecimal vatRate = price.getVatRate();
         BigDecimal productCredit = vatExclusive.negate();
 
-        ItemVariant item = itemSale.getItemVariant();
+        ItemVariant itemVariant = itemSale.getItemVariant();
+        Item item = itemVariant.getItem();
         LocaleText description = item.getDescription();
+
+        List<AttributeValue> attributeValues = itemVariant.getAttributeValues();
+        StringBuilder attributeValueDescriptionBuilder = new StringBuilder();
+        // TODO: add all attributes
+
         AccountingEntry productAccountingEntry = new AccountingEntry();
         productAccountingEntry.setCompany(company);
         productAccountingEntry.setCustomer(customer);
@@ -367,15 +375,23 @@ public class SaleService {
             itemSale.setDateTime(dateTime);
         }
         // Update price
-        ItemVariant item = itemSale.getItemVariant();
+        ItemVariant itemVariant = itemSale.getItemVariant();
 
         // TODO: create a new price if necessary... or clean up on sale save?
         Price specificPrice = itemSale.getPrice();
         if (specificPrice == null) {
+            Item item = itemVariant.getItem();
             Price defaultItemPrice = item.getCurrentPrice();
+
             specificPrice = new Price();
             BigDecimal vatExclusive = defaultItemPrice.getVatExclusive();
             BigDecimal vatRate = defaultItemPrice.getVatRate();
+
+            BigDecimal pricingAmount = itemVariant.getPricingAmount();
+            if (pricingAmount != null) {
+                vatExclusive.add(pricingAmount);
+            }
+
             specificPrice.setVatExclusive(vatExclusive);
             specificPrice.setVatRate(vatRate);
         }
@@ -430,9 +446,9 @@ public class SaleService {
             predicates.add(salePredicate);
         }
 
-        ItemVariant item = itemSaleSearch.getItemVariant();
-        if (item != null) {
-            Predicate itemPredicate = criteriaBuilder.equal(itemJoin, item);
+        ItemVariant itemVariant = itemSaleSearch.getItemVariant();
+        if (itemVariant != null) {
+            Predicate itemPredicate = criteriaBuilder.equal(itemJoin, itemVariant);
             predicates.add(itemPredicate);
         }
 

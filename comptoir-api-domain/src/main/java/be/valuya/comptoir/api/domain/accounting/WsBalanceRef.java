@@ -42,6 +42,7 @@ public class WsBalanceRef implements WithId {
         return id;
     }
 
+    @Override
     public void setId(Long id) {
         this.id = id;
     }

@@ -41,10 +41,12 @@ public class WsCustomer implements WithId {
     private String email;
     private String notes;
 
+    @Override
     public Long getId() {
         return id;
     }
 
+    @Override
     public void setId(Long id) {
         this.id = id;
     }

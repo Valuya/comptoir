@@ -6,11 +6,11 @@ import be.valuya.comptoir.api.domain.search.WsItemSearch;
 import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.model.search.ItemSearch;
 import be.valuya.comptoir.service.StockService;
-import be.valuya.comptoir.util.pagination.ItemColumn;
+import be.valuya.comptoir.util.pagination.ItemVariantColumn;
 import be.valuya.comptoir.util.pagination.Pagination;
 import be.valuya.comptoir.ws.config.HeadersConfig;
-import be.valuya.comptoir.ws.convert.commercial.FromWsItemConverter;
-import be.valuya.comptoir.ws.convert.commercial.ToWsItemConverter;
+import be.valuya.comptoir.ws.convert.commercial.FromWsItemVariantConverter;
+import be.valuya.comptoir.ws.convert.commercial.ToWsItemVariantConverter;
 import be.valuya.comptoir.ws.convert.search.FromWsItemSearchConverter;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
 import be.valuya.comptoir.ws.rest.validation.NoId;
@@ -43,11 +43,11 @@ public class ItemResource {
     @EJB
     private StockService stockService;
     @Inject
-    private FromWsItemConverter fromWsItemConverter;
+    private FromWsItemVariantConverter fromWsItemConverter;
     @Inject
     private FromWsItemSearchConverter fromWsItemSearchConverter;
     @Inject
-    private ToWsItemConverter toWsItemConverter;
+    private ToWsItemVariantConverter toWsItemConverter;
     @Inject
     private IdChecker idChecker;
     @Context
@@ -60,8 +60,8 @@ public class ItemResource {
     @POST
     @Valid
     public WsItemVariantRef createItem(@NoId @Valid WsItemVariant wsItem) {
-        ItemVariant item = fromWsItemConverter.convert(wsItem);
-        ItemVariant savedItem = stockService.saveItem(item);
+        ItemVariant itemVariant = fromWsItemConverter.convert(wsItem);
+        ItemVariant savedItem = stockService.saveItem(itemVariant);
 
         WsItemVariantRef itemVariantRef = toWsItemConverter.reference(savedItem);
 
@@ -73,8 +73,8 @@ public class ItemResource {
     @Valid
     public WsItemVariantRef updateItem(@PathParam("id") long id, @Valid WsItemVariant wsItem) {
         idChecker.checkId(id, wsItem);
-        ItemVariant item = fromWsItemConverter.convert(wsItem);
-        ItemVariant savedItem = stockService.saveItem(item);
+        ItemVariant itemVariant = fromWsItemConverter.convert(wsItem);
+        ItemVariant savedItem = stockService.saveItem(itemVariant);
 
         WsItemVariantRef itemVariantRef = toWsItemConverter.reference(savedItem);
 
@@ -85,9 +85,9 @@ public class ItemResource {
     @GET
     @Valid
     public WsItemVariant getItem(@PathParam("id") long id) {
-        ItemVariant item = stockService.findItemById(id);
+        ItemVariant itemVariant = stockService.findItemVariantById(id);
 
-        WsItemVariant wsItem = toWsItemConverter.convert(item);
+        WsItemVariant wsItem = toWsItemConverter.convert(itemVariant);
 
         return wsItem;
     }
@@ -96,7 +96,7 @@ public class ItemResource {
     @Path("search")
     @Valid
     public List<WsItemVariant> findItems(@Valid WsItemSearch wsItemSearch) {
-        Pagination<ItemVariant, ItemColumn> pagination = restPaginationUtil.extractPagination(uriInfo, ItemColumn::valueOf);
+        Pagination<ItemVariant, ItemVariantColumn> pagination = restPaginationUtil.extractPagination(uriInfo, ItemVariantColumn::valueOf);
 
         ItemSearch itemSearch = fromWsItemSearchConverter.convert(wsItemSearch);
 

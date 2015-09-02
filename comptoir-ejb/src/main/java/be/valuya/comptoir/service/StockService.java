@@ -1,10 +1,12 @@
 package be.valuya.comptoir.service;
 
+import be.valuya.comptoir.model.commercial.Item;
 import be.valuya.comptoir.model.commercial.ItemPicture;
 import be.valuya.comptoir.model.commercial.ItemPicture_;
 import be.valuya.comptoir.model.commercial.ItemSale;
 import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.model.commercial.ItemVariant_;
+import be.valuya.comptoir.model.commercial.Item_;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.lang.LocaleText;
 import be.valuya.comptoir.model.lang.LocaleText_;
@@ -15,7 +17,7 @@ import be.valuya.comptoir.model.stock.ItemStock_;
 import be.valuya.comptoir.model.stock.Stock;
 import be.valuya.comptoir.model.stock.StockChangeType;
 import be.valuya.comptoir.model.stock.Stock_;
-import be.valuya.comptoir.util.pagination.ItemColumn;
+import be.valuya.comptoir.util.pagination.ItemVariantColumn;
 import be.valuya.comptoir.util.pagination.Pagination;
 import be.valuya.comptoir.util.pagination.Sort;
 import java.math.BigDecimal;
@@ -33,6 +35,7 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.From;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.MapJoin;
@@ -52,29 +55,32 @@ public class StockService {
     private EntityManager entityManager;
 
     @Nonnull
-    public List<ItemVariant> findItems(@Nonnull ItemSearch itemSearch, @CheckForNull Pagination<ItemVariant, ItemColumn> pagination) {
+    public List<ItemVariant> findItems(@Nonnull ItemSearch itemSearch, @CheckForNull Pagination<ItemVariant, ItemVariantColumn> pagination) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<ItemVariant> query = criteriaBuilder.createQuery(ItemVariant.class);
-        Root<ItemVariant> itemRoot = query.from(ItemVariant.class);
+        Root<ItemVariant> itemVariantRoot = query.from(ItemVariant.class);
 
         List<Predicate> predicates = new ArrayList<>();
 
         Company company = itemSearch.getCompany();
-        Path<Company> companyPath = itemRoot.get(ItemVariant_.company);
+        Join<ItemVariant, Item> itemJoin = itemVariantRoot.join(ItemVariant_.item, JoinType.LEFT);
+
+        Path<Company> companyPath = itemJoin.get(Item_.company);
         Predicate companyPredicate = criteriaBuilder.equal(companyPath, company);
         predicates.add(companyPredicate);
 
-        Path<String> referencePath = itemRoot.get(ItemVariant_.reference);
+        Path<String> referencePath = itemJoin.get(Item_.reference);
 
         String multiSearch = itemSearch.getMultiSearch();
         if (multiSearch != null && !multiSearch.isEmpty()) {
             String lowerMultiSearch = multiSearch.toLowerCase(Locale.FRENCH); //TODO: actual locale
 
-            Predicate referenceContainsPredicate = createReferenceContainsPredicate(itemRoot, lowerMultiSearch);
-            Predicate namePredicate = createNameContainsPredicate(itemRoot, lowerMultiSearch);
-            Predicate descriptionPredicate = createDescriptionContainsPredicate(itemRoot, lowerMultiSearch);
+            Predicate referenceContainsPredicate = createReferenceContainsPredicate(itemJoin, lowerMultiSearch);
+            Predicate variantReferenceContainsPredicate = createVariantReferenceContainsPredicate(itemVariantRoot, lowerMultiSearch);
+            Predicate namePredicate = createNameContainsPredicate(itemJoin, lowerMultiSearch);
+            Predicate descriptionPredicate = createDescriptionContainsPredicate(itemJoin, lowerMultiSearch);
 
-            Predicate multiSearchPredicate = criteriaBuilder.or(referenceContainsPredicate, namePredicate, descriptionPredicate);
+            Predicate multiSearchPredicate = criteriaBuilder.or(referenceContainsPredicate, variantReferenceContainsPredicate, namePredicate, descriptionPredicate);
             predicates.add(multiSearchPredicate);
         }
 
@@ -88,14 +94,21 @@ public class StockService {
         String referenceContains = itemSearch.getReferenceContains();
         if (referenceContains != null && !referenceContains.trim().isEmpty()) {
             referenceContains = referenceContains.trim().toLowerCase(Locale.FRENCH);
-            Predicate referenceContainsPredicate = createReferenceContainsPredicate(itemRoot, referenceContains);
+            Predicate referenceContainsPredicate = createReferenceContainsPredicate(itemJoin, referenceContains);
             predicates.add(referenceContainsPredicate);
         }
 
-        String model = itemSearch.getModel();
+        String variantReferenceContains = itemSearch.getVariantReferenceContains();
+        if (variantReferenceContains != null && !variantReferenceContains.trim().isEmpty()) {
+            variantReferenceContains = variantReferenceContains.trim().toLowerCase(Locale.FRENCH);
+            Predicate variantReferenceContainsPredicate = createVariantReferenceContainsPredicate(itemVariantRoot, variantReferenceContains);
+            predicates.add(variantReferenceContainsPredicate);
+        }
+
+        String model = itemSearch.getVariantReference();
         if (model != null && !model.trim().isEmpty()) {
             model = model.trim();
-            Path<String> modelPath = itemRoot.get(ItemVariant_.model);
+            Path<String> modelPath = itemVariantRoot.get(ItemVariant_.variantReference);
             Predicate modelPredicate = criteriaBuilder.equal(modelPath, model);
             predicates.add(modelPredicate);
         }
@@ -103,20 +116,20 @@ public class StockService {
         String nameContains = itemSearch.getNameContains();
         if (nameContains != null && !nameContains.trim().isEmpty()) {
             nameContains = nameContains.trim().toLowerCase(Locale.FRENCH);
-            Predicate namePredicate = createNameContainsPredicate(itemRoot, nameContains);
+            Predicate namePredicate = createNameContainsPredicate(itemJoin, nameContains);
             predicates.add(namePredicate);
         }
 
         String descriptionContains = itemSearch.getDescriptionContains();
         if (descriptionContains != null && !descriptionContains.trim().isEmpty()) {
             descriptionContains = descriptionContains.trim().toLowerCase(Locale.FRENCH);
-            Predicate descriptionPredicate = createDescriptionContainsPredicate(itemRoot, descriptionContains);
+            Predicate descriptionPredicate = createDescriptionContainsPredicate(itemJoin, descriptionContains);
             predicates.add(descriptionPredicate);
         }
 
         if (pagination != null) {
-            List<Sort<ItemColumn>> sortings = pagination.getSortings();
-            List<Order> orders = ItemColumnPersistenceUtil.createOrdersFromSortings(criteriaBuilder, itemRoot, sortings);
+            List<Sort<ItemVariantColumn>> sortings = pagination.getSortings();
+            List<Order> orders = ItemVariantColumnPersistenceUtil.createOrdersFromSortings(criteriaBuilder, itemVariantRoot, sortings);
             query.orderBy(orders);
         }
 
@@ -138,8 +151,14 @@ public class StockService {
         return items;
     }
 
-    private Predicate createReferenceContainsPredicate(Root<ItemVariant> itemRoot, String referenceContains) {
-        Path<String> referencePath = itemRoot.get(ItemVariant_.reference);
+    private Predicate createVariantReferenceContainsPredicate(Path<ItemVariant> itemVariantPath, String referenceContains) {
+        Path<String> referencePath = itemVariantPath.get(ItemVariant_.variantReference);
+
+        return createContainsPredicate(referencePath, referenceContains);
+    }
+
+    private Predicate createReferenceContainsPredicate(Path<Item> itemPath, String referenceContains) {
+        Path<String> referencePath = itemPath.get(Item_.reference);
 
         return createContainsPredicate(referencePath, referenceContains);
     }
@@ -152,16 +171,16 @@ public class StockService {
         return referenceContainsPredicate;
     }
 
-    private Predicate createDescriptionContainsPredicate(Root<ItemVariant> itemRoot, String descriptionContains) {
-        Join<ItemVariant, LocaleText> descriptionJoin = itemRoot.join(ItemVariant_.description);
+    private Predicate createDescriptionContainsPredicate(From<?, Item> itemPath, String descriptionContains) {
+        Join<Item, LocaleText> descriptionJoin = itemPath.join(Item_.description);
         MapJoin<LocaleText, Locale, String> localeTextMapJoin = descriptionJoin.join(LocaleText_.localeTextMap);
         Path<String> textPath = localeTextMapJoin.value();
         Predicate descriptionPredicate = createContainsPredicate(textPath, descriptionContains);
         return descriptionPredicate;
     }
 
-    private Predicate createNameContainsPredicate(Root<ItemVariant> itemRoot, String nameContains) {
-        Join<ItemVariant, LocaleText> nameJoin = itemRoot.join(ItemVariant_.name);
+    private Predicate createNameContainsPredicate(From<?, Item> itemPath, String nameContains) {
+        Join<Item, LocaleText> nameJoin = itemPath.join(Item_.name);
         MapJoin<LocaleText, Locale, String> localeTextMapJoin = nameJoin.join(LocaleText_.localeTextMap);
         Path<String> textPath = localeTextMapJoin.value();
         Predicate namePredicate = createContainsPredicate(textPath, nameContains);
@@ -224,8 +243,9 @@ public class StockService {
         List<Predicate> predicates = new ArrayList<>();
 
         Company company = itemStockSearch.getCompany();
-        Join<ItemStock, ItemVariant> itemJoin = itemStockRoot.join(ItemStock_.itemVariant, JoinType.LEFT);
-        Path<Company> companyPath = itemJoin.get(ItemVariant_.company);
+        Join<ItemStock, ItemVariant> itemVariantJoin = itemStockRoot.join(ItemStock_.itemVariant, JoinType.LEFT);
+        Join<ItemVariant, Item> itemJoin = itemVariantJoin.join(ItemVariant_.item, JoinType.LEFT);
+        Path<Company> companyPath = itemJoin.get(Item_.company);
         Predicate companyPredicate = criteriaBuilder.equal(companyPath, company);
         predicates.add(companyPredicate);
 
@@ -236,9 +256,9 @@ public class StockService {
             predicates.add(stockPredicate);
         }
 
-        ItemVariant item = itemStockSearch.getItemVariant();
-        if (item != null) {
-            Predicate itemPredicate = criteriaBuilder.equal(itemJoin, item);
+        ItemVariant itemVariant = itemStockSearch.getItemVariant();
+        if (itemVariant != null) {
+            Predicate itemPredicate = criteriaBuilder.equal(itemJoin, itemVariant);
             predicates.add(itemPredicate);
         }
 
@@ -264,11 +284,12 @@ public class StockService {
     }
 
     @Nonnull
-    public List<ItemStock> findItemStocks(@Nonnull ItemVariant item, @Nonnull ZonedDateTime atDateTime) {
+    public List<ItemStock> findItemStocks(@Nonnull ItemVariant itemVariant, @Nonnull ZonedDateTime atDateTime) {
+        Item item = itemVariant.getItem();
         Company company = item.getCompany();
         ItemStockSearch itemStockSearch = new ItemStockSearch();
         itemStockSearch.setCompany(company);
-        itemStockSearch.setItemVariant(item);
+        itemStockSearch.setItemVariant(itemVariant);
         itemStockSearch.setAtDateTime(atDateTime);
 
         return findItemStocks(itemStockSearch);
@@ -283,18 +304,19 @@ public class StockService {
     /**
      * Find ItemStock at given time for item, in given Stock.
      *
-     * @param item
+     * @param itemVariant
      * @param stock
      * @param atDateTime
      * @return
      */
     @CheckForNull
-    public ItemStock findItemStock(@Nonnull ItemVariant item, @Nonnull Stock stock, @Nonnull ZonedDateTime atDateTime) {
+    public ItemStock findItemStock(@Nonnull ItemVariant itemVariant, @Nonnull Stock stock, @Nonnull ZonedDateTime atDateTime) {
+        Item item = itemVariant.getItem();
         Company company = item.getCompany();
         ItemStockSearch itemStockSearch = new ItemStockSearch();
         itemStockSearch.setCompany(company);
         itemStockSearch.setStock(stock);
-        itemStockSearch.setItemVariant(item);
+        itemStockSearch.setItemVariant(itemVariant);
         itemStockSearch.setAtDateTime(atDateTime);
 
         List<ItemStock> itemStocks = findItemStocks(itemStockSearch);
@@ -302,7 +324,7 @@ public class StockService {
             return null;
         }
         if (itemStocks.size() > 1) {
-            String errorMessage = MessageFormat.format("Multiple stock entries for item {0} in stock {1} at {2}", item, stock, atDateTime);
+            String errorMessage = MessageFormat.format("Multiple stock entries for item {0} in stock {1} at {2}", itemVariant, stock, atDateTime);
             throw new AssertionError(errorMessage);
         }
         return itemStocks.get(0);
@@ -332,8 +354,12 @@ public class StockService {
         return managedItem;
     }
 
-    public ItemVariant findItemById(Long id) {
+    public ItemVariant findItemVariantById(Long id) {
         return entityManager.find(ItemVariant.class, id);
+    }
+
+    public Item findItemById(Long id) {
+        return entityManager.find(Item.class, id);
     }
 
     public ItemPicture findItemPictureById(Long id) {
@@ -353,10 +379,10 @@ public class StockService {
     }
 
     public ItemPicture saveItemPicture(ItemPicture itemPicture) {
-        ItemVariant item = itemPicture.getItemVariant();
+        ItemVariant itemVariant = itemPicture.getItemVariant();
         ItemPicture managedPicture = entityManager.merge(itemPicture);
-        item.setMainPicture(itemPicture);
-        ItemVariant managedItem = entityManager.merge(item);
+        itemVariant.setMainPicture(itemPicture);
+        ItemVariant managedItem = entityManager.merge(itemVariant);
         return managedPicture;
     }
 

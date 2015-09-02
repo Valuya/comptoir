@@ -1,13 +1,12 @@
 package be.valuya.comptoir.ws.convert.commercial;
 
+import be.valuya.comptoir.api.domain.commercial.WsItem;
 import be.valuya.comptoir.api.domain.commercial.WsItemPictureRef;
-import be.valuya.comptoir.api.domain.commercial.WsItemVariant;
-import be.valuya.comptoir.api.domain.commercial.WsItemVariantRef;
+import be.valuya.comptoir.api.domain.commercial.WsItemRef;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.api.domain.lang.WsLocaleText;
-import be.valuya.comptoir.model.commercial.ItemPicture;
-import be.valuya.comptoir.model.commercial.ItemVariant;
-import be.valuya.comptoir.model.commercial.Price;
+import be.valuya.comptoir.model.commercial.Item;
+import be.valuya.comptoir.model.commercial.ItemPicture;import be.valuya.comptoir.model.commercial.Price;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.lang.LocaleText;
 import be.valuya.comptoir.service.StockService;
@@ -33,15 +32,16 @@ public class FromWsItemConverter {
     @Inject
     private FromWsCompanyConverter fromWsCompanyConverter;
     @Inject
+    private FromWsItemConverter fromWsItemConverter;
+    @Inject
     private FromWsItemPictureConverter fromWsItemPictureConverter;
 
-    public ItemVariant convert(WsItemVariant wsItem) {
+    public Item convert(WsItem wsItem) {
         if (wsItem == null) {
             return null;
         }
         Long id = wsItem.getId();
 
-        String model = wsItem.getModel();
         String reference = wsItem.getReference();
         BigDecimal vatExclusive = wsItem.getVatExclusive();
         BigDecimal vatRate = wsItem.getVatRate();
@@ -58,30 +58,29 @@ public class FromWsItemConverter {
         WsItemPictureRef mainPictureRef = wsItem.getMainPictureRef();
 
         ItemPicture mainPicture = fromWsItemPictureConverter.find(mainPictureRef);
-
+        
         Price price = new Price();
         price.setVatExclusive(vatExclusive);
         price.setVatRate(vatRate);
 
-        ItemVariant item = new ItemVariant();
+        Item item = new Item();
         item.setId(id);
         item.setCompany(company);
         item.setDescription(wsDescription);
         item.setMainPicture(mainPicture);
         item.setName(wsName);
-        item.setModel(model);
         item.setReference(reference);
         item.setCurrentPrice(price);
 
         return item;
     }
 
-    public ItemVariant find(WsItemVariantRef itemVariantRef) {
-        if (itemVariantRef == null) {
+    public Item find(WsItemRef itemRef) {
+        if (itemRef == null) {
             return null;
         }
-        Long itemId = itemVariantRef.getId();
-        ItemVariant item = stockService.findItemById(itemId);
+        Long itemId = itemRef.getId();
+        Item item = stockService.findItemById(itemId);
         return item;
     }
 

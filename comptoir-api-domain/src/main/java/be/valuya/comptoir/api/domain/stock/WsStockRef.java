@@ -30,10 +30,12 @@ public class WsStockRef implements WithId {
         this.link = link;
     }
 
+    @Override
     public Long getId() {
         return id;
     }
 
+    @Override
     public void setId(Long id) {
         this.id = id;
     }

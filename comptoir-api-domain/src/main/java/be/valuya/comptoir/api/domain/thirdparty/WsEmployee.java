@@ -35,10 +35,12 @@ public class WsEmployee implements Serializable, WithId {
     private String lastName;
     private Locale locale;
 
+    @Override
     public Long getId() {
         return id;
     }
 
+    @Override
     public void setId(Long id) {
         this.id = id;
     }

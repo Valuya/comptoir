@@ -12,20 +12,20 @@ import org.glassfish.jersey.linking.InjectLink;
  *
  * @author Yannick Majoros <yannick@valuya.be>
  */
-@XmlRootElement(name = "InvoiceRef")
+@XmlRootElement(name = "ItemRef")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class WsInvoiceRef implements WithId {
+public class WsItemRef implements WithId {
 
-    @InjectLink(value = "invoice/${instance.id}")
+    @InjectLink(value = "item/${instance.id}")
     @XmlElement
     private URI link;
     @XmlElement
     private Long id;
 
-    public WsInvoiceRef() {
+    public WsItemRef() {
     }
 
-    public WsInvoiceRef(Long id) {
+    public WsItemRef(Long id) {
         this.id = id;
     }
 

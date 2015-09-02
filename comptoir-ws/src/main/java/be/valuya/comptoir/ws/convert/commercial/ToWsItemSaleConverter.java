@@ -30,7 +30,7 @@ public class ToWsItemSaleConverter {
     @Inject
     private ToWsSaleConverter toWsSaleConverter;
     @Inject
-    private ToWsItemConverter toWsItemConverter;
+    private ToWsItemVariantConverter toWsItemConverter;
     @Inject
     private ToWsCompanyConverter toWsCompanyConverter;
 
@@ -53,8 +53,8 @@ public class ToWsItemSaleConverter {
         Sale sale = itemSale.getSale();
         WsSaleRef saleRef = toWsSaleConverter.reference(sale);
 
-        ItemVariant item = itemSale.getItemVariant();
-        WsItemVariantRef itemVariantRef = toWsItemConverter.reference(item);
+        ItemVariant itemVariant = itemSale.getItemVariant();
+        WsItemVariantRef itemVariantRef = toWsItemConverter.reference(itemVariant);
 
         LocaleText comment = itemSale.getComment();
         List<WsLocaleText> wsComment = fromWsLocaleTextConverter.convert(comment);

@@ -1,12 +1,12 @@
 package be.valuya.comptoir.ws.convert.commercial;
 
+import be.valuya.comptoir.api.domain.commercial.WsItem;
 import be.valuya.comptoir.api.domain.commercial.WsItemPictureRef;
-import be.valuya.comptoir.api.domain.commercial.WsItemVariant;
-import be.valuya.comptoir.api.domain.commercial.WsItemVariantRef;
+import be.valuya.comptoir.api.domain.commercial.WsItemRef;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.api.domain.lang.WsLocaleText;
+import be.valuya.comptoir.model.commercial.Item;
 import be.valuya.comptoir.model.commercial.ItemPicture;
-import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.model.commercial.Price;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.lang.LocaleText;
@@ -31,7 +31,7 @@ public class ToWsItemConverter {
     @Inject
     private ToWsItemPictureConverter toWsItemPictureConverter;
 
-    public WsItemVariant convert(ItemVariant item) {
+    public WsItem convert(Item item) {
         if (item == null) {
             return null;
         }
@@ -39,7 +39,6 @@ public class ToWsItemConverter {
         Company company = item.getCompany();
         LocaleText description = item.getDescription();
         Price currentPrice = item.getCurrentPrice();
-        String model = item.getModel();
         LocaleText name = item.getName();
         String reference = item.getReference();
 
@@ -53,12 +52,11 @@ public class ToWsItemConverter {
         BigDecimal vatExclusive = currentPrice.getVatExclusive();
         BigDecimal vatRate = currentPrice.getVatRate();
 
-        WsItemVariant wsItem = new WsItemVariant();
+        WsItem wsItem = new WsItem();
         wsItem.setId(id);
         wsItem.setCompanyRef(companyRef);
         wsItem.setDescription(wsDescription);
         wsItem.setMainPictureRef(mainPictureRef);
-        wsItem.setModel(model);
         wsItem.setName(wsName);
         wsItem.setReference(reference);
         wsItem.setVatExclusive(vatExclusive);
@@ -67,13 +65,13 @@ public class ToWsItemConverter {
         return wsItem;
     }
 
-    public WsItemVariantRef reference(ItemVariant item) {
+    public WsItemRef reference(Item item) {
         if (item == null) {
             return null;
         }
         Long id = item.getId();
-        WsItemVariantRef itemVariantRef = new WsItemVariantRef(id);
-        return itemVariantRef;
+        WsItemRef itemRef = new WsItemRef(id);
+        return itemRef;
     }
 
 }

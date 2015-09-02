@@ -2,11 +2,13 @@ package be.valuya.comptoir.service;
 
 import be.valuya.comptoir.model.accounting.Account;
 import be.valuya.comptoir.model.accounting.AccountType;
+import be.valuya.comptoir.model.commercial.Item;
 import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.model.commercial.Pos;
 import be.valuya.comptoir.model.commercial.PosPaymentAccount;
 import be.valuya.comptoir.model.commercial.Price;
 import be.valuya.comptoir.model.company.Company;
+import be.valuya.comptoir.model.factory.ItemFactory;
 import be.valuya.comptoir.model.factory.LocaleTextFactory;
 import be.valuya.comptoir.model.lang.LocaleText;
 import be.valuya.comptoir.model.stock.Stock;
@@ -36,6 +38,8 @@ public class RegistrationService {
     private LocaleTextFactory localeTextFactory;
     @EJB
     private EmployeeService employeeService;
+    @EJB
+    private ItemFactory itemFactory;
 
     public Company register(Company company, Employee employee, String password) {
         Company managedCompany = entityManager.merge(company);
@@ -92,25 +96,25 @@ public class RegistrationService {
         unknownItemPrice.setVatExclusive(BigDecimal.valueOf(100, 2));
         unknownItemPrice.setVatRate(BigDecimal.valueOf(21, 2));
 
-        ItemVariant unkownItem = new ItemVariant();
-        unkownItem.setCompany(managedCompany);
+        ItemVariant unkownItemVariant = itemFactory.createItemVariant(company);
 
         LocaleText unkownItemDescription = localeTextFactory.createLocaleText();
         unkownItemDescription.put(Locale.ENGLISH, "Unknown item");
         unkownItemDescription.put(Locale.FRENCH, "Objet inconnu");
 
-        unkownItem.setDescription(unkownItemDescription);
-        unkownItem.setCurrentPrice(unknownItemPrice);
+        Item unknownItem = unkownItemVariant.getItem();
+        unknownItem.setDescription(unkownItemDescription);
+        unknownItem.setCurrentPrice(unknownItemPrice);
 
         LocaleText unkownItemName = localeTextFactory.createLocaleText();
         unkownItemName.put(Locale.ENGLISH, "unknown");
         unkownItemName.put(Locale.FRENCH, "inconnu");
 
-        unkownItem.setName(unkownItemName);
+        unknownItem.setName(unkownItemName);
 
-        unkownItem.setReference("?");
+        unknownItem.setReference("?");
 
-        ItemVariant managedUnkownItem = entityManager.merge(unkownItem);
+        ItemVariant managedUnkownItem = entityManager.merge(unkownItemVariant);
 
         return managedCompany;
     }

@@ -1,8 +1,7 @@
 package be.valuya.comptoir.service;
 
-import be.valuya.comptoir.model.commercial.Item;
-import be.valuya.comptoir.model.commercial.Item_;
-import be.valuya.comptoir.util.pagination.ItemColumn;
+import be.valuya.comptoir.model.commercial.ItemVariant;
+import be.valuya.comptoir.util.pagination.ItemVariantColumn;
 import be.valuya.comptoir.util.pagination.Sort;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,9 +15,9 @@ import javax.persistence.criteria.Root;
  *
  * @author Yannick Majoros <yannick@valuya.be>
  */
-public class ItemColumnPersistenceUtil {
+public class ItemVariantColumnPersistenceUtil {
 
-    public static List<Order> createOrdersFromSortings(CriteriaBuilder criteriaBuilder, Root<Item> itemRoot, List<Sort<ItemColumn>> sortings) {
+    public static List<Order> createOrdersFromSortings(CriteriaBuilder criteriaBuilder, Root<ItemVariant> itemRoot, List<Sort<ItemVariantColumn>> sortings) {
         if (sortings == null) {
             return new ArrayList<>();
         }
@@ -28,8 +27,8 @@ public class ItemColumnPersistenceUtil {
         return orders;
     }
 
-    public static Order createOrderFromSorting(CriteriaBuilder criteriaBuilder, Root<Item> itemRoot, Sort<ItemColumn> sorting) {
-        ItemColumn itemColumn = sorting.getSortColumn();
+    public static Order createOrderFromSorting(CriteriaBuilder criteriaBuilder, Root<ItemVariant> itemRoot, Sort<ItemVariantColumn> sorting) {
+        ItemVariantColumn itemColumn = sorting.getSortColumn();
         Path<?> path = getPath(itemRoot, itemColumn);
 
         Order order;
@@ -41,12 +40,8 @@ public class ItemColumnPersistenceUtil {
         return order;
     }
 
-    public static Path<?> getPath(Root<Item> itemRoot, ItemColumn itemColumn) {
+    public static Path<?> getPath(Root<ItemVariant> itemRoot, ItemVariantColumn itemColumn) {
         switch (itemColumn) {
-            case NAME:
-                return itemRoot.get(Item_.name);
-            case DESCRIPTION:
-                return itemRoot.get(Item_.description);
             default:
                 throw new AssertionError(itemColumn.name());
         }

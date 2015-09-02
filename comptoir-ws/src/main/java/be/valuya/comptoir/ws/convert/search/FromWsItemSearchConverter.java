@@ -34,7 +34,7 @@ public class FromWsItemSearchConverter {
 
         ItemSearch itemSearch = new ItemSearch();
         itemSearch.setCompany(company);
-        itemSearch.setModel(model);
+        itemSearch.setVariantReference(model);
         itemSearch.setMultiSearch(multiSearch);
         itemSearch.setNameContains(nameContains);
         itemSearch.setReference(reference);

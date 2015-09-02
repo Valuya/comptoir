@@ -1,7 +1,7 @@
 package be.valuya.comptoir.api.domain.commercial;
 
-import be.valuya.comptoir.model.common.WithId;
 import be.valuya.comptoir.api.domain.lang.WsLocaleText;
+import be.valuya.comptoir.model.common.WithId;
 import java.io.Serializable;
 import java.util.Objects;
 import javax.annotation.Nonnull;
@@ -29,6 +29,7 @@ public class WsAttributeValue implements Serializable, WithId {
         return id;
     }
 
+    @Override
     public void setId(Long id) {
         this.id = id;
     }

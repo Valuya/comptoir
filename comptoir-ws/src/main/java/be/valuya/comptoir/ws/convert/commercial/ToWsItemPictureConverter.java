@@ -2,13 +2,8 @@ package be.valuya.comptoir.ws.convert.commercial;
 
 import be.valuya.comptoir.api.domain.commercial.WsItemPicture;
 import be.valuya.comptoir.api.domain.commercial.WsItemPictureRef;
-import be.valuya.comptoir.api.domain.commercial.WsItemVariantRef;
 import be.valuya.comptoir.model.commercial.ItemPicture;
-import be.valuya.comptoir.model.commercial.ItemVariant;
-import be.valuya.comptoir.ws.convert.company.ToWsCompanyConverter;
-import be.valuya.comptoir.ws.convert.text.ToWsLocaleTextConverter;
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 
 /**
  *
@@ -17,26 +12,15 @@ import javax.inject.Inject;
 @ApplicationScoped
 public class ToWsItemPictureConverter {
 
-    @Inject
-    private ToWsLocaleTextConverter fromWsLocaleTextConverter;
-    @Inject
-    private ToWsCompanyConverter toWsCompanyConverter;
-    @Inject
-    private ToWsItemConverter toWsItemConverter;
-
     public WsItemPicture convert(ItemPicture itemPicture) {
         Long id = itemPicture.getId();
         String contentType = itemPicture.getContentType();
         byte[] data = itemPicture.getData();
 
-        ItemVariant item = itemPicture.getItemVariant();
-        WsItemVariantRef itemVariantRef = toWsItemConverter.reference(item);
-
         WsItemPicture wsItemPicture = new WsItemPicture();
         wsItemPicture.setId(id);
         wsItemPicture.setContentType(contentType);
         wsItemPicture.setData(data);
-        wsItemPicture.setItemVariantRef(itemVariantRef);
 
         return wsItemPicture;
     }

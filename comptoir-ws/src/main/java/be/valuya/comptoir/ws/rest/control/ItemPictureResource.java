@@ -2,8 +2,8 @@ package be.valuya.comptoir.ws.rest.control;
 
 import be.valuya.comptoir.api.domain.commercial.WsItemPicture;
 import be.valuya.comptoir.api.domain.commercial.WsItemPictureRef;
-import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.model.commercial.ItemPicture;
+import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.service.StockService;
 import be.valuya.comptoir.ws.convert.commercial.FromWsItemPictureConverter;
 import be.valuya.comptoir.ws.convert.commercial.ToWsItemPictureConverter;
@@ -66,8 +66,8 @@ public class ItemPictureResource {
     @GET
     @Valid
     public List<WsItemPicture> findItemPictures() {
-        ItemVariant item = stockService.findItemById(itemId);
-        List<ItemPicture> itemPictures = stockService.findItemPictures(item);
+        ItemVariant itemVariant = stockService.findItemVariantById(itemId);
+        List<ItemPicture> itemPictures = stockService.findItemPictures(itemVariant);
 
         List<WsItemPicture> wsItemPictures = itemPictures.stream()
                 .map(toWsItemPictureConverter::convert)

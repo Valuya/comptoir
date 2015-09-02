@@ -1,12 +1,10 @@
 package be.valuya.comptoir.model.commercial;
 
 import be.valuya.comptoir.model.common.WithId;
-import be.valuya.comptoir.model.company.Company;
-import be.valuya.comptoir.model.lang.LocaleText;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
-import javax.annotation.Nonnull;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -18,7 +16,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -27,45 +25,28 @@ import javax.validation.constraints.Size;
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @Entity
+@Table(name = "item_variant")
 public class ItemVariant implements Serializable, WithId {
 
     @Id
     @GeneratedValue
     private Long id;
     @NotNull
-    @Nonnull
-    @ManyToOne(optional = false)
-    private Company company;
+    @ManyToOne(optional = false, cascade = CascadeType.ALL)
+    private Item item;
     @NotNull
-    @Nonnull
     @Column(length = 128)
     @Size(max = 128)
-    private String reference;
-    @Column(length = 128)
-    @Size(max = 128)
-    private String model;
-    @NotNull
-    @Nonnull
-    @ManyToOne(cascade = CascadeType.ALL, optional = false)
-    private LocaleText name;
-    @NotNull
-    @Nonnull
-    @ManyToOne(cascade = CascadeType.ALL, optional = false)
-    private LocaleText description;
+    private String variantReference;
     @Enumerated(EnumType.STRING)
     private Pricing pricing;
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "current_price_id")
-    private Price currentPrice;
+    private BigDecimal pricingAmount;
     @ManyToOne
     @JoinColumn(name = "main_picture_id")
     private ItemPicture mainPicture;
     @OneToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "itemvariant_attribute_value")
+    @JoinTable(name = "item_attribute_value")
     private List<AttributeValue> attributeValues;
-    @OneToOne
-    @JoinColumn(name = "parent_itemvariant_id")
-    private ItemVariant parentItem;
 
     @Override
     public Long getId() {
@@ -77,52 +58,12 @@ public class ItemVariant implements Serializable, WithId {
         this.id = id;
     }
 
-    public Company getCompany() {
-        return company;
+    public String getVariantReference() {
+        return variantReference;
     }
 
-    public void setCompany(Company company) {
-        this.company = company;
-    }
-
-    public String getReference() {
-        return reference;
-    }
-
-    public void setReference(String reference) {
-        this.reference = reference;
-    }
-
-    public String getModel() {
-        return model;
-    }
-
-    public void setModel(String model) {
-        this.model = model;
-    }
-
-    public LocaleText getName() {
-        return name;
-    }
-
-    public void setName(LocaleText name) {
-        this.name = name;
-    }
-
-    public LocaleText getDescription() {
-        return description;
-    }
-
-    public void setDescription(LocaleText description) {
-        this.description = description;
-    }
-
-    public Price getCurrentPrice() {
-        return currentPrice;
-    }
-
-    public void setCurrentPrice(Price currentPrice) {
-        this.currentPrice = currentPrice;
+    public void setVariantReference(String variantReference) {
+        this.variantReference = variantReference;
     }
 
     public ItemPicture getMainPicture() {
@@ -141,20 +82,28 @@ public class ItemVariant implements Serializable, WithId {
         this.attributeValues = attributeValues;
     }
 
-    public ItemVariant getParentItem() {
-        return parentItem;
-    }
-
-    public void setParentItem(ItemVariant parentItem) {
-        this.parentItem = parentItem;
-    }
-
     public Pricing getPricing() {
         return pricing;
     }
 
     public void setPricing(Pricing pricing) {
         this.pricing = pricing;
+    }
+
+    public Item getItem() {
+        return item;
+    }
+
+    public void setItem(Item item) {
+        this.item = item;
+    }
+
+    public BigDecimal getPricingAmount() {
+        return pricingAmount;
+    }
+
+    public void setPricingAmount(BigDecimal pricingAmount) {
+        this.pricingAmount = pricingAmount;
     }
 
     @Override

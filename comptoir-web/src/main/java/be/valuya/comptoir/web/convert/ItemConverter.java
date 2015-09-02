@@ -26,7 +26,7 @@ public class ItemConverter implements Converter {
             return null;
         }
         Long id = Long.valueOf(valueStr);
-        return stockService.findItemById(id);
+        return stockService.findItemVariantById(id);
     }
 
     @Override
@@ -34,8 +34,8 @@ public class ItemConverter implements Converter {
         if (value == null) {
             return null;
         }
-        ItemVariant item = (ItemVariant) value;
-        Long id = item.getId();
+        ItemVariant itemVariant = (ItemVariant) value;
+        Long id = itemVariant.getId();
         String idStr = Long.toString(id);
         return idStr;
     }

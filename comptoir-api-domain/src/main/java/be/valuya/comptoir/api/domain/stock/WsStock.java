@@ -21,10 +21,12 @@ public class WsStock implements Serializable, WithId {
     private Company company;
     private LocaleText description;
 
+    @Override
     public Long getId() {
         return id;
     }
 
+    @Override
     public void setId(Long id) {
         this.id = id;
     }

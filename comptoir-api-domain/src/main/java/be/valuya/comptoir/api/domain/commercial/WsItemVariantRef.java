@@ -16,7 +16,7 @@ import org.glassfish.jersey.linking.InjectLink;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class WsItemVariantRef implements WithId {
 
-    @InjectLink(value = "item/${instance.id}")
+    @InjectLink(value = "itemVariant/${instance.id}")
     @XmlElement
     private URI link;
     @XmlElement
@@ -37,10 +37,12 @@ public class WsItemVariantRef implements WithId {
         this.link = link;
     }
 
+    @Override
     public Long getId() {
         return id;
     }
 
+    @Override
     public void setId(Long id) {
         this.id = id;
     }

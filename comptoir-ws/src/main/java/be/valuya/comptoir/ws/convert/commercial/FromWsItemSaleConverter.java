@@ -31,7 +31,7 @@ public class FromWsItemSaleConverter {
     @Inject
     private FromWsSaleConverter fromWsSaleConverter;
     @Inject
-    private FromWsItemConverter fromWsItemConverter;
+    private FromWsItemVariantConverter fromWsItemConverter;
     @EJB
     private SaleService saleService;
 

@@ -44,6 +44,10 @@ public class ImportService {
                 .getBackendEntityStream()
                 .map(externalEntity -> this.load(company, backendName, externalEntity))
                 .count();
+        long itemCount = prestashopImportUtil.getItemStore()
+                .getBackendEntityStream()
+                .map(externalEntity -> this.load(company, backendName, externalEntity))
+                .count();
 
     }
 

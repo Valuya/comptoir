@@ -2,6 +2,7 @@ package be.valuya.comptoir.service;
 
 import be.valuya.comptoir.model.commercial.AttributeDefinition;
 import be.valuya.comptoir.model.commercial.AttributeValue;
+import be.valuya.comptoir.model.commercial.Item;
 import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.model.company.Company;
 import java.math.BigDecimal;
@@ -44,22 +45,19 @@ public class PrestashopImportUtilTest {
         });
 
         prestashopImportUtil.getItemStore().getBackendEntityStream().forEach(externalEntity -> {
-            ItemVariant itemVariant = externalEntity.getValue();
-            String reference = itemVariant.getReference();
-            BigDecimal vatExclusive = itemVariant.getCurrentPrice().getVatExclusive();
-            String name = itemVariant.getName().get(locale);
-            String description = itemVariant.getDescription().get(locale);
+            Item item = externalEntity.getValue();
+            String reference = item.getReference();
+            BigDecimal vatExclusive = item.getCurrentPrice().getVatExclusive();
+            String name = item.getName().get(locale);
+            String description = item.getDescription().get(locale);
             String itemStr = MessageFormat.format("{0,number,0}: {1}, {2,number,0.00} € - {3}", 0, reference, vatExclusive, name, description);
             System.out.println(itemStr);
         });
 
         prestashopImportUtil.getItemVariantStore().getBackendEntityStream().forEach(externalEntity -> {
             ItemVariant itemVariant = externalEntity.getValue();
-            String reference = itemVariant.getReference();
-            BigDecimal vatExclusive = itemVariant.getCurrentPrice().getVatExclusive();
-            String name = itemVariant.getName().get(locale);
-            String description = itemVariant.getDescription().get(locale);
-            String itemStr = MessageFormat.format("{0,number,0}: {1}, {2,number,0.00} € - {3}", 0, reference, vatExclusive, name, description);
+            String variantReference = itemVariant.getVariantReference();
+            String itemStr = MessageFormat.format("{0,number,0}: {1}", 0, variantReference);
             for (AttributeValue attributeValue : itemVariant.getAttributeValues()) {
                 String attributeValueStr = renderAttributeValue(attributeValue, locale);
                 System.out.println("* " + attributeValueStr);

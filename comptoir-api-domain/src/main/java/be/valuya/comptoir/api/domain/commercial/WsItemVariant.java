@@ -1,12 +1,10 @@
 package be.valuya.comptoir.api.domain.commercial;
 
+import be.valuya.comptoir.model.commercial.Pricing;
 import be.valuya.comptoir.model.common.WithId;
-import be.valuya.comptoir.api.domain.company.WsCompanyRef;
-import be.valuya.comptoir.api.domain.lang.WsLocaleText;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
-import javax.annotation.Nonnull;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -22,45 +20,24 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class WsItemVariant implements WithId {
 
     private Long id;
-    @NotNull
-    @Nonnull
-    private WsCompanyRef companyRef;
     private WsItemPictureRef mainPictureRef;
     @NotNull
-    @Nonnull
     @Size(max = 128)
-    private String reference;
-    @Size(max = 128)
-    private String model;
+    private String variantReference;
     @NotNull
-    @Nonnull
-    private List<WsLocaleText> name;
-    @NotNull
-    @Nonnull
-    private List<WsLocaleText> description;
-    @NotNull
-    @Nonnull
-    private BigDecimal vatExclusive;
-    @NotNull
-    @Nonnull
-    private BigDecimal vatRate;
+    private Pricing pricing;
+    private BigDecimal pricingAmount;
     private List<WsAttributeValue> attributeValues;
+    private WsItemRef itemRef;
 
     @Override
     public Long getId() {
         return id;
     }
 
+    @Override
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public WsCompanyRef getCompanyRef() {
-        return companyRef;
-    }
-
-    public void setCompanyRef(WsCompanyRef companyRef) {
-        this.companyRef = companyRef;
     }
 
     public WsItemPictureRef getMainPictureRef() {
@@ -71,52 +48,28 @@ public class WsItemVariant implements WithId {
         this.mainPictureRef = mainPictureRef;
     }
 
-    public String getReference() {
-        return reference;
+    public String getVariantReference() {
+        return variantReference;
     }
 
-    public void setReference(String reference) {
-        this.reference = reference;
+    public void setVariantReference(String variantReference) {
+        this.variantReference = variantReference;
     }
 
-    public String getModel() {
-        return model;
+    public Pricing getPricing() {
+        return pricing;
     }
 
-    public void setModel(String model) {
-        this.model = model;
+    public void setPricing(Pricing pricing) {
+        this.pricing = pricing;
     }
 
-    public List<WsLocaleText> getName() {
-        return name;
+    public BigDecimal getPricingAmount() {
+        return pricingAmount;
     }
 
-    public void setName(List<WsLocaleText> name) {
-        this.name = name;
-    }
-
-    public List<WsLocaleText> getDescription() {
-        return description;
-    }
-
-    public void setDescription(List<WsLocaleText> description) {
-        this.description = description;
-    }
-
-    public BigDecimal getVatExclusive() {
-        return vatExclusive;
-    }
-
-    public void setVatExclusive(BigDecimal vatExclusive) {
-        this.vatExclusive = vatExclusive;
-    }
-
-    public BigDecimal getVatRate() {
-        return vatRate;
-    }
-
-    public void setVatRate(BigDecimal vatRate) {
-        this.vatRate = vatRate;
+    public void setPricingAmount(BigDecimal pricingAmount) {
+        this.pricingAmount = pricingAmount;
     }
 
     public List<WsAttributeValue> getAttributeValues() {
@@ -125,6 +78,14 @@ public class WsItemVariant implements WithId {
 
     public void setAttributeValues(List<WsAttributeValue> attributeValues) {
         this.attributeValues = attributeValues;
+    }
+
+    public WsItemRef getItemRef() {
+        return itemRef;
+    }
+
+    public void setItemRef(WsItemRef itemRef) {
+        this.itemRef = itemRef;
     }
 
     @Override

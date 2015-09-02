@@ -18,7 +18,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class WsItemPicture implements Serializable, WithId {
 
     private Long id;
-    private WsItemVariantRef itemVariantRef;
     @NotNull
     private byte[] data;
     @Size(min = 1, max = 128)
@@ -29,16 +28,9 @@ public class WsItemPicture implements Serializable, WithId {
         return id;
     }
 
+    @Override
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public WsItemVariantRef getItemVariantRef() {
-        return itemVariantRef;
-    }
-
-    public void setItemVariantRef(WsItemVariantRef itemVariantRef) {
-        this.itemVariantRef = itemVariantRef;
     }
 
     public byte[] getData() {
