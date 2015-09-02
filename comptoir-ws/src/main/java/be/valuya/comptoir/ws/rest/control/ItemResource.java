@@ -59,7 +59,7 @@ public class ItemResource {
 
     @POST
     @Valid
-    public WsItemVariantRef createItem(@NoId @Valid WsItemVariant wsItem) {
+    public WsItemVariantRef createItemVariant(@NoId @Valid WsItemVariant wsItem) {
         ItemVariant itemVariant = fromWsItemConverter.convert(wsItem);
         ItemVariant savedItem = stockService.saveItem(itemVariant);
 
@@ -71,7 +71,7 @@ public class ItemResource {
     @Path("{id}")
     @PUT
     @Valid
-    public WsItemVariantRef updateItem(@PathParam("id") long id, @Valid WsItemVariant wsItem) {
+    public WsItemVariantRef updateItemVariant(@PathParam("id") long id, @Valid WsItemVariant wsItem) {
         idChecker.checkId(id, wsItem);
         ItemVariant itemVariant = fromWsItemConverter.convert(wsItem);
         ItemVariant savedItem = stockService.saveItem(itemVariant);
@@ -84,7 +84,7 @@ public class ItemResource {
     @Path("{id}")
     @GET
     @Valid
-    public WsItemVariant getItem(@PathParam("id") long id) {
+    public WsItemVariant getItemVariant(@PathParam("id") long id) {
         ItemVariant itemVariant = stockService.findItemVariantById(id);
 
         WsItemVariant wsItem = toWsItemConverter.convert(itemVariant);
@@ -95,7 +95,7 @@ public class ItemResource {
     @POST
     @Path("search")
     @Valid
-    public List<WsItemVariant> findItems(@Valid WsItemSearch wsItemSearch) {
+    public List<WsItemVariant> findItemVariants(@Valid WsItemSearch wsItemSearch) {
         Pagination<ItemVariant, ItemVariantColumn> pagination = restPaginationUtil.extractPagination(uriInfo, ItemVariantColumn::valueOf);
 
         ItemSearch itemSearch = fromWsItemSearchConverter.convert(wsItemSearch);

@@ -12,6 +12,7 @@ import be.valuya.comptoir.model.commercial.Item_;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.lang.LocaleText;
 import be.valuya.comptoir.model.lang.LocaleText_;
+import be.valuya.comptoir.model.search.AttributeSearch;
 import be.valuya.comptoir.model.search.ItemSearch;
 import be.valuya.comptoir.model.search.ItemStockSearch;
 import be.valuya.comptoir.model.stock.ItemStock;
@@ -19,6 +20,7 @@ import be.valuya.comptoir.model.stock.ItemStock_;
 import be.valuya.comptoir.model.stock.Stock;
 import be.valuya.comptoir.model.stock.StockChangeType;
 import be.valuya.comptoir.model.stock.Stock_;
+import be.valuya.comptoir.util.pagination.AttributeDefinitionColumn;
 import be.valuya.comptoir.util.pagination.ItemVariantColumn;
 import be.valuya.comptoir.util.pagination.Pagination;
 import be.valuya.comptoir.util.pagination.Sort;
@@ -412,6 +414,18 @@ public class StockService {
 
     public AttributeValue findAttributeValueById(long id) {
         return entityManager.find(AttributeValue.class, id);
+    }
+
+    public AttributeDefinition saveAttributeDefinition(AttributeDefinition attributeDefinition) {
+        return entityManager.merge(attributeDefinition);
+    }
+
+    public AttributeValue saveAttributeValue(AttributeValue attributeValue) {
+        return entityManager.merge(attributeValue);
+    }
+
+    public List<AttributeDefinition> findAttributeDefinitions(AttributeSearch attributeSearch, Pagination<AttributeDefinition, AttributeDefinitionColumn> pagination) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }
