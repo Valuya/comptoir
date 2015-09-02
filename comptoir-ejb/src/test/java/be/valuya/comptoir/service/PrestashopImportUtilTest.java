@@ -38,13 +38,13 @@ public class PrestashopImportUtilTest {
 
         Locale locale = new Locale("fr");
 
-        prestashopImportUtil.getAttributeValueStore().getBackendEntityStream().forEach(externalEntity -> {
+        prestashopImportUtil.getAttributeValueStore().stream().forEach(externalEntity -> {
             AttributeValue attributeValue = externalEntity.getValue();
             String attributeValueStr = renderAttributeValue(attributeValue, locale);
             System.out.println(attributeValueStr);
         });
 
-        prestashopImportUtil.getItemStore().getBackendEntityStream().forEach(externalEntity -> {
+        prestashopImportUtil.getItemStore().stream().forEach(externalEntity -> {
             Item item = externalEntity.getValue();
             String reference = item.getReference();
             BigDecimal vatExclusive = item.getCurrentPrice().getVatExclusive();
@@ -54,10 +54,12 @@ public class PrestashopImportUtilTest {
             System.out.println(itemStr);
         });
 
-        prestashopImportUtil.getItemVariantStore().getBackendEntityStream().forEach(externalEntity -> {
+        prestashopImportUtil.getItemVariantStore().stream().forEach(externalEntity -> {
             ItemVariant itemVariant = externalEntity.getValue();
             String variantReference = itemVariant.getVariantReference();
-            String itemStr = MessageFormat.format("{0,number,0}: {1}", 0, variantReference);
+            Item item = itemVariant.getItem();
+            String reference = item.getReference();
+            String itemStr = MessageFormat.format("{0,number,0}: {1}/{2}", 0, reference, variantReference);
             for (AttributeValue attributeValue : itemVariant.getAttributeValues()) {
                 String attributeValueStr = renderAttributeValue(attributeValue, locale);
                 System.out.println("* " + attributeValueStr);

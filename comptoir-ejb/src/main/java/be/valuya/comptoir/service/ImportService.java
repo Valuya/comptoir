@@ -28,27 +28,40 @@ public class ImportService {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public void doImport(Company company, String backendName, PrestashopImportParams prestashopImportParams) {
+    public ImportSummary doImport(Company company, String backendName, PrestashopImportParams prestashopImportParams) {
         PrestashopImportUtil prestashopImportUtil = new PrestashopImportUtil(company, prestashopImportParams);
         prestashopImportUtil.importAll();
 
         long attributeDefinitionCount = prestashopImportUtil.getAttributeDefinitionStore()
-                .getBackendEntityStream()
+                .stream()
                 .map(externalEntity -> this.load(company, backendName, externalEntity))
                 .count();
         long attributeValueCount = prestashopImportUtil.getAttributeValueStore()
-                .getBackendEntityStream()
+                .stream()
                 .map(externalEntity -> this.load(company, backendName, externalEntity))
                 .count();
         long itemVariantCount = prestashopImportUtil.getItemVariantStore()
-                .getBackendEntityStream()
+                .stream()
                 .map(externalEntity -> this.load(company, backendName, externalEntity))
                 .count();
         long itemCount = prestashopImportUtil.getItemStore()
-                .getBackendEntityStream()
+                .stream()
                 .map(externalEntity -> this.load(company, backendName, externalEntity))
                 .count();
 
+        long defaultItemVariantCount = prestashopImportUtil.getDefaultItemVariants()
+                .stream()
+                .map(entityManager::merge)
+                .count();
+
+        ImportSummary importSummary = new ImportSummary();
+        importSummary.setAttributeDefinitionCount(attributeDefinitionCount);
+        importSummary.setAttributeValueCount(attributeValueCount);
+        importSummary.setItemCount(itemCount);
+        importSummary.setItemVariantCount(itemVariantCount);
+        importSummary.setDefaultItemVariantCount(defaultItemVariantCount);
+
+        return importSummary;
     }
 
     private <T extends WithId> T load(Company company, String backendName, ExternalEntity<Long, T> externalEntity) {

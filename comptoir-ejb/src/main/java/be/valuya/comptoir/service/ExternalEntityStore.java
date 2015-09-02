@@ -45,7 +45,7 @@ public class ExternalEntityStore<K, V> {
         return cacheMap.values();
     }
 
-    public Stream<ExternalEntity<K, V>> getBackendEntityStream() {
+    public Stream<ExternalEntity<K, V>> stream() {
         return cacheMap.entrySet()
                 .stream()
                 .map(this::createBackendEntity);

@@ -2,6 +2,7 @@ package be.valuya.comptoir.service;
 
 import be.valuya.comptoir.model.commercial.AttributeDefinition;
 import be.valuya.comptoir.model.commercial.AttributeValue;
+import be.valuya.comptoir.model.commercial.ExternalEntity;
 import be.valuya.comptoir.model.commercial.Item;
 import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.model.commercial.Price;
@@ -27,10 +28,11 @@ import java.util.Properties;
 public class PrestashopImportUtil {
 
     private final ExternalEntityStore<Long, Item> itemStore = new ExternalEntityStore<>();
-    private final ExternalEntityStore<Long, ItemVariant> itemModelStore = new ExternalEntityStore<>();
+    private final ExternalEntityStore<Long, ItemVariant> itemVariantStore = new ExternalEntityStore<>();
     private final ExternalEntityStore<Long, AttributeDefinition> attributeDefinitionStore = new ExternalEntityStore<>();
     private final ExternalEntityStore<Long, AttributeValue> attributeValueStore = new ExternalEntityStore<>();
     private final ExternalEntityStore<Long, Locale> localeStore = new ExternalEntityStore<>();
+    private final List<ItemVariant> defaultItemVariants = new ArrayList<>();
     private final Company company;
     private final PrestashopImportParams prestashopImportParams;
     private Connection connection;
@@ -49,6 +51,7 @@ public class PrestashopImportUtil {
             importItems();
             importItemTexts();
             importItemVariants();
+            addDefaultItemVariants();
         } catch (SQLException | ClassNotFoundException | InstantiationException | IllegalAccessException exception) {
             throw new RuntimeException(exception);
         }
@@ -160,7 +163,7 @@ public class PrestashopImportUtil {
 
                     Item item = itemStore.get(idProduct);
 
-                    ItemVariant itemVariant = itemModelStore.computeIfAbsent(idProductAttribute, id -> createItemVariant(item));
+                    ItemVariant itemVariant = itemVariantStore.computeIfAbsent(idProductAttribute, id -> createItemVariant(item));
                     List<AttributeValue> attributeValues = itemVariant.getAttributeValues();
                     itemVariant.setVariantReference(variantReference);
                     attributeValues.add(attributeValue);
@@ -190,6 +193,21 @@ public class PrestashopImportUtil {
                 }
             }
         }
+    }
+
+    private void addDefaultItemVariants() {
+        itemStore.stream()
+                .map(ExternalEntity::getValue)
+                .filter(this::hasItemVariants)
+                .map(this::createItemVariant)
+                .forEach(defaultItemVariants::add);
+    }
+
+    private boolean hasItemVariants(Item item) {
+        return itemVariantStore.stream()
+                .map(ExternalEntity::getValue)
+                .map(ItemVariant::getItem)
+                .anyMatch(item::equals);
     }
 
     private void loadLangs() throws SQLException {
@@ -288,7 +306,7 @@ public class PrestashopImportUtil {
     }
 
     public ExternalEntityStore<Long, ItemVariant> getItemVariantStore() {
-        return itemModelStore;
+        return itemVariantStore;
     }
 
     public ExternalEntityStore<Long, AttributeDefinition> getAttributeDefinitionStore() {
@@ -297,6 +315,10 @@ public class PrestashopImportUtil {
 
     public ExternalEntityStore<Long, AttributeValue> getAttributeValueStore() {
         return attributeValueStore;
+    }
+
+    public List<ItemVariant> getDefaultItemVariants() {
+        return defaultItemVariants;
     }
 
 }
