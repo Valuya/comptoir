@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
+    <changeSet id="1" author="ymajoros">
+        <renameTable oldTableName="item_picture" newTableName="picture" />
+    </changeSet>
+
+    <changeSet id="3" author="ymajoros">
+        <createTable tableName="item_picture">
+            <column name="id" type="bigint(20)" />
+            <column name="picture_id" type="bigint(20)" />
+            <column name="item_id" type="bigint(20)" />
+            <column name="priority" type="int" />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="4" author="ymajoros">
+        <addForeignKeyConstraint 
+            constraintName="fk_item_picture_picture" 
+            baseTableName="item_picture" 
+            baseColumnNames="main_picture_id" 
+            referencedTableName="picture" 
+            referencedColumnNames="id"
+        />
+    </changeSet>
+
+    <changeSet id="5" author="ymajoros">
+        <addForeignKeyConstraint 
+            constraintName="fk_item_picture_item" 
+            baseTableName="item_picture" 
+            baseColumnNames="item_id" 
+            referencedTableName="item" 
+            referencedColumnNames="id"
+        />
+    </changeSet>
+
+    <changeSet id="6" author="ymajoros">
+        <dropColumn tableName="picture" columnName="item_id" />
+    </changeSet>
+
+    <changeSet id="7" author="ymajoros">
+        <createTable tableName="item_variant_picture">
+            <column name="id" type="bigint(20)" />
+            <column name="picture_id" type="bigint(20)" />
+            <column name="item_variant_id" type="bigint(20)" />
+            <column name="priority" type="int" />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="8" author="ymajoros">
+        <addForeignKeyConstraint 
+            constraintName="fk_item_variant_picture_picture" 
+            baseTableName="item_variant_picture" 
+            baseColumnNames="main_picture_id" 
+            referencedTableName="picture" 
+            referencedColumnNames="id"
+        />
+    </changeSet>
+
+    <changeSet id="10" author="ymajoros">
+        <addForeignKeyConstraint 
+            constraintName="fk_item_variant_picture_ivariant" 
+            baseTableName="item_variant_picture" 
+            baseColumnNames="item_variant_id" 
+            referencedTableName="item_variant" 
+            referencedColumnNames="id"
+        />
+    </changeSet>
+
+</databaseChangeLog>

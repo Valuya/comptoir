@@ -11,11 +11,11 @@
     </changeSet>
 
     <changeSet id="2" author="ymajoros">
-        <createTable tableName="itemvariant_picture">
+        <createTable tableName="item_picture">
             <column name="id" type="bigint(20)">
                 <constraints primaryKey="true" />
             </column>
-            <column name="itemvariant_id" type="bigint(20)" />
+            <column name="item_id" type="bigint(20)" />
             <column name="picture_data" type="mediumblob" />
             <column name="content_type" type="varchar(128)" />
         </createTable>
@@ -23,19 +23,19 @@
 
     <changeSet id="3" author="ymajoros">
         <addForeignKeyConstraint 
-            constraintName="fk_itemvariant_main_picture" 
+            constraintName="fk_item_main_picture" 
             baseTableName="item" 
             baseColumnNames="main_picture_id" 
-            referencedTableName="itemvariant_picture" 
+            referencedTableName="item_picture" 
             referencedColumnNames="id"
         />
     </changeSet>
 
     <changeSet id="4" author="ymajoros">
         <addForeignKeyConstraint 
-            constraintName="fk_itemvariant_picture_item" 
-            baseTableName="itemvariant_picture" 
-            baseColumnNames="itemvariant_id" 
+            constraintName="fk_item_picture_item" 
+            baseTableName="item_picture" 
+            baseColumnNames="item_id" 
             referencedTableName="item" 
             referencedColumnNames="id"
         />

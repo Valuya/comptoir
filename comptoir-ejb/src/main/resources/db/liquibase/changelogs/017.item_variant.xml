@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
+    <changeSet id="1" author="ymajoros">
+        <delete tableName="item" />
+    </changeSet>
+
+    <changeSet id="2" author="ymajoros">
+        <renameTable oldTableName="item" newTableName="item_variant" />
+    </changeSet>
+    
+    <changeSet id="3" author="ymajoros">
+        <dropColumn tableName="item_variant" columnName="model" />
+        <dropColumn tableName="item_variant" columnName="company_id" />
+        <dropColumn tableName="item_variant" columnName="current_price_id" />
+        <dropColumn tableName="item_variant" columnName="description_id" />
+        <dropColumn tableName="item_variant" columnName="name_id" />
+    </changeSet>
+
+    <changeSet id="4" author="ymajoros">
+        <renameColumn tableName="item_variant" oldColumnName="reference" newColumnName="variant_reference" columnDataType="varchar(128)" />
+    </changeSet>
+
+    <changeSet id="5" author="ymajoros">
+        <createTable tableName="item">
+            <column name="id" type="bigint(20)">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="company_id" type="bigint(20)" />
+            <column name="name_id" type="bigint(20)" />
+            <column name="description_id" type="bigint(20)" />
+            <column name="current_price_id" type="bigint(20)" />
+            <column name="main_picture_id" type="bigint(20)" />
+            <column name="reference" />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="6" author="ymajoros">
+        <addForeignKeyConstraint 
+            constraintName="fk_item_main_picture" 
+            baseTableName="item" 
+            baseColumnNames="main_picture_id" 
+            referencedTableName="picture" 
+            referencedColumnNames="id"
+        />
+    </changeSet>
+
+    <changeSet id="7" author="ymajoros">
+        <addForeignKeyConstraint 
+            constraintName="fk_item_company" 
+            baseTableName="item" 
+            baseColumnNames="company_id" 
+            referencedTableName="company" 
+            referencedColumnNames="id"
+        />
+    </changeSet>
+
+    <changeSet id="8" author="ymajoros">
+        <addForeignKeyConstraint 
+            constraintName="fk_item_name" 
+            baseTableName="item" 
+            baseColumnNames="name_id" 
+            referencedTableName="locale_text" 
+            referencedColumnNames="id"
+        />
+    </changeSet>
+
+    <changeSet id="9" author="ymajoros">
+        <addForeignKeyConstraint 
+            constraintName="fk_item_description" 
+            baseTableName="item" 
+            baseColumnNames="description_id" 
+            referencedTableName="locale_text" 
+            referencedColumnNames="id"
+        />
+    </changeSet>
+
+    <changeSet id="9" author="ymajoros">
+        <addForeignKeyConstraint 
+            constraintName="fk_item_price" 
+            baseTableName="item" 
+            baseColumnNames="current_price_id" 
+            referencedTableName="price" 
+            referencedColumnNames="id"
+        />
+    </changeSet>
+
+    <changeSet id="10" author="ymajoros">
+        <addColumn tableName="item_variant">
+            <column name="item_id" type="bigint(20)">
+                <constraints nullable="false" />
+            </column>
+        </addColumn>
+    </changeSet>
+    
+    <changeSet id="11" author="ymajoros">
+        <addForeignKeyConstraint 
+            constraintName="fk_item_variant_item" 
+            baseTableName="item_variant" 
+            baseColumnNames="item_id" 
+            referencedTableName="item" 
+            referencedColumnNames="id">
+    </changeSet>
+
+</databaseChangeLog>

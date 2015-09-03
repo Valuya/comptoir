@@ -20,6 +20,6 @@
     </changeSet>
 
     <changeSet id="4" author="ymajoros">
-        <modifyDataType tableName="itemvariant_sale" columnName="discount_ratio" newDataType="decimal(14,4)" />
+        <modifyDataType tableName="item_sale" columnName="discount_ratio" newDataType="decimal(14,4)" />
     </changeSet>
 </databaseChangeLog>

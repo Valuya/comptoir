@@ -23,7 +23,7 @@ public class ItemVariantPicture implements Serializable {
     @ManyToOne
     private Picture picture;
     @ManyToOne
-    @JoinColumn
+    @JoinColumn(name = "item_variant_id")
     private ItemVariant itemVariant;
     private int priority;
 
@@ -50,7 +50,6 @@ public class ItemVariantPicture implements Serializable {
     public void setItemVariant(ItemVariant itemVariant) {
         this.itemVariant = itemVariant;
     }
-
 
     public int getPriority() {
         return priority;

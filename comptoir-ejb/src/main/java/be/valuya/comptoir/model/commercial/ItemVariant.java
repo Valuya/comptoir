@@ -35,7 +35,7 @@ public class ItemVariant implements Serializable, WithId {
     @ManyToOne(optional = false, cascade = CascadeType.ALL)
     private Item item;
     @NotNull
-    @Column(length = 128)
+    @Column(name = "variant_reference", length = 128)
     @Size(max = 128)
     private String variantReference;
     @Enumerated(EnumType.STRING)
