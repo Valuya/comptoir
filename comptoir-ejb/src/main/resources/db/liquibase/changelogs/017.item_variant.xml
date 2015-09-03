@@ -5,6 +5,12 @@
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
 
     <changeSet id="1" author="ymajoros">
+        <update tableName="item">
+            <column name="main_picture_id" valueComputed="null" />
+        </update>
+        <delete tableName="item_sale" />
+        <delete tableName="item_picture" />
+        <delete tableName="item_stock" />
         <delete tableName="item" />
     </changeSet>
 
@@ -13,7 +19,10 @@
     </changeSet>
     
     <changeSet id="3" author="ymajoros">
-        <dropColumn tableName="item_variant" columnName="model" />
+        <dropForeignKeyConstraint baseTableName="item_variant" constraintName="FK_ITEM_COMPANY_ID"/>
+        <dropForeignKeyConstraint baseTableName="item_variant" constraintName="FK_ITEM_CURRENT_PRICE_ID"/>
+        <dropForeignKeyConstraint baseTableName="item_variant" constraintName="FK_ITEM_DESCRIPTION_ID"/>
+        <dropForeignKeyConstraint baseTableName="item_variant" constraintName="FK_ITEM_NAME_ID"/>
         <dropColumn tableName="item_variant" columnName="company_id" />
         <dropColumn tableName="item_variant" columnName="current_price_id" />
         <dropColumn tableName="item_variant" columnName="description_id" />
@@ -34,7 +43,7 @@
             <column name="description_id" type="bigint(20)" />
             <column name="current_price_id" type="bigint(20)" />
             <column name="main_picture_id" type="bigint(20)" />
-            <column name="reference" />
+            <column name="reference" type="varchar(128)" />
         </createTable>
     </changeSet>
 
@@ -78,7 +87,7 @@
         />
     </changeSet>
 
-    <changeSet id="9" author="ymajoros">
+    <changeSet id="10" author="ymajoros">
         <addForeignKeyConstraint 
             constraintName="fk_item_price" 
             baseTableName="item" 
@@ -88,21 +97,21 @@
         />
     </changeSet>
 
-    <changeSet id="10" author="ymajoros">
+    <changeSet id="11" author="ymajoros">
         <addColumn tableName="item_variant">
             <column name="item_id" type="bigint(20)">
                 <constraints nullable="false" />
             </column>
         </addColumn>
     </changeSet>
-    
-    <changeSet id="11" author="ymajoros">
+
+    <changeSet id="12" author="ymajoros">
         <addForeignKeyConstraint 
             constraintName="fk_item_variant_item" 
             baseTableName="item_variant" 
             baseColumnNames="item_id" 
             referencedTableName="item" 
-            referencedColumnNames="id">
+            referencedColumnNames="id" />
     </changeSet>
 
 </databaseChangeLog>
