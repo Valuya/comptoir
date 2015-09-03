@@ -12,20 +12,20 @@ import org.glassfish.jersey.linking.InjectLink;
  *
  * @author Yannick Majoros <yannick@valuya.be>
  */
-@XmlRootElement(name = "ItemPictureRef")
+@XmlRootElement(name = "PictureRef")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class WsItemPictureRef implements WithId {
+public class WsPictureRef implements WithId {
 
-    @InjectLink(value = "itemPicture/${instance.id}")
+    @InjectLink(value = "picture/${instance.id}")
     @XmlElement
     private URI link;
     @XmlElement
     private Long id;
 
-    public WsItemPictureRef() {
+    public WsPictureRef() {
     }
 
-    public WsItemPictureRef(Long id) {
+    public WsPictureRef(Long id) {
         this.id = id;
     }
 

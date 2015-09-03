@@ -25,7 +25,7 @@ public class WsItem implements WithId {
     @NotNull
     @Nonnull
     private WsCompanyRef companyRef;
-    private WsItemPictureRef mainPictureRef;
+    private WsPictureRef mainPictureRef;
     @NotNull
     @Nonnull
     @Size(max = 128)
@@ -61,11 +61,11 @@ public class WsItem implements WithId {
         this.companyRef = companyRef;
     }
 
-    public WsItemPictureRef getMainPictureRef() {
+    public WsPictureRef getMainPictureRef() {
         return mainPictureRef;
     }
 
-    public void setMainPictureRef(WsItemPictureRef mainPictureRef) {
+    public void setMainPictureRef(WsPictureRef mainPictureRef) {
         this.mainPictureRef = mainPictureRef;
     }
 

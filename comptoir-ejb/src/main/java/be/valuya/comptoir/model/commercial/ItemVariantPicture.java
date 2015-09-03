@@ -5,6 +5,7 @@ import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -13,8 +14,8 @@ import javax.persistence.Table;
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @Entity
-@Table(name = "item_picture")
-public class ItemPicture implements Serializable {
+@Table(name = "item_variant_picture")
+public class ItemVariantPicture implements Serializable {
 
     @Id
     @GeneratedValue
@@ -22,7 +23,8 @@ public class ItemPicture implements Serializable {
     @ManyToOne
     private Picture picture;
     @ManyToOne
-    private Item item;
+    @JoinColumn
+    private ItemVariant itemVariant;
     private int priority;
 
     public Long getId() {
@@ -41,13 +43,14 @@ public class ItemPicture implements Serializable {
         this.picture = picture;
     }
 
-    public Item getItem() {
-        return item;
+    public ItemVariant getItemVariant() {
+        return itemVariant;
     }
 
-    public void setItem(Item item) {
-        this.item = item;
+    public void setItemVariant(ItemVariant itemVariant) {
+        this.itemVariant = itemVariant;
     }
+
 
     public int getPriority() {
         return priority;
@@ -59,23 +62,20 @@ public class ItemPicture implements Serializable {
 
     @Override
     public int hashCode() {
-        int hash = 7;
+        int hash = 5;
         hash = 23 * hash + Objects.hashCode(this.id);
         return hash;
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
         if (obj == null) {
             return false;
         }
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final ItemPicture other = (ItemPicture) obj;
+        final ItemVariantPicture other = (ItemVariantPicture) obj;
         return Objects.equals(this.id, other.id);
     }
 

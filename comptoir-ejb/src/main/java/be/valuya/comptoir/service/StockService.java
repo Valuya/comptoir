@@ -1,20 +1,27 @@
 package be.valuya.comptoir.service;
 
 import be.valuya.comptoir.model.commercial.AttributeDefinition;
+import be.valuya.comptoir.model.commercial.AttributeDefinition_;
 import be.valuya.comptoir.model.commercial.AttributeValue;
+import be.valuya.comptoir.model.commercial.AttributeValue_;
 import be.valuya.comptoir.model.commercial.Item;
 import be.valuya.comptoir.model.commercial.ItemPicture;
 import be.valuya.comptoir.model.commercial.ItemPicture_;
 import be.valuya.comptoir.model.commercial.ItemSale;
 import be.valuya.comptoir.model.commercial.ItemVariant;
+import be.valuya.comptoir.model.commercial.ItemVariantPicture;
+import be.valuya.comptoir.model.commercial.ItemVariantPicture_;
 import be.valuya.comptoir.model.commercial.ItemVariant_;
 import be.valuya.comptoir.model.commercial.Item_;
+import be.valuya.comptoir.model.commercial.Picture;
+import be.valuya.comptoir.model.commercial.Picture_;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.lang.LocaleText;
 import be.valuya.comptoir.model.lang.LocaleText_;
 import be.valuya.comptoir.model.search.AttributeSearch;
 import be.valuya.comptoir.model.search.ItemSearch;
 import be.valuya.comptoir.model.search.ItemStockSearch;
+import be.valuya.comptoir.model.search.PictureSearch;
 import be.valuya.comptoir.model.stock.ItemStock;
 import be.valuya.comptoir.model.stock.ItemStock_;
 import be.valuya.comptoir.model.stock.Stock;
@@ -47,6 +54,7 @@ import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Subquery;
 
 /**
  *
@@ -66,9 +74,9 @@ public class StockService {
 
         List<Predicate> predicates = new ArrayList<>();
 
-        Company company = itemSearch.getCompany();
         Join<ItemVariant, Item> itemJoin = itemVariantRoot.join(ItemVariant_.item, JoinType.LEFT);
 
+        Company company = itemSearch.getCompany();
         Path<Company> companyPath = itemJoin.get(Item_.company);
         Predicate companyPredicate = criteriaBuilder.equal(companyPath, company);
         predicates.add(companyPredicate);
@@ -81,7 +89,7 @@ public class StockService {
 
             Predicate referenceContainsPredicate = createReferenceContainsPredicate(itemJoin, lowerMultiSearch);
             Predicate variantReferenceContainsPredicate = createVariantReferenceContainsPredicate(itemVariantRoot, lowerMultiSearch);
-            Predicate namePredicate = createNameContainsPredicate(itemJoin, lowerMultiSearch);
+            Predicate namePredicate = createItemNameContainsPredicate(itemJoin, lowerMultiSearch);
             Predicate descriptionPredicate = createDescriptionContainsPredicate(itemJoin, lowerMultiSearch);
 
             Predicate multiSearchPredicate = criteriaBuilder.or(referenceContainsPredicate, variantReferenceContainsPredicate, namePredicate, descriptionPredicate);
@@ -120,7 +128,7 @@ public class StockService {
         String nameContains = itemSearch.getNameContains();
         if (nameContains != null && !nameContains.trim().isEmpty()) {
             nameContains = nameContains.trim().toLowerCase(Locale.FRENCH);
-            Predicate namePredicate = createNameContainsPredicate(itemJoin, nameContains);
+            Predicate namePredicate = createItemNameContainsPredicate(itemJoin, nameContains);
             predicates.add(namePredicate);
         }
 
@@ -177,17 +185,32 @@ public class StockService {
 
     private Predicate createDescriptionContainsPredicate(From<?, Item> itemPath, String descriptionContains) {
         Join<Item, LocaleText> descriptionJoin = itemPath.join(Item_.description);
-        MapJoin<LocaleText, Locale, String> localeTextMapJoin = descriptionJoin.join(LocaleText_.localeTextMap);
-        Path<String> textPath = localeTextMapJoin.value();
-        Predicate descriptionPredicate = createContainsPredicate(textPath, descriptionContains);
+        Predicate descriptionPredicate = createLocaleTextContainsPredicate(descriptionJoin, descriptionContains);
         return descriptionPredicate;
     }
 
-    private Predicate createNameContainsPredicate(From<?, Item> itemPath, String nameContains) {
+    private Predicate createItemNameContainsPredicate(From<?, Item> itemPath, String nameContains) {
         Join<Item, LocaleText> nameJoin = itemPath.join(Item_.name);
-        MapJoin<LocaleText, Locale, String> localeTextMapJoin = nameJoin.join(LocaleText_.localeTextMap);
+        Predicate namePredicate = createLocaleTextContainsPredicate(nameJoin, nameContains);
+        return namePredicate;
+    }
+
+    private Predicate createAttributeDefinitionNameContainsPredicate(From<?, AttributeDefinition> attributeDefinitionPath, String contains) {
+        Join<AttributeDefinition, LocaleText> nameJoin = attributeDefinitionPath.join(AttributeDefinition_.name);
+        Predicate namePredicate = createLocaleTextContainsPredicate(nameJoin, contains);
+        return namePredicate;
+    }
+
+    private Predicate createAttributeValueContainsPredicate(From<?, AttributeValue> attributeValuePath, String contains) {
+        Join<AttributeValue, LocaleText> valueJoin = attributeValuePath.join(AttributeValue_.value);
+        Predicate namePredicate = createLocaleTextContainsPredicate(valueJoin, contains);
+        return namePredicate;
+    }
+
+    private Predicate createLocaleTextContainsPredicate(From<?, LocaleText> localeTextPath, String contains) {
+        MapJoin<LocaleText, Locale, String> localeTextMapJoin = localeTextPath.join(LocaleText_.localeTextMap);
         Path<String> textPath = localeTextMapJoin.value();
-        Predicate namePredicate = createContainsPredicate(textPath, nameContains);
+        Predicate namePredicate = createContainsPredicate(textPath, contains);
         return namePredicate;
     }
 
@@ -366,8 +389,8 @@ public class StockService {
         return entityManager.find(Item.class, id);
     }
 
-    public ItemPicture findItemPictureById(Long id) {
-        return entityManager.find(ItemPicture.class, id);
+    public Picture findPictureById(Long id) {
+        return entityManager.find(Picture.class, id);
     }
 
     /**
@@ -382,29 +405,61 @@ public class StockService {
         return entityManager.merge(item);
     }
 
-    public ItemPicture saveItemPicture(ItemPicture itemPicture) {
-        ItemVariant itemVariant = itemPicture.getItemVariant();
-        ItemPicture managedPicture = entityManager.merge(itemPicture);
-        itemVariant.setMainPicture(itemPicture);
-        ItemVariant managedItem = entityManager.merge(itemVariant);
+    public Picture savePicture(Picture picture) {
+        Picture managedPicture = entityManager.merge(picture);
         return managedPicture;
     }
 
-    public List<ItemPicture> findItemPictures(@Nonnull ItemVariant item) {
+    public List<Picture> findPictures(@Nonnull PictureSearch pictureSearch) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<ItemPicture> query = criteriaBuilder.createQuery(ItemPicture.class);
-        Root<ItemPicture> itemPictureRoot = query.from(ItemPicture.class);
+        CriteriaQuery<Picture> query = criteriaBuilder.createQuery(Picture.class);
+        Root<Picture> pictureRoot = query.from(Picture.class);
 
         List<Predicate> predicates = new ArrayList<>();
 
-        Path<ItemVariant> itemPath = itemPictureRoot.get(ItemPicture_.itemVariant);
-        Predicate itemPredicate = criteriaBuilder.equal(itemPath, item);
-        predicates.add(itemPredicate);
+        Company company = pictureSearch.getCompany();
+        Path<Company> companyPath = pictureRoot.get(Picture_.company);
+        Predicate companyPredicate = criteriaBuilder.equal(companyPath, company);
+        predicates.add(companyPredicate);
+
+        ItemVariant itemVariant = pictureSearch.getItemVariant();
+        if (itemVariant != null) {
+            Subquery<ItemVariantPicture> itemVariantPictureSubquery = query.subquery(ItemVariantPicture.class);
+            Root<ItemVariantPicture> itemVariantPictureRoot = itemVariantPictureSubquery.from(ItemVariantPicture.class);
+
+            Path<Picture> itemVariantPicturePicturePath = itemVariantPictureRoot.get(ItemVariantPicture_.picture);
+            Predicate itemVariantPicturePicturePredicate = criteriaBuilder.equal(itemVariantPicturePicturePath, pictureRoot);
+
+            Path<ItemVariant> itemVariantPictureItemVariantPath = itemVariantPictureRoot.get(ItemVariantPicture_.itemVariant);
+            Predicate itemVariantPictureItemVariantPredicate = criteriaBuilder.equal(itemVariantPictureItemVariantPath, pictureRoot);
+
+            itemVariantPictureSubquery.where(itemVariantPicturePicturePredicate, itemVariantPictureItemVariantPredicate);
+
+            Predicate itemVariantExistsPredicate = criteriaBuilder.exists(itemVariantPictureSubquery);
+            predicates.add(itemVariantExistsPredicate);
+        }
+
+        Item item = pictureSearch.getItem();
+        if (item != null) {
+            Subquery<ItemPicture> itemPictureSubquery = query.subquery(ItemPicture.class);
+            Root<ItemPicture> itemPictureRoot = itemPictureSubquery.from(ItemPicture.class);
+
+            Path<Picture> itemPicturePicturePath = itemPictureRoot.get(ItemPicture_.picture);
+            Predicate itemPicturePicturePredicate = criteriaBuilder.equal(itemPicturePicturePath, pictureRoot);
+
+            Path<Item> itemPictureItemPath = itemPictureRoot.get(ItemPicture_.item);
+            Predicate itemPictureItemPredicate = criteriaBuilder.equal(itemPictureItemPath, pictureRoot);
+
+            itemPictureSubquery.where(itemPicturePicturePredicate, itemPictureItemPredicate);
+
+            Predicate itemExistsPredicate = criteriaBuilder.exists(itemPictureSubquery);
+            predicates.add(itemExistsPredicate);
+        }
 
         Predicate[] predicateArray = predicates.toArray(new Predicate[0]);
         query.where(predicateArray);
 
-        TypedQuery<ItemPicture> typedQuery = entityManager.createQuery(query);
+        TypedQuery<Picture> typedQuery = entityManager.createQuery(query);
         return typedQuery.getResultList();
     }
 
@@ -425,7 +480,53 @@ public class StockService {
     }
 
     public List<AttributeDefinition> findAttributeDefinitions(AttributeSearch attributeSearch, Pagination<AttributeDefinition, AttributeDefinitionColumn> pagination) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<AttributeDefinition> query = criteriaBuilder.createQuery(AttributeDefinition.class);
+        Root<AttributeDefinition> attributeDefinitionRoot = query.from(AttributeDefinition.class);
+
+        List<Predicate> predicates = new ArrayList<>();
+
+        Company company = attributeSearch.getCompany();
+        Path<Company> companyPath = attributeDefinitionRoot.get(AttributeDefinition_.company);
+        Predicate companyPredicate = criteriaBuilder.equal(companyPath, company);
+        predicates.add(companyPredicate);
+
+        String multiSearch = attributeSearch.getMultiSearch();
+
+        String nameContains = attributeSearch.getNameContains();
+        if (nameContains != null) {
+            Predicate nameContainsPredicate = createAttributeDefinitionNameContainsPredicate(attributeDefinitionRoot, nameContains);
+            predicates.add(nameContainsPredicate);
+        }
+
+        String valueContains = attributeSearch.getValueContains();
+        if (valueContains != null) {
+            Predicate attributeHasValuePredicate = createAttributeHasValuePredicate(query, valueContains, attributeDefinitionRoot);
+            predicates.add(attributeHasValuePredicate);
+        }
+
+        Predicate[] predicateArray = predicates.toArray(new Predicate[0]);
+        query.where(predicateArray);
+
+        TypedQuery<AttributeDefinition> typedQuery = entityManager.createQuery(query);
+        return typedQuery.getResultList();
+    }
+
+    private Predicate createAttributeHasValuePredicate(CriteriaQuery<AttributeDefinition> query, String valueContains, Root<AttributeDefinition> attributeDefinitionRoot) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+
+        Subquery<AttributeValue> attributeValueSubquery = query.subquery(AttributeValue.class);
+        Root<AttributeValue> attributeValueRoot = attributeValueSubquery.from(AttributeValue.class);
+
+        Predicate valueContainsPredicate = createAttributeValueContainsPredicate(attributeValueRoot, valueContains);
+
+        Path<AttributeDefinition> attributeDefinitionPath = attributeValueRoot.get(AttributeValue_.attributeDefinition);
+        Predicate attributeDefinitionPredicate = criteriaBuilder.equal(attributeDefinitionPath, attributeDefinitionRoot);
+
+        attributeValueSubquery.where(valueContainsPredicate, attributeDefinitionPredicate);
+
+        Predicate attributeValueExistsPredicate = criteriaBuilder.exists(attributeValueSubquery);
+        return attributeValueExistsPredicate;
     }
 
 }

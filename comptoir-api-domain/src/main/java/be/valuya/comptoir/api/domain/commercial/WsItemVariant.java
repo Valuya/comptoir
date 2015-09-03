@@ -20,7 +20,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class WsItemVariant implements WithId {
 
     private Long id;
-    private WsItemPictureRef mainPictureRef;
+    private WsPictureRef mainPictureRef;
     @NotNull
     @Size(max = 128)
     private String variantReference;
@@ -40,11 +40,11 @@ public class WsItemVariant implements WithId {
         this.id = id;
     }
 
-    public WsItemPictureRef getMainPictureRef() {
+    public WsPictureRef getMainPictureRef() {
         return mainPictureRef;
     }
 
-    public void setMainPictureRef(WsItemPictureRef mainPictureRef) {
+    public void setMainPictureRef(WsPictureRef mainPictureRef) {
         this.mainPictureRef = mainPictureRef;
     }
 

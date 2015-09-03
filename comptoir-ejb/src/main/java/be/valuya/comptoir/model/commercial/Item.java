@@ -43,7 +43,7 @@ public class Item implements Serializable, WithId {
     private Price currentPrice;
     @ManyToOne
     @JoinColumn(name = "main_picture_id")
-    private ItemPicture mainPicture;
+    private Picture mainPicture;
 
     @Override
     public Long getId() {
@@ -95,11 +95,11 @@ public class Item implements Serializable, WithId {
         this.currentPrice = currentPrice;
     }
 
-    public ItemPicture getMainPicture() {
+    public Picture getMainPicture() {
         return mainPicture;
     }
 
-    public void setMainPicture(ItemPicture mainPicture) {
+    public void setMainPicture(Picture mainPicture) {
         this.mainPicture = mainPicture;
     }
 

@@ -43,7 +43,7 @@ public class ItemVariant implements Serializable, WithId {
     private BigDecimal pricingAmount;
     @ManyToOne
     @JoinColumn(name = "main_picture_id")
-    private ItemPicture mainPicture;
+    private Picture mainPicture;
     @OneToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "item_attribute_value")
     private List<AttributeValue> attributeValues;
@@ -66,11 +66,11 @@ public class ItemVariant implements Serializable, WithId {
         this.variantReference = variantReference;
     }
 
-    public ItemPicture getMainPicture() {
+    public Picture getMainPicture() {
         return mainPicture;
     }
 
-    public void setMainPicture(ItemPicture mainPicture) {
+    public void setMainPicture(Picture mainPicture) {
         this.mainPicture = mainPicture;
     }
 

@@ -1,12 +1,12 @@
 package be.valuya.comptoir.ws.convert.commercial;
 
 import be.valuya.comptoir.api.domain.commercial.WsItem;
-import be.valuya.comptoir.api.domain.commercial.WsItemPictureRef;
+import be.valuya.comptoir.api.domain.commercial.WsPictureRef;
 import be.valuya.comptoir.api.domain.commercial.WsItemRef;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.api.domain.lang.WsLocaleText;
 import be.valuya.comptoir.model.commercial.Item;
-import be.valuya.comptoir.model.commercial.ItemPicture;
+import be.valuya.comptoir.model.commercial.Picture;
 import be.valuya.comptoir.model.commercial.Price;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.lang.LocaleText;
@@ -29,7 +29,7 @@ public class ToWsItemConverter {
     @Inject
     private ToWsCompanyConverter toWsCompanyConverter;
     @Inject
-    private ToWsItemPictureConverter toWsItemPictureConverter;
+    private ToWsPictureConverter toWsPictureConverter;
 
     public WsItem convert(Item item) {
         if (item == null) {
@@ -46,8 +46,8 @@ public class ToWsItemConverter {
         List<WsLocaleText> wsDescription = fromWsLocaleTextConverter.convert(description);
         List<WsLocaleText> wsName = fromWsLocaleTextConverter.convert(name);
 
-        ItemPicture mainPicture = item.getMainPicture();
-        WsItemPictureRef mainPictureRef = toWsItemPictureConverter.reference(mainPicture);
+        Picture mainPicture = item.getMainPicture();
+        WsPictureRef mainPictureRef = toWsPictureConverter.reference(mainPicture);
 
         BigDecimal vatExclusive = currentPrice.getVatExclusive();
         BigDecimal vatRate = currentPrice.getVatRate();

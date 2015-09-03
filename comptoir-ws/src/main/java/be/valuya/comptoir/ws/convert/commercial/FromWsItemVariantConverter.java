@@ -1,12 +1,12 @@
 package be.valuya.comptoir.ws.convert.commercial;
 
-import be.valuya.comptoir.api.domain.commercial.WsItemPictureRef;
+import be.valuya.comptoir.api.domain.commercial.WsPictureRef;
 import be.valuya.comptoir.api.domain.commercial.WsItemRef;
 import be.valuya.comptoir.api.domain.commercial.WsItemVariant;
 import be.valuya.comptoir.api.domain.commercial.WsItemVariantRef;
 import be.valuya.comptoir.model.commercial.AttributeValue;
 import be.valuya.comptoir.model.commercial.Item;
-import be.valuya.comptoir.model.commercial.ItemPicture;
+import be.valuya.comptoir.model.commercial.Picture;
 import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.model.commercial.Pricing;
 import be.valuya.comptoir.service.StockService;
@@ -31,7 +31,7 @@ public class FromWsItemVariantConverter {
     @Inject
     private FromWsItemConverter fromWsItemConverter;
     @Inject
-    private FromWsItemPictureConverter fromWsItemPictureConverter;
+    private FromWsPictureConverter fromWsPictureConverter;
 
     public ItemVariant convert(WsItemVariant wsItemVariant) {
         if (wsItemVariant == null) {
@@ -43,9 +43,9 @@ public class FromWsItemVariantConverter {
         Pricing pricing = wsItemVariant.getPricing();
         BigDecimal pricingAmount = wsItemVariant.getPricingAmount();
 
-        WsItemPictureRef mainPictureRef = wsItemVariant.getMainPictureRef();
+        WsPictureRef mainPictureRef = wsItemVariant.getMainPictureRef();
 
-        ItemPicture mainPicture = fromWsItemPictureConverter.find(mainPictureRef);
+        Picture mainPicture = fromWsPictureConverter.find(mainPictureRef);
 
         WsItemRef itemRef = wsItemVariant.getItemRef();
         Item item = fromWsItemConverter.find(itemRef);
