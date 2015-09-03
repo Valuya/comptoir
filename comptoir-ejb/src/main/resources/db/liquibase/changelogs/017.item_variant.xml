@@ -49,10 +49,10 @@
 
     <changeSet id="6" author="ymajoros">
         <addForeignKeyConstraint 
-            constraintName="fk_item_main_picture" 
+            constraintName="fk_itemp_main_picture" 
             baseTableName="item" 
             baseColumnNames="main_picture_id" 
-            referencedTableName="picture" 
+            referencedTableName="item_picture" 
             referencedColumnNames="id"
         />
     </changeSet>
