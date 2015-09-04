@@ -18,14 +18,23 @@
         <renameTable oldTableName="item" newTableName="item_variant" />
     </changeSet>
     
-    <changeSet id="3" author="ymajoros">
+    <changeSet id="3-company" author="ymajoros">
         <dropForeignKeyConstraint baseTableName="item_variant" constraintName="FK_ITEM_COMPANY_ID"/>
-        <dropForeignKeyConstraint baseTableName="item_variant" constraintName="FK_ITEM_CURRENT_PRICE_ID"/>
-        <dropForeignKeyConstraint baseTableName="item_variant" constraintName="FK_ITEM_DESCRIPTION_ID"/>
-        <dropForeignKeyConstraint baseTableName="item_variant" constraintName="FK_ITEM_NAME_ID"/>
         <dropColumn tableName="item_variant" columnName="company_id" />
+    </changeSet>
+
+    <changeSet id="3-currentprice" author="cghislai">
+        <dropForeignKeyConstraint baseTableName="item_variant" constraintName="FK_ITEM_current_price_id"/>
         <dropColumn tableName="item_variant" columnName="current_price_id" />
+    </changeSet>
+    
+    <changeSet id="3-description" author="cghislai">
+        <dropForeignKeyConstraint baseTableName="item_variant" constraintName="FK_ITEM_DESCRIPTION_ID"/>
         <dropColumn tableName="item_variant" columnName="description_id" />
+    </changeSet>
+    
+    <changeSet id="3-name" author="cghislai">
+        <dropForeignKeyConstraint baseTableName="item_variant" constraintName="FK_ITEM_NAME_ID"/>
         <dropColumn tableName="item_variant" columnName="name_id" />
     </changeSet>
 
@@ -114,4 +123,21 @@
             referencedColumnNames="id" />
     </changeSet>
 
+    <changeSet id="13" author="cghislai">
+        <addColumn tableName="item_variant">
+            <column name="PRICING" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    
+    <changeSet id="14" author="cghislai">
+        <addColumn tableName="item_variant">
+            <column name="PRICINGAMOUNT" type="DECIMAL(19,2)"/>
+        </addColumn>
+    </changeSet>
+    
+    <changeSet id="15" author="cghislai">
+        <addNotNullConstraint tableName="item_variant" columnName="PRICING" 
+                              columnDataType="VARCHAR(255)"
+                              defaultNullValue="ADD_TO_BASE"/>
+    </changeSet>
 </databaseChangeLog>

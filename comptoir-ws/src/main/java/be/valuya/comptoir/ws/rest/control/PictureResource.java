@@ -65,7 +65,8 @@ public class PictureResource {
         return pictureRef;
     }
 
-    @GET
+    @POST
+    @Path("search")
     @Valid
     public List<WsPicture> findPictures(WsPictureSearch wsPictureSearch) {
         PictureSearch pictureSearch = fromWsPictureSearchConverter.convert(wsPictureSearch);
