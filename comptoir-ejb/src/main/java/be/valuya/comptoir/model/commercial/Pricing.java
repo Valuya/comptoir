@@ -7,6 +7,7 @@ package be.valuya.comptoir.model.commercial;
 public enum Pricing {
 
     ABSOLUTE,
-    ADD_TO_BASE;
+    ADD_TO_BASE,
+    PARENT_ITEM;
 
 }

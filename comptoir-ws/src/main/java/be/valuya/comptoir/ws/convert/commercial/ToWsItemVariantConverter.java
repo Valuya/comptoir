@@ -1,9 +1,11 @@
 package be.valuya.comptoir.ws.convert.commercial;
 
 import be.valuya.comptoir.api.domain.commercial.WsAttributeValueRef;
-import be.valuya.comptoir.api.domain.commercial.WsPictureRef;
+import be.valuya.comptoir.api.domain.commercial.WsItemRef;
 import be.valuya.comptoir.api.domain.commercial.WsItemVariant;
+import be.valuya.comptoir.api.domain.commercial.WsPictureRef;
 import be.valuya.comptoir.api.domain.commercial.WsItemVariantRef;
+import be.valuya.comptoir.model.commercial.Item;
 import be.valuya.comptoir.model.commercial.Picture;
 import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.model.commercial.Pricing;
@@ -24,6 +26,8 @@ public class ToWsItemVariantConverter {
     private ToWsAttributeValueConverter toWsAttributeValueConverter;
     @Inject
     private ToWsPictureConverter toWsPictureConverter;
+    @Inject
+    private ToWsItemConverter toWsItemConverter;
 
     public WsItemVariant convert(ItemVariant itemVariant) {
         if (itemVariant == null) {
@@ -43,6 +47,9 @@ public class ToWsItemVariantConverter {
                 .map(toWsAttributeValueConverter::reference)
                 .collect(Collectors.toList());
 
+        Item item = itemVariant.getItem();
+        WsItemRef itemRef = toWsItemConverter.reference(item);
+
         WsItemVariant wsItem = new WsItemVariant();
         wsItem.setId(id);
         wsItem.setMainPictureRef(mainPictureRef);
@@ -50,7 +57,7 @@ public class ToWsItemVariantConverter {
         wsItem.setPricing(pricing);
         wsItem.setPricingAmount(pricingAmount);
         wsItem.setAttributeValueRefs(attributeValueRefs);
-
+        wsItem.setItemRef(itemRef);
         return wsItem;
     }
 

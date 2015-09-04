@@ -35,7 +35,7 @@ import javax.ws.rs.core.UriInfo;
  *
  * @author Yannick Majoros <yannick@valuya.be>
  */
-@Path("/itemvariant")
+@Path("/itemVariant")
 @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 public class ItemVariantResource {
