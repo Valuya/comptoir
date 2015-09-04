@@ -62,7 +62,9 @@ public class ItemResource {
     public WsItemRef createItem(@NoId @Valid WsItem wsItem) {
         Item item = fromWsItemConverter.convert(wsItem);
         Item savedItem = stockService.saveItem(item);
+
         WsItemRef itemRef = toWsItemConverter.reference(savedItem);
+
         return itemRef;
     }
 
