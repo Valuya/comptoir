@@ -96,7 +96,8 @@ public class RegistrationService {
         unknownItemPrice.setVatExclusive(BigDecimal.valueOf(100, 2));
         unknownItemPrice.setVatRate(BigDecimal.valueOf(21, 2));
 
-        ItemVariant unkownItemVariant = itemFactory.createItemVariant(company);
+        ItemVariant unkownItemVariant = itemFactory.createItemVariant(managedCompany);
+        unkownItemVariant.setVariantReference("?");
 
         LocaleText unkownItemDescription = localeTextFactory.createLocaleText();
         unkownItemDescription.put(Locale.ENGLISH, "Unknown item");
