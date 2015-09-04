@@ -1,16 +1,16 @@
 package be.valuya.comptoir.ws.rest.control;
 
-import be.valuya.comptoir.api.domain.commercial.WsItem;
-import be.valuya.comptoir.api.domain.commercial.WsItemRef;
+import be.valuya.comptoir.api.domain.commercial.WsItemVariant;
+import be.valuya.comptoir.api.domain.commercial.WsItemVariantRef;
 import be.valuya.comptoir.api.domain.search.WsItemSearch;
-import be.valuya.comptoir.model.commercial.Item;
+import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.model.search.ItemSearch;
 import be.valuya.comptoir.service.StockService;
-import be.valuya.comptoir.util.pagination.ItemColumn;
+import be.valuya.comptoir.util.pagination.ItemVariantColumn;
 import be.valuya.comptoir.util.pagination.Pagination;
 import be.valuya.comptoir.ws.config.HeadersConfig;
-import be.valuya.comptoir.ws.convert.commercial.FromWsItemConverter;
-import be.valuya.comptoir.ws.convert.commercial.ToWsItemConverter;
+import be.valuya.comptoir.ws.convert.commercial.FromWsItemVariantConverter;
+import be.valuya.comptoir.ws.convert.commercial.ToWsItemVariantConverter;
 import be.valuya.comptoir.ws.convert.search.FromWsItemSearchConverter;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
 import be.valuya.comptoir.ws.rest.validation.NoId;
@@ -38,16 +38,16 @@ import javax.ws.rs.core.UriInfo;
 @Path("/item")
 @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-public class ItemResource {
+public class ItemVariantResource {
 
     @EJB
     private StockService stockService;
     @Inject
-    private FromWsItemConverter fromWsItemConverter;
+    private FromWsItemVariantConverter fromWsItemConverter;
     @Inject
     private FromWsItemSearchConverter fromWsItemSearchConverter;
     @Inject
-    private ToWsItemConverter toWsItemConverter;
+    private ToWsItemVariantConverter toWsItemConverter;
     @Inject
     private IdChecker idChecker;
     @Context
@@ -59,35 +59,35 @@ public class ItemResource {
 
     @POST
     @Valid
-    public WsItemRef createItem(@NoId @Valid WsItem wsItem) {
-        Item item = fromWsItemConverter.convert(wsItem);
-        Item savedItem = stockService.saveItem(item);
+    public WsItemVariantRef createItemVariant(@NoId @Valid WsItemVariant wsItem) {
+        ItemVariant itemVariant = fromWsItemConverter.convert(wsItem);
+        ItemVariant savedItem = stockService.saveItem(itemVariant);
 
-        WsItemRef itemRef = toWsItemConverter.reference(savedItem);
+        WsItemVariantRef itemVariantRef = toWsItemConverter.reference(savedItem);
 
-        return itemRef;
+        return itemVariantRef;
     }
 
     @Path("{id}")
     @PUT
     @Valid
-    public WsItemRef updateItem(@PathParam("id") long id, @Valid WsItem wsItem) {
+    public WsItemVariantRef updateItemVariant(@PathParam("id") long id, @Valid WsItemVariant wsItem) {
         idChecker.checkId(id, wsItem);
-        Item item = fromWsItemConverter.convert(wsItem);
-        Item savedItem = stockService.saveItem(item);
+        ItemVariant itemVariant = fromWsItemConverter.convert(wsItem);
+        ItemVariant savedItem = stockService.saveItem(itemVariant);
 
-        WsItemRef itemRef = toWsItemConverter.reference(savedItem);
+        WsItemVariantRef itemVariantRef = toWsItemConverter.reference(savedItem);
 
-        return itemRef;
+        return itemVariantRef;
     }
 
     @Path("{id}")
     @GET
     @Valid
-    public WsItem getItem(@PathParam("id") long id) {
-        Item item = stockService.findItemById(id);
+    public WsItemVariant getItemVariant(@PathParam("id") long id) {
+        ItemVariant itemVariant = stockService.findItemVariantById(id);
 
-        WsItem wsItem = toWsItemConverter.convert(item);
+        WsItemVariant wsItem = toWsItemConverter.convert(itemVariant);
 
         return wsItem;
     }
@@ -95,14 +95,14 @@ public class ItemResource {
     @POST
     @Path("search")
     @Valid
-    public List<WsItem> findItems(@Valid WsItemSearch wsItemSearch) {
-        Pagination<Item, ItemColumn> pagination = restPaginationUtil.extractPagination(uriInfo, ItemColumn::valueOf);
+    public List<WsItemVariant> findItemVariants(@Valid WsItemSearch wsItemSearch) {
+        Pagination<ItemVariant, ItemVariantColumn> pagination = restPaginationUtil.extractPagination(uriInfo, ItemVariantColumn::valueOf);
 
         ItemSearch itemSearch = fromWsItemSearchConverter.convert(wsItemSearch);
 
-        List<Item> items = stockService.findItems(itemSearch, pagination);
+        List<ItemVariant> items = stockService.findItemVariants(itemSearch, pagination);
 
-        List<WsItem> wsItems = items.stream()
+        List<WsItemVariant> wsItems = items.stream()
                 .map(toWsItemConverter::convert)
                 .collect(Collectors.toList());
 
