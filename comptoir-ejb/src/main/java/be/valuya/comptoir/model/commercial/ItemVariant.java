@@ -39,6 +39,7 @@ public class ItemVariant implements Serializable, WithId {
     @Size(max = 128)
     private String variantReference;
     @Enumerated(EnumType.STRING)
+    @NotNull
     private Pricing pricing;
     private BigDecimal pricingAmount;
     @ManyToOne
