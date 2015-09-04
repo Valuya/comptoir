@@ -55,7 +55,7 @@ import javax.persistence.criteria.MapJoin;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Root; 
 import javax.persistence.criteria.Subquery;
 
 /**
@@ -69,34 +69,7 @@ public class StockService {
     private EntityManager entityManager;
 
     @Nonnull
-    public List<Item> findItems(@Nonnull ItemSearch itemSearch, @CheckForNull Pagination<Item, ItemColumn> pagination) {
-        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Item> query = criteriaBuilder.createQuery(Item.class);
-        Root<Item> itemRoot = query.from(Item.class);
-
-        List<Predicate> predicates = createItemPredicates(itemSearch, itemRoot, null);
-
-        if (pagination != null) {
-            List<Sort<ItemColumn>> sortings = pagination.getSortings();
-            List<Order> orders = ItemColumnPersistenceUtil.createOrdersFromSortings(criteriaBuilder, itemRoot, sortings);
-            query.orderBy(orders);
-        }
-
-        Predicate[] predicateArray = predicates.toArray(new Predicate[0]);
-        query.where(predicateArray);
-        query.distinct(true);
-
-        TypedQuery<Item> typedQuery = entityManager.createQuery(query);
-
-        paginate(pagination, typedQuery);
-
-        List<Item> items = typedQuery.getResultList();
-
-        return items;
-    }
-
-    @Nonnull
-    public List<ItemVariant> findItemVariants(@Nonnull ItemSearch itemSearch, @CheckForNull Pagination<ItemVariant, ItemVariantColumn> pagination) {
+    public List<ItemVariant> findItemVariants(@Nonnull ItemVariantSearch itemVariantSearch, @CheckForNull Pagination<ItemVariant, ItemVariantColumn> pagination) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<ItemVariant> query = criteriaBuilder.createQuery(ItemVariant.class);
         Root<ItemVariant> itemVariantRoot = query.from(ItemVariant.class);
@@ -105,56 +78,21 @@ public class StockService {
 
         Join<ItemVariant, Item> itemJoin = itemVariantRoot.join(ItemVariant_.item, JoinType.LEFT);
 
-        List<Predicate> itemPredicates = createItemPredicates(itemSearch, itemJoin, itemVariantRoot);
-        predicates.addAll(itemPredicates);
-
-        String variantReferenceContains = itemSearch.getVariantReferenceContains();
-        if (variantReferenceContains != null && !variantReferenceContains.trim().isEmpty()) {
-            variantReferenceContains = variantReferenceContains.trim().toLowerCase(Locale.FRENCH);
-            Predicate variantReferenceContainsPredicate = createVariantReferenceContainsPredicate(itemVariantRoot, variantReferenceContains);
-            predicates.add(variantReferenceContainsPredicate);
-        }
-
-        if (pagination != null) {
-            List<Sort<ItemVariantColumn>> sortings = pagination.getSortings();
-            List<Order> orders = ItemVariantColumnPersistenceUtil.createOrdersFromSortings(criteriaBuilder, itemVariantRoot, sortings);
-            query.orderBy(orders);
-        }
-
-        Predicate[] predicateArray = predicates.toArray(new Predicate[0]);
-        query.where(predicateArray);
-        query.distinct(true);
-
-        TypedQuery<ItemVariant> typedQuery = entityManager.createQuery(query);
-
-        paginate(pagination, typedQuery);
-
-        List<ItemVariant> items = typedQuery.getResultList();
-
-        return items;
-    }
-
-    private void paginate(Pagination<?, ?> pagination, TypedQuery<?> typedQuery) {
-        if (pagination != null) {
-            int offset = pagination.getOffset();
-            int maxResults = pagination.getMaxResults();
-            typedQuery.setFirstResult(offset);
-            typedQuery.setMaxResults(maxResults);
-        }
-    }
-
-    private List<Predicate> createItemPredicates(ItemSearch itemSearch, From<?, Item> itemFrom, From<?, ItemVariant> itemVariantFrom) {
-        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-
-        List<Predicate> predicates = new ArrayList<>();
-        Company company = itemSearch.getCompany();
-        Path<Company> companyPath = itemFrom.get(Item_.company);
+        Company company = itemVariantSearch.getCompany();
+        Path<Company> companyPath = itemJoin.get(Item_.company);
         Predicate companyPredicate = criteriaBuilder.equal(companyPath, company);
         predicates.add(companyPredicate);
-        Path<String> referencePath = itemFrom.get(Item_.reference);
-        String multiSearch = itemSearch.getMultiSearch();
+
+        String multiSearch = itemVariantSearch.getMultiSearch();
         if (multiSearch != null && !multiSearch.isEmpty()) {
-            Predicate multiSearchPredicate = createItemMultiSearchPredicate(multiSearch, itemFrom, itemVariantFrom, criteriaBuilder);
+            String lowerMultiSearch = multiSearch.toLowerCase(Locale.FRENCH); //TODO: actual locale
+
+            Predicate referenceContainsPredicate = createReferenceContainsPredicate(itemJoin, lowerMultiSearch);
+            Predicate variantReferenceContainsPredicate = createVariantReferenceContainsPredicate(itemVariantRoot, lowerMultiSearch);
+            Predicate namePredicate = createItemNameContainsPredicate(itemJoin, lowerMultiSearch);
+            Predicate descriptionPredicate = createDescriptionContainsPredicate(itemJoin, lowerMultiSearch);
+
+            Predicate multiSearchPredicate = criteriaBuilder.or(referenceContainsPredicate, variantReferenceContainsPredicate, namePredicate, descriptionPredicate);
             predicates.add(multiSearchPredicate);
         }
         
@@ -168,21 +106,35 @@ public class StockService {
         String referenceContains = itemVariantSearch.getReferenceContains();
         if (referenceContains != null && !referenceContains.trim().isEmpty()) {
             referenceContains = referenceContains.trim().toLowerCase(Locale.FRENCH);
-            Predicate referenceContainsPredicate = createReferenceContainsPredicate(itemFrom, referenceContains);
+            Predicate referenceContainsPredicate = createReferenceContainsPredicate(itemJoin, referenceContains);
             predicates.add(referenceContainsPredicate);
         }
 
-        String nameContains = itemSearch.getNameContains();
+        String variantReference = itemVariantSearch.getVariantReference();
+          if (variantReference != null && !variantReference.trim().isEmpty()) {
+            variantReference = variantReference.trim().toLowerCase(Locale.FRENCH);
+            Predicate variantReferencePredicate = createVariantReferencePredicate(itemVariantRoot, variantReference);
+            predicates.add(variantReferencePredicate);
+        }
+        
+        String variantReferenceContains = itemVariantSearch.getVariantReferenceContains();
+        if (variantReferenceContains != null && !variantReferenceContains.trim().isEmpty()) {
+            variantReferenceContains = variantReferenceContains.trim().toLowerCase(Locale.FRENCH);
+            Predicate variantReferenceContainsPredicate = createVariantReferenceContainsPredicate(itemVariantRoot, variantReferenceContains);
+            predicates.add(variantReferenceContainsPredicate);
+        }
+
+        String nameContains = itemVariantSearch.getNameContains();
         if (nameContains != null && !nameContains.trim().isEmpty()) {
             nameContains = nameContains.trim().toLowerCase(Locale.FRENCH);
-            Predicate namePredicate = createItemNameContainsPredicate(itemFrom, nameContains);
+            Predicate namePredicate = createItemNameContainsPredicate(itemJoin, nameContains);
             predicates.add(namePredicate);
         }
 
         String descriptionContains = itemVariantSearch.getDescriptionContains();
         if (descriptionContains != null && !descriptionContains.trim().isEmpty()) {
             descriptionContains = descriptionContains.trim().toLowerCase(Locale.FRENCH);
-            Predicate descriptionPredicate = createDescriptionContainsPredicate(itemFrom, descriptionContains);
+            Predicate descriptionPredicate = createDescriptionContainsPredicate(itemJoin, descriptionContains);
             predicates.add(descriptionPredicate);
         }
         
@@ -192,26 +144,28 @@ public class StockService {
             predicates.add(itemPredicate);
         }
 
-        return predicates;
+        if (pagination != null) {
+            List<Sort<ItemVariantColumn>> sortings = pagination.getSortings();
+            List<Order> orders = ItemVariantColumnPersistenceUtil.createOrdersFromSortings(criteriaBuilder, itemVariantRoot, sortings);
+            query.orderBy(orders);
     }
 
-    private Predicate createItemMultiSearchPredicate(String multiSearch, From<?, Item> itemFrom, From<?, ItemVariant> itemVariantFrom, CriteriaBuilder criteriaBuilder) {
-        String lowerMultiSearch = multiSearch.toLowerCase(Locale.FRENCH); //TODO: actual locale
-        List<Predicate> multiSearchPredicates = new ArrayList<>();
-        Predicate referenceContainsPredicate = createReferenceContainsPredicate(itemFrom, lowerMultiSearch);
-        multiSearchPredicates.add(referenceContainsPredicate);
-        Predicate namePredicate = createItemNameContainsPredicate(itemFrom, lowerMultiSearch);
-        multiSearchPredicates.add(namePredicate);
-        Predicate descriptionPredicate = createDescriptionContainsPredicate(itemFrom, lowerMultiSearch);
-        multiSearchPredicates.add(descriptionPredicate);
-        if (itemVariantFrom != null) {
-            Predicate variantReferenceContainsPredicate = createVariantReferenceContainsPredicate(itemVariantFrom, lowerMultiSearch);
-            multiSearchPredicates.add(variantReferenceContainsPredicate);
+        Predicate[] predicateArray = predicates.toArray(new Predicate[0]);
+        query.where(predicateArray);
+        query.distinct(true);
+
+        TypedQuery<ItemVariant> typedQuery = entityManager.createQuery(query);
+
+        if (pagination != null) {
+            int offset = pagination.getOffset();
+            int maxResults = pagination.getMaxResults();
+            typedQuery.setFirstResult(offset);
+            typedQuery.setMaxResults(maxResults);
         }
-        // combine
-        Predicate[] multiSearchPredicateArray = multiSearchPredicates.toArray(new Predicate[0]);
-        Predicate multiSearchPredicate = criteriaBuilder.or(multiSearchPredicateArray);
-        return multiSearchPredicate;
+
+        List<ItemVariant> items = typedQuery.getResultList();
+
+        return items;
     }
     
      @Nonnull
@@ -679,10 +633,6 @@ public class StockService {
 
         Predicate attributeValueExistsPredicate = criteriaBuilder.exists(attributeValueSubquery);
         return attributeValueExistsPredicate;
-    }
-
-    public Item saveItem(Item item) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }
