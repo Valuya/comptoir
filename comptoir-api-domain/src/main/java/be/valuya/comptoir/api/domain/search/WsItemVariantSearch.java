@@ -1,8 +1,8 @@
-package be.valuya.comptoir.model.search;
+package be.valuya.comptoir.api.domain.search;
 
-import be.valuya.comptoir.model.company.Company;
+import be.valuya.comptoir.api.domain.commercial.WsItemRef;
+import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import javax.annotation.Nonnull;
-import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -11,25 +11,36 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  * @author Yannick Majoros <yannick@valuya.be>
  */
-@XmlRootElement
+@XmlRootElement(name = "ItemSearch")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ItemSearch {
+public class WsItemVariantSearch {
 
-    @NotNull
-    private Company company;
-    
+    @Nonnull
+    private WsCompanyRef companyRef;
+    private WsItemRef itemRef;
     private String nameContains;
     private String descriptionContains;
     private String reference;
     private String referenceContains;
+    private String variantReference;
+    private String variantReferenceContains;
+
     private String multiSearch;
-    
-    public Company getCompany() {
-        return company;
+
+    public WsCompanyRef getCompanyRef() {
+        return companyRef;
     }
 
-    public void setCompany(Company company) {
-        this.company = company;
+    public void setCompanyRef(WsCompanyRef companyRef) {
+        this.companyRef = companyRef;
+    }
+
+    public WsItemRef getItemRef() {
+        return itemRef;
+    }
+
+    public void setItemRef(WsItemRef itemRef) {
+        this.itemRef = itemRef;
     }
 
     public String getNameContains() {
@@ -70,6 +81,22 @@ public class ItemSearch {
 
     public void setMultiSearch(String multiSearch) {
         this.multiSearch = multiSearch;
+    }
+
+    public String getVariantReference() {
+        return variantReference;
+    }
+
+    public void setVariantReference(String variantReference) {
+        this.variantReference = variantReference;
+    }
+
+    public String getVariantReferenceContains() {
+        return variantReferenceContains;
+    }
+
+    public void setVariantReferenceContains(String variantReferenceContains) {
+        this.variantReferenceContains = variantReferenceContains;
     }
 
 }

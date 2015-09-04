@@ -1,6 +1,7 @@
 package be.valuya.comptoir.service;
 
 import be.valuya.comptoir.model.commercial.ItemVariant;
+import be.valuya.comptoir.model.commercial.ItemVariant_;
 import be.valuya.comptoir.util.pagination.ItemVariantColumn;
 import be.valuya.comptoir.util.pagination.Sort;
 import java.util.ArrayList;
@@ -40,10 +41,14 @@ public class ItemVariantColumnPersistenceUtil {
         return order;
     }
 
-    public static Path<?> getPath(Root<ItemVariant> itemRoot, ItemVariantColumn itemColumn) {
-        switch (itemColumn) {
+    public static Path<?> getPath(Root<ItemVariant> itemVariantRoot, ItemVariantColumn itemVariantColumn) {
+        switch (itemVariantColumn) {
+            case VARIANT_REFERENCE:
+                return itemVariantRoot.get(ItemVariant_.variantReference);
+            case PRICING:
+                return itemVariantRoot.get(ItemVariant_.pricing);
             default:
-                throw new AssertionError(itemColumn.name());
+                throw new AssertionError(itemVariantColumn.name());
         }
     }
 

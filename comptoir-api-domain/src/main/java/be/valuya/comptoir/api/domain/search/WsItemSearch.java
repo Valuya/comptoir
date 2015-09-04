@@ -14,16 +14,15 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class WsItemSearch {
 
+    @Nonnull
+    private WsCompanyRef companyRef;
+    
     private String nameContains;
     private String descriptionContains;
     private String reference;
     private String referenceContains;
     private String multiSearch;
-    // size, color, ...
-    private String model;
-
-    @Nonnull
-    private WsCompanyRef companyRef;
+    
 
     public WsCompanyRef getCompanyRef() {
         return companyRef;
@@ -63,14 +62,6 @@ public class WsItemSearch {
 
     public void setReferenceContains(String referenceContains) {
         this.referenceContains = referenceContains;
-    }
-
-    public String getModel() {
-        return model;
-    }
-
-    public void setModel(String model) {
-        this.model = model;
     }
 
     public String getMultiSearch() {

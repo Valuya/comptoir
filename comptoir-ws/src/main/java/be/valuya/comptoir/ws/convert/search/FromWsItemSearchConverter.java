@@ -23,18 +23,17 @@ public class FromWsItemSearchConverter {
             return null;
         }
         WsCompanyRef companyRef = wsItemSearch.getCompanyRef();
-        wsItemSearch.getDescriptionContains();
-        String model = wsItemSearch.getModel();
+        String descriptionContains = wsItemSearch.getDescriptionContains();
         String multiSearch = wsItemSearch.getMultiSearch();
         String nameContains = wsItemSearch.getNameContains();
         String reference = wsItemSearch.getReference();
         String referenceContains = wsItemSearch.getReferenceContains();
-
+        
         Company company = fromWsCompanyConverter.find(companyRef);
 
         ItemSearch itemSearch = new ItemSearch();
         itemSearch.setCompany(company);
-        itemSearch.setVariantReference(model);
+        itemSearch.setDescriptionContains(descriptionContains);
         itemSearch.setMultiSearch(multiSearch);
         itemSearch.setNameContains(nameContains);
         itemSearch.setReference(reference);
