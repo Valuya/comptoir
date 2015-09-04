@@ -123,4 +123,15 @@
             referencedColumnNames="id" />
     </changeSet>
 
+    <changeSet id="13" author="cghislai">
+        <addColumn tableName="item_variant">
+            <column name="PRICING" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    
+    <changeSet id="14" author="cghislai">
+        <addColumn tableName="item_variant">
+            <column name="PRICINGAMOUNT" type="DECIMAL(19,2)"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>
