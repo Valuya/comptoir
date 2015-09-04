@@ -7,6 +7,7 @@ import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.model.commercial.Pos;
 import be.valuya.comptoir.model.commercial.PosPaymentAccount;
 import be.valuya.comptoir.model.commercial.Price;
+import be.valuya.comptoir.model.commercial.Pricing;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.factory.ItemFactory;
 import be.valuya.comptoir.model.factory.LocaleTextFactory;
@@ -98,6 +99,8 @@ public class RegistrationService {
 
         ItemVariant unkownItemVariant = itemFactory.createItemVariant(managedCompany);
         unkownItemVariant.setVariantReference("?");
+        unkownItemVariant.setPricing(Pricing.ADD_TO_BASE);
+        unkownItemVariant.setPricingAmount(BigDecimal.ZERO);
 
         LocaleText unkownItemDescription = localeTextFactory.createLocaleText();
         unkownItemDescription.put(Locale.ENGLISH, "Unknown item");

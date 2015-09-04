@@ -134,4 +134,10 @@
             <column name="PRICINGAMOUNT" type="DECIMAL(19,2)"/>
         </addColumn>
     </changeSet>
+    
+    <changeSet id="15" author="cghislai">
+        <addNotNullConstraint tableName="item_variant" columnName="PRICING" 
+                              columnDataType="VARCHAR(255)"
+                              defaultNullValue="ADD_TO_BASE"/>
+    </changeSet>
 </databaseChangeLog>
