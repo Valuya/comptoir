@@ -12,6 +12,7 @@ import be.valuya.comptoir.model.commercial.ItemSale;
 import be.valuya.comptoir.model.commercial.ItemSale_;
 import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.model.commercial.Price;
+import be.valuya.comptoir.model.commercial.Pricing;
 import be.valuya.comptoir.model.commercial.Sale;
 import be.valuya.comptoir.model.commercial.SalePrice;
 import be.valuya.comptoir.model.commercial.Sale_;
@@ -387,9 +388,23 @@ public class SaleService {
             BigDecimal vatExclusive = defaultItemPrice.getVatExclusive();
             BigDecimal vatRate = defaultItemPrice.getVatRate();
 
+            Pricing pricing = itemVariant.getPricing();
             BigDecimal pricingAmount = itemVariant.getPricingAmount();
-            if (pricingAmount != null) {
-                vatExclusive.add(pricingAmount);
+            switch (pricing) {
+                case ABSOLUTE: {
+                    vatExclusive = pricingAmount;
+                }
+                break;
+                case ADD_TO_BASE: {
+                    vatExclusive = vatExclusive.add(pricingAmount);
+                }
+                break;
+                case PARENT_ITEM: {
+                    // just ignore pricingAmount
+                }
+                break;
+                default:
+                    throw new AssertionError();
             }
 
             specificPrice.setVatExclusive(vatExclusive);
