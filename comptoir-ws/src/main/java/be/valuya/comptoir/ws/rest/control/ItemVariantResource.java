@@ -35,7 +35,7 @@ import javax.ws.rs.core.UriInfo;
  *
  * @author Yannick Majoros <yannick@valuya.be>
  */
-@Path("/item")
+@Path("/itemvariant")
 @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 public class ItemVariantResource {
@@ -45,9 +45,9 @@ public class ItemVariantResource {
     @Inject
     private FromWsItemVariantConverter fromWsItemConverter;
     @Inject
-    private FromWsItemSearchConverter fromWsItemSearchConverter;
+    private FromWsItemVariantSearchConverter fromWsItemVariantSearchConverter;
     @Inject
-    private ToWsItemVariantConverter toWsItemConverter;
+    private ToWsItemVariantConverter toWsItemVariantConverter;
     @Inject
     private IdChecker idChecker;
     @Context
@@ -61,9 +61,9 @@ public class ItemVariantResource {
     @Valid
     public WsItemVariantRef createItemVariant(@NoId @Valid WsItemVariant wsItem) {
         ItemVariant itemVariant = fromWsItemConverter.convert(wsItem);
-        ItemVariant savedItem = stockService.saveItem(itemVariant);
+        ItemVariant savedItem = stockService.saveItemVariant(itemVariant);
 
-        WsItemVariantRef itemVariantRef = toWsItemConverter.reference(savedItem);
+        WsItemVariantRef itemVariantRef = toWsItemVariantConverter.reference(savedItem);
 
         return itemVariantRef;
     }
@@ -74,9 +74,9 @@ public class ItemVariantResource {
     public WsItemVariantRef updateItemVariant(@PathParam("id") long id, @Valid WsItemVariant wsItem) {
         idChecker.checkId(id, wsItem);
         ItemVariant itemVariant = fromWsItemConverter.convert(wsItem);
-        ItemVariant savedItem = stockService.saveItem(itemVariant);
+        ItemVariant savedItem = stockService.saveItemVariant(itemVariant);
 
-        WsItemVariantRef itemVariantRef = toWsItemConverter.reference(savedItem);
+        WsItemVariantRef itemVariantRef = toWsItemVariantConverter.reference(savedItem);
 
         return itemVariantRef;
     }
@@ -87,7 +87,7 @@ public class ItemVariantResource {
     public WsItemVariant getItemVariant(@PathParam("id") long id) {
         ItemVariant itemVariant = stockService.findItemVariantById(id);
 
-        WsItemVariant wsItem = toWsItemConverter.convert(itemVariant);
+        WsItemVariant wsItem = toWsItemVariantConverter.convert(itemVariant);
 
         return wsItem;
     }
@@ -95,15 +95,15 @@ public class ItemVariantResource {
     @POST
     @Path("search")
     @Valid
-    public List<WsItemVariant> findItemVariants(@Valid WsItemSearch wsItemSearch) {
+    public List<WsItemVariant> findItemVariants(@Valid WsItemVariantSearch wsItemVariantSearch) {
         Pagination<ItemVariant, ItemVariantColumn> pagination = restPaginationUtil.extractPagination(uriInfo, ItemVariantColumn::valueOf);
 
-        ItemSearch itemSearch = fromWsItemSearchConverter.convert(wsItemSearch);
+        ItemVariantSearch itemVariantSearch = fromWsItemVariantSearchConverter.convert(wsItemVariantSearch);
 
-        List<ItemVariant> items = stockService.findItemVariants(itemSearch, pagination);
+        List<ItemVariant> items = stockService.findItemVariants(itemVariantSearch, pagination);
 
         List<WsItemVariant> wsItems = items.stream()
-                .map(toWsItemConverter::convert)
+                .map(toWsItemVariantConverter::convert)
                 .collect(Collectors.toList());
 
         response.setHeader(HeadersConfig.LIST_RESULTS_COUNT_HEADER, "1234");

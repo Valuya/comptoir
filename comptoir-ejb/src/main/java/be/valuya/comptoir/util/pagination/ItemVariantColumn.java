@@ -8,7 +8,7 @@ import be.valuya.comptoir.model.commercial.ItemVariant;
  */
 public enum ItemVariantColumn implements Column<ItemVariant> {
 
-    NAME,
-    DESCRIPTION;
+    VARIANT_REFERENCE,
+    PRICING;
 
 }
