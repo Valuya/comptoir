@@ -136,11 +136,11 @@ public class StockService {
         }
     }
 
-    private List<Predicate> createItemVariantPredicates(ItemVariantSearch itemVariantSearch, From<?, Item> itemFrom,  From<?, ItemVariant> itemVariantFrom) {
+    private List<Predicate> createItemVariantPredicates(ItemVariantSearch itemVariantSearch, From<?, Item> itemFrom, From<?, ItemVariant> itemVariantFrom) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         ItemSearch itemSearch = itemVariantSearch.getItemSearch();
         List<Predicate> predicates = createItemPredicates(itemSearch, itemFrom, itemVariantFrom);
-        
+
         Item item = itemVariantSearch.getItem();
         if (item != null) {
             Predicate itemPredicate = criteriaBuilder.equal(itemFrom, item);
@@ -159,7 +159,7 @@ public class StockService {
         }
         return predicates;
     }
-    
+
     private List<Predicate> createItemPredicates(ItemSearch itemSearch, From<?, Item> itemFrom, From<?, ItemVariant> itemVariantFrom) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
 
@@ -298,7 +298,8 @@ public class StockService {
     }
 
     /**
-     * Adapt stock values by creating a new ItemStock and updating the previous one.
+     * Adapt stock values by creating a new ItemStock and updating the previous
+     * one.
      *
      * @param fromDateTime
      * @param stock
@@ -463,7 +464,12 @@ public class StockService {
      * @deprecated
      */
     @Deprecated
-    public ItemVariant saveItem(ItemVariant item) {
+    public ItemVariant saveItemVariant(ItemVariant item) {
+        return entityManager.merge(item);
+    }
+
+    @Deprecated
+    public Item saveItem(Item item) {
         return entityManager.merge(item);
     }
 
@@ -589,10 +595,6 @@ public class StockService {
 
         Predicate attributeValueExistsPredicate = criteriaBuilder.exists(attributeValueSubquery);
         return attributeValueExistsPredicate;
-    }
-
-    public Item saveItem(Item item) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }
