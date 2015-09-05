@@ -61,7 +61,7 @@ public class ItemVariantResource {
     @Valid
     public WsItemVariantRef createItemVariant(@NoId @Valid WsItemVariant wsItem) {
         ItemVariant itemVariant = fromWsItemConverter.convert(wsItem);
-        ItemVariant savedItem = stockService.saveItem(itemVariant);
+        ItemVariant savedItem = stockService.saveItemVariant(itemVariant);
 
         WsItemVariantRef itemVariantRef = toWsItemConverter.reference(savedItem);
 
@@ -74,7 +74,7 @@ public class ItemVariantResource {
     public WsItemVariantRef updateItemVariant(@PathParam("id") long id, @Valid WsItemVariant wsItem) {
         idChecker.checkId(id, wsItem);
         ItemVariant itemVariant = fromWsItemConverter.convert(wsItem);
-        ItemVariant savedItem = stockService.saveItem(itemVariant);
+        ItemVariant savedItem = stockService.saveItemVariant(itemVariant);
 
         WsItemVariantRef itemVariantRef = toWsItemConverter.reference(savedItem);
 
