@@ -7,6 +7,19 @@
     <changeSet id="1" author="ymajoros">
         <renameTable oldTableName="item_picture" newTableName="picture" />
     </changeSet>
+    
+    <changeSet id="2-companyid-column" author="">
+        <addColumn tableName="picture">
+            <column name="COMPANY_ID" type="BIGINT(19)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="2-companyid-fk" author="">
+        <addForeignKeyConstraint baseTableName="picture" baseColumnNames="COMPANY_ID"
+                                 constraintName="KF_PICTURE_COMPANY_ID" 
+                                 referencedTableName="company" referencedColumnNames="ID"/>
+    </changeSet>
 
     <changeSet id="3" author="ymajoros">
         <createTable tableName="item_picture">
