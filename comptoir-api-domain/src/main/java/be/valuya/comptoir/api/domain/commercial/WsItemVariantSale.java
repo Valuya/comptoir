@@ -17,9 +17,9 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *
  * @author Yannick Majoros <yannick@valuya.be>
  */
-@XmlRootElement(name = "ItemSale")
+@XmlRootElement(name = "ItemVariantSale")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class WsItemSale implements WithId {
+public class WsItemVariantSale implements WithId {
 
     private Long id;
     @XmlJavaTypeAdapter(ZonedDateTimeXmlAdapter.class)

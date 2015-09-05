@@ -7,7 +7,7 @@ import be.valuya.comptoir.model.commercial.AttributeValue_;
 import be.valuya.comptoir.model.commercial.Item;
 import be.valuya.comptoir.model.commercial.ItemPicture;
 import be.valuya.comptoir.model.commercial.ItemPicture_;
-import be.valuya.comptoir.model.commercial.ItemSale;
+import be.valuya.comptoir.model.commercial.ItemVariantSale;
 import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.model.commercial.ItemVariantPicture;
 import be.valuya.comptoir.model.commercial.ItemVariantPicture_;
@@ -21,6 +21,7 @@ import be.valuya.comptoir.model.lang.LocaleText_;
 import be.valuya.comptoir.model.search.AttributeSearch;
 import be.valuya.comptoir.model.search.ItemSearch;
 import be.valuya.comptoir.model.search.ItemStockSearch;
+import be.valuya.comptoir.model.search.ItemVariantSearch;
 import be.valuya.comptoir.model.search.PictureSearch;
 import be.valuya.comptoir.model.stock.ItemStock;
 import be.valuya.comptoir.model.stock.ItemStock_;
@@ -95,7 +96,7 @@ public class StockService {
     }
 
     @Nonnull
-    public List<ItemVariant> findItemVariants(@Nonnull ItemSearch itemSearch, @CheckForNull Pagination<ItemVariant, ItemVariantColumn> pagination) {
+    public List<ItemVariant> findItemVariants(@Nonnull ItemVariantSearch itemVariantSearch, @CheckForNull Pagination<ItemVariant, ItemVariantColumn> pagination) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<ItemVariant> query = criteriaBuilder.createQuery(ItemVariant.class);
         Root<ItemVariant> itemVariantRoot = query.from(ItemVariant.class);
@@ -104,15 +105,8 @@ public class StockService {
 
         Join<ItemVariant, Item> itemJoin = itemVariantRoot.join(ItemVariant_.item, JoinType.LEFT);
 
-        List<Predicate> itemPredicates = createItemPredicates(itemSearch, itemJoin, itemVariantRoot);
+        List<Predicate> itemPredicates = createItemVariantPredicates(itemVariantSearch, itemJoin, itemVariantRoot);
         predicates.addAll(itemPredicates);
-
-        String variantReferenceContains = itemSearch.getVariantReferenceContains();
-        if (variantReferenceContains != null && !variantReferenceContains.trim().isEmpty()) {
-            variantReferenceContains = variantReferenceContains.trim().toLowerCase(Locale.FRENCH);
-            Predicate variantReferenceContainsPredicate = createVariantReferenceContainsPredicate(itemVariantRoot, variantReferenceContains);
-            predicates.add(variantReferenceContainsPredicate);
-        }
 
         if (pagination != null) {
             List<Sort<ItemVariantColumn>> sortings = pagination.getSortings();
@@ -140,6 +134,30 @@ public class StockService {
             typedQuery.setFirstResult(offset);
             typedQuery.setMaxResults(maxResults);
         }
+    }
+
+    private List<Predicate> createItemVariantPredicates(ItemVariantSearch itemVariantSearch, From<?, Item> itemFrom, From<?, ItemVariant> itemVariantFrom) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        ItemSearch itemSearch = itemVariantSearch.getItemSearch();
+        List<Predicate> predicates = createItemPredicates(itemSearch, itemFrom, itemVariantFrom);
+
+        Item item = itemVariantSearch.getItem();
+        if (item != null) {
+            Predicate itemPredicate = criteriaBuilder.equal(itemFrom, item);
+            predicates.add(itemPredicate);
+        }
+        String variantReference = itemVariantSearch.getVariantReference();
+        if (variantReference != null) {
+            Path<String> variantReferencePath = itemVariantFrom.get(ItemVariant_.variantReference);
+            Predicate variantReferencePredicate = criteriaBuilder.equal(variantReferencePath, variantReference);
+            predicates.add(variantReferencePredicate);
+        }
+        String variantReferenceContains = itemVariantSearch.getVariantReferenceContains();
+        if (variantReferenceContains != null) {
+            Predicate createVariantReferenceContainsPredicate = createVariantReferenceContainsPredicate(itemVariantFrom, variantReferenceContains);
+            predicates.add(createVariantReferenceContainsPredicate);
+        }
+        return predicates;
     }
 
     private List<Predicate> createItemPredicates(ItemSearch itemSearch, From<?, Item> itemFrom, From<?, ItemVariant> itemVariantFrom) {
@@ -258,7 +276,7 @@ public class StockService {
         return namePredicate;
     }
 
-    public ItemStock adaptStockFromItemSale(ZonedDateTime fromDateTime, Stock stock, ItemSale managedItemSale, StockChangeType stockChangeType, String comment) {
+    public ItemStock adaptStockFromItemSale(ZonedDateTime fromDateTime, Stock stock, ItemVariantSale managedItemSale, StockChangeType stockChangeType, String comment) {
         ItemVariant managedItem = managedItemSale.getItemVariant();
         BigDecimal soldQuantity = managedItemSale.getQuantity();
 
@@ -280,7 +298,8 @@ public class StockService {
     }
 
     /**
-     * Adapt stock values by creating a new ItemStock and updating the previous one.
+     * Adapt stock values by creating a new ItemStock and updating the previous
+     * one.
      *
      * @param fromDateTime
      * @param stock
@@ -445,7 +464,12 @@ public class StockService {
      * @deprecated
      */
     @Deprecated
-    public ItemVariant saveItem(ItemVariant item) {
+    public ItemVariant saveItemVariant(ItemVariant item) {
+        return entityManager.merge(item);
+    }
+
+    @Deprecated
+    public Item saveItem(Item item) {
         return entityManager.merge(item);
     }
 
@@ -571,10 +595,6 @@ public class StockService {
 
         Predicate attributeValueExistsPredicate = criteriaBuilder.exists(attributeValueSubquery);
         return attributeValueExistsPredicate;
-    }
-
-    public Item saveItem(Item item) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }
