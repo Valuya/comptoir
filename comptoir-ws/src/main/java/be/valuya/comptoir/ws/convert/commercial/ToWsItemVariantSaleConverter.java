@@ -1,12 +1,12 @@
 package be.valuya.comptoir.ws.convert.commercial;
 
-import be.valuya.comptoir.api.domain.commercial.WsItemSale;
-import be.valuya.comptoir.api.domain.commercial.WsItemSaleRef;
+import be.valuya.comptoir.api.domain.commercial.WsItemVariantSale;
+import be.valuya.comptoir.api.domain.commercial.WsItemVariantSaleRef;
 import be.valuya.comptoir.api.domain.commercial.WsItemVariantRef;
 import be.valuya.comptoir.api.domain.commercial.WsSaleRef;
 import be.valuya.comptoir.api.domain.lang.WsLocaleText;
 import be.valuya.comptoir.model.accounting.AccountingEntry;
-import be.valuya.comptoir.model.commercial.ItemSale;
+import be.valuya.comptoir.model.commercial.ItemVariantSale;
 import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.model.commercial.Price;
 import be.valuya.comptoir.model.commercial.Sale;
@@ -23,7 +23,7 @@ import javax.inject.Inject;
  *
  */
 @ApplicationScoped
-public class ToWsItemSaleConverter {
+public class ToWsItemVariantSaleConverter {
 
     @Inject
     private ToWsLocaleTextConverter fromWsLocaleTextConverter;
@@ -34,7 +34,7 @@ public class ToWsItemSaleConverter {
     @Inject
     private ToWsCompanyConverter toWsCompanyConverter;
 
-    public WsItemSale convert(ItemSale itemSale) {
+    public WsItemVariantSale convert(ItemVariantSale itemSale) {
         if (itemSale == null) {
             return null;
         }
@@ -59,7 +59,7 @@ public class ToWsItemSaleConverter {
         LocaleText comment = itemSale.getComment();
         List<WsLocaleText> wsComment = fromWsLocaleTextConverter.convert(comment);
 
-        WsItemSale wsItemSale = new WsItemSale();
+        WsItemVariantSale wsItemSale = new WsItemVariantSale();
         wsItemSale.setId(id);
         wsItemSale.setComment(wsComment);
         wsItemSale.setDateTime(dateTime);
@@ -74,9 +74,9 @@ public class ToWsItemSaleConverter {
         return wsItemSale;
     }
 
-    public WsItemSaleRef reference(ItemSale itemSale) {
+    public WsItemVariantSaleRef reference(ItemVariantSale itemSale) {
         Long id = itemSale.getId();
-        WsItemSaleRef wsItemSaleRef = new WsItemSaleRef(id);
+        WsItemVariantSaleRef wsItemSaleRef = new WsItemVariantSaleRef(id);
         return wsItemSaleRef;
     }
 

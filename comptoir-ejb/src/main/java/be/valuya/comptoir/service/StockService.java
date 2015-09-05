@@ -7,7 +7,7 @@ import be.valuya.comptoir.model.commercial.AttributeValue_;
 import be.valuya.comptoir.model.commercial.Item;
 import be.valuya.comptoir.model.commercial.ItemPicture;
 import be.valuya.comptoir.model.commercial.ItemPicture_;
-import be.valuya.comptoir.model.commercial.ItemSale;
+import be.valuya.comptoir.model.commercial.ItemVariantSale;
 import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.model.commercial.ItemVariantPicture;
 import be.valuya.comptoir.model.commercial.ItemVariantPicture_;
@@ -258,7 +258,7 @@ public class StockService {
         return namePredicate;
     }
 
-    public ItemStock adaptStockFromItemSale(ZonedDateTime fromDateTime, Stock stock, ItemSale managedItemSale, StockChangeType stockChangeType, String comment) {
+    public ItemStock adaptStockFromItemSale(ZonedDateTime fromDateTime, Stock stock, ItemVariantSale managedItemSale, StockChangeType stockChangeType, String comment) {
         ItemVariant managedItem = managedItemSale.getItemVariant();
         BigDecimal soldQuantity = managedItemSale.getQuantity();
 

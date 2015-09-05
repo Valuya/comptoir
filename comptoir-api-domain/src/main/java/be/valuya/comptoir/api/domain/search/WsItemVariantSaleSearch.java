@@ -15,7 +15,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement(name = "ItemSaleSearch")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class WsItemSaleSearch {
+public class WsItemVariantSaleSearch {
 
     @Nonnull
     @NotNull
