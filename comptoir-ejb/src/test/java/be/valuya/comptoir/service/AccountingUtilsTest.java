@@ -1,7 +1,7 @@
 package be.valuya.comptoir.service;
 
 import be.valuya.comptoir.model.commercial.Item;
-import be.valuya.comptoir.model.commercial.ItemSale;
+import be.valuya.comptoir.model.commercial.ItemVariantSale;
 import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.model.commercial.Price;
 import be.valuya.comptoir.model.commercial.Sale;
@@ -42,19 +42,19 @@ public class AccountingUtilsTest {
         ItemVariant itemVariant2 = new ItemVariant();
         itemVariant2.setItem(item2);
 
-        ItemSale itemSale1 = new ItemSale();
+        ItemVariantSale itemSale1 = new ItemVariantSale();
         itemSale1.setItemVariant(itemVariant1);
         itemSale1.setPrice(price1);
         itemSale1.setQuantity(BigDecimal.valueOf(2, 0));
 
-        ItemSale itemSale2 = new ItemSale();
+        ItemVariantSale itemSale2 = new ItemVariantSale();
         itemSale2.setItemVariant(itemVariant2);
         itemSale2.setPrice(price2);
         itemSale2.setQuantity(BigDecimal.valueOf(1, 0));
 
         Sale sale = new Sale();
 
-        List<ItemSale> itemSales = Arrays.asList(itemSale1, itemSale2);
+        List<ItemVariantSale> itemSales = Arrays.asList(itemSale1, itemSale2);
 
         Sale adjustedSale = AccountingUtils.calcSale(sale, itemSales);
         BigDecimal vatExclusiveAmount = adjustedSale.getVatExclusiveAmount();
