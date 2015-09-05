@@ -1,6 +1,6 @@
 package be.valuya.comptoir.service;
 
-import be.valuya.comptoir.model.commercial.ItemSale;
+import be.valuya.comptoir.model.commercial.ItemVariantSale;
 import be.valuya.comptoir.model.commercial.Price;
 import be.valuya.comptoir.model.commercial.Sale;
 import be.valuya.comptoir.model.commercial.SalePrice;
@@ -36,7 +36,7 @@ public class AccountingUtils {
         return vatInclusive;
     }
 
-    public static SalePrice calcSalePrice(ItemSale itemSale) {
+    public static SalePrice calcSalePrice(ItemVariantSale itemSale) {
         Price price = itemSale.getPrice();
         BigDecimal quantity = itemSale.getQuantity();
         return AccountingUtils.calcSalePrice(price, quantity);
@@ -63,7 +63,7 @@ public class AccountingUtils {
         return effectiveVatExclusive;
     }
 
-    public static Sale calcSale(Sale sale, List<ItemSale> itemSales) {
+    public static Sale calcSale(Sale sale, List<ItemVariantSale> itemSales) {
         SalePrice totalSalePrice = itemSales.stream()
                 .map(AccountingUtils::calcSalePrice)
                 .reduce(AccountingUtils::combineSalePrices)

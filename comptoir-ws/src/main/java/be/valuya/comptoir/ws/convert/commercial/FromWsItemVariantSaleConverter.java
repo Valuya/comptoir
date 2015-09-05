@@ -1,11 +1,11 @@
 package be.valuya.comptoir.ws.convert.commercial;
 
-import be.valuya.comptoir.api.domain.commercial.WsItemSale;
-import be.valuya.comptoir.api.domain.commercial.WsItemSaleRef;
+import be.valuya.comptoir.api.domain.commercial.WsItemVariantSale;
+import be.valuya.comptoir.api.domain.commercial.WsItemVariantSaleRef;
 import be.valuya.comptoir.api.domain.commercial.WsItemVariantRef;
 import be.valuya.comptoir.api.domain.commercial.WsSaleRef;
 import be.valuya.comptoir.api.domain.lang.WsLocaleText;
-import be.valuya.comptoir.model.commercial.ItemSale;
+import be.valuya.comptoir.model.commercial.ItemVariantSale;
 import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.model.commercial.Price;
 import be.valuya.comptoir.model.commercial.Sale;
@@ -24,7 +24,7 @@ import javax.inject.Inject;
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @ApplicationScoped
-public class FromWsItemSaleConverter {
+public class FromWsItemVariantSaleConverter {
 
     @Inject
     private FromWsLocaleTextConverter fromWsLocaleTextConverter;
@@ -35,16 +35,16 @@ public class FromWsItemSaleConverter {
     @EJB
     private SaleService saleService;
 
-    public ItemSale convert(WsItemSale wsItemSale) {
+    public ItemVariantSale convert(WsItemVariantSale wsItemSale) {
         if (wsItemSale == null) {
             return null;
         }
-        ItemSale itemSale = new ItemSale();
+        ItemVariantSale itemSale = new ItemVariantSale();
 
         return patch(itemSale, wsItemSale);
     }
 
-    public ItemSale patch(ItemSale itemSale, WsItemSale wsItemSale) {
+    public ItemVariantSale patch(ItemVariantSale itemSale, WsItemVariantSale wsItemSale) {
         Long id = wsItemSale.getId();
 
         ZonedDateTime dateTime = wsItemSale.getDateTime();
@@ -83,7 +83,7 @@ public class FromWsItemSaleConverter {
         return itemSale;
     }
 
-    public ItemSale find(WsItemSaleRef itemSaleRef) {
+    public ItemVariantSale find(WsItemVariantSaleRef itemSaleRef) {
         if (itemSaleRef == null) {
             return null;
         }

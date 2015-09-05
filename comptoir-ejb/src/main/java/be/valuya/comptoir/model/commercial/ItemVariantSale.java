@@ -21,7 +21,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "itemvariant_sale")
-public class ItemSale implements Serializable {
+public class ItemVariantSale implements Serializable {
 
     @Id
     @GeneratedValue
@@ -128,7 +128,7 @@ public class ItemSale implements Serializable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final ItemSale other = (ItemSale) obj;
+        final ItemVariantSale other = (ItemVariantSale) obj;
         return Objects.equals(this.id, other.id);
     }
 }
