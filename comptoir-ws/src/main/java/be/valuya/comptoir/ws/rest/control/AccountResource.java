@@ -86,6 +86,8 @@ public class AccountResource {
     @Path("search")
     @Valid
     public List<WsAccount> findAccounts(@Valid WsAccountSearch wsAccountSearch) {
+//        Pagination<Account, AccountColumn> pagination = restPaginationUtil.extractPagination(uriInfo, AttributeDefinitionColumn::valueOf);
+
         AccountSearch accountSearch = fromWsAccountSearchConverter.convert(wsAccountSearch);
         List<Account> accounts = accountService.findAccounts(accountSearch);
 
