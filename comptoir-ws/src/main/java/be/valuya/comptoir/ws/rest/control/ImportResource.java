@@ -1,7 +1,11 @@
 package be.valuya.comptoir.ws.rest.control;
 
+import be.valuya.comptoir.api.domain.company.WsCompanyRef;
+import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.service.ImportService;
-import be.valuya.comptoir.ws.rest.validation.IdChecker;
+import be.valuya.comptoir.service.ImportSummary;
+import be.valuya.comptoir.service.PrestashopImportParams;
+import be.valuya.comptoir.ws.convert.company.FromWsCompanyConverter;
 import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -23,11 +27,15 @@ public class ImportResource {
     @EJB
     private ImportService importService;
     @Inject
-    private IdChecker idChecker;
+    private FromWsCompanyConverter fromWsCompanyConverter;
 
     @POST
-    @Path("{id}/import")
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public void importItems(@PathParam("id") Long companyId, byte[] data) {
+    @Path("{companyId}/{backendName}")
+    public ImportSummary importItems(@PathParam("companyId") Long companyId, @PathParam("backendName") String backendName, PrestashopImportParams prestashopImportParams) {
+        WsCompanyRef wsCompanyRef = new WsCompanyRef(companyId);
+        Company company = fromWsCompanyConverter.find(wsCompanyRef);
+
+        ImportSummary importSummary = importService.doImport(company, backendName, prestashopImportParams);
+        return importSummary;
     }
 }

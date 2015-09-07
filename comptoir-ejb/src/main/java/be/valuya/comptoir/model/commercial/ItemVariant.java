@@ -46,7 +46,13 @@ public class ItemVariant implements Serializable, WithId {
     @JoinColumn(name = "main_picture_id")
     private Picture mainPicture;
     @OneToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "item_attribute_value")
+    @JoinTable(
+            name = "item_attribute_value",
+            joinColumns = {
+                @JoinColumn(name = "item_variant_id")},
+            inverseJoinColumns = {
+                @JoinColumn(name = "attribute_value_id")}
+    )
     private List<AttributeValue> attributeValues;
 
     @Override

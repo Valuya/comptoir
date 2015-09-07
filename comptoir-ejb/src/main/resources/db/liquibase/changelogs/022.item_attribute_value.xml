@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
+    <changeSet id="1" author="ymajoros">
+        <createTable tableName="item_attribute_value">
+            <column name="item_variant_id" type="bigint(20)">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="attribute_value_id" type="bigint(20)">
+                <constraints primaryKey="true" />
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="2" author="ymajoros">
+        <addForeignKeyConstraint 
+            constraintName="fk_item_attr_val_item_variant" 
+            baseTableName="item_attribute_value" 
+            baseColumnNames="item_variant_id" 
+            referencedTableName="item_variant" 
+            referencedColumnNames="id"
+        />
+    </changeSet>
+
+    <changeSet id="3" author="ymajoros">
+        <addForeignKeyConstraint 
+            constraintName="fk_item_attr_val_attr_def" 
+            baseTableName="item_attribute_value" 
+            baseColumnNames="attribute_value_id" 
+            referencedTableName="attribute_value" 
+            referencedColumnNames="id"
+        />
+    </changeSet>
+    
+</databaseChangeLog>
