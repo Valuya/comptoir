@@ -80,7 +80,7 @@ public class StockService {
                 itemColumn -> ItemColumnPersistenceUtil.getPath(itemRoot, itemColumn)
         );
 
-        List<Item> items = paginatedQueryService.getResults(predicates, query, Item.class, pagination);
+        List<Item> items = paginatedQueryService.getResults(predicates, query, itemRoot, pagination);
 
         return items;
     }
@@ -111,7 +111,7 @@ public class StockService {
 
         query.distinct(true);
 
-        List<ItemVariant> items = paginatedQueryService.getResults(predicates, query, ItemVariant.class, pagination);
+        List<ItemVariant> items = paginatedQueryService.getResults(predicates, query, itemVariantRoot, pagination);
 
         return items;
     }
@@ -548,7 +548,7 @@ public class StockService {
     }
 
     public Item saveItem(Item item) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return entityManager.merge(item);
     }
 
 }

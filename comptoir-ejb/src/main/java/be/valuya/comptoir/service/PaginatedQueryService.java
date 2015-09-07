@@ -31,11 +31,11 @@ public class PaginatedQueryService {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public <T, C extends Column<T>> List<T> getResults(List<Predicate> predicates, CriteriaQuery<T> query, Class<T> fromClass, Pagination<T, C> pagination) {
+    public <T, C extends Column<T>> List<T> getResults(List<Predicate> predicates, CriteriaQuery<T> query, Root<T> root, Pagination<T, C> pagination) {
         Predicate[] predicateArray = predicates.toArray(new Predicate[0]);
         query.where(predicateArray);
 
-        List<T> items = getResults(query, fromClass, predicates, pagination);
+        List<T> items = getResults(query, root, predicates, pagination);
         return items;
     }
 
@@ -46,11 +46,11 @@ public class PaginatedQueryService {
         }
     }
 
-    public <T, C extends Column<T>> List<T> getResults(CriteriaQuery<T> query, Class<T> fromClass, List<Predicate> predicates, Pagination<T, C> pagination) {
+    public <T, C extends Column<T>> List<T> getResults(CriteriaQuery<T> query, Root<T> root, List<Predicate> predicates, Pagination<T, C> pagination) {
         TypedQuery<T> typedQuery = entityManager.createQuery(query);
         paginate(pagination, typedQuery);
 
-        long allResultCount = countResults(fromClass, predicates);
+        long allResultCount = countResults(root, predicates);
         pagination.setAllResultCount(allResultCount);
 
         return typedQuery.getResultList();
@@ -101,10 +101,9 @@ public class PaginatedQueryService {
         return order;
     }
 
-    private <T, C extends Object & Column<T>> long countResults(Class<T> fromClass, List<Predicate> predicates) {
+    private <T, C extends Object & Column<T>> long countResults(Root<T> root, List<Predicate> predicates) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Long> query = criteriaBuilder.createQuery(Long.class);
-        Root<T> root = query.from(fromClass);
 
         Expression<Long> countExpression = criteriaBuilder.count(root);
         query.select(countExpression);
