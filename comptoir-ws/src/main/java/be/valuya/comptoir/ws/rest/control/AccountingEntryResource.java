@@ -95,6 +95,7 @@ public class AccountingEntryResource {
                 .collect(Collectors.toList());
 
         response.setHeader(HeadersConfig.LIST_RESULTS_COUNT_HEADER, "101");
+
         return wsAccountingEntrys;
     }
 

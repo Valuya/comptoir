@@ -8,7 +8,6 @@ import be.valuya.comptoir.model.search.SaleSearch;
 import be.valuya.comptoir.service.SaleService;
 import be.valuya.comptoir.util.pagination.Pagination;
 import be.valuya.comptoir.util.pagination.SaleColumn;
-import be.valuya.comptoir.ws.config.HeadersConfig;
 import be.valuya.comptoir.ws.convert.commercial.FromWsSaleConverter;
 import be.valuya.comptoir.ws.convert.commercial.ToWsSaleConverter;
 import be.valuya.comptoir.ws.convert.search.FromWsSaleSearchConverter;
@@ -108,12 +107,13 @@ public class SaleResource {
         SaleSearch saleSearch = fromWsSaleSearchConverter.convert(wsSaleSearch);
 
         List<Sale> sales = saleService.findSales(saleSearch, pagination);
-        Long count = saleService.countSales(saleSearch);
 
         List<WsSale> wsSales = sales.stream()
                 .map(toWsSaleConverter::convert)
                 .collect(Collectors.toList());
-        response.setHeader(HeadersConfig.LIST_RESULTS_COUNT_HEADER, count.toString());
+
+        restPaginationUtil.addResultCount(response, pagination);
+
         return wsSales;
     }
 

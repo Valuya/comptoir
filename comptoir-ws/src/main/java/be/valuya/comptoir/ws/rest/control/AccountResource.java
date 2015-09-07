@@ -94,6 +94,7 @@ public class AccountResource {
                 .collect(Collectors.toList());
 
         response.setHeader(HeadersConfig.LIST_RESULTS_COUNT_HEADER, "101");
+
         return wsAccounts;
     }
 

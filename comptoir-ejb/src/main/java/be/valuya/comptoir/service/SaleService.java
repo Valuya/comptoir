@@ -42,7 +42,6 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Path;
@@ -292,24 +291,6 @@ public class SaleService {
 
         List<Sale> sales = typedQuery.getResultList();
         return sales;
-    }
-
-    @Nonnull
-    public Long countSales(@Nonnull SaleSearch saleSearch) {
-        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Long> query = criteriaBuilder.createQuery(Long.class);
-        Root<Sale> saleRoot = query.from(Sale.class);
-
-        Expression<Long> saleCountExpression = criteriaBuilder.count(saleRoot);
-        query.select(saleCountExpression);
-
-        List<Predicate> predicates = applySaleSearch(saleSearch, saleRoot, criteriaBuilder);
-        Predicate[] predicateArray = predicates.toArray(new Predicate[0]);
-        query.where(predicateArray);
-
-        TypedQuery<Long> typedQuery = entityManager.createQuery(query);
-        Long saleCount = typedQuery.getSingleResult();
-        return saleCount;
     }
 
     private List<Predicate> applySaleSearch(SaleSearch saleSearch, Path<Sale> saleRoot, CriteriaBuilder criteriaBuilder) {
