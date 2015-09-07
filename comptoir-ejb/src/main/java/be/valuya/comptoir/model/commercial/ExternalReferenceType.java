@@ -7,7 +7,7 @@ package be.valuya.comptoir.model.commercial;
 public enum ExternalReferenceType {
 
     ITEM,
-    ITEMVARIANT_VARIANT,
+    ITEM_VARIANT,
     ATTRIBUTE_DEFINITION,
     ATTRIBUTE_VALUE;
 

@@ -34,25 +34,30 @@ public class ImportService {
 
         long attributeDefinitionCount = prestashopImportUtil.getAttributeDefinitionStore()
                 .stream()
-                .map(externalEntity -> this.load(company, backendName, externalEntity))
+                .map(externalEntity -> this.load(company, backendName, externalEntity, ExternalReferenceType.ATTRIBUTE_DEFINITION))
                 .count();
+        entityManager.flush();
         long attributeValueCount = prestashopImportUtil.getAttributeValueStore()
                 .stream()
-                .map(externalEntity -> this.load(company, backendName, externalEntity))
+                .map(externalEntity -> this.load(company, backendName, externalEntity, ExternalReferenceType.ATTRIBUTE_VALUE))
                 .count();
+        entityManager.flush();
         long itemVariantCount = prestashopImportUtil.getItemVariantStore()
                 .stream()
-                .map(externalEntity -> this.load(company, backendName, externalEntity))
+                .map(externalEntity -> this.load(company, backendName, externalEntity, ExternalReferenceType.ITEM_VARIANT))
                 .count();
+        entityManager.flush();
         long itemCount = prestashopImportUtil.getItemStore()
                 .stream()
-                .map(externalEntity -> this.load(company, backendName, externalEntity))
+                .map(externalEntity -> this.load(company, backendName, externalEntity, ExternalReferenceType.ITEM))
                 .count();
+        entityManager.flush();
 
         long defaultItemVariantCount = prestashopImportUtil.getDefaultItemVariants()
                 .stream()
                 .map(entityManager::merge)
                 .count();
+        entityManager.flush();
 
         ImportSummary importSummary = new ImportSummary();
         importSummary.setAttributeDefinitionCount(attributeDefinitionCount);
@@ -64,24 +69,26 @@ public class ImportService {
         return importSummary;
     }
 
-    private <T extends WithId> T load(Company company, String backendName, ExternalEntity<Long, T> externalEntity) {
-        T attributeValue = externalEntity.getValue();
+    private <T extends WithId> T load(Company company, String backendName, ExternalEntity<Long, T> externalEntity, ExternalReferenceType externalReferenceType) {
+        T entity = externalEntity.getValue();
 
-        ExternalReference externalReference = loadExternalReference(company, backendName, externalEntity);
+        ExternalReference externalReference = loadExternalReference(company, backendName, externalEntity, externalReferenceType);
 
-        T managedAttributeValue = entityManager.merge(attributeValue);
         Long localId = externalReference.getLocalId();
-        attributeValue.setId(localId);
+        entity.setId(localId);
+        T managedEntity = entityManager.merge(entity);
+        Long id = managedEntity.getId();
+        externalReference.setId(id);
 
-        return managedAttributeValue;
+        return managedEntity;
     }
 
-    private <T extends WithId> ExternalReference loadExternalReference(Company company, String backendName, ExternalEntity<Long, T> externalEntity) {
+    private <T extends WithId> ExternalReference loadExternalReference(Company company, String backendName, ExternalEntity<Long, T> externalEntity, ExternalReferenceType externalReferenceType) {
         T entity = externalEntity.getValue();
         Long externalId = externalEntity.getExternalId();
         String externalIdStr = Long.toString(externalId);
 
-        ExternalReference externalReference = findExternalReferenceOptional(company, backendName, externalIdStr, ExternalReferenceType.ATTRIBUTE_VALUE)
+        ExternalReference externalReference = findExternalReferenceOptional(company, backendName, externalIdStr, externalReferenceType)
                 .orElseGet(() -> createExternalReference(entity, company, backendName, externalIdStr));
         return externalReference;
     }
