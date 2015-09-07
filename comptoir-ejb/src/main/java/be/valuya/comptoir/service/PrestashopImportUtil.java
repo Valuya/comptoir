@@ -212,6 +212,10 @@ public class PrestashopImportUtil {
                 .map(ExternalEntity::getValue)
                 .filter(this::hasItemVariants)
                 .map(this::createItemVariant)
+                .peek(itemVariant -> {
+                    itemVariant.setPricing(Pricing.PARENT_ITEM);
+                    itemVariant.setVariantReference("0");
+                })
                 .forEach(defaultItemVariants::add);
     }
 

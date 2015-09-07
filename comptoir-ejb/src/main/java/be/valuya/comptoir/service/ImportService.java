@@ -89,14 +89,14 @@ public class ImportService {
         String externalIdStr = Long.toString(externalId);
 
         ExternalReference externalReference = findExternalReferenceOptional(company, backendName, externalIdStr, externalReferenceType)
-                .orElseGet(() -> createExternalReference(entity, company, backendName, externalIdStr));
+                .orElseGet(() -> createExternalReference(entity, company, backendName, externalReferenceType, externalIdStr));
         return externalReference;
     }
 
-    private <T extends WithId> ExternalReference createExternalReference(T entity, Company company, String backendName, String externalIdStr) {
+    private <T extends WithId> ExternalReference createExternalReference(T entity, Company company, String backendName, ExternalReferenceType externalReferenceType, String externalIdStr) {
         entityManager.persist(entity);
         Long localId = entity.getId();
-        ExternalReference externalReference = new ExternalReference(company, backendName, ExternalReferenceType.ATTRIBUTE_VALUE, externalIdStr, localId);
+        ExternalReference externalReference = new ExternalReference(company, backendName, externalReferenceType, externalIdStr, localId);
         entityManager.persist(externalReference);
 
         return externalReference;
