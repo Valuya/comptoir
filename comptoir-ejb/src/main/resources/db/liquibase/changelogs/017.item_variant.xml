@@ -140,4 +140,24 @@
                               columnDataType="VARCHAR(255)"
                               defaultNullValue="ADD_TO_BASE"/>
     </changeSet>
+    
+    
+    <changeSet id="16" author="cghislai">
+        <dropForeignKeyConstraint baseTableName="item_sale"
+                                  constraintName="FK_item_sale_ITEM_ID" />
+    </changeSet>
+    <changeSet id="17" author="cghislai">
+        <renameTable oldTableName="item_sale" newTableName="itemvariant_sale" />
+    </changeSet>
+    <changeSet id="18" author="cghislai">
+        <renameColumn tableName="itemvariant_sale" 
+                      oldColumnName="ITEM_ID" newColumnName="ITEMVARIANT_ID"
+                      columnDataType="BIGINT(19)"/>
+    </changeSet>
+    <changeSet id="19" author="cghislai">
+        <addForeignKeyConstraint baseTableName="itemvariant_sale" 
+                                 baseColumnNames="ITEMVARIANT_ID" 
+                                 constraintName="FK_itemvariant_sale_ITEMVARIANT_ID"
+                                 referencedTableName="item_variant" referencedColumnNames="ID" />
+    </changeSet>
 </databaseChangeLog>

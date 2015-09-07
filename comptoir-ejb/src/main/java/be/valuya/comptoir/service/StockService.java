@@ -7,10 +7,10 @@ import be.valuya.comptoir.model.commercial.AttributeValue_;
 import be.valuya.comptoir.model.commercial.Item;
 import be.valuya.comptoir.model.commercial.ItemPicture;
 import be.valuya.comptoir.model.commercial.ItemPicture_;
-import be.valuya.comptoir.model.commercial.ItemSale;
 import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.model.commercial.ItemVariantPicture;
 import be.valuya.comptoir.model.commercial.ItemVariantPicture_;
+import be.valuya.comptoir.model.commercial.ItemVariantSale;
 import be.valuya.comptoir.model.commercial.ItemVariant_;
 import be.valuya.comptoir.model.commercial.Item_;
 import be.valuya.comptoir.model.commercial.Picture;
@@ -32,7 +32,6 @@ import be.valuya.comptoir.util.pagination.AttributeDefinitionColumn;
 import be.valuya.comptoir.util.pagination.ItemColumn;
 import be.valuya.comptoir.util.pagination.ItemVariantColumn;
 import be.valuya.comptoir.util.pagination.Pagination;
-import be.valuya.comptoir.util.pagination.Sort;
 import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.time.ZonedDateTime;
@@ -41,6 +40,7 @@ import java.util.List;
 import java.util.Locale;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -52,7 +52,6 @@ import javax.persistence.criteria.From;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.MapJoin;
-import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
@@ -67,6 +66,8 @@ public class StockService {
 
     @PersistenceContext
     private EntityManager entityManager;
+    @EJB
+    private PaginatedQueryService paginatedQueryService;
 
     @Nonnull
     public List<Item> findItems(@Nonnull ItemSearch itemSearch, @CheckForNull Pagination<Item, ItemColumn> pagination) {
@@ -76,21 +77,11 @@ public class StockService {
 
         List<Predicate> predicates = createItemPredicates(itemSearch, itemRoot, null);
 
-        if (pagination != null) {
-            List<Sort<ItemColumn>> sortings = pagination.getSortings();
-            List<Order> orders = ItemColumnPersistenceUtil.createOrdersFromSortings(criteriaBuilder, itemRoot, sortings);
-            query.orderBy(orders);
-        }
+        paginatedQueryService.applySort(pagination, itemRoot, query,
+                itemColumn -> ItemColumnPersistenceUtil.getPath(itemRoot, itemColumn)
+        );
 
-        Predicate[] predicateArray = predicates.toArray(new Predicate[0]);
-        query.where(predicateArray);
-        query.distinct(true);
-
-        TypedQuery<Item> typedQuery = entityManager.createQuery(query);
-
-        paginate(pagination, typedQuery);
-
-        List<Item> items = typedQuery.getResultList();
+        List<Item> items = paginatedQueryService.getResults(predicates, query, Item.class, pagination);
 
         return items;
     }
@@ -108,21 +99,13 @@ public class StockService {
         List<Predicate> itemPredicates = createItemVariantPredicates(itemVariantSearch, itemJoin, itemVariantRoot);
         predicates.addAll(itemPredicates);
 
-        if (pagination != null) {
-            List<Sort<ItemVariantColumn>> sortings = pagination.getSortings();
-            List<Order> orders = ItemVariantColumnPersistenceUtil.createOrdersFromSortings(criteriaBuilder, itemVariantRoot, sortings);
-            query.orderBy(orders);
-        }
+        paginatedQueryService.applySort(pagination, itemVariantRoot, query,
+                itemVariantColumn -> ItemVariantColumnPersistenceUtil.getPath(itemVariantRoot, itemVariantColumn)
+        );
 
-        Predicate[] predicateArray = predicates.toArray(new Predicate[0]);
-        query.where(predicateArray);
         query.distinct(true);
 
-        TypedQuery<ItemVariant> typedQuery = entityManager.createQuery(query);
-
-        paginate(pagination, typedQuery);
-
-        List<ItemVariant> items = typedQuery.getResultList();
+        List<ItemVariant> items = paginatedQueryService.getResults(predicates, query, ItemVariant.class, pagination);
 
         return items;
     }
@@ -159,7 +142,7 @@ public class StockService {
         }
         return predicates;
     }
-
+    
     private List<Predicate> createItemPredicates(ItemSearch itemSearch, From<?, Item> itemFrom, From<?, ItemVariant> itemVariantFrom) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
 
@@ -276,7 +259,7 @@ public class StockService {
         return namePredicate;
     }
 
-    public ItemStock adaptStockFromItemSale(ZonedDateTime fromDateTime, Stock stock, ItemSale managedItemSale, StockChangeType stockChangeType, String comment) {
+    public ItemStock adaptStockFromItemSale(ZonedDateTime fromDateTime, Stock stock, ItemVariantSale managedItemSale, StockChangeType stockChangeType, String comment) {
         ItemVariant managedItem = managedItemSale.getItemVariant();
         BigDecimal soldQuantity = managedItemSale.getQuantity();
 
