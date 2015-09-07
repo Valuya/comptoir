@@ -8,9 +8,9 @@ import be.valuya.comptoir.model.accounting.AccountingTransaction;
 import be.valuya.comptoir.model.accounting.AccountingTransactionType;
 import be.valuya.comptoir.model.commercial.AttributeValue;
 import be.valuya.comptoir.model.commercial.Item;
-import be.valuya.comptoir.model.commercial.ItemSale;
-import be.valuya.comptoir.model.commercial.ItemSale_;
+import be.valuya.comptoir.model.commercial.ItemVariantSale;
 import be.valuya.comptoir.model.commercial.ItemVariant;
+import be.valuya.comptoir.model.commercial.ItemVariantSale_;
 import be.valuya.comptoir.model.commercial.Price;
 import be.valuya.comptoir.model.commercial.Pricing;
 import be.valuya.comptoir.model.commercial.Sale;
@@ -19,7 +19,7 @@ import be.valuya.comptoir.model.commercial.Sale_;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.lang.LocaleText;
 import be.valuya.comptoir.model.search.AccountingEntrySearch;
-import be.valuya.comptoir.model.search.ItemSaleSearch;
+import be.valuya.comptoir.model.search.ItemVariantSaleSearch;
 import be.valuya.comptoir.model.search.SaleSearch;
 import be.valuya.comptoir.model.stock.Stock;
 import be.valuya.comptoir.model.stock.StockChangeType;
@@ -63,11 +63,11 @@ public class SaleService {
     @EJB
     private AccountService accountService;
 
-    public Sale createSale(Stock stock, Sale sale, List<ItemSale> itemSales) {
+    public Sale createSale(Stock stock, Sale sale, List<ItemVariantSale> itemSales) {
         Sale managedSale = entityManager.merge(sale);
 
-        for (ItemSale itemSale : itemSales) {
-            ItemSale managedItemSale = entityManager.merge(itemSale);
+        for (ItemVariantSale itemSale : itemSales) {
+            ItemVariantSale managedItemSale = entityManager.merge(itemSale);
             managedItemSale.setSale(managedSale);
             ZonedDateTime zonedDateTime = ZonedDateTime.now();
             stockService.adaptStockFromItemSale(zonedDateTime, stock, managedItemSale, StockChangeType.SALE, null);
@@ -78,32 +78,32 @@ public class SaleService {
     }
 
     @Nonnull
-    public List<ItemSale> findItemSales(@Nonnull Sale sale) {
+    public List<ItemVariantSale> findItemSales(@Nonnull Sale sale) {
         if (sale.getId() == null) {
             // new sale, no ItemSale list
             return Arrays.asList();
         }
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<ItemSale> query = criteriaBuilder.createQuery(ItemSale.class);
+        CriteriaQuery<ItemVariantSale> query = criteriaBuilder.createQuery(ItemVariantSale.class);
 
-        Root<ItemSale> itemSaleRoot = query.from(ItemSale.class);
-        Path<Sale> salePath = itemSaleRoot.get(ItemSale_.sale);
+        Root<ItemVariantSale> itemSaleRoot = query.from(ItemVariantSale.class);
+        Path<Sale> salePath = itemSaleRoot.get(ItemVariantSale_.sale);
         Predicate salePredicate = criteriaBuilder.equal(salePath, sale);
 
         query.where(salePredicate);
 
-        TypedQuery<ItemSale> typedQuery = entityManager.createQuery(query);
+        TypedQuery<ItemVariantSale> typedQuery = entityManager.createQuery(query);
         return typedQuery.getResultList();
     }
 
     public Sale calcSale(Sale sale) {
-        List<ItemSale> itemSales = findItemSales(sale);
+        List<ItemVariantSale> itemSales = findItemSales(sale);
 
         return AccountingUtils.calcSale(sale, itemSales);
     }
 
-    public void createSaleAccountingEntries(Sale sale, List<ItemSale> itemSales) {
+    public void createSaleAccountingEntries(Sale sale, List<ItemVariantSale> itemSales) {
         List<AccountingEntry> productAccountingEntries = itemSales.stream()
                 .map(this::createItemSaleAccountingEntry)
                 .collect(Collectors.toList());
@@ -137,7 +137,7 @@ public class SaleService {
         return vatAccountingEntry;
     }
 
-    private AccountingEntry createItemSaleAccountingEntry(ItemSale itemSale) {
+    private AccountingEntry createItemSaleAccountingEntry(ItemVariantSale itemSale) {
         Sale sale = itemSale.getSale();
         Company company = sale.getCompany();
         ZonedDateTime dateTime = ZonedDateTime.now();
@@ -189,7 +189,7 @@ public class SaleService {
         return saleDebitAccountingEntry;
     }
 
-    public Sale pay(Sale sale, List<ItemSale> itemSales, List<AccountingEntry> paymentAccountingEntryList, boolean close) {
+    public Sale pay(Sale sale, List<ItemVariantSale> itemSales, List<AccountingEntry> paymentAccountingEntryList, boolean close) {
         Sale adjustedSale = AccountingUtils.calcSale(sale, itemSales);
 
         ZonedDateTime dateTime = ZonedDateTime.now();
@@ -217,7 +217,7 @@ public class SaleService {
     }
 
     @Nonnull
-    public BigDecimal calcPayBackAmount(@Nonnull Sale sale, @Nonnull List<ItemSale> itemSales, @Nonnull List<AccountingEntry> paymentAccountingEntryList) {
+    public BigDecimal calcPayBackAmount(@Nonnull Sale sale, @Nonnull List<ItemVariantSale> itemSales, @Nonnull List<AccountingEntry> paymentAccountingEntryList) {
         BigDecimal totalPayedAmount = BigDecimal.ZERO;
         for (AccountingEntry paymentAccountingEntry : paymentAccountingEntryList) {
             BigDecimal payedAmount = paymentAccountingEntry.getAmount();
@@ -259,8 +259,8 @@ public class SaleService {
         return entityManager.find(Sale.class, saleId);
     }
 
-    public ItemSale findItemSaleById(Long saleId) {
-        return entityManager.find(ItemSale.class, saleId);
+    public ItemVariantSale findItemSaleById(Long saleId) {
+        return entityManager.find(ItemVariantSale.class, saleId);
     }
 
     @Nonnull
@@ -361,15 +361,15 @@ public class SaleService {
         if (sale.isClosed()) {
             throw new IllegalArgumentException("The sale is closed");
         }
-        List<ItemSale> itemSaleList = findItemSales(sale);
-        for (ItemSale itemSale : itemSaleList) {
+        List<ItemVariantSale> itemSaleList = findItemSales(sale);
+        for (ItemVariantSale itemSale : itemSaleList) {
             removeItemSale(itemSale);
         }
         Sale managedSale = entityManager.merge(sale);
         entityManager.remove(managedSale);
     }
 
-    public ItemSale saveItemSale(ItemSale itemSale) {
+    public ItemVariantSale saveItemSale(ItemVariantSale itemSale) {
         ZonedDateTime dateTime = itemSale.getDateTime();
         if (dateTime == null) {
             dateTime = ZonedDateTime.now();
@@ -419,19 +419,19 @@ public class SaleService {
         itemSale.setPrice(specificPrice);
         itemSale.setTotal(total);
 
-        ItemSale managedItemSale = entityManager.merge(itemSale);
+        ItemVariantSale managedItemSale = entityManager.merge(itemSale);
         Sale managedSale = managedItemSale.getSale();
         managedSale = calcSale(managedSale);
 
         return managedItemSale;
     }
 
-    public void removeItemSale(ItemSale itemSale) {
+    public void removeItemSale(ItemVariantSale itemSale) {
         Sale sale = itemSale.getSale();
         if (sale.isClosed()) {
             throw new IllegalArgumentException("Cannot change a closed sale.");
         }
-        ItemSale managedItemSale = entityManager.merge(itemSale);
+        ItemVariantSale managedItemSale = entityManager.merge(itemSale);
         Sale managedSale = managedItemSale.getSale();
         entityManager.remove(managedItemSale);
 
@@ -439,15 +439,15 @@ public class SaleService {
     }
 
     @Nonnull
-    public List<ItemSale> findItemSales(@Nonnull ItemSaleSearch itemSaleSearch) {
+    public List<ItemVariantSale> findItemSales(@Nonnull ItemVariantSaleSearch itemSaleSearch) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<ItemSale> query = criteriaBuilder.createQuery(ItemSale.class);
-        Root<ItemSale> itemSaleRoot = query.from(ItemSale.class);
+        CriteriaQuery<ItemVariantSale> query = criteriaBuilder.createQuery(ItemVariantSale.class);
+        Root<ItemVariantSale> itemSaleRoot = query.from(ItemVariantSale.class);
 
         List<Predicate> predicates = new ArrayList<>();
 
-        Join<ItemSale, Sale> saleJoin = itemSaleRoot.join(ItemSale_.sale);
-        Join<ItemSale, ItemVariant> itemJoin = itemSaleRoot.join(ItemSale_.itemVariant);
+        Join<ItemVariantSale, Sale> saleJoin = itemSaleRoot.join(ItemVariantSale_.sale);
+        Join<ItemVariantSale, ItemVariant> itemJoin = itemSaleRoot.join(ItemVariantSale_.itemVariant);
 
         Company company = itemSaleSearch.getCompany();
 
@@ -470,9 +470,9 @@ public class SaleService {
         Predicate[] predicateArray = predicates.toArray(new Predicate[0]);
         query.where(predicateArray);
 
-        TypedQuery<ItemSale> typedQuery = entityManager.createQuery(query);
+        TypedQuery<ItemVariantSale> typedQuery = entityManager.createQuery(query);
 
-        List<ItemSale> itemSales = typedQuery.getResultList();
+        List<ItemVariantSale> itemSales = typedQuery.getResultList();
 
         return itemSales;
     }
