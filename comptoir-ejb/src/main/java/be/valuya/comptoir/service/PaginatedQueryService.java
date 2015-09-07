@@ -8,13 +8,17 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.From;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 
 /**
  *
@@ -26,6 +30,14 @@ public class PaginatedQueryService {
     @PersistenceContext
     private EntityManager entityManager;
 
+    public <T, C extends Column<T>> List<T> getResults(List<Predicate> predicates, CriteriaQuery<T> query, Class<T> fromClass, Pagination<T, C> pagination) {
+        Predicate[] predicateArray = predicates.toArray(new Predicate[0]);
+        query.where(predicateArray);
+
+        List<T> items = getResults(query, fromClass, predicates, pagination);
+        return items;
+    }
+
     public <T, C extends Column<T>> void applySort(Pagination<T, C> pagination, From<?, T> from, CriteriaQuery<T> query, Function<C, Path<?>> sortToPathFunction) {
         if (pagination != null) {
             List<Order> orders = createOrders(pagination, from, sortToPathFunction);
@@ -33,9 +45,13 @@ public class PaginatedQueryService {
         }
     }
 
-    public <T, C extends Column<T>> List<T> getResults(CriteriaQuery<T> query, Pagination<T, C> pagination) {
+    public <T, C extends Column<T>> List<T> getResults(CriteriaQuery<T> query, Class<T> fromClass, List<Predicate> predicates, Pagination<T, C> pagination) {
         TypedQuery<T> typedQuery = entityManager.createQuery(query);
         paginate(pagination, typedQuery);
+
+        long allResultCount = countResults(fromClass, predicates);
+        pagination.setAllResultCount(allResultCount);
+
         return typedQuery.getResultList();
     }
 
@@ -78,6 +94,25 @@ public class PaginatedQueryService {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         Order order = criteriaBuilder.asc(path);
         return order;
+    }
+
+    private <T, C extends Object & Column<T>> long countResults(Class<T> fromClass, List<Predicate> predicates) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Long> query = criteriaBuilder.createQuery(Long.class);
+        Root<T> root = query.from(fromClass);
+
+        Expression<Long> countExpression = criteriaBuilder.count(root);
+        query.select(countExpression);
+
+        Predicate[] predicateArray = predicates.toArray(new Predicate[0]);
+        query.where(predicateArray);
+
+        TypedQuery<Long> typedQuery = entityManager.createQuery(query);
+        try {
+            return typedQuery.getSingleResult();
+        } catch (NoResultException noResultException) {
+            return 0;
+        }
     }
 
 }

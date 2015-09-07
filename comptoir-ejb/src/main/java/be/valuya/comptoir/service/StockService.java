@@ -7,10 +7,10 @@ import be.valuya.comptoir.model.commercial.AttributeValue_;
 import be.valuya.comptoir.model.commercial.Item;
 import be.valuya.comptoir.model.commercial.ItemPicture;
 import be.valuya.comptoir.model.commercial.ItemPicture_;
-import be.valuya.comptoir.model.commercial.ItemVariantSale;
 import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.model.commercial.ItemVariantPicture;
 import be.valuya.comptoir.model.commercial.ItemVariantPicture_;
+import be.valuya.comptoir.model.commercial.ItemVariantSale;
 import be.valuya.comptoir.model.commercial.ItemVariant_;
 import be.valuya.comptoir.model.commercial.Item_;
 import be.valuya.comptoir.model.commercial.Picture;
@@ -80,15 +80,7 @@ public class StockService {
                 itemColumn -> ItemColumnPersistenceUtil.getPath(itemRoot, itemColumn)
         );
 
-        Predicate[] predicateArray = predicates.toArray(new Predicate[0]);
-        query.where(predicateArray);
-        query.distinct(true);
-
-        TypedQuery<Item> typedQuery = entityManager.createQuery(query);
-
-        paginatedQueryService.paginate(pagination, typedQuery);
-
-        List<Item> items = typedQuery.getResultList();
+        List<Item> items = paginatedQueryService.getResults(predicates, query, Item.class, pagination);
 
         return items;
     }
@@ -119,10 +111,7 @@ public class StockService {
 
         query.distinct(true);
 
-        Predicate[] predicateArray = predicates.toArray(new Predicate[0]);
-        query.where(predicateArray);
-
-        List<ItemVariant> items = paginatedQueryService.getResults(query, pagination);
+        List<ItemVariant> items = paginatedQueryService.getResults(predicates, query, ItemVariant.class, pagination);
 
         return items;
     }
