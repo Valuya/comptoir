@@ -12,7 +12,7 @@ public class Pagination<T, S extends Column<T>> {
 
     private int offset;
     private int maxResults;
-    private long allResultCount;
+    private Long allResultCount;
     private List<Sort<S>> sortings;
 
     public Pagination() {
@@ -40,11 +40,11 @@ public class Pagination<T, S extends Column<T>> {
         this.maxResults = maxResults;
     }
 
-    public long getAllResultCount() {
+    public Long getAllResultCount() {
         return allResultCount;
     }
 
-    public void setAllResultCount(long allResultCount) {
+    public void setAllResultCount(Long allResultCount) {
         this.allResultCount = allResultCount;
     }
 

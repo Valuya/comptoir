@@ -8,7 +8,6 @@ import be.valuya.comptoir.model.search.ItemVariantSearch;
 import be.valuya.comptoir.service.StockService;
 import be.valuya.comptoir.util.pagination.ItemVariantColumn;
 import be.valuya.comptoir.util.pagination.Pagination;
-import be.valuya.comptoir.ws.config.HeadersConfig;
 import be.valuya.comptoir.ws.convert.commercial.FromWsItemVariantConverter;
 import be.valuya.comptoir.ws.convert.commercial.ToWsItemVariantConverter;
 import be.valuya.comptoir.ws.convert.search.FromWsItemVariantSearchConverter;
@@ -106,7 +105,7 @@ public class ItemVariantResource {
                 .map(toWsItemConverter::convert)
                 .collect(Collectors.toList());
 
-        response.setHeader(HeadersConfig.LIST_RESULTS_COUNT_HEADER, "1234");
+        restPaginationUtil.addResultCount(response, pagination);
 
         return wsItems;
     }

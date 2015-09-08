@@ -26,6 +26,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
 
 /**
  *
@@ -47,6 +48,8 @@ public class AccountResource {
     private IdChecker idChecker;
     @Context
     private HttpServletResponse response;
+    @Context
+    private UriInfo uriInfo;
 
     @POST
     @Valid
@@ -86,6 +89,8 @@ public class AccountResource {
     @Path("search")
     @Valid
     public List<WsAccount> findAccounts(@Valid WsAccountSearch wsAccountSearch) {
+//        Pagination<Account, AccountColumn> pagination = restPaginationUtil.extractPagination(uriInfo, AttributeDefinitionColumn::valueOf);
+
         AccountSearch accountSearch = fromWsAccountSearchConverter.convert(wsAccountSearch);
         List<Account> accounts = accountService.findAccounts(accountSearch);
 
@@ -94,6 +99,7 @@ public class AccountResource {
                 .collect(Collectors.toList());
 
         response.setHeader(HeadersConfig.LIST_RESULTS_COUNT_HEADER, "101");
+
         return wsAccounts;
     }
 

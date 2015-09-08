@@ -3,10 +3,12 @@ package be.valuya.comptoir.ws.rest.control;
 import be.valuya.comptoir.util.pagination.Column;
 import be.valuya.comptoir.util.pagination.Pagination;
 import be.valuya.comptoir.util.pagination.Sort;
+import be.valuya.comptoir.ws.config.HeadersConfig;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 
@@ -60,4 +62,11 @@ public class RestPaginationUtil {
         return new Sort<>(conversionFunction.apply(sortDefs[0]), sortDefs[1].equals("asc"));
     }
 
+    public <T, C extends Column<T>> void addResultCount(HttpServletResponse response, Pagination<T, C> pagination) {
+        Long allResultCount = pagination.getAllResultCount();
+        if (allResultCount == null) {
+            return;
+        }
+        response.setHeader(HeadersConfig.LIST_RESULTS_COUNT_HEADER, Long.toString(allResultCount));
+    }
 }

@@ -8,7 +8,6 @@ import be.valuya.comptoir.model.search.AttributeSearch;
 import be.valuya.comptoir.service.StockService;
 import be.valuya.comptoir.util.pagination.AttributeDefinitionColumn;
 import be.valuya.comptoir.util.pagination.Pagination;
-import be.valuya.comptoir.ws.config.HeadersConfig;
 import be.valuya.comptoir.ws.convert.commercial.FromWsAttributeDefinitionConverter;
 import be.valuya.comptoir.ws.convert.commercial.ToWsAttributeDefinitionConverter;
 import be.valuya.comptoir.ws.convert.search.FromWsAttributeSearchConverter;
@@ -106,7 +105,7 @@ public class AttributeDefinitionResource {
                 .map(toWsAttributeDefinitionConverter::convert)
                 .collect(Collectors.toList());
 
-        response.setHeader(HeadersConfig.LIST_RESULTS_COUNT_HEADER, "1234");
+        restPaginationUtil.addResultCount(response, pagination);
 
         return wsAttributeDefinitions;
     }
