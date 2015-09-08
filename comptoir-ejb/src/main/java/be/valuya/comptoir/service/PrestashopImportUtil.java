@@ -6,6 +6,7 @@ import be.valuya.comptoir.model.commercial.ExternalEntity;
 import be.valuya.comptoir.model.commercial.Item;
 import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.model.commercial.Price;
+import be.valuya.comptoir.model.commercial.Pricing;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.lang.LocaleText;
 import java.math.BigDecimal;
@@ -146,7 +147,8 @@ public class PrestashopImportUtil {
                 + "    pa.id_product,\n"
                 + "    pac.id_product_attribute,\n"
                 + "    pac.id_attribute,\n"
-                + "    pa.reference\n"
+                + "    pa.reference,\n"
+                + "    pa.price\n"
                 + "FROM\n"
                 + "    ps_product_attribute pa\n"
                 + "        LEFT JOIN\n"
@@ -154,16 +156,26 @@ public class PrestashopImportUtil {
         )) {
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
-                    String variantReference = resultSet.getString("pa.reference");
                     Long idProduct = resultSet.getLong("pa.id_product");
                     Long idAttribute = resultSet.getLong("pac.id_attribute");
                     Long idProductAttribute = resultSet.getLong("pac.id_product_attribute");
+                    String variantReference = resultSet.getString("pa.reference");
+                    if (variantReference == null) {
+                        variantReference = Long.toString(idProductAttribute);
+                    }
+                    BigDecimal pricingAmount = resultSet.getBigDecimal("pa.price");
 
                     AttributeValue attributeValue = attributeValueStore.get(idAttribute);
 
                     Item item = itemStore.get(idProduct);
 
                     ItemVariant itemVariant = itemVariantStore.computeIfAbsent(idProductAttribute, id -> createItemVariant(item));
+                    if (pricingAmount == null) {
+                        itemVariant.setPricing(Pricing.PARENT_ITEM);
+                    } else {
+                        itemVariant.setPricing(Pricing.ADD_TO_BASE);
+                        itemVariant.setPricingAmount(pricingAmount);
+                    }
                     List<AttributeValue> attributeValues = itemVariant.getAttributeValues();
                     itemVariant.setVariantReference(variantReference);
                     attributeValues.add(attributeValue);

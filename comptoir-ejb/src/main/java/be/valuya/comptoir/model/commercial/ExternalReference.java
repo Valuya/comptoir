@@ -5,6 +5,8 @@ import java.io.Serializable;
 import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
@@ -26,7 +28,7 @@ public class ExternalReference implements Serializable {
     @NotNull
     @ManyToOne(optional = false)
     private Company company;
-    @Column(name = "backend_id")
+    @Column(length = 64, name = "backend_name")
     @NotNull
     private String backendName; // name of the backend ("prestashop", ...)
     @NotNull
@@ -36,6 +38,7 @@ public class ExternalReference implements Serializable {
     @NotNull
     @Column(length = 128, name = "local_id")
     private Long localId;
+    @Enumerated(EnumType.STRING)
     private ExternalReferenceType type;
 
     public ExternalReference() {

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
+    <changeSet id="1" author="ymajoros">
+        <createTable tableName="external_reference">
+            <column name="id" type="bigint(20)">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="company_id" type="bigint(20)" />
+            <column name="backend_name" type="varchar(64)" />
+            <column name="external_id" type="varchar(128)" />
+            <column name="local_id" type="bigint(20)" />
+            <column name="type" type="varchar(32)" />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="2" author="ymajoros">
+        <addForeignKeyConstraint 
+            constraintName="fk_external_reference_company" 
+            baseTableName="external_reference" 
+            baseColumnNames="company_id" 
+            referencedTableName="company" 
+            referencedColumnNames="id"
+        />
+    </changeSet>
+
+</databaseChangeLog>

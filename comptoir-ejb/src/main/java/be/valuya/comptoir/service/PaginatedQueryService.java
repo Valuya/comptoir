@@ -3,6 +3,7 @@ package be.valuya.comptoir.service;
 import be.valuya.comptoir.util.pagination.Column;
 import be.valuya.comptoir.util.pagination.Pagination;
 import be.valuya.comptoir.util.pagination.Sort;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -65,10 +66,11 @@ public class PaginatedQueryService {
     }
 
     public <T, C extends Column<T>> List<Order> createOrders(Pagination<T, C> pagination, From<?, T> from, Function<C, Path<?>> sortToPathFunction) {
-        if (pagination.getSortings() == null) {
-            return null;
+        List<Sort<C>> sortings = pagination.getSortings();
+        if (sortings == null) {
+            return Arrays.asList();
         }
-        List<Order> orders = pagination.getSortings()
+        List<Order> orders = sortings
                 .stream()
                 .map(sort -> createOrder(sort, sortToPathFunction))
                 .collect(Collectors.toList());
