@@ -22,10 +22,7 @@ public class ItemSearch {
     private String descriptionContains;
     private String reference;
     private String referenceContains;
-    private String variantReference;
-    private String variantReferenceContains;
     private String multiSearch;
-    // size, color, ...
 
     public Company getCompany() {
         return company;
@@ -65,22 +62,6 @@ public class ItemSearch {
 
     public void setReferenceContains(String referenceContains) {
         this.referenceContains = referenceContains;
-    }
-
-    public String getVariantReference() {
-        return variantReference;
-    }
-
-    public void setVariantReference(String variantReference) {
-        this.variantReference = variantReference;
-    }
-
-    public String getVariantReferenceContains() {
-        return variantReferenceContains;
-    }
-
-    public void setVariantReferenceContains(String variantReferenceContains) {
-        this.variantReferenceContains = variantReferenceContains;
     }
 
     public String getMultiSearch() {
