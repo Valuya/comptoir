@@ -5,11 +5,13 @@ import be.valuya.comptoir.api.domain.commercial.WsItemRef;
 import be.valuya.comptoir.api.domain.commercial.WsItemVariant;
 import be.valuya.comptoir.api.domain.commercial.WsPictureRef;
 import be.valuya.comptoir.api.domain.commercial.WsItemVariantRef;
+import be.valuya.comptoir.model.commercial.AttributeValue;
 import be.valuya.comptoir.model.commercial.Item;
 import be.valuya.comptoir.model.commercial.Picture;
 import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.model.commercial.Pricing;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
@@ -42,7 +44,9 @@ public class ToWsItemVariantConverter {
         Pricing pricing = itemVariant.getPricing();
         BigDecimal pricingAmount = itemVariant.getPricingAmount();
 
-        List<WsAttributeValueRef> attributeValueRefs = itemVariant.getAttributeValues()
+        // Copy to List : IndirectList does not handle stream
+        List<AttributeValue> attributeValues = new ArrayList<>(itemVariant.getAttributeValues());
+        List<WsAttributeValueRef> attributeValueRefs = attributeValues
                 .stream()
                 .map(toWsAttributeValueConverter::reference)
                 .collect(Collectors.toList());
