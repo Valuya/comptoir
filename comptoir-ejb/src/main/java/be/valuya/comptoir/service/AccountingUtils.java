@@ -1,5 +1,7 @@
 package be.valuya.comptoir.service;
 
+import be.valuya.comptoir.model.cash.Balance;
+import be.valuya.comptoir.model.cash.MoneyPile;
 import be.valuya.comptoir.model.commercial.ItemVariantSale;
 import be.valuya.comptoir.model.commercial.Price;
 import be.valuya.comptoir.model.commercial.Sale;
@@ -89,5 +91,22 @@ public class AccountingUtils {
         BigDecimal taxesTot = taxes1.add(taxes2);
 
         return new SalePrice(baseTot, taxesTot);
+    }
+    
+    
+    public static MoneyPile calcMoneyPile(MoneyPile moneyPile) {
+        BigDecimal count = moneyPile.getCount();
+        BigDecimal unitAmount = moneyPile.getUnitAmount();
+        BigDecimal totalValue = count.multiply(unitAmount);
+        moneyPile.setTotal(totalValue);
+        return moneyPile;
+    }
+    
+    public static Balance calcBalance(Balance balance, List<MoneyPile> moneyPiles) {
+        BigDecimal balanceValue = moneyPiles.stream()
+                .map((moneyPile) -> moneyPile.getTotal())
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        balance.setBalance(balanceValue);
+        return balance;
     }
 }

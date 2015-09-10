@@ -240,8 +240,13 @@ public class AccountService {
             moneyPile.setDateTime(dateTime);
         }
         MoneyPile managedMoneyPile = entityManager.merge(moneyPile);
-        entityManager.merge(managedMoneyPile);
-        managedMoneyPile = calcMoneyPile(managedMoneyPile);
+        managedMoneyPile = AccountingUtils.calcMoneyPile(managedMoneyPile);
+        
+        Balance balance = managedMoneyPile.getBalance();
+        List<MoneyPile> moneyPiles = findMoneyPileListForBalance(balance);
+        balance = AccountingUtils.calcBalance(balance, moneyPiles);
+        Balance managedBalance = entityManager.merge(balance);
+        
         return managedMoneyPile;
     }
 
@@ -262,28 +267,5 @@ public class AccountService {
 //        moneyPiles.forEach(thid::deleteMoneyPile);
         Balance managedBalance = entityManager.merge(balance);
         entityManager.remove(managedBalance);
-    }
-
-    private Balance calcBalance(Balance balance) {
-        List<MoneyPile> moneyPileList = findMoneyPileListForBalance(balance);
-
-        double totalBalance = moneyPileList.stream()
-                .map((moneyPile) -> moneyPile.getTotal())
-                .mapToDouble((moneyPileTotalBigDecimal) -> moneyPileTotalBigDecimal.doubleValue())
-                .sum();
-        BigDecimal totalBalanceBigDecimal = new BigDecimal(totalBalance);
-        balance.setBalance(totalBalanceBigDecimal);
-        return entityManager.merge(balance);
-    }
-
-    private MoneyPile calcMoneyPile(MoneyPile moneyPile) {
-        BigDecimal count = moneyPile.getCount();
-        BigDecimal unitAmount = moneyPile.getUnitAmount();
-        BigDecimal totalValue = count.multiply(unitAmount);
-        moneyPile.setTotal(totalValue);
-        MoneyPile managedMoneyPile = entityManager.merge(moneyPile);
-
-        calcBalance(managedMoneyPile.getBalance());
-        return managedMoneyPile;
     }
 }
