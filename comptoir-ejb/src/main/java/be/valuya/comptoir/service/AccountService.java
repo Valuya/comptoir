@@ -9,6 +9,7 @@ import be.valuya.comptoir.model.accounting.AccountingTransaction;
 import be.valuya.comptoir.model.cash.Balance;
 import be.valuya.comptoir.model.cash.Balance_;
 import be.valuya.comptoir.model.cash.MoneyPile;
+import be.valuya.comptoir.model.cash.MoneyPile_;
 import be.valuya.comptoir.model.commercial.Pos;
 import be.valuya.comptoir.model.commercial.PosPaymentAccount;
 import be.valuya.comptoir.model.commercial.PosPaymentAccount_;
@@ -16,6 +17,7 @@ import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.search.AccountSearch;
 import be.valuya.comptoir.model.search.AccountingEntrySearch;
 import be.valuya.comptoir.model.search.BalanceSearch;
+import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -216,12 +218,39 @@ public class AccountService {
         return entityManager.find(MoneyPile.class, id);
     }
 
+    public List<MoneyPile> findMoneyPileListForBalance(Balance balance) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<MoneyPile> query = criteriaBuilder.createQuery(MoneyPile.class);
+        Root<MoneyPile> root = query.from(MoneyPile.class);
+
+        Path<Balance> balancePath = root.get(MoneyPile_.balance);
+        Predicate balancePredicate = criteriaBuilder.equal(balancePath, balance);
+
+        query.select(root);
+        query.where(balancePredicate);
+
+        TypedQuery<MoneyPile> typedQuery = entityManager.createQuery(query);
+        List<MoneyPile> resultList = typedQuery.getResultList();
+        return resultList;
+    }
+
     public MoneyPile saveMoneyPile(MoneyPile moneyPile) {
-        return entityManager.merge(moneyPile);
+        if (moneyPile.getDateTime() == null) {
+            ZonedDateTime dateTime = ZonedDateTime.now();
+            moneyPile.setDateTime(dateTime);
+        }
+        MoneyPile managedMoneyPile = entityManager.merge(moneyPile);
+        calcMoneyPile(managedMoneyPile);
+        entityManager.merge(managedMoneyPile);
+        return managedMoneyPile;
     }
 
     public Balance closeBalance(Balance balance) {
         balance.setClosed(true);
+        if (balance.getDateTime() == null) {
+            ZonedDateTime dateTime = ZonedDateTime.now();
+            balance.setDateTime(dateTime);
+        }
         return saveBalance(balance);
     }
 
@@ -235,4 +264,24 @@ public class AccountService {
         entityManager.remove(managedBalance);
     }
 
+    private void calcBalance(Balance balance) {
+        List<MoneyPile> moneyPileList = findMoneyPileListForBalance(balance);
+
+        double totalBalance = moneyPileList.stream()
+                .map((moneyPile) -> moneyPile.getTotal())
+                .mapToDouble((moneyPileTotalBigDecimal) -> moneyPileTotalBigDecimal.doubleValue())
+                .sum();
+        BigDecimal totalBalanceBigDecimal = new BigDecimal(totalBalance);
+        balance.setBalance(totalBalanceBigDecimal);
+        entityManager.merge(balance);
+    }
+
+    private void calcMoneyPile(MoneyPile moneyPile) {
+        BigDecimal count = moneyPile.getCount();
+        BigDecimal unitAmount = moneyPile.getUnitAmount();
+        BigDecimal totalValue = count.multiply(unitAmount);
+        moneyPile.setTotal(totalValue);
+
+        calcBalance(moneyPile.getBalance());
+    }
 }
