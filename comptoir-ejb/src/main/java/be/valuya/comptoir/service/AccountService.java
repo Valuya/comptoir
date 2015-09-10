@@ -240,8 +240,8 @@ public class AccountService {
             moneyPile.setDateTime(dateTime);
         }
         MoneyPile managedMoneyPile = entityManager.merge(moneyPile);
-        calcMoneyPile(managedMoneyPile);
         entityManager.merge(managedMoneyPile);
+        managedMoneyPile = calcMoneyPile(managedMoneyPile);
         return managedMoneyPile;
     }
 
@@ -264,7 +264,7 @@ public class AccountService {
         entityManager.remove(managedBalance);
     }
 
-    private void calcBalance(Balance balance) {
+    private Balance calcBalance(Balance balance) {
         List<MoneyPile> moneyPileList = findMoneyPileListForBalance(balance);
 
         double totalBalance = moneyPileList.stream()
@@ -273,15 +273,17 @@ public class AccountService {
                 .sum();
         BigDecimal totalBalanceBigDecimal = new BigDecimal(totalBalance);
         balance.setBalance(totalBalanceBigDecimal);
-        entityManager.merge(balance);
+        return entityManager.merge(balance);
     }
 
-    private void calcMoneyPile(MoneyPile moneyPile) {
+    private MoneyPile calcMoneyPile(MoneyPile moneyPile) {
         BigDecimal count = moneyPile.getCount();
         BigDecimal unitAmount = moneyPile.getUnitAmount();
         BigDecimal totalValue = count.multiply(unitAmount);
         moneyPile.setTotal(totalValue);
+        MoneyPile managedMoneyPile = entityManager.merge(moneyPile);
 
-        calcBalance(moneyPile.getBalance());
+        calcBalance(managedMoneyPile.getBalance());
+        return managedMoneyPile;
     }
 }
