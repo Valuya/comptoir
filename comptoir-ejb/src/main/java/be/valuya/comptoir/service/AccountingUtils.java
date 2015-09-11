@@ -65,9 +65,6 @@ public class AccountingUtils {
 
      public static SalePrice calcSaleDiscount(SalePrice salePrice, Sale sale) {
         BigDecimal discountRatio = Optional.ofNullable(sale.getDiscountRatio()).orElse(BigDecimal.ZERO).setScale(2, RoundingMode.HALF_UP);
-        if (discountRatio == null) {
-            return salePrice;
-        }
         BigDecimal base = salePrice.getBase();
         BigDecimal taxes = salePrice.getTaxes();
         
