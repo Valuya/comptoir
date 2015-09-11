@@ -18,6 +18,7 @@ import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -81,6 +82,13 @@ public class AccountingEntryResource {
         WsAccountingEntry wsAccountingEntry = toWsAccountingEntryConverter.convert(accountingEntry);
 
         return wsAccountingEntry;
+    }
+    
+    @Path("{id}")
+    @DELETE
+    public void deleteAccountingEntry(@PathParam("id") long id) {
+        AccountingEntry accountingEntry = accountingEntryService.findAccountingEntryById(id);
+        accountingEntryService.removeAccountingEntry(accountingEntry);
     }
 
     @POST

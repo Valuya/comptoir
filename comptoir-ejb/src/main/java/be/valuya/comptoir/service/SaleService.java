@@ -346,6 +346,16 @@ public class SaleService {
         for (ItemVariantSale itemSale : itemSaleList) {
             removeItemSale(itemSale);
         }
+        AccountingTransaction accountingTransaction = sale.getAccountingTransaction();
+        Company company = sale.getCompany();
+        AccountingEntrySearch accountingEntrySearch = new AccountingEntrySearch();
+        accountingEntrySearch.setAccountingTransaction(accountingTransaction);
+        accountingEntrySearch.setCompany(company);
+        List<AccountingEntry> accountingEntries = accountService.findAccountingEntries(accountingEntrySearch);
+        for (AccountingEntry accountingEntry : accountingEntries) {
+            accountService.removeAccountingEntry(accountingEntry);
+        }
+        
         Sale managedSale = entityManager.merge(sale);
         entityManager.remove(managedSale);
     }
