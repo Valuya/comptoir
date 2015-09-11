@@ -111,6 +111,11 @@ public class AccountService {
         return entityManager.find(AccountingEntry.class, id);
     }
 
+    public void  removeAccountingEntry(AccountingEntry accountingEntry) {
+        AccountingEntry managedEntry = entityManager.merge(accountingEntry);
+        entityManager.remove(managedEntry);
+    }
+
     public Account saveAccount(Account account) {
         return entityManager.merge(account);
     }

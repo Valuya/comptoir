@@ -50,7 +50,7 @@ public class AccountingEntry implements Serializable {
     private LocaleText description;
     @NotNull
     @Nonnull
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinColumn(name = "accounting_transaction_id")
     private AccountingTransaction accountingTransaction;
     @OneToOne(cascade = CascadeType.ALL)
