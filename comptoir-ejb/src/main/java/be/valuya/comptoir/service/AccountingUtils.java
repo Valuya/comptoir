@@ -63,14 +63,34 @@ public class AccountingUtils {
         return effectiveVatExclusive;
     }
 
+     public static SalePrice calcSaleDiscount(SalePrice salePrice, Sale sale) {
+        BigDecimal discountRatio = Optional.ofNullable(sale.getDiscountRatio()).orElse(BigDecimal.ZERO).setScale(2, RoundingMode.HALF_UP);
+        if (discountRatio == null) {
+            return salePrice;
+        }
+        BigDecimal base = salePrice.getBase();
+        BigDecimal taxes = salePrice.getTaxes();
+        
+        BigDecimal discountBaseAmount = base.multiply(discountRatio).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal discountTaxesAmount = taxes.multiply(discountRatio).setScale(2, RoundingMode.HALF_UP);
+        
+        BigDecimal baseWithDiscount = base.subtract(discountBaseAmount);
+        BigDecimal taxesWithDiscount = taxes.subtract(discountTaxesAmount);
+        salePrice.setBase(baseWithDiscount);
+        salePrice.setTaxes(taxesWithDiscount);
+        sale.setDiscountAmount(discountBaseAmount);
+        return salePrice;
+    }
+     
     public static Sale calcSale(Sale sale, List<ItemVariantSale> itemSales) {
         SalePrice totalSalePrice = itemSales.stream()
                 .map(AccountingUtils::calcSalePrice)
                 .reduce(AccountingUtils::combineSalePrices)
                 .orElseGet(() -> new SalePrice(BigDecimal.ZERO, BigDecimal.ZERO));
 
-        BigDecimal vatExclusiveTotal = totalSalePrice.getBase();
-        BigDecimal vatTotal = totalSalePrice.getTaxes();
+        SalePrice totalSalePriceWithDiscount  = AccountingUtils.calcSaleDiscount(totalSalePrice, sale);
+        BigDecimal vatExclusiveTotal = totalSalePriceWithDiscount.getBase();
+        BigDecimal vatTotal = totalSalePriceWithDiscount.getTaxes();
 
         sale.setVatExclusiveAmount(vatExclusiveTotal);
         sale.setVatAmount(vatTotal);
