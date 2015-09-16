@@ -48,6 +48,10 @@ public class Item implements Serializable, WithId, Activable {
     @NotNull
     private Boolean active;
 
+    public Item() {
+    }
+
+    
     @Override
     public Long getId() {
         return id;

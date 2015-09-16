@@ -58,6 +58,10 @@ public class ItemVariant implements Serializable, WithId, Activable {
     @NotNull
     private Boolean active;
 
+    public ItemVariant() {
+    }
+
+    
     @Override
     public Long getId() {
         return id;

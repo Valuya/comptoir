@@ -294,6 +294,7 @@ public class PrestashopImportUtil {
         item.setName(name);
         item.setDescription(description);
         item.setCurrentPrice(price);
+        item.setActive(Boolean.TRUE);
 
         return item;
     }
@@ -304,6 +305,7 @@ public class PrestashopImportUtil {
         ItemVariant itemVariant = new ItemVariant();
         itemVariant.setAttributeValues(attributeValues);
         itemVariant.setItem(item);
+        itemVariant.setActive(Boolean.TRUE);
 
         return itemVariant;
     }
