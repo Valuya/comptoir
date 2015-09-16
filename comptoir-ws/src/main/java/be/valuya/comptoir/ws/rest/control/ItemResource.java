@@ -20,6 +20,7 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -89,6 +90,14 @@ public class ItemResource {
         WsItem wsItem = toWsItemConverter.convert(item);
 
         return wsItem;
+    }
+
+    @Path("{id}")
+    @DELETE
+    public void deleteItem(@PathParam("id") long id) {
+        Item item = stockService.findItemById(id);
+        item.setActive(Boolean.FALSE);
+        stockService.saveItem(item);
     }
 
     @POST

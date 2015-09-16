@@ -3,6 +3,7 @@ package be.valuya.comptoir.ws.rest.control;
 import be.valuya.comptoir.api.domain.commercial.WsItemVariant;
 import be.valuya.comptoir.api.domain.commercial.WsItemVariantRef;
 import be.valuya.comptoir.api.domain.search.WsItemVariantSearch;
+import be.valuya.comptoir.model.commercial.Item;
 import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.model.search.ItemVariantSearch;
 import be.valuya.comptoir.service.StockService;
@@ -20,6 +21,7 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -89,6 +91,14 @@ public class ItemVariantResource {
         WsItemVariant wsItem = toWsItemConverter.convert(itemVariant);
 
         return wsItem;
+    }
+
+    @Path("{id}")
+    @DELETE
+    public void deleteItemVariant(@PathParam("id") long id) {
+        ItemVariant itemVariant = stockService.findItemVariantById(id);
+        itemVariant.setActive(Boolean.FALSE);
+        stockService.saveItemVariant(itemVariant);
     }
 
     @POST
