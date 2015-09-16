@@ -69,7 +69,7 @@ public class FromWsItemConverter {
         item.setName(wsName);
         item.setReference(reference);
         item.setCurrentPrice(price);
-        item.setActive(Boolean.TRUE);
+        item.setActive(true);
 
         return item;
     }

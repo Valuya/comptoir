@@ -32,11 +32,11 @@ public class ItemFactory {
         item.setDescription(descriptionLocaleText);
         item.setName(nameLocaleText);
         item.setCurrentPrice(basePrice);
-        item.setActive(Boolean.TRUE);
+        item.setActive(true);
         
         ItemVariant itemVariant = new ItemVariant();
         itemVariant.setItem(item);
-        itemVariant.setActive(Boolean.TRUE);
+        itemVariant.setActive(true);
 
         return itemVariant;
     }

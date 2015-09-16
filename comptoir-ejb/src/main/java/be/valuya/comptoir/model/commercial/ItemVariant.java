@@ -55,8 +55,7 @@ public class ItemVariant implements Serializable, WithId, Activable {
                 @JoinColumn(name = "attribute_value_id")}
     )
     private List<AttributeValue> attributeValues;
-    @NotNull
-    private Boolean active;
+    private boolean active;
 
     public ItemVariant() {
     }
@@ -121,12 +120,12 @@ public class ItemVariant implements Serializable, WithId, Activable {
     }
 
     @Override
-    public Boolean getActive() {
+    public boolean isActive() {
         return active;
     }
 
     @Override
-    public void setActive(Boolean active) {
+    public void setActive(boolean active) {
         this.active = active;
     }
 

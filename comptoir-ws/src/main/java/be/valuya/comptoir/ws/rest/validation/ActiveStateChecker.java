@@ -17,8 +17,8 @@ import javax.ws.rs.BadRequestException;
 public class ActiveStateChecker {
 
     public void checkState(Activable activable, boolean expectedActriveState) {
-        Boolean active = activable.getActive();
-        if (active == null || active != expectedActriveState) {
+        boolean active = activable.isActive();
+        if (active != expectedActriveState) {
             throw new BadRequestException("Unexpected active state");
         }
     }

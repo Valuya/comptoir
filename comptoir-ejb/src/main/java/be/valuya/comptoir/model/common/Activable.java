@@ -11,7 +11,7 @@ package be.valuya.comptoir.model.common;
  */
 public interface Activable {
 
-    Boolean getActive();
+    boolean isActive();
 
-    void setActive(Boolean active);
+    void setActive(boolean active);
 }

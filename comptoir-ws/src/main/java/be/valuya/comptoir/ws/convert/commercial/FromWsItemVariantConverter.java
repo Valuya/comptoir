@@ -63,7 +63,7 @@ public class FromWsItemVariantConverter {
         itemVariant.setPricingAmount(pricingAmount);
         itemVariant.setItem(item);
         itemVariant.setAttributeValues(attributeValues);
-        itemVariant.setActive(Boolean.TRUE);
+        itemVariant.setActive(true);
 
         return itemVariant;
     }

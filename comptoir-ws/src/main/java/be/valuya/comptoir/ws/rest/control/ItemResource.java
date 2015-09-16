@@ -100,7 +100,7 @@ public class ItemResource {
     public void deleteItem(@PathParam("id") long id) {
         Item item = stockService.findItemById(id);
         activeStateChecker.checkState(item, true);
-        item.setActive(Boolean.FALSE);
+        item.setActive(false);
         stockService.saveItem(item);
     }
 

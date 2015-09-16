@@ -101,7 +101,7 @@ public class ItemVariantResource {
     public void deleteItemVariant(@PathParam("id") long id) {
         ItemVariant itemVariant = stockService.findItemVariantById(id);
         activeStateChecker.checkState(itemVariant, true);
-        itemVariant.setActive(Boolean.FALSE);
+        itemVariant.setActive(false);
         stockService.saveItemVariant(itemVariant);
     }
 
