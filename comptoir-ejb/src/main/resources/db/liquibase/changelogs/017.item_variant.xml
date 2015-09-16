@@ -160,4 +160,12 @@
                                  constraintName="FK_itemvariant_sale_ITEMVARIANT_ID"
                                  referencedTableName="item_variant" referencedColumnNames="ID" />
     </changeSet>
+     
+    <changeSet id="20" author="cghislai">
+        <addColumn tableName="item_variant">
+            <column name="active" type="BIT" defaultValueBoolean="true">
+                <constraints nullable="false" />
+            </column>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>
