@@ -19,6 +19,7 @@ import be.valuya.comptoir.model.search.AccountSearch;
 import be.valuya.comptoir.model.search.AccountingEntrySearch;
 import be.valuya.comptoir.model.search.BalanceSearch;
 import be.valuya.comptoir.util.pagination.AccountColumn;
+import be.valuya.comptoir.util.pagination.BalanceColumn;
 import be.valuya.comptoir.util.pagination.ItemColumn;
 import be.valuya.comptoir.util.pagination.Pagination;
 import java.math.BigDecimal;
@@ -186,7 +187,7 @@ public class AccountService {
         return entityManager.find(Balance.class, id);
     }
 
-    public List<Balance> findBalances(BalanceSearch balanceSearch) {
+    public List<Balance> findBalances(BalanceSearch balanceSearch, @CheckForNull Pagination<Balance, BalanceColumn> pagination) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Balance> query = criteriaBuilder.createQuery(Balance.class);
         Root<Balance> balanceRoot = query.from(Balance.class);
@@ -215,12 +216,10 @@ public class AccountService {
             predicates.add(toDateTimePredicate);
         }
 
-        Predicate[] predicateArray = predicates.toArray(new Predicate[0]);
-        query.where(predicateArray);
+        paginatedQueryService.applySort(pagination, balanceRoot, query,
+                balanceColumn -> BalanceColumnPersistenceUtil.getPath(balanceRoot, balanceColumn));
 
-        TypedQuery<Balance> typedQuery = entityManager.createQuery(query);
-
-        List<Balance> balances = typedQuery.getResultList();
+        List<Balance> balances = paginatedQueryService.getResults(query, balanceRoot, predicates, pagination);
 
         return balances;
 
