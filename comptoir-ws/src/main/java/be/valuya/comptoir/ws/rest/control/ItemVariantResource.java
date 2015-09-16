@@ -12,6 +12,7 @@ import be.valuya.comptoir.util.pagination.Pagination;
 import be.valuya.comptoir.ws.convert.commercial.FromWsItemVariantConverter;
 import be.valuya.comptoir.ws.convert.commercial.ToWsItemVariantConverter;
 import be.valuya.comptoir.ws.convert.search.FromWsItemVariantSearchConverter;
+import be.valuya.comptoir.ws.rest.validation.ActiveStateChecker;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
 import be.valuya.comptoir.ws.rest.validation.NoId;
 import java.util.List;
@@ -57,6 +58,8 @@ public class ItemVariantResource {
     private UriInfo uriInfo;
     @Inject
     private RestPaginationUtil restPaginationUtil;
+    @Inject
+    private ActiveStateChecker activeStateChecker;
 
     @POST
     @Valid
@@ -97,6 +100,7 @@ public class ItemVariantResource {
     @DELETE
     public void deleteItemVariant(@PathParam("id") long id) {
         ItemVariant itemVariant = stockService.findItemVariantById(id);
+        activeStateChecker.checkState(itemVariant, true);
         itemVariant.setActive(Boolean.FALSE);
         stockService.saveItemVariant(itemVariant);
     }
