@@ -124,6 +124,11 @@ public class StockService {
         ItemSearch itemSearch = itemVariantSearch.getItemSearch();
         List<Predicate> predicates = createItemPredicates(itemSearch, itemFrom, itemVariantFrom);
 
+        
+        Path<Boolean> activePath = itemVariantFrom.get(ItemVariant_.active);
+        Predicate activePredicate = criteriaBuilder.equal(activePath, Boolean.TRUE);
+        predicates.add(activePredicate);
+        
         Item item = itemVariantSearch.getItem();
         if (item != null) {
             Predicate itemPredicate = criteriaBuilder.equal(itemFrom, item);
@@ -147,10 +152,16 @@ public class StockService {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
 
         List<Predicate> predicates = new ArrayList<>();
+        
+        Path<Boolean> activePath = itemFrom.get(Item_.active);
+        Predicate activePredicate = criteriaBuilder.equal(activePath, Boolean.TRUE);
+        predicates.add(activePredicate);
+        
         Company company = itemSearch.getCompany();
         Path<Company> companyPath = itemFrom.get(Item_.company);
         Predicate companyPredicate = criteriaBuilder.equal(companyPath, company);
         predicates.add(companyPredicate);
+        
         Path<String> referencePath = itemFrom.get(Item_.reference);
         String multiSearch = itemSearch.getMultiSearch();
         if (multiSearch != null && !multiSearch.isEmpty()) {
