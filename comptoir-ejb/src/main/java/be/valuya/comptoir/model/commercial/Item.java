@@ -1,5 +1,6 @@
 package be.valuya.comptoir.model.commercial;
 
+import be.valuya.comptoir.model.common.Activable;
 import be.valuya.comptoir.model.common.WithId;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.lang.LocaleText;
@@ -20,7 +21,7 @@ import javax.validation.constraints.Size;
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @Entity
-public class Item implements Serializable, WithId {
+public class Item implements Serializable, WithId, Activable {
 
     @Id
     @GeneratedValue
@@ -105,10 +106,12 @@ public class Item implements Serializable, WithId {
         this.mainPicture = mainPicture;
     }
 
+    @Override
     public Boolean getActive() {
         return active;
     }
 
+    @Override
     public void setActive(Boolean active) {
         this.active = active;
     }
