@@ -10,6 +10,7 @@ import be.valuya.comptoir.model.cash.Balance;
 import be.valuya.comptoir.model.cash.Balance_;
 import be.valuya.comptoir.model.cash.MoneyPile;
 import be.valuya.comptoir.model.cash.MoneyPile_;
+import be.valuya.comptoir.model.commercial.Item;
 import be.valuya.comptoir.model.commercial.Pos;
 import be.valuya.comptoir.model.commercial.PosPaymentAccount;
 import be.valuya.comptoir.model.commercial.PosPaymentAccount_;
@@ -17,11 +18,16 @@ import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.search.AccountSearch;
 import be.valuya.comptoir.model.search.AccountingEntrySearch;
 import be.valuya.comptoir.model.search.BalanceSearch;
+import be.valuya.comptoir.util.pagination.AccountColumn;
+import be.valuya.comptoir.util.pagination.ItemColumn;
+import be.valuya.comptoir.util.pagination.Pagination;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -44,21 +50,26 @@ public class AccountService {
 
     @PersistenceContext
     private EntityManager entityManager;
+    @EJB
+    private PaginatedQueryService paginatedQueryService;
 
     @Nonnull
-    public List<Account> findAccounts(@Nonnull AccountSearch accountSearch) {
+    public List<Account> findAccounts(@Nonnull AccountSearch accountSearch, @CheckForNull Pagination<Account, AccountColumn> pagination) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Account> query = criteriaBuilder.createQuery(Account.class);
         Root<Account> accountRoot = query.from(Account.class);
 
         List<Predicate> predicates = createAccountPredicates(query, accountSearch, accountRoot);
 
+
         Predicate[] predicateArray = predicates.toArray(new Predicate[0]);
         query.where(predicateArray);
 
-        TypedQuery<Account> typedQuery = entityManager.createQuery(query);
-
-        List<Account> accounts = typedQuery.getResultList();
+        paginatedQueryService.applySort(pagination, accountRoot, query,
+                accountColumn -> AccountColumnPersistenceUtil.getPath(accountRoot, accountColumn)
+        );
+        
+        List<Account> accounts = paginatedQueryService.getResults(query, accountRoot, predicates, pagination);
 
         return accounts;
     }
@@ -111,7 +122,7 @@ public class AccountService {
         return entityManager.find(AccountingEntry.class, id);
     }
 
-    public void  removeAccountingEntry(AccountingEntry accountingEntry) {
+    public void removeAccountingEntry(AccountingEntry accountingEntry) {
         AccountingEntry managedEntry = entityManager.merge(accountingEntry);
         entityManager.remove(managedEntry);
     }
@@ -246,12 +257,12 @@ public class AccountService {
         }
         MoneyPile managedMoneyPile = entityManager.merge(moneyPile);
         managedMoneyPile = AccountingUtils.calcMoneyPile(managedMoneyPile);
-        
+
         Balance balance = managedMoneyPile.getBalance();
         List<MoneyPile> moneyPiles = findMoneyPileListForBalance(balance);
         balance = AccountingUtils.calcBalance(balance, moneyPiles);
         Balance managedBalance = entityManager.merge(balance);
-        
+
         return managedMoneyPile;
     }
 
