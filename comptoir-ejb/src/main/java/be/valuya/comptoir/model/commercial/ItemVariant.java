@@ -54,6 +54,8 @@ public class ItemVariant implements Serializable, WithId {
                 @JoinColumn(name = "attribute_value_id")}
     )
     private List<AttributeValue> attributeValues;
+    @NotNull
+    private Boolean active;
 
     @Override
     public Long getId() {
@@ -111,6 +113,14 @@ public class ItemVariant implements Serializable, WithId {
 
     public void setPricingAmount(BigDecimal pricingAmount) {
         this.pricingAmount = pricingAmount;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 
     @Override

@@ -44,6 +44,8 @@ public class Item implements Serializable, WithId {
     @ManyToOne
     @JoinColumn(name = "main_picture_id")
     private Picture mainPicture;
+    @NotNull
+    private Boolean active;
 
     @Override
     public Long getId() {
@@ -101,6 +103,14 @@ public class Item implements Serializable, WithId {
 
     public void setMainPicture(Picture mainPicture) {
         this.mainPicture = mainPicture;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 
     @Override
