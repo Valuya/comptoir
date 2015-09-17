@@ -27,7 +27,7 @@ public class PrestashopImportUtilTest {
         prestashopImportParams.setHost("localhost");
         prestashopImportParams.setPort(3306);
         prestashopImportParams.setUsername("root");
-        prestashopImportParams.setPassword("zzzzzz");
+        prestashopImportParams.setPassword("aaaaa");
 
         prestashopImportUtil = new PrestashopImportUtil(company, prestashopImportParams);
     }

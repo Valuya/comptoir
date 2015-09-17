@@ -9,11 +9,15 @@ import be.valuya.comptoir.model.commercial.Price;
 import be.valuya.comptoir.model.commercial.Pricing;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.lang.LocaleText;
+import be.valuya.comptoir.prestashop.domain.Tables;
+import be.valuya.comptoir.prestashop.domain.tables.records.PsLangRecord;
+import be.valuya.comptoir.prestashop.domain.tables.records.PsProductAttributeCombinationRecord;
+import be.valuya.comptoir.prestashop.domain.tables.records.PsProductAttributeRecord;
+import be.valuya.comptoir.prestashop.domain.tables.records.PsProductLangRecord;
+import be.valuya.comptoir.prestashop.domain.tables.records.PsProductRecord;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,6 +25,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import org.jooq.DSLContext;
+import org.jooq.SQLDialect;
+import org.jooq.TableField;
+import org.jooq.impl.DSL;
 
 /**
  *
@@ -46,7 +54,7 @@ public class PrestashopImportUtil {
     public void importAll() {
         try (Connection newConnection = getConnection()) {
             this.connection = newConnection;
-            loadLangs();
+            importLangs();
             importAttributeDefinitions();
             importAttributeValues();
             importItems();
@@ -60,110 +68,89 @@ public class PrestashopImportUtil {
 
     private void importAttributeDefinitions() throws SQLException {
         // AttributeDefinitions = ps_attribute_group in Prestashop
-        try (PreparedStatement preparedStatement = connection.prepareStatement(
-                "SELECT \n"
-                + "    ag.id_attribute_group,\n"
-                + "    agl.id_lang,\n"
-                + "    agl.name\n"
-                + "FROM\n"
-                + "    ps_attribute_group ag\n"
-                + "        LEFT JOIN\n"
-                + "    ps_attribute_group_lang agl ON ag.id_attribute_group = agl.id_attribute_group;"
-        )) {
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                while (resultSet.next()) {
-                    long idAttributeGroup = resultSet.getLong("ag.id_attribute_group");
-                    long idLang = resultSet.getLong("agl.id_lang");
-                    String localizedName = resultSet.getString("agl.name");
+        DSLContext create = DSL.using(connection, SQLDialect.MYSQL);
+        create.select(Tables.PS_ATTRIBUTE_GROUP.ID_ATTRIBUTE_GROUP, Tables.PS_ATTRIBUTE_GROUP_LANG.ID_LANG, Tables.PS_ATTRIBUTE_GROUP_LANG.NAME)
+                .from(Tables.PS_ATTRIBUTE_GROUP)
+                .leftOuterJoin(Tables.PS_ATTRIBUTE_GROUP_LANG)
+                .on(Tables.PS_ATTRIBUTE_GROUP.ID_ATTRIBUTE_GROUP.eq(Tables.PS_ATTRIBUTE_GROUP_LANG.ID_ATTRIBUTE_GROUP))
+                .fetch()
+                .forEach(record -> {
+                    long idAttributeGroup = record.getValue(Tables.PS_ATTRIBUTE_GROUP.ID_ATTRIBUTE_GROUP);
+                    long idLang = record.getValue(Tables.PS_ATTRIBUTE_GROUP_LANG.ID_LANG);
+                    String localizedName = record.getValue(Tables.PS_ATTRIBUTE_GROUP_LANG.NAME);
 
                     AttributeDefinition attributeDefinition = attributeDefinitionStore.computeIfAbsent(idAttributeGroup, id -> createAttributeDefinition());
 
                     Locale locale = localeStore.get(idLang);
                     attributeDefinition.getName().put(locale, localizedName);
-                }
-            }
-        }
+                });
 
     }
 
     public void importAttributeValues() throws SQLException {
         // AttributeDefinitions = ps_attribute_group in Prestashop
-        try (PreparedStatement preparedStatement = connection.prepareStatement(
-                "SELECT \n"
-                + "    a.id_attribute,\n"
-                + "    a.id_attribute_group,\n"
-                + "    al.id_lang,\n"
-                + "    al.name\n"
-                + "FROM\n"
-                + "    ps_attribute a\n"
-                + "        LEFT JOIN\n"
-                + "    ps_attribute_lang al ON a.id_attribute = al.id_attribute;"
-        )) {
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                while (resultSet.next()) {
-                    long idAttributeGroup = resultSet.getLong("a.id_attribute_group");
-                    long idAttribute = resultSet.getLong("a.id_attribute");
-                    long idLang = resultSet.getLong("al.id_lang");
-                    String localizedName = resultSet.getString("al.name");
+        DSLContext create = DSL.using(connection, SQLDialect.MYSQL);
+        create.select(Tables.PS_ATTRIBUTE.ID_ATTRIBUTE, Tables.PS_ATTRIBUTE.ID_ATTRIBUTE_GROUP, Tables.PS_ATTRIBUTE_LANG.ID_LANG, Tables.PS_ATTRIBUTE_LANG.NAME)
+                .from(Tables.PS_ATTRIBUTE)
+                .leftOuterJoin(Tables.PS_ATTRIBUTE_LANG)
+                .on(Tables.PS_ATTRIBUTE.ID_ATTRIBUTE.eq(Tables.PS_ATTRIBUTE_LANG.ID_ATTRIBUTE))
+                .fetch()
+                .forEach(record -> {
+                    long idAttributeGroup = record.getValue(Tables.PS_ATTRIBUTE.ID_ATTRIBUTE_GROUP);
+                    long idAttribute = record.getValue(Tables.PS_ATTRIBUTE.ID_ATTRIBUTE);
+                    long idLang = record.getValue(Tables.PS_ATTRIBUTE_LANG.ID_LANG);
+                    String localizedName = record.getValue(Tables.PS_ATTRIBUTE_LANG.NAME);
 
                     Locale locale = localeStore.get(idLang);
                     AttributeDefinition attributeDefinition = attributeDefinitionStore.get(idAttributeGroup);
                     AttributeValue attributeValue = attributeValueStore.computeIfAbsent(idAttribute, id -> createAttributeValue(attributeDefinition));
                     attributeValue.getValue().put(locale, localizedName);
-                }
-            }
-        }
-
+                });
     }
 
     public void importItems() throws SQLException {
-        try (PreparedStatement preparedStatement = connection.prepareStatement(
-                "SELECT \n"
-                + "    p.id_product,\n"
-                + "    p.price,\n"
-                + "    p.reference\n"
-                + "FROM\n"
-                + "    ps_product p;"
-        )) {
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                while (resultSet.next()) {
-                    String productReference = resultSet.getString("p.reference");
-                    BigDecimal vatExclusive = resultSet.getBigDecimal("p.price");
-                    Long idProduct = resultSet.getLong("p.id_product");
+        // AttributeDefinitions = ps_attribute_group in Prestashop
+        DSLContext create = DSL.using(connection, SQLDialect.MYSQL);
+        TableField<PsProductRecord, String> referenceField = Tables.PS_PRODUCT.REFERENCE;
+        TableField<PsProductRecord, BigDecimal> priceField = Tables.PS_PRODUCT.PRICE;
+        TableField<PsProductRecord, Long> idProductField = Tables.PS_PRODUCT.ID_PRODUCT;
+
+        create.select(referenceField, priceField, idProductField)
+                .from(Tables.PS_PRODUCT)
+                .fetch()
+                .forEach(record -> {
+                    String productReference = record.getValue(referenceField);
+                    BigDecimal vatExclusive = record.getValue(priceField);
+                    long idProduct = record.getValue(idProductField);
 
                     Item item = itemStore.computeIfAbsent(idProduct, id -> createItem());
                     item.setReference(productReference);
                     item.getCurrentPrice().setVatExclusive(vatExclusive);
                     item.getCurrentPrice().setVatRate(BigDecimal.valueOf(21, 2)); // TODO: get correct tax rate
-                }
-            }
-        }
-
+                });
     }
 
     public void importItemVariants() throws SQLException {
-        try (PreparedStatement preparedStatement = connection.prepareStatement(
-                "SELECT \n"
-                + "    pa.id_product,\n"
-                + "    pac.id_product_attribute,\n"
-                + "    pac.id_attribute,\n"
-                + "    pa.reference,\n"
-                + "    pa.price\n"
-                + "FROM\n"
-                + "    ps_product_attribute pa\n"
-                + "        LEFT JOIN\n"
-                + "    ps_product_attribute_combination pac ON pa.id_product_attribute = pac.id_product_attribute;"
-        )) {
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                while (resultSet.next()) {
-                    Long idProduct = resultSet.getLong("pa.id_product");
-                    Long idAttribute = resultSet.getLong("pac.id_attribute");
-                    Long idProductAttribute = resultSet.getLong("pac.id_product_attribute");
-                    String variantReference = resultSet.getString("pa.reference");
+        DSLContext create = DSL.using(connection, SQLDialect.MYSQL);
+        TableField<PsProductAttributeRecord, Long> idProductField = Tables.PS_PRODUCT_ATTRIBUTE.ID_PRODUCT;
+        TableField<PsProductAttributeCombinationRecord, Long> idAttributeField = Tables.PS_PRODUCT_ATTRIBUTE_COMBINATION.ID_ATTRIBUTE;
+        TableField<PsProductAttributeRecord, Long> idProductAttributeField = Tables.PS_PRODUCT_ATTRIBUTE.ID_PRODUCT_ATTRIBUTE;
+        TableField<PsProductAttributeRecord, String> referenceField = Tables.PS_PRODUCT_ATTRIBUTE.REFERENCE;
+        TableField<PsProductAttributeRecord, BigDecimal> priceField = Tables.PS_PRODUCT_ATTRIBUTE.PRICE;
+        create.select(idProductField, idAttributeField, idProductAttributeField, referenceField, priceField)
+                .from(Tables.PS_PRODUCT_ATTRIBUTE)
+                .leftOuterJoin(Tables.PS_PRODUCT_ATTRIBUTE_COMBINATION)
+                .on(idProductAttributeField.eq(Tables.PS_PRODUCT_ATTRIBUTE_COMBINATION.ID_PRODUCT_ATTRIBUTE))
+                .fetch()
+                .forEach(record -> {
+                    Long idProduct = record.getValue(idProductField);
+                    Long idAttribute = record.getValue(idAttributeField);
+                    Long idProductAttribute = record.getValue(idProductAttributeField);
+                    String variantReference = record.getValue(referenceField);
                     if (variantReference == null) {
                         variantReference = Long.toString(idProductAttribute);
                     }
-                    BigDecimal pricingAmount = resultSet.getBigDecimal("pa.price");
+                    BigDecimal pricingAmount = record.getValue(priceField);
 
                     AttributeValue attributeValue = attributeValueStore.get(idAttribute);
 
@@ -179,20 +166,24 @@ public class PrestashopImportUtil {
                     List<AttributeValue> attributeValues = itemVariant.getAttributeValues();
                     itemVariant.setVariantReference(variantReference);
                     attributeValues.add(attributeValue);
-                }
-            }
-        }
-
+                });
     }
 
     public void importItemTexts() throws SQLException {
-        try (PreparedStatement preparedStatement = connection.prepareStatement("select * from ps_product_lang")) {
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                while (resultSet.next()) {
-                    long idLang = resultSet.getLong("id_lang");
-                    long idProduct = resultSet.getLong("id_product");
-                    String itemName = resultSet.getString("name");
-                    String itemDescription = resultSet.getString("description_short");
+        DSLContext create = DSL.using(connection, SQLDialect.MYSQL);
+        TableField<PsProductLangRecord, Long> idLangField = Tables.PS_PRODUCT_LANG.ID_LANG;
+        TableField<PsProductLangRecord, Long> idProductField = Tables.PS_PRODUCT_LANG.ID_PRODUCT;
+        TableField<PsProductLangRecord, String> nameField = Tables.PS_PRODUCT_LANG.NAME;
+        TableField<PsProductLangRecord, String> descriptionShortField = Tables.PS_PRODUCT_LANG.DESCRIPTION_SHORT;
+
+        create.select(idLangField, idProductField, nameField, descriptionShortField)
+                .from(Tables.PS_PRODUCT_LANG)
+                .fetch()
+                .forEach(record -> {
+                    long idLang = record.getValue(idLangField);
+                    long idProduct = record.getValue(idProductField);
+                    String itemName = record.getValue(nameField);
+                    String itemDescription = record.getValue(descriptionShortField);
 
                     Item item = itemStore.get(idProduct);
                     Locale locale = localeStore.get(idLang);
@@ -202,9 +193,7 @@ public class PrestashopImportUtil {
 
                     LocaleText description = item.getDescription();
                     description.put(locale, itemDescription);
-                }
-            }
-        }
+                });
     }
 
     private void addDefaultItemVariants() {
@@ -226,40 +215,21 @@ public class PrestashopImportUtil {
                 .anyMatch(item::equals);
     }
 
-    private void loadLangs() throws SQLException {
-        try (PreparedStatement preparedStatement = connection.prepareStatement("select * from ps_lang where active")) {
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                while (resultSet.next()) {
-                    long idLang = resultSet.getLong("id_lang");
-                    String isoCode = resultSet.getString("iso_code");
+    private void importLangs() throws SQLException {
+        TableField<PsLangRecord, Long> idLangField = Tables.PS_LANG.ID_LANG;
+        TableField<PsLangRecord, String> isoCodeField = Tables.PS_LANG.ISO_CODE;
+
+        DSLContext create = DSL.using(connection, SQLDialect.MYSQL);
+        create.select(idLangField, isoCodeField)
+                .from(Tables.PS_LANG)
+                .where(Tables.PS_LANG.ACTIVE.isTrue())
+                .fetch()
+                .forEach(record -> {
+                    long idLang = record.getValue(idLangField);
+                    String isoCode = record.getValue(isoCodeField);
                     Locale locale = new Locale(isoCode);
                     localeStore.put(idLang, locale);
-                }
-            }
-        }
-    }
-
-    private Connection getConnection() throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
-        String driverClassName = prestashopImportParams.getDriverClassName();
-        Class<?> driverClass = Class.forName(driverClassName);
-        driverClass.newInstance();
-
-        String database = prestashopImportParams.getDatabase();
-        String username = prestashopImportParams.getUsername();
-        String password = prestashopImportParams.getPassword();
-        String host = prestashopImportParams.getHost();
-        int port = prestashopImportParams.getPort();
-
-        Properties connectionProperties = new Properties();
-        connectionProperties.put("user", username);
-        connectionProperties.put("password", password);
-
-        Connection newConnection = DriverManager.getConnection(
-                "jdbc:mysql://"
-                + host
-                + ":" + port + "/" + database,
-                connectionProperties);
-        return newConnection;
+                });
     }
 
     private AttributeDefinition createAttributeDefinition() {
@@ -339,4 +309,26 @@ public class PrestashopImportUtil {
         return defaultItemVariants;
     }
 
+    private Connection getConnection() throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+        String driverClassName = prestashopImportParams.getDriverClassName();
+        Class<?> driverClass = Class.forName(driverClassName);
+        driverClass.newInstance();
+
+        String database = prestashopImportParams.getDatabase();
+        String username = prestashopImportParams.getUsername();
+        String password = prestashopImportParams.getPassword();
+        String host = prestashopImportParams.getHost();
+        int port = prestashopImportParams.getPort();
+
+        Properties connectionProperties = new Properties();
+        connectionProperties.put("user", username);
+        connectionProperties.put("password", password);
+
+        Connection newConnection = DriverManager.getConnection(
+                "jdbc:mysql://"
+                + host
+                + ":" + port + "/" + database,
+                connectionProperties);
+        return newConnection;
+    }
 }

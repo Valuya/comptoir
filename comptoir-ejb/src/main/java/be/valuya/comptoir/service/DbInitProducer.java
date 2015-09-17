@@ -32,9 +32,8 @@ public class DbInitProducer {
 
     @PostConstruct
     public void run() {
-        try {
-            LOG.info("Starting liquibase...");
-            Connection connection = dataSource.getConnection();
+        LOG.info("Starting liquibase...");
+        try (Connection connection = dataSource.getConnection();) {
             JdbcConnection jdbcConnection = new JdbcConnection(connection);
             Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(jdbcConnection);
             ClassLoader classLoader = this.getClass().getClassLoader();
