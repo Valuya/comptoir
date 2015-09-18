@@ -19,7 +19,7 @@ public class FromWsEmployeeSearchConverter {
 
     @Inject
     private FromWsCompanyConverter fromWsCompanyConverter;
- @Inject
+    @Inject
     private FromWsLocaleSearchConverter fromWsLocaleSearchConverter;
 
     public EmployeeSearch convert(WsEmployeeSearch wsEmployeeSearch) {
@@ -29,14 +29,14 @@ public class FromWsEmployeeSearchConverter {
         WsCompanyRef companyRef = wsEmployeeSearch.getCompanyRef();
 
         Company company = fromWsCompanyConverter.find(companyRef);
-        
+
         WsLocaleSearch wsLocaleSearch = wsEmployeeSearch.getLocaleSearch();
         LocaleSearch localeSearch = fromWsLocaleSearchConverter.convert(wsLocaleSearch);
 
         EmployeeSearch employeeSearch = new EmployeeSearch();
         employeeSearch.setCompany(company);
         employeeSearch.setLocaleSearch(localeSearch);
-        
+
         return employeeSearch;
     }
 

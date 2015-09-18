@@ -39,7 +39,7 @@ public class FromWsAccountSearchConverter {
 
         WsPosRef posRef = wsAccountSearch.getPosRef();
         Pos pos = fromWsPosConverter.find(posRef);
-        
+
         WsLocaleSearch wsLocaleSearch = wsAccountSearch.getLocaleSearch();
         LocaleSearch localeSearch = fromWsLocaleSearchConverter.convert(wsLocaleSearch);
 

@@ -32,7 +32,7 @@ public class FromWsAttributeSearchConverter {
         String valueContains = wsAttributeSearch.getValueContains();
 
         Company company = fromWsCompanyConverter.find(companyRef);
-        
+
         WsLocaleSearch wsLocaleSearch = wsAttributeSearch.getLocaleSearch();
         LocaleSearch localeSearch = fromWsLocaleSearchConverter.convert(wsLocaleSearch);
 

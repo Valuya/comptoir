@@ -23,7 +23,7 @@ public class FromWsItemVariantSearchConverter {
     private FromWsItemConverter fromWsItemConverter;
     @Inject
     private FromWsItemSearchConverter fromWsItemSearchConverter;
- @Inject
+    @Inject
     private FromWsLocaleSearchConverter fromWsLocaleSearchConverter;
 
     public ItemVariantSearch convert(WsItemVariantSearch wsItemVariantSearch) {
@@ -37,7 +37,7 @@ public class FromWsItemVariantSearchConverter {
 
         ItemSearch itemSearch = fromWsItemSearchConverter.convert(wsItemSearch);
         Item item = fromWsItemConverter.find(wsItemRef);
-        
+
         WsLocaleSearch wsLocaleSearch = wsItemVariantSearch.getLocaleSearch();
         LocaleSearch localeSearch = fromWsLocaleSearchConverter.convert(wsLocaleSearch);
 

@@ -19,7 +19,7 @@ public class FromWsItemSearchConverter {
 
     @Inject
     private FromWsCompanyConverter fromWsCompanyConverter;
- @Inject
+    @Inject
     private FromWsLocaleSearchConverter fromWsLocaleSearchConverter;
 
     public ItemSearch convert(WsItemSearch wsItemSearch) {
@@ -34,7 +34,7 @@ public class FromWsItemSearchConverter {
         String referenceContains = wsItemSearch.getReferenceContains();
 
         Company company = fromWsCompanyConverter.find(companyRef);
-        
+
         WsLocaleSearch wsLocaleSearch = wsItemSearch.getLocaleSearch();
         LocaleSearch localeSearch = fromWsLocaleSearchConverter.convert(wsLocaleSearch);
 

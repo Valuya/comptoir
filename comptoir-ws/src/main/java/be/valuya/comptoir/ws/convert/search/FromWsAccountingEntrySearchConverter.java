@@ -31,7 +31,7 @@ public class FromWsAccountingEntrySearchConverter {
     private FromWsAccountSearchConverter fromWsAccountSearchConverter;
     @Inject
     private FromWsLocaleSearchConverter fromWsLocaleSearchConverter;
-   
+
     public AccountingEntrySearch convert(WsAccountingEntrySearch wsAccountingEntrySearch) {
         if (wsAccountingEntrySearch == null) {
             return null;
@@ -47,7 +47,7 @@ public class FromWsAccountingEntrySearchConverter {
 
         ZonedDateTime fromDateTime = wsAccountingEntrySearch.getFromDateTime();
         ZonedDateTime toDateTime = wsAccountingEntrySearch.getToDateTime();
-        
+
         WsLocaleSearch wsLocaleSearch = wsAccountingEntrySearch.getLocaleSearch();
         LocaleSearch localeSearch = fromWsLocaleSearchConverter.convert(wsLocaleSearch);
 

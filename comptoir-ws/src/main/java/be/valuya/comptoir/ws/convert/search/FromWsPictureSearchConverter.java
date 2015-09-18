@@ -29,7 +29,7 @@ public class FromWsPictureSearchConverter {
     private FromWsItemConverter fromWsItemConverter;
     @Inject
     private FromWsItemVariantConverter fromWsItemVariantConverter;
- @Inject
+    @Inject
     private FromWsLocaleSearchConverter fromWsLocaleSearchConverter;
 
     public PictureSearch convert(WsPictureSearch wsPictureSearch) {
@@ -38,10 +38,10 @@ public class FromWsPictureSearchConverter {
         }
         WsCompanyRef companyRef = wsPictureSearch.getCompanyRef();
         Company company = fromWsCompanyConverter.find(companyRef);
-        
+
         WsItemRef itemRef = wsPictureSearch.getItemRef();
         Item item = fromWsItemConverter.find(itemRef);
-        
+
         WsItemVariantRef itemVariantRef = wsPictureSearch.getItemVariantRef();
         ItemVariant itemVariant = fromWsItemVariantConverter.find(itemVariantRef);
 

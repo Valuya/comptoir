@@ -35,7 +35,7 @@ public class FromWsInvoiceSearchConverter {
         InvoiceSearch invoiceSearch = new InvoiceSearch();
         invoiceSearch.setCompany(company);
         invoiceSearch.setLocaleSearch(localeSearch);
-        
+
         return invoiceSearch;
     }
 

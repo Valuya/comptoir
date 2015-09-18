@@ -19,7 +19,7 @@ public class FromWsSaleSearchConverter {
 
     @Inject
     private FromWsCompanyConverter fromWsCompanyConverter;
- @Inject
+    @Inject
     private FromWsLocaleSearchConverter fromWsLocaleSearchConverter;
 
     public SaleSearch convert(WsSaleSearch wsSaleSearch) {
@@ -27,10 +27,10 @@ public class FromWsSaleSearchConverter {
             return null;
         }
         Boolean closed = wsSaleSearch.getClosed();
-        
+
         WsCompanyRef companyRef = wsSaleSearch.getCompanyRef();
         Company company = fromWsCompanyConverter.find(companyRef);
-        
+
         WsLocaleSearch wsLocaleSearch = wsSaleSearch.getLocaleSearch();
         LocaleSearch localeSearch = fromWsLocaleSearchConverter.convert(wsLocaleSearch);
 

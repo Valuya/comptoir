@@ -24,7 +24,7 @@ public class FromWsBalanceSearchConverter {
     private FromWsCompanyConverter fromWsCompanyConverter;
     @Inject
     private FromWsAccountSearchConverter fromWsAccountSearchConverter;
- @Inject
+    @Inject
     private FromWsLocaleSearchConverter fromWsLocaleSearchConverter;
 
     public BalanceSearch convert(WsBalanceSearch wsBalanceSearch) {
@@ -39,7 +39,7 @@ public class FromWsBalanceSearchConverter {
 
         ZonedDateTime fromDateTime = wsBalanceSearch.getFromDateTime();
         ZonedDateTime toDateTime = wsBalanceSearch.getToDateTime();
-        
+
         WsLocaleSearch wsLocaleSearch = wsBalanceSearch.getLocaleSearch();
         LocaleSearch localeSearch = fromWsLocaleSearchConverter.convert(wsLocaleSearch);
 

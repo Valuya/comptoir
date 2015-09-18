@@ -29,7 +29,7 @@ public class FromWsItemVariantSaleSearchConverter {
     private FromWsItemVariantConverter fromWsItemVariantConverter;
     @Inject
     private FromWsSaleConverter fromWsSaleConverter;
- @Inject
+    @Inject
     private FromWsLocaleSearchConverter fromWsLocaleSearchConverter;
 
     public ItemVariantSaleSearch convert(WsItemVariantSaleSearch wsItemSaleSearch) {
@@ -45,7 +45,7 @@ public class FromWsItemVariantSaleSearchConverter {
 
         WsSaleRef saleRef = wsItemSaleSearch.getSaleRef();
         Sale sale = fromWsSaleConverter.find(saleRef);
-        
+
         WsLocaleSearch wsLocaleSearch = wsItemSaleSearch.getLocaleSearch();
         LocaleSearch localeSearch = fromWsLocaleSearchConverter.convert(wsLocaleSearch);
 
@@ -54,7 +54,7 @@ public class FromWsItemVariantSaleSearchConverter {
         itemSaleSearch.setSale(sale);
         itemSaleSearch.setItemVariant(itemVariant);
         itemSaleSearch.setLocaleSearch(localeSearch);
-        
+
         return itemSaleSearch;
     }
 

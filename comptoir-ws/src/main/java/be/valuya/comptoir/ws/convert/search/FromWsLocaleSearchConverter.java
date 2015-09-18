@@ -11,16 +11,16 @@ import javax.enterprise.context.ApplicationScoped;
  */
 @ApplicationScoped
 public class FromWsLocaleSearchConverter {
-    
+
     public LocaleSearch convert(WsLocaleSearch wsLocaleSearch) {
         if (wsLocaleSearch == null) {
             return null;
         }
         LocaleSearch localeSearch = new LocaleSearch();
-        
+
         Locale locale = wsLocaleSearch.getLocale();
         localeSearch.setLocale(locale);
-        
+
         return localeSearch;
     }
 }
