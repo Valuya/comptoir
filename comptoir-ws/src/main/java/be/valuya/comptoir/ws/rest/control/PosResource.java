@@ -6,6 +6,8 @@ import be.valuya.comptoir.api.domain.search.WsPosSearch;
 import be.valuya.comptoir.model.commercial.Pos;
 import be.valuya.comptoir.model.search.PosSearch;
 import be.valuya.comptoir.service.PosService;
+import be.valuya.comptoir.util.pagination.Pagination;
+import be.valuya.comptoir.util.pagination.PosColumn;
 import be.valuya.comptoir.ws.convert.commercial.FromWsPosConverter;
 import be.valuya.comptoir.ws.convert.commercial.ToWsPosConverter;
 import be.valuya.comptoir.ws.convert.search.FromWsPosSearchConverter;
@@ -15,6 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.ejb.EJB;
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -23,7 +26,9 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
 
 /**
  *
@@ -44,6 +49,12 @@ public class PosResource {
     private ToWsPosConverter toWsPosConverter;
     @Inject
     private IdChecker idChecker;
+    @Context
+    private UriInfo uriInfo;
+    @Inject
+    private RestPaginationUtil restPaginationUtil;
+    @Context
+    private HttpServletResponse response;
 
     @POST
     @Valid
@@ -84,14 +95,16 @@ public class PosResource {
     @POST
     @Valid
     public List<WsPos> findPosList(@Valid WsPosSearch wsPosSearch) {
+        Pagination<Pos, PosColumn> pagination = restPaginationUtil.extractPagination(uriInfo, PosColumn::valueOf);
         PosSearch posSearch = fromWsPosSearchConverter.convert(wsPosSearch);
-        List<Pos> poss = posService.findPosList(posSearch);
+        List<Pos> posList = posService.findPosList(posSearch, pagination);
 
-        List<WsPos> wsPoss = poss.stream()
+        List<WsPos> wsPosList = posList.stream()
                 .map(toWsPosConverter::convert)
                 .collect(Collectors.toList());
 
-        return wsPoss;
+        restPaginationUtil.addResultCount(response, pagination);
+        return wsPosList;
     }
 
 }

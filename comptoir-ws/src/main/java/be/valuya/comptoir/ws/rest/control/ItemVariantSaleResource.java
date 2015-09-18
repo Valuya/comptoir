@@ -9,7 +9,6 @@ import be.valuya.comptoir.model.search.ItemVariantSaleSearch;
 import be.valuya.comptoir.service.SaleService;
 import be.valuya.comptoir.util.pagination.ItemVariantSaleColumn;
 import be.valuya.comptoir.util.pagination.Pagination;
-import be.valuya.comptoir.ws.config.HeadersConfig;
 import be.valuya.comptoir.ws.convert.commercial.FromWsItemVariantSaleConverter;
 import be.valuya.comptoir.ws.convert.commercial.ToWsItemVariantSaleConverter;
 import be.valuya.comptoir.ws.convert.search.FromWsItemVariantSaleSearchConverter;
