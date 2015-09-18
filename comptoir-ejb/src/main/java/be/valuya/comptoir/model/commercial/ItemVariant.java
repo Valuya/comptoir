@@ -1,5 +1,6 @@
 package be.valuya.comptoir.model.commercial;
 
+import be.valuya.comptoir.model.common.Activable;
 import be.valuya.comptoir.model.common.WithId;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -26,7 +27,7 @@ import javax.validation.constraints.Size;
  */
 @Entity
 @Table(name = "item_variant")
-public class ItemVariant implements Serializable, WithId {
+public class ItemVariant implements Serializable, WithId, Activable {
 
     @Id
     @GeneratedValue
@@ -54,7 +55,12 @@ public class ItemVariant implements Serializable, WithId {
                 @JoinColumn(name = "attribute_value_id")}
     )
     private List<AttributeValue> attributeValues;
+    private boolean active;
 
+    public ItemVariant() {
+    }
+
+    
     @Override
     public Long getId() {
         return id;
@@ -111,6 +117,16 @@ public class ItemVariant implements Serializable, WithId {
 
     public void setPricingAmount(BigDecimal pricingAmount) {
         this.pricingAmount = pricingAmount;
+    }
+
+    @Override
+    public boolean isActive() {
+        return active;
+    }
+
+    @Override
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
     @Override

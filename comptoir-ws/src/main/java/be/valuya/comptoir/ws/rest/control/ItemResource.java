@@ -11,6 +11,7 @@ import be.valuya.comptoir.util.pagination.Pagination;
 import be.valuya.comptoir.ws.convert.commercial.FromWsItemConverter;
 import be.valuya.comptoir.ws.convert.commercial.ToWsItemConverter;
 import be.valuya.comptoir.ws.convert.search.FromWsItemSearchConverter;
+import be.valuya.comptoir.ws.rest.validation.ActiveStateChecker;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
 import be.valuya.comptoir.ws.rest.validation.NoId;
 import java.util.List;
@@ -20,6 +21,7 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -55,6 +57,8 @@ public class ItemResource {
     private UriInfo uriInfo;
     @Inject
     private RestPaginationUtil restPaginationUtil;
+    @Inject
+    private ActiveStateChecker activeStateChecker;
 
     @POST
     @Valid
@@ -89,6 +93,15 @@ public class ItemResource {
         WsItem wsItem = toWsItemConverter.convert(item);
 
         return wsItem;
+    }
+
+    @Path("{id}")
+    @DELETE
+    public void deleteItem(@PathParam("id") long id) {
+        Item item = stockService.findItemById(id);
+        activeStateChecker.checkState(item, true);
+        item.setActive(false);
+        stockService.saveItem(item);
     }
 
     @POST
