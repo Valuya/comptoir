@@ -7,6 +7,8 @@ import be.valuya.comptoir.model.commercial.ItemVariantSale;
 import be.valuya.comptoir.model.commercial.Sale;
 import be.valuya.comptoir.model.search.ItemVariantSaleSearch;
 import be.valuya.comptoir.service.SaleService;
+import be.valuya.comptoir.util.pagination.ItemVariantSaleColumn;
+import be.valuya.comptoir.util.pagination.Pagination;
 import be.valuya.comptoir.ws.config.HeadersConfig;
 import be.valuya.comptoir.ws.convert.commercial.FromWsItemVariantSaleConverter;
 import be.valuya.comptoir.ws.convert.commercial.ToWsItemVariantSaleConverter;
@@ -30,6 +32,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
 
 /**
  *
@@ -54,6 +57,10 @@ public class ItemVariantSaleResource {
     private SaleStateChecker saleStateChecker;
     @Context
     private HttpServletResponse response;
+    @Context
+    private UriInfo uriInfo;
+    @Inject
+    private RestPaginationUtil restPaginationUtil;
 
     @POST
     @Valid
@@ -95,15 +102,15 @@ public class ItemVariantSaleResource {
     @Path("search")
     @Valid
     public List<WsItemVariantSale> findItemSales(@Valid WsItemVariantSaleSearch wsItemSaleSearch) {
+        Pagination<ItemVariantSale, ItemVariantSaleColumn> pagination = restPaginationUtil.extractPagination(uriInfo, ItemVariantSaleColumn::valueOf);
         ItemVariantSaleSearch itemSaleSearch = fromWsItemSaleSearchConverter.convert(wsItemSaleSearch);
-        List<ItemVariantSale> itemSales = saleService.findItemSales(itemSaleSearch);
+        List<ItemVariantSale> itemSales = saleService.findItemSales(itemSaleSearch, pagination);
 
         List<WsItemVariantSale> wsItemSales = itemSales.stream()
                 .map(toWsItemSaleConverter::convert)
                 .collect(Collectors.toList());
 
-        response.setHeader(HeadersConfig.LIST_RESULTS_COUNT_HEADER, "101");
-
+        restPaginationUtil.addResultCount(response, pagination);
         return wsItemSales;
     }
 

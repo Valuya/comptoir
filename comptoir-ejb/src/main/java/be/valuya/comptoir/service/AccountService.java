@@ -70,7 +70,7 @@ public class AccountService {
                 accountColumn -> AccountColumnPersistenceUtil.getPath(accountRoot, accountColumn)
         );
         
-        List<Account> accounts = paginatedQueryService.getResults(query, accountRoot, predicates, pagination);
+        List<Account> accounts = paginatedQueryService.getResults(predicates, query, accountRoot, pagination);
 
         return accounts;
     }
@@ -219,7 +219,7 @@ public class AccountService {
         paginatedQueryService.applySort(pagination, balanceRoot, query,
                 balanceColumn -> BalanceColumnPersistenceUtil.getPath(balanceRoot, balanceColumn));
 
-        List<Balance> balances = paginatedQueryService.getResults(query, balanceRoot, predicates, pagination);
+        List<Balance> balances = paginatedQueryService.getResults(predicates, query, balanceRoot, pagination);
 
         return balances;
 
