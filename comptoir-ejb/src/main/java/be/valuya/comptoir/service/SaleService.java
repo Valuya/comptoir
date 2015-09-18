@@ -24,7 +24,6 @@ import be.valuya.comptoir.model.search.SaleSearch;
 import be.valuya.comptoir.model.stock.Stock;
 import be.valuya.comptoir.model.stock.StockChangeType;
 import be.valuya.comptoir.model.thirdparty.Customer;
-import be.valuya.comptoir.util.pagination.ItemVariantColumn;
 import be.valuya.comptoir.util.pagination.ItemVariantSaleColumn;
 import be.valuya.comptoir.util.pagination.Pagination;
 import be.valuya.comptoir.util.pagination.SaleColumn;

@@ -1,13 +1,11 @@
 package be.valuya.comptoir.service;
 
-import be.valuya.comptoir.model.commercial.Item;
 import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.model.commercial.ItemVariantSale;
 import be.valuya.comptoir.model.commercial.ItemVariantSale_;
 import be.valuya.comptoir.model.commercial.ItemVariant_;
 import be.valuya.comptoir.model.commercial.Item_;
 import be.valuya.comptoir.model.commercial.Price_;
-import be.valuya.comptoir.util.pagination.ItemVariantColumn;
 import be.valuya.comptoir.util.pagination.ItemVariantSaleColumn;
 import be.valuya.comptoir.util.pagination.Sort;
 import java.util.ArrayList;
@@ -15,7 +13,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.From;
-import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Root;
