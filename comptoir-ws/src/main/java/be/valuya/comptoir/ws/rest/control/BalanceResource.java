@@ -6,6 +6,8 @@ import be.valuya.comptoir.api.domain.search.WsBalanceSearch;
 import be.valuya.comptoir.model.cash.Balance;
 import be.valuya.comptoir.model.search.BalanceSearch;
 import be.valuya.comptoir.service.AccountService;
+import be.valuya.comptoir.util.pagination.BalanceColumn;
+import be.valuya.comptoir.util.pagination.Pagination;
 import be.valuya.comptoir.ws.config.HeadersConfig;
 import be.valuya.comptoir.ws.convert.accounting.FromWsBalanceConverter;
 import be.valuya.comptoir.ws.convert.balanceing.ToWsBalanceConverter;
@@ -28,6 +30,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
 
 /**
  *
@@ -51,6 +54,11 @@ public class BalanceResource {
     private BalanceStateChecker balanceStateChecker;
     @Context
     private HttpServletResponse response;
+    @Context
+    private UriInfo uriInfo;
+    @Inject
+    private RestPaginationUtil restPaginationUtil;
+
 
     @POST
     @Valid
@@ -91,14 +99,15 @@ public class BalanceResource {
     @Valid
     @Path("search")
     public List<WsBalance> findBalances(@Valid WsBalanceSearch wsBalanceSearch) {
+        Pagination<Balance, BalanceColumn> pagination = restPaginationUtil.extractPagination(uriInfo, BalanceColumn::valueOf);
         BalanceSearch balanceSearch = fromWsBalanceSearchConverter.convert(wsBalanceSearch);
-        List<Balance> balances = accountService.findBalances(balanceSearch);
+        List<Balance> balances = accountService.findBalances(balanceSearch, pagination);
 
         List<WsBalance> wsBalances = balances.stream()
                 .map(toWsBalanceConverter::convert)
                 .collect(Collectors.toList());
 
-        response.setHeader(HeadersConfig.LIST_RESULTS_COUNT_HEADER, "101");
+        restPaginationUtil.addResultCount(response, pagination);
 
         return wsBalances;
     }

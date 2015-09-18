@@ -6,6 +6,8 @@ import be.valuya.comptoir.api.domain.search.WsAccountSearch;
 import be.valuya.comptoir.model.accounting.Account;
 import be.valuya.comptoir.model.search.AccountSearch;
 import be.valuya.comptoir.service.AccountService;
+import be.valuya.comptoir.util.pagination.AccountColumn;
+import be.valuya.comptoir.util.pagination.Pagination;
 import be.valuya.comptoir.ws.config.HeadersConfig;
 import be.valuya.comptoir.ws.convert.accounting.FromWsAccountConverter;
 import be.valuya.comptoir.ws.convert.accounting.ToWsAccountConverter;
@@ -50,6 +52,8 @@ public class AccountResource {
     private HttpServletResponse response;
     @Context
     private UriInfo uriInfo;
+    @Inject
+    private RestPaginationUtil restPaginationUtil;
 
     @POST
     @Valid
@@ -89,16 +93,16 @@ public class AccountResource {
     @Path("search")
     @Valid
     public List<WsAccount> findAccounts(@Valid WsAccountSearch wsAccountSearch) {
-//        Pagination<Account, AccountColumn> pagination = restPaginationUtil.extractPagination(uriInfo, AttributeDefinitionColumn::valueOf);
+        Pagination<Account, AccountColumn> pagination = restPaginationUtil.extractPagination(uriInfo, AccountColumn::valueOf);
 
         AccountSearch accountSearch = fromWsAccountSearchConverter.convert(wsAccountSearch);
-        List<Account> accounts = accountService.findAccounts(accountSearch);
+        List<Account> accounts = accountService.findAccounts(accountSearch, pagination);
 
         List<WsAccount> wsAccounts = accounts.stream()
                 .map(toWsAccountConverter::convert)
                 .collect(Collectors.toList());
 
-        response.setHeader(HeadersConfig.LIST_RESULTS_COUNT_HEADER, "101");
+        restPaginationUtil.addResultCount(response, pagination);
 
         return wsAccounts;
     }

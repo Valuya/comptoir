@@ -2,11 +2,17 @@ package be.valuya.comptoir.service;
 
 import be.valuya.comptoir.model.commercial.Pos;
 import be.valuya.comptoir.model.commercial.Pos_;
+import be.valuya.comptoir.model.commercial.Sale;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.search.PosSearch;
+import be.valuya.comptoir.util.pagination.Pagination;
+import be.valuya.comptoir.util.pagination.PosColumn;
+import be.valuya.comptoir.util.pagination.SaleColumn;
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -26,9 +32,11 @@ public class PosService {
 
     @PersistenceContext
     private EntityManager entityManager;
+    @EJB
+    private PaginatedQueryService paginatedQueryService;
 
     @Nonnull
-    public List<Pos> findPosList(@Nonnull PosSearch posSearch) {
+    public List<Pos> findPosList(@Nonnull PosSearch posSearch, @CheckForNull Pagination<Pos, PosColumn> pagination) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Pos> query = criteriaBuilder.createQuery(Pos.class);
         Root<Pos> posRoot = query.from(Pos.class);
@@ -40,14 +48,12 @@ public class PosService {
         Predicate companyPredicate = criteriaBuilder.equal(companyPath, company);
         predicates.add(companyPredicate);
 
-        Predicate[] predicateArray = predicates.toArray(new Predicate[0]);
-        query.where(predicateArray);
-
-        TypedQuery<Pos> typedQuery = entityManager.createQuery(query);
-
-        List<Pos> poss = typedQuery.getResultList();
-
-        return poss;
+        paginatedQueryService.applySort(pagination, posRoot, query,
+                (posColumn) -> PosColumnPersistenceUtil.getPath(posRoot, posColumn));
+        
+        List<Pos> posList = paginatedQueryService.getResults(predicates, query, posRoot, pagination);
+        
+        return posList;
     }
 
     public Pos findPosById(Long id) {
