@@ -4,6 +4,7 @@ import be.valuya.comptoir.api.domain.accounting.WsAccountingTransactionRef;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.api.utils.ZonedDateTimeXmlAdapter;
 import java.time.ZonedDateTime;
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -28,6 +29,8 @@ public class WsAccountingEntrySearch {
     private ZonedDateTime fromDateTime;
     @XmlJavaTypeAdapter(ZonedDateTimeXmlAdapter.class)
     private ZonedDateTime toDateTime;
+    @CheckForNull
+    private WsLocaleSearch localeSearch;
 
     public WsCompanyRef getCompanyRef() {
         return companyRef;
@@ -67,6 +70,15 @@ public class WsAccountingEntrySearch {
 
     public void setToDateTime(ZonedDateTime toDateTime) {
         this.toDateTime = toDateTime;
+    }
+
+    @CheckForNull
+    public WsLocaleSearch getLocaleSearch() {
+        return localeSearch;
+    }
+
+    public void setLocaleSearch(WsLocaleSearch localeSearch) {
+        this.localeSearch = localeSearch;
     }
 
 }

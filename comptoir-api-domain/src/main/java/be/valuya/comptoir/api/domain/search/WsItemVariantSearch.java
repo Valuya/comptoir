@@ -1,6 +1,7 @@
 package be.valuya.comptoir.api.domain.search;
 
 import be.valuya.comptoir.api.domain.commercial.WsItemRef;
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -19,6 +20,8 @@ public class WsItemVariantSearch {
     private WsItemRef itemRef;
     private String variantReference;
     private String variantReferenceContains;
+    @CheckForNull
+    private WsLocaleSearch localeSearch;
 
     public WsItemSearch getItemSearch() {
         return itemSearch;
@@ -52,4 +55,14 @@ public class WsItemVariantSearch {
         this.variantReferenceContains = variantReferenceContains;
     }
 
+    @CheckForNull
+    public WsLocaleSearch getLocaleSearch() {
+        return localeSearch;
+    }
+
+    public void setLocaleSearch(WsLocaleSearch localeSearch) {
+        this.localeSearch = localeSearch;
+    }
+
+    
 }

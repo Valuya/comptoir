@@ -3,6 +3,7 @@ package be.valuya.comptoir.api.domain.search;
 import be.valuya.comptoir.api.domain.commercial.WsItemRef;
 import be.valuya.comptoir.api.domain.commercial.WsItemVariantRef;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -20,6 +21,8 @@ public class WsPictureSearch {
     private WsCompanyRef companyRef;
     private WsItemRef itemRef;
     private WsItemVariantRef itemVariantRef;
+    @CheckForNull
+    private WsLocaleSearch localeSearch;
 
     public WsCompanyRef getCompanyRef() {
         return companyRef;
@@ -44,4 +47,14 @@ public class WsPictureSearch {
     public void setItemVariantRef(WsItemVariantRef itemVariantRef) {
         this.itemVariantRef = itemVariantRef;
     }
+
+    @CheckForNull
+    public WsLocaleSearch getLocaleSearch() {
+        return localeSearch;
+    }
+
+    public void setLocaleSearch(WsLocaleSearch localeSearch) {
+        this.localeSearch = localeSearch;
+    }
+    
 }

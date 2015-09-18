@@ -1,5 +1,6 @@
-package be.valuya.comptoir.api.domain.lang;
+package be.valuya.comptoir.api.domain.search;
 
+import be.valuya.comptoir.api.domain.lang.LocaleAdapter;
 import java.io.Serializable;
 import java.util.Locale;
 import javax.validation.constraints.NotNull;

@@ -2,6 +2,7 @@ package be.valuya.comptoir.model.search;
 
 import be.valuya.comptoir.model.company.Company;
 import java.time.ZonedDateTime;
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -22,6 +23,8 @@ public class BalanceSearch {
     private AccountSearch accountSearch;
     private ZonedDateTime fromDateTime;
     private ZonedDateTime toDateTime;
+    @CheckForNull
+    private LocaleSearch localeSearch;
 
     public Company getCompany() {
         return company;
@@ -53,5 +56,14 @@ public class BalanceSearch {
 
     public void setToDateTime(ZonedDateTime toDateTime) {
         this.toDateTime = toDateTime;
+    }
+
+    @CheckForNull
+    public LocaleSearch getLocaleSearch() {
+        return localeSearch;
+    }
+
+    public void setLocaleSearch(LocaleSearch localeSearch) {
+        this.localeSearch = localeSearch;
     }
 }

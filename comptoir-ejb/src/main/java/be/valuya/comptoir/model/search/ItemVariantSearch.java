@@ -1,6 +1,7 @@
 package be.valuya.comptoir.model.search;
 
 import be.valuya.comptoir.model.commercial.Item;
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -21,6 +22,8 @@ public class ItemVariantSearch {
     private Item item;
     private String variantReference;
     private String variantReferenceContains;
+    @CheckForNull
+    private LocaleSearch localeSearch;
 
     public ItemSearch getItemSearch() {
         return itemSearch;
@@ -54,4 +57,12 @@ public class ItemVariantSearch {
         this.variantReferenceContains = variantReferenceContains;
     }
 
+    @CheckForNull
+    public LocaleSearch getLocaleSearch() {
+        return localeSearch;
+    }
+
+    public void setLocaleSearch(LocaleSearch localeSearch) {
+        this.localeSearch = localeSearch;
+    }
 }
