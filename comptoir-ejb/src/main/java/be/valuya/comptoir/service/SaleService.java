@@ -24,6 +24,7 @@ import be.valuya.comptoir.model.search.SaleSearch;
 import be.valuya.comptoir.model.stock.Stock;
 import be.valuya.comptoir.model.stock.StockChangeType;
 import be.valuya.comptoir.model.thirdparty.Customer;
+import be.valuya.comptoir.util.pagination.ItemVariantSaleColumn;
 import be.valuya.comptoir.util.pagination.Pagination;
 import be.valuya.comptoir.util.pagination.SaleColumn;
 import be.valuya.comptoir.util.pagination.Sort;
@@ -61,6 +62,9 @@ public class SaleService {
     private StockService stockService;
     @EJB
     private AccountService accountService;
+    @EJB
+    private PaginatedQueryService paginatedQueryService;
+
 
     public Sale createSale(Stock stock, Sale sale, List<ItemVariantSale> itemSales) {
         Sale managedSale = entityManager.merge(sale);
@@ -430,7 +434,7 @@ public class SaleService {
     }
 
     @Nonnull
-    public List<ItemVariantSale> findItemSales(@Nonnull ItemVariantSaleSearch itemSaleSearch) {
+    public List<ItemVariantSale> findItemSales(@Nonnull ItemVariantSaleSearch itemSaleSearch, @CheckForNull Pagination<ItemVariantSale, ItemVariantSaleColumn> pagination) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<ItemVariantSale> query = criteriaBuilder.createQuery(ItemVariantSale.class);
         Root<ItemVariantSale> itemSaleRoot = query.from(ItemVariantSale.class);
@@ -458,13 +462,10 @@ public class SaleService {
             predicates.add(itemPredicate);
         }
 
-        Predicate[] predicateArray = predicates.toArray(new Predicate[0]);
-        query.where(predicateArray);
-
-        TypedQuery<ItemVariantSale> typedQuery = entityManager.createQuery(query);
-
-        List<ItemVariantSale> itemSales = typedQuery.getResultList();
-
+        paginatedQueryService.applySort(pagination, itemSaleRoot, query, 
+                (itemVarianSaleColumn)->ItemVariantSaleColumnPersistenceUtil.getPath(itemSaleRoot, itemVarianSaleColumn));
+        
+        List<ItemVariantSale> itemSales = paginatedQueryService.getResults(predicates, query, itemSaleRoot, pagination);
         return itemSales;
     }
 

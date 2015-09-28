@@ -46,7 +46,7 @@ public class PaginatedQueryService {
         }
     }
 
-    public <T, C extends Column<T>> List<T> getResults(CriteriaQuery<T> query, Root<T> root, List<Predicate> predicates, Pagination<T, C> pagination) {
+    private <T, C extends Column<T>> List<T> getResults(CriteriaQuery<T> query, Root<T> root, List<Predicate> predicates, Pagination<T, C> pagination) {
         TypedQuery<T> typedQuery = entityManager.createQuery(query);
         paginate(pagination, typedQuery);
 
