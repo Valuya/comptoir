@@ -278,23 +278,8 @@ public class SaleService {
         Predicate[] predicateArray = predicates.toArray(new Predicate[0]);
         query.where(predicateArray);
 
-        if (pagination != null) {
-            List<Sort<SaleColumn>> sortings = pagination.getSortings();
-            List<Order> orders = SaleColumnPersistenceUtils.createOrdersFromSortings(criteriaBuilder, saleRoot, sortings);
-            query.orderBy(orders);
-        }
-
-        TypedQuery<Sale> typedQuery = entityManager.createQuery(query);
-
-        if (pagination != null) {
-            int offset = pagination.getOffset();
-            int maxResults = pagination.getMaxResults();
-            typedQuery.setFirstResult(offset);
-            typedQuery.setMaxResults(maxResults);
-        }
-
-        List<Sale> sales = typedQuery.getResultList();
-        return sales;
+        List<Sale> results = paginatedQueryService.getResults(predicates, query, saleRoot, pagination);
+        return results;
     }
 
     private List<Predicate> applySaleSearch(SaleSearch saleSearch, Path<Sale> saleRoot, CriteriaBuilder criteriaBuilder) {
