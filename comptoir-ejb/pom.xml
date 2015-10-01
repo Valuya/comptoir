@@ -106,10 +106,10 @@
 
                     <!-- JDBC connection parameters -->
                     <jdbc>
-                        <driver>com.mysql.jdbc.Driver</driver>
-                        <url>jdbc:mysql://localhost:3306/petitnapo</url>
-                        <user>root</user>
-                        <password>aaaaa</password>
+                        <driver>${db.napo.driver}</driver>
+                        <url>${db.napo.url}</url>
+                        <user>${db.napo.username}</user>
+                        <password>${db.napo.password}</password>
                     </jdbc>
 
                     <!-- Generator parameters -->
