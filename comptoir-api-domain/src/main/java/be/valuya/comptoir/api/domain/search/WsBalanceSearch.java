@@ -1,5 +1,6 @@
 package be.valuya.comptoir.api.domain.search;
 
+import be.valuya.comptoir.api.domain.accounting.WsAccountRef;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.api.utils.ZonedDateTimeXmlAdapter;
 import java.time.ZonedDateTime;
@@ -26,6 +27,7 @@ public class WsBalanceSearch {
     private ZonedDateTime fromDateTime;
     @XmlJavaTypeAdapter(ZonedDateTimeXmlAdapter.class)
     private ZonedDateTime toDateTime;
+    private WsAccountRef accountRef;
 
     public WsCompanyRef getCompanyRef() {
         return companyRef;
@@ -57,6 +59,14 @@ public class WsBalanceSearch {
 
     public void setToDateTime(ZonedDateTime toDateTime) {
         this.toDateTime = toDateTime;
+    }
+
+    public WsAccountRef getAccountRef() {
+        return accountRef;
+    }
+
+    public void setAccountRef(WsAccountRef accountRef) {
+        this.accountRef = accountRef;
     }
 
 }
