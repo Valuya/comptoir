@@ -51,6 +51,7 @@ import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.From;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
+import javax.persistence.criteria.ListJoin;
 import javax.persistence.criteria.MapJoin;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
@@ -124,11 +125,10 @@ public class StockService {
         ItemSearch itemSearch = itemVariantSearch.getItemSearch();
         List<Predicate> predicates = createItemPredicates(itemSearch, itemFrom, itemVariantFrom);
 
-        
         Path<Boolean> activePath = itemVariantFrom.get(ItemVariant_.active);
         Predicate activePredicate = criteriaBuilder.equal(activePath, Boolean.TRUE);
         predicates.add(activePredicate);
-        
+
         Item item = itemVariantSearch.getItem();
         if (item != null) {
             Predicate itemPredicate = criteriaBuilder.equal(itemFrom, item);
@@ -147,21 +147,21 @@ public class StockService {
         }
         return predicates;
     }
-    
+
     private List<Predicate> createItemPredicates(ItemSearch itemSearch, From<?, Item> itemFrom, From<?, ItemVariant> itemVariantFrom) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
 
         List<Predicate> predicates = new ArrayList<>();
-        
+
         Path<Boolean> activePath = itemFrom.get(Item_.active);
         Predicate activePredicate = criteriaBuilder.equal(activePath, Boolean.TRUE);
         predicates.add(activePredicate);
-        
+
         Company company = itemSearch.getCompany();
         Path<Company> companyPath = itemFrom.get(Item_.company);
         Predicate companyPredicate = criteriaBuilder.equal(companyPath, company);
         predicates.add(companyPredicate);
-        
+
         Path<String> referencePath = itemFrom.get(Item_.reference);
         String multiSearch = itemSearch.getMultiSearch();
         if (multiSearch != null && !multiSearch.isEmpty()) {
@@ -212,6 +212,21 @@ public class StockService {
         if (itemVariantFrom != null) {
             Predicate variantReferenceContainsPredicate = createVariantReferenceContainsPredicate(itemVariantFrom, lowerMultiSearch);
             multiSearchPredicates.add(variantReferenceContainsPredicate);
+
+            // FIME: item variants without any attributes will not match
+            Expression<List<AttributeValue>> attributesPath = itemVariantFrom.get(ItemVariant_.attributeValues);
+            Predicate noAttributesPredicate = criteriaBuilder.isEmpty(attributesPath);
+            multiSearchPredicates.add(noAttributesPredicate);
+            
+            ListJoin<ItemVariant, AttributeValue> attributesValues = itemVariantFrom.join(ItemVariant_.attributeValues, JoinType.LEFT);
+            Join<AttributeValue, LocaleText> valueTextsJoin = attributesValues.join(AttributeValue_.value, JoinType.LEFT);
+            Predicate valueContainsPredicate = createLocaleTextContainsPredicate(valueTextsJoin, multiSearch);
+            multiSearchPredicates.add(valueContainsPredicate);
+
+            Join<AttributeValue, AttributeDefinition> definitionJoin = attributesValues.join(AttributeValue_.attributeDefinition, JoinType.LEFT);
+            Join<AttributeDefinition, LocaleText> defintionNameJoin = definitionJoin.join(AttributeDefinition_.name, JoinType.LEFT);
+            Predicate definitionContainsPredicate = createLocaleTextContainsPredicate(defintionNameJoin, multiSearch);
+            multiSearchPredicates.add(definitionContainsPredicate);
         }
         // combine
         Predicate[] multiSearchPredicateArray = multiSearchPredicates.toArray(new Predicate[0]);
