@@ -28,6 +28,8 @@ public class ItemStockSearch {
     private Stock stock;
     @CheckForNull
     private ZonedDateTime atDateTime;
+    @CheckForNull
+    private LocaleSearch localeSearch;
 
     @NotNull
     @Nonnull
@@ -66,4 +68,12 @@ public class ItemStockSearch {
         this.atDateTime = atDateTime;
     }
 
+    @CheckForNull
+    public LocaleSearch getLocaleSearch() {
+        return localeSearch;
+    }
+
+    public void setLocaleSearch(LocaleSearch localeSearch) {
+        this.localeSearch = localeSearch;
+    }
 }

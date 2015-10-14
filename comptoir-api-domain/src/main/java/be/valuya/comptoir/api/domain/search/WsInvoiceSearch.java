@@ -1,6 +1,7 @@
 package be.valuya.comptoir.api.domain.search;
 
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -18,6 +19,8 @@ public class WsInvoiceSearch {
     @Nonnull
     @NotNull
     private WsCompanyRef companyRef;
+    @CheckForNull
+    private WsLocaleSearch localeSearch;
 
     public WsCompanyRef getCompanyRef() {
         return companyRef;
@@ -25,6 +28,15 @@ public class WsInvoiceSearch {
 
     public void setCompanyRef(WsCompanyRef companyRef) {
         this.companyRef = companyRef;
+    }
+
+    @CheckForNull
+    public WsLocaleSearch getLocaleSearch() {
+        return localeSearch;
+    }
+
+    public void setLocaleSearch(WsLocaleSearch localeSearch) {
+        this.localeSearch = localeSearch;
     }
 
 }

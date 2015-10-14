@@ -4,10 +4,12 @@ import be.valuya.comptoir.api.domain.commercial.WsItemVariantRef;
 import be.valuya.comptoir.api.domain.commercial.WsSaleRef;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.api.domain.search.WsItemVariantSaleSearch;
+import be.valuya.comptoir.api.domain.search.WsLocaleSearch;
 import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.model.commercial.Sale;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.search.ItemVariantSaleSearch;
+import be.valuya.comptoir.model.search.LocaleSearch;
 import be.valuya.comptoir.ws.convert.commercial.FromWsItemVariantConverter;
 import be.valuya.comptoir.ws.convert.commercial.FromWsSaleConverter;
 import be.valuya.comptoir.ws.convert.company.FromWsCompanyConverter;
@@ -27,6 +29,8 @@ public class FromWsItemVariantSaleSearchConverter {
     private FromWsItemVariantConverter fromWsItemVariantConverter;
     @Inject
     private FromWsSaleConverter fromWsSaleConverter;
+    @Inject
+    private FromWsLocaleSearchConverter fromWsLocaleSearchConverter;
 
     public ItemVariantSaleSearch convert(WsItemVariantSaleSearch wsItemSaleSearch) {
         if (wsItemSaleSearch == null) {
@@ -42,10 +46,14 @@ public class FromWsItemVariantSaleSearchConverter {
         WsSaleRef saleRef = wsItemSaleSearch.getSaleRef();
         Sale sale = fromWsSaleConverter.find(saleRef);
 
+        WsLocaleSearch wsLocaleSearch = wsItemSaleSearch.getLocaleSearch();
+        LocaleSearch localeSearch = fromWsLocaleSearchConverter.convert(wsLocaleSearch);
+
         ItemVariantSaleSearch itemSaleSearch = new ItemVariantSaleSearch();
         itemSaleSearch.setCompany(company);
         itemSaleSearch.setSale(sale);
         itemSaleSearch.setItemVariant(itemVariant);
+        itemSaleSearch.setLocaleSearch(localeSearch);
 
         return itemSaleSearch;
     }

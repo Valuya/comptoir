@@ -2,12 +2,14 @@ package be.valuya.comptoir.ws.convert.search;
 
 import be.valuya.comptoir.api.domain.accounting.WsAccountingTransactionRef;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
+import be.valuya.comptoir.api.domain.search.WsLocaleSearch;
 import be.valuya.comptoir.api.domain.search.WsAccountSearch;
 import be.valuya.comptoir.api.domain.search.WsAccountingEntrySearch;
 import be.valuya.comptoir.model.accounting.AccountingTransaction;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.search.AccountSearch;
 import be.valuya.comptoir.model.search.AccountingEntrySearch;
+import be.valuya.comptoir.model.search.LocaleSearch;
 import be.valuya.comptoir.ws.convert.accounting.FromWsAccountingTransactionConverter;
 import be.valuya.comptoir.ws.convert.company.FromWsCompanyConverter;
 import java.time.ZonedDateTime;
@@ -27,6 +29,8 @@ public class FromWsAccountingEntrySearchConverter {
     private FromWsAccountingTransactionConverter fromWsAccountingTransactionConverter;
     @Inject
     private FromWsAccountSearchConverter fromWsAccountSearchConverter;
+    @Inject
+    private FromWsLocaleSearchConverter fromWsLocaleSearchConverter;
 
     public AccountingEntrySearch convert(WsAccountingEntrySearch wsAccountingEntrySearch) {
         if (wsAccountingEntrySearch == null) {
@@ -44,12 +48,16 @@ public class FromWsAccountingEntrySearchConverter {
         ZonedDateTime fromDateTime = wsAccountingEntrySearch.getFromDateTime();
         ZonedDateTime toDateTime = wsAccountingEntrySearch.getToDateTime();
 
+        WsLocaleSearch wsLocaleSearch = wsAccountingEntrySearch.getLocaleSearch();
+        LocaleSearch localeSearch = fromWsLocaleSearchConverter.convert(wsLocaleSearch);
+
         AccountingEntrySearch accountingEntrySearch = new AccountingEntrySearch();
         accountingEntrySearch.setAccountSearch(accountSearch);
         accountingEntrySearch.setCompany(company);
         accountingEntrySearch.setAccountingTransaction(accountingTransaction);
         accountingEntrySearch.setFromDateTime(fromDateTime);
         accountingEntrySearch.setToDateTime(toDateTime);
+        accountingEntrySearch.setLocaleSearch(localeSearch);
 
         return accountingEntrySearch;
     }

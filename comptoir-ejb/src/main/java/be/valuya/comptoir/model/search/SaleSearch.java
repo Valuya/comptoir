@@ -1,6 +1,7 @@
 package be.valuya.comptoir.model.search;
 
 import be.valuya.comptoir.model.company.Company;
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.validation.constraints.NotNull;
 
@@ -14,6 +15,8 @@ public class SaleSearch {
     @Nonnull
     private Company company;
     private Boolean closed;
+    @CheckForNull
+    private LocaleSearch localeSearch;
 
     public Company getCompany() {
         return company;
@@ -31,4 +34,12 @@ public class SaleSearch {
         this.closed = closed;
     }
 
+    @CheckForNull
+    public LocaleSearch getLocaleSearch() {
+        return localeSearch;
+    }
+
+    public void setLocaleSearch(LocaleSearch localeSearch) {
+        this.localeSearch = localeSearch;
+    }
 }

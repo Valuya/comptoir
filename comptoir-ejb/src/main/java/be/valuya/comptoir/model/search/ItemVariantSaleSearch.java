@@ -3,6 +3,7 @@ package be.valuya.comptoir.model.search;
 import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.model.commercial.Sale;
 import be.valuya.comptoir.model.company.Company;
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -22,6 +23,8 @@ public class ItemVariantSaleSearch {
     private Company company;
     private ItemVariant itemVariant;
     private Sale sale;
+    @CheckForNull
+    private LocaleSearch localeSearch;
 
     public Company getCompany() {
         return company;
@@ -45,6 +48,15 @@ public class ItemVariantSaleSearch {
 
     public void setSale(Sale sale) {
         this.sale = sale;
+    }
+
+    @CheckForNull
+    public LocaleSearch getLocaleSearch() {
+        return localeSearch;
+    }
+
+    public void setLocaleSearch(LocaleSearch localeSearch) {
+        this.localeSearch = localeSearch;
     }
 
 }

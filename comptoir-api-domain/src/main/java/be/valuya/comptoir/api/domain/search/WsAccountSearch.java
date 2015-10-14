@@ -3,6 +3,7 @@ package be.valuya.comptoir.api.domain.search;
 import be.valuya.comptoir.api.domain.commercial.WsPosRef;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.model.accounting.AccountType;
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -22,6 +23,8 @@ public class WsAccountSearch {
     private WsCompanyRef companyRef;
     private AccountType accountType;
     private WsPosRef posRef;
+    @CheckForNull
+    private WsLocaleSearch localeSearch;
 
     public WsCompanyRef getCompanyRef() {
         return companyRef;
@@ -45,6 +48,15 @@ public class WsAccountSearch {
 
     public void setPosRef(WsPosRef posRef) {
         this.posRef = posRef;
+    }
+
+    @CheckForNull
+    public WsLocaleSearch getLocaleSearch() {
+        return localeSearch;
+    }
+
+    public void setLocaleSearch(WsLocaleSearch localeSearch) {
+        this.localeSearch = localeSearch;
     }
 
 }
