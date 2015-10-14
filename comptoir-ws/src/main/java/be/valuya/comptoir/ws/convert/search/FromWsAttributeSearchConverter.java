@@ -5,6 +5,7 @@ import be.valuya.comptoir.api.domain.search.WsAttributeSearch;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.search.AttributeSearch;
 import be.valuya.comptoir.ws.convert.company.FromWsCompanyConverter;
+import java.util.Locale;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
@@ -26,6 +27,7 @@ public class FromWsAttributeSearchConverter {
         String multiSearch = wsAttributeSearch.getMultiSearch();
         String nameContains = wsAttributeSearch.getNameContains();
         String valueContains = wsAttributeSearch.getValueContains();
+        Locale locale = wsAttributeSearch.getLocale();
 
         Company company = fromWsCompanyConverter.find(companyRef);
 
@@ -34,6 +36,7 @@ public class FromWsAttributeSearchConverter {
         attributeSearch.setMultiSearch(multiSearch);
         attributeSearch.setNameContains(nameContains);
         attributeSearch.setValueContains(valueContains);
+        attributeSearch.setLocale(locale);
 
         return attributeSearch;
     }

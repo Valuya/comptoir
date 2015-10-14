@@ -111,15 +111,6 @@ public class StockService {
         return items;
     }
 
-    private void paginate(Pagination<?, ?> pagination, TypedQuery<?> typedQuery) {
-        if (pagination != null) {
-            int offset = pagination.getOffset();
-            int maxResults = pagination.getMaxResults();
-            typedQuery.setFirstResult(offset);
-            typedQuery.setMaxResults(maxResults);
-        }
-    }
-
     private List<Predicate> createItemVariantPredicates(ItemVariantSearch itemVariantSearch, From<?, Item> itemFrom, From<?, ItemVariant> itemVariantFrom) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         ItemSearch itemSearch = itemVariantSearch.getItemSearch();
@@ -164,8 +155,9 @@ public class StockService {
 
         Path<String> referencePath = itemFrom.get(Item_.reference);
         String multiSearch = itemSearch.getMultiSearch();
+        Locale locale = itemSearch.getLocale();
         if (multiSearch != null && !multiSearch.isEmpty()) {
-            Predicate multiSearchPredicate = createItemMultiSearchPredicate(multiSearch, itemFrom, itemVariantFrom, criteriaBuilder);
+            Predicate multiSearchPredicate = createItemMultiSearchPredicate(multiSearch, itemFrom, itemVariantFrom, criteriaBuilder, locale);
             predicates.add(multiSearchPredicate);
         }
 
@@ -186,28 +178,33 @@ public class StockService {
         String nameContains = itemSearch.getNameContains();
         if (nameContains != null && !nameContains.trim().isEmpty()) {
             nameContains = nameContains.trim().toLowerCase(Locale.FRENCH);
-            Predicate namePredicate = createItemNameContainsPredicate(itemFrom, nameContains);
+            Predicate namePredicate = createItemNameContainsPredicate(itemFrom, nameContains, locale);
             predicates.add(namePredicate);
         }
 
         String descriptionContains = itemSearch.getDescriptionContains();
         if (descriptionContains != null && !descriptionContains.trim().isEmpty()) {
             descriptionContains = descriptionContains.trim().toLowerCase(Locale.FRENCH);
-            Predicate descriptionPredicate = createDescriptionContainsPredicate(itemFrom, descriptionContains);
+            Predicate descriptionPredicate = createDescriptionContainsPredicate(itemFrom, descriptionContains, locale);
             predicates.add(descriptionPredicate);
         }
 
         return predicates;
     }
 
-    private Predicate createItemMultiSearchPredicate(String multiSearch, From<?, Item> itemFrom, From<?, ItemVariant> itemVariantFrom, CriteriaBuilder criteriaBuilder) {
-        String lowerMultiSearch = multiSearch.toLowerCase(Locale.FRENCH); //TODO: actual locale
+    private Predicate createItemMultiSearchPredicate(String multiSearch, From<?, Item> itemFrom, From<?, ItemVariant> itemVariantFrom, CriteriaBuilder criteriaBuilder, Locale locale) {
+        String lowerMultiSearch;
+        if (locale == null) {
+            lowerMultiSearch = multiSearch.toLowerCase();
+        } else {
+            lowerMultiSearch = multiSearch.toLowerCase(locale);
+        }
         List<Predicate> multiSearchPredicates = new ArrayList<>();
         Predicate referenceContainsPredicate = createReferenceContainsPredicate(itemFrom, lowerMultiSearch);
         multiSearchPredicates.add(referenceContainsPredicate);
-        Predicate namePredicate = createItemNameContainsPredicate(itemFrom, lowerMultiSearch);
+        Predicate namePredicate = createItemNameContainsPredicate(itemFrom, lowerMultiSearch, locale);
         multiSearchPredicates.add(namePredicate);
-        Predicate descriptionPredicate = createDescriptionContainsPredicate(itemFrom, lowerMultiSearch);
+        Predicate descriptionPredicate = createDescriptionContainsPredicate(itemFrom, lowerMultiSearch, locale);
         multiSearchPredicates.add(descriptionPredicate);
         if (itemVariantFrom != null) {
             Predicate variantReferenceContainsPredicate = createVariantReferenceContainsPredicate(itemVariantFrom, lowerMultiSearch);
@@ -246,6 +243,12 @@ public class StockService {
         return createContainsPredicate(referencePath, referenceContains);
     }
 
+    private Predicate createLocalePredicate(Path<Locale> localePath, @Nonnull Locale locale) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        Predicate predicate = criteriaBuilder.equal(localePath, locale);
+        return predicate;
+    }
+
     private Predicate createContainsPredicate(Path<String> path, String text) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         Expression<String> lowerReferenceExpression = criteriaBuilder.lower(path);
@@ -254,34 +257,41 @@ public class StockService {
         return referenceContainsPredicate;
     }
 
-    private Predicate createDescriptionContainsPredicate(From<?, Item> itemPath, String descriptionContains) {
+    private Predicate createDescriptionContainsPredicate(From<?, Item> itemPath, String descriptionContains, @CheckForNull Locale locale) {
         Join<Item, LocaleText> descriptionJoin = itemPath.join(Item_.description);
-        Predicate descriptionPredicate = createLocaleTextContainsPredicate(descriptionJoin, descriptionContains);
+        Predicate descriptionPredicate = createLocaleTextContainsPredicate(descriptionJoin, descriptionContains, locale);
         return descriptionPredicate;
     }
 
-    private Predicate createItemNameContainsPredicate(From<?, Item> itemPath, String nameContains) {
+    private Predicate createItemNameContainsPredicate(From<?, Item> itemPath, String nameContains, @CheckForNull Locale locale) {
         Join<Item, LocaleText> nameJoin = itemPath.join(Item_.name);
-        Predicate namePredicate = createLocaleTextContainsPredicate(nameJoin, nameContains);
+        Predicate namePredicate = createLocaleTextContainsPredicate(nameJoin, nameContains, locale);
         return namePredicate;
     }
 
-    private Predicate createAttributeDefinitionNameContainsPredicate(From<?, AttributeDefinition> attributeDefinitionPath, String contains) {
+    private Predicate createAttributeDefinitionNameContainsPredicate(From<?, AttributeDefinition> attributeDefinitionPath, String contains, @CheckForNull Locale locale) {
         Join<AttributeDefinition, LocaleText> nameJoin = attributeDefinitionPath.join(AttributeDefinition_.name);
-        Predicate namePredicate = createLocaleTextContainsPredicate(nameJoin, contains);
+        Predicate namePredicate = createLocaleTextContainsPredicate(nameJoin, contains, locale);
         return namePredicate;
     }
 
-    private Predicate createAttributeValueContainsPredicate(From<?, AttributeValue> attributeValuePath, String contains) {
+    private Predicate createAttributeValueContainsPredicate(From<?, AttributeValue> attributeValuePath, String contains, @CheckForNull Locale locale) {
         Join<AttributeValue, LocaleText> valueJoin = attributeValuePath.join(AttributeValue_.value);
-        Predicate namePredicate = createLocaleTextContainsPredicate(valueJoin, contains);
+        Predicate namePredicate = createLocaleTextContainsPredicate(valueJoin, contains, locale);
         return namePredicate;
     }
 
-    private Predicate createLocaleTextContainsPredicate(From<?, LocaleText> localeTextPath, String contains) {
+    private Predicate createLocaleTextContainsPredicate(From<?, LocaleText> localeTextPath, String contains, @CheckForNull Locale locale) {
         MapJoin<LocaleText, Locale, String> localeTextMapJoin = localeTextPath.join(LocaleText_.localeTextMap);
         Path<String> textPath = localeTextMapJoin.value();
         Predicate namePredicate = createContainsPredicate(textPath, contains);
+
+        if (locale != null) {
+            Path<Locale> localePath = localeTextMapJoin.key();
+            Predicate localePredicate = createLocalePredicate(localePath, locale);
+            CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+            return criteriaBuilder.and(localePredicate, namePredicate);
+        }
         return namePredicate;
     }
 
@@ -568,18 +578,26 @@ public class StockService {
         Predicate companyPredicate = criteriaBuilder.equal(companyPath, company);
         predicates.add(companyPredicate);
 
-        String multiSearch = attributeSearch.getMultiSearch();
+        Locale locale = attributeSearch.getLocale();
 
         String nameContains = attributeSearch.getNameContains();
         if (nameContains != null) {
-            Predicate nameContainsPredicate = createAttributeDefinitionNameContainsPredicate(attributeDefinitionRoot, nameContains);
+            Predicate nameContainsPredicate = createAttributeDefinitionNameContainsPredicate(attributeDefinitionRoot, nameContains, locale);
             predicates.add(nameContainsPredicate);
         }
 
         String valueContains = attributeSearch.getValueContains();
         if (valueContains != null) {
-            Predicate attributeHasValuePredicate = createAttributeHasValuePredicate(query, valueContains, attributeDefinitionRoot);
+            Predicate attributeHasValuePredicate = createAttributeHasValuePredicate(query, valueContains, attributeDefinitionRoot, locale);
             predicates.add(attributeHasValuePredicate);
+        }
+
+        String multiSearch = attributeSearch.getMultiSearch();
+        if (multiSearch != null) {
+            Predicate nameContainsPredicate = createAttributeDefinitionNameContainsPredicate(attributeDefinitionRoot, multiSearch, locale);
+            Predicate hasValuePredicate = createAttributeHasValuePredicate(query, multiSearch, attributeDefinitionRoot, locale);
+            Predicate multiSearchPredicate = criteriaBuilder.or(nameContainsPredicate, hasValuePredicate);
+            predicates.add(multiSearchPredicate);
         }
 
         Predicate[] predicateArray = predicates.toArray(new Predicate[0]);
@@ -589,13 +607,13 @@ public class StockService {
         return typedQuery.getResultList();
     }
 
-    private Predicate createAttributeHasValuePredicate(CriteriaQuery<AttributeDefinition> query, String valueContains, Root<AttributeDefinition> attributeDefinitionRoot) {
+    private Predicate createAttributeHasValuePredicate(CriteriaQuery<AttributeDefinition> query, String valueContains, Root<AttributeDefinition> attributeDefinitionRoot, @CheckForNull Locale locale) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
 
         Subquery<AttributeValue> attributeValueSubquery = query.subquery(AttributeValue.class);
         Root<AttributeValue> attributeValueRoot = attributeValueSubquery.from(AttributeValue.class);
 
-        Predicate valueContainsPredicate = createAttributeValueContainsPredicate(attributeValueRoot, valueContains);
+        Predicate valueContainsPredicate = createAttributeValueContainsPredicate(attributeValueRoot, valueContains, locale);
 
         Path<AttributeDefinition> attributeDefinitionPath = attributeValueRoot.get(AttributeValue_.attributeDefinition);
         Predicate attributeDefinitionPredicate = criteriaBuilder.equal(attributeDefinitionPath, attributeDefinitionRoot);

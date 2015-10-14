@@ -2,6 +2,7 @@ package be.valuya.comptoir.api.domain.thirdparty;
 
 import be.valuya.comptoir.model.common.WithId;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
+import be.valuya.comptoir.api.utils.LocaleXmlAdapter;
 import java.io.Serializable;
 import java.util.Locale;
 import java.util.Objects;
@@ -11,6 +12,7 @@ import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  *
@@ -33,6 +35,7 @@ public class WsEmployee implements Serializable, WithId {
     private String firstName;
     @Size(max = 200)
     private String lastName;
+    @XmlJavaTypeAdapter(LocaleXmlAdapter.class)
     private Locale locale;
 
     @Override
