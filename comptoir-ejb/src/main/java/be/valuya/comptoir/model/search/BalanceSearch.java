@@ -1,5 +1,6 @@
 package be.valuya.comptoir.model.search;
 
+import be.valuya.comptoir.model.accounting.Account;
 import be.valuya.comptoir.model.company.Company;
 import java.time.ZonedDateTime;
 import javax.annotation.Nonnull;
@@ -22,6 +23,7 @@ public class BalanceSearch {
     private AccountSearch accountSearch;
     private ZonedDateTime fromDateTime;
     private ZonedDateTime toDateTime;
+    private Account account;
 
     public Company getCompany() {
         return company;
@@ -54,4 +56,13 @@ public class BalanceSearch {
     public void setToDateTime(ZonedDateTime toDateTime) {
         this.toDateTime = toDateTime;
     }
+
+    public Account getAccount() {
+        return account;
+    }
+
+    public void setAccount(Account account) {
+        this.account = account;
+    }
+
 }

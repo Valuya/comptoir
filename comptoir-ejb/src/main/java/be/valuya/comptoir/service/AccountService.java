@@ -59,14 +59,13 @@ public class AccountService {
 
         List<Predicate> predicates = createAccountPredicates(query, accountSearch, accountRoot);
 
-
         Predicate[] predicateArray = predicates.toArray(new Predicate[0]);
         query.where(predicateArray);
 
         paginatedQueryService.applySort(pagination, accountRoot, query,
                 accountColumn -> AccountColumnPersistenceUtil.getPath(accountRoot, accountColumn)
         );
-        
+
         List<Account> accounts = paginatedQueryService.getResults(predicates, query, accountRoot, pagination);
 
         return accounts;
@@ -200,6 +199,12 @@ public class AccountService {
         Join<Balance, Account> accountJoin = balanceRoot.join(Balance_.account);
         List<Predicate> accountPredicates = createAccountPredicates(query, accountSearch, accountJoin);
         predicates.addAll(accountPredicates);
+
+        Account account = balanceSearch.getAccount();
+        if (account != null) {
+            Predicate accountPredicate = criteriaBuilder.equal(accountJoin, account);
+            predicates.add(accountPredicate);
+        }
 
         Path<ZonedDateTime> dateTimePath = balanceRoot.get(Balance_.dateTime);
         ZonedDateTime fromDateTime = balanceSearch.getFromDateTime();
