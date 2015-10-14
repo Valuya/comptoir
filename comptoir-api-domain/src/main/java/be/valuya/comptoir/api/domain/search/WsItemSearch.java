@@ -1,12 +1,15 @@
 package be.valuya.comptoir.api.domain.search;
 
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
+import be.valuya.comptoir.api.utils.LocaleXmlAdapter;
+import be.valuya.comptoir.api.utils.ZonedDateTimeXmlAdapter;
 import java.util.Locale;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  *
@@ -23,7 +26,7 @@ public class WsItemSearch {
     private String reference;
     private String referenceContains;
     private String multiSearch;
-    @CheckForNull
+    @XmlJavaTypeAdapter(LocaleXmlAdapter.class)
     private Locale locale;
 
     public WsCompanyRef getCompanyRef() {
