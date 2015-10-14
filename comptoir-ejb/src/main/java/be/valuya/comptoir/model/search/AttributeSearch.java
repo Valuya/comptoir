@@ -1,6 +1,8 @@
 package be.valuya.comptoir.model.search;
 
 import be.valuya.comptoir.model.company.Company;
+import java.util.Locale;
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -21,6 +23,8 @@ public class AttributeSearch {
     private String nameContains;
     private String valueContains;
     private String multiSearch;
+    @CheckForNull
+    private Locale locale;
 
     public Company getCompany() {
         return company;
@@ -52,6 +56,14 @@ public class AttributeSearch {
 
     public void setMultiSearch(String multiSearch) {
         this.multiSearch = multiSearch;
+    }
+
+    public Locale getLocale() {
+        return locale;
+    }
+
+    public void setLocale(Locale locale) {
+        this.locale = locale;
     }
 
 }

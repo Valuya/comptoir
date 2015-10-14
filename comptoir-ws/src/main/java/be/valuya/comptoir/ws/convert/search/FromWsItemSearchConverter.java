@@ -5,6 +5,7 @@ import be.valuya.comptoir.api.domain.search.WsItemSearch;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.search.ItemSearch;
 import be.valuya.comptoir.ws.convert.company.FromWsCompanyConverter;
+import java.util.Locale;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
@@ -28,6 +29,7 @@ public class FromWsItemSearchConverter {
         String nameContains = wsItemSearch.getNameContains();
         String reference = wsItemSearch.getReference();
         String referenceContains = wsItemSearch.getReferenceContains();
+        Locale locale = wsItemSearch.getLocale();
 
         Company company = fromWsCompanyConverter.find(companyRef);
 
@@ -38,6 +40,7 @@ public class FromWsItemSearchConverter {
         itemSearch.setNameContains(nameContains);
         itemSearch.setReference(reference);
         itemSearch.setReferenceContains(referenceContains);
+        itemSearch.setLocale(locale);
 
         return itemSearch;
     }
