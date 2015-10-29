@@ -217,12 +217,12 @@ public class StockService {
             
             ListJoin<ItemVariant, AttributeValue> attributesValues = itemVariantFrom.join(ItemVariant_.attributeValues, JoinType.LEFT);
             Join<AttributeValue, LocaleText> valueTextsJoin = attributesValues.join(AttributeValue_.value, JoinType.LEFT);
-            Predicate valueContainsPredicate = createLocaleTextContainsPredicate(valueTextsJoin, multiSearch);
+            Predicate valueContainsPredicate = createLocaleTextContainsPredicate(valueTextsJoin, multiSearch, locale);
             multiSearchPredicates.add(valueContainsPredicate);
 
             Join<AttributeValue, AttributeDefinition> definitionJoin = attributesValues.join(AttributeValue_.attributeDefinition, JoinType.LEFT);
             Join<AttributeDefinition, LocaleText> defintionNameJoin = definitionJoin.join(AttributeDefinition_.name, JoinType.LEFT);
-            Predicate definitionContainsPredicate = createLocaleTextContainsPredicate(defintionNameJoin, multiSearch);
+            Predicate definitionContainsPredicate = createLocaleTextContainsPredicate(defintionNameJoin, multiSearch, locale);
             multiSearchPredicates.add(definitionContainsPredicate);
         }
         // combine
