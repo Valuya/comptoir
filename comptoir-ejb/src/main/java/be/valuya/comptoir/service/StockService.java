@@ -38,6 +38,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.ejb.EJB;
@@ -153,16 +154,16 @@ public class StockService {
         Predicate companyPredicate = criteriaBuilder.equal(companyPath, company);
         predicates.add(companyPredicate);
 
-        Path<String> referencePath = itemFrom.get(Item_.reference);
         String multiSearch = itemSearch.getMultiSearch();
         Locale locale = itemSearch.getLocale();
-        if (multiSearch != null && !multiSearch.isEmpty()) {
+        if (multiSearch != null && !multiSearch.trim().isEmpty()) {
             Predicate multiSearchPredicate = createItemMultiSearchPredicate(multiSearch, itemFrom, itemVariantFrom, criteriaBuilder, locale);
             predicates.add(multiSearchPredicate);
         }
 
         String reference = itemSearch.getReference();
         if (reference != null && !reference.trim().isEmpty()) {
+            Path<String> referencePath = itemFrom.get(Item_.reference);
             reference = reference.trim();
             Predicate referencePredicate = criteriaBuilder.equal(referencePath, reference);
             predicates.add(referencePredicate);
@@ -178,14 +179,16 @@ public class StockService {
         String nameContains = itemSearch.getNameContains();
         if (nameContains != null && !nameContains.trim().isEmpty()) {
             nameContains = nameContains.trim().toLowerCase(Locale.FRENCH);
-            Predicate namePredicate = createItemNameContainsPredicate(itemFrom, nameContains, locale);
+            Join<Item, LocaleText> nameJoin = itemFrom.join(Item_.name);
+            Predicate namePredicate = createLocaleTextContainsPredicate(nameJoin, nameContains, locale, predicates);
             predicates.add(namePredicate);
         }
 
         String descriptionContains = itemSearch.getDescriptionContains();
         if (descriptionContains != null && !descriptionContains.trim().isEmpty()) {
             descriptionContains = descriptionContains.trim().toLowerCase(Locale.FRENCH);
-            Predicate descriptionPredicate = createDescriptionContainsPredicate(itemFrom, descriptionContains, locale);
+            Join<Item, LocaleText> descriptionJoin = itemFrom.join(Item_.description);
+            Predicate descriptionPredicate = createLocaleTextContainsPredicate(descriptionJoin, descriptionContains, locale, predicates);
             predicates.add(descriptionPredicate);
         }
 
@@ -200,12 +203,19 @@ public class StockService {
             lowerMultiSearch = multiSearch.toLowerCase(locale);
         }
         List<Predicate> multiSearchPredicates = new ArrayList<>();
+        List<Predicate> localeTextRestrictions = new ArrayList<>();
+
         Predicate referenceContainsPredicate = createReferenceContainsPredicate(itemFrom, lowerMultiSearch);
         multiSearchPredicates.add(referenceContainsPredicate);
-        Predicate namePredicate = createItemNameContainsPredicate(itemFrom, lowerMultiSearch, locale);
+
+        Join<Item, LocaleText> nameJoin = itemFrom.join(Item_.name);
+        Predicate namePredicate = createLocaleTextContainsPredicate(nameJoin, lowerMultiSearch, locale, localeTextRestrictions);
         multiSearchPredicates.add(namePredicate);
-        Predicate descriptionPredicate = createDescriptionContainsPredicate(itemFrom, lowerMultiSearch, locale);
+
+        Join<Item, LocaleText> descriptionJoin = itemFrom.join(Item_.description);
+        Predicate descriptionPredicate = createLocaleTextContainsPredicate(descriptionJoin, lowerMultiSearch, locale, localeTextRestrictions);
         multiSearchPredicates.add(descriptionPredicate);
+
         if (itemVariantFrom != null) {
             Predicate variantReferenceContainsPredicate = createVariantReferenceContainsPredicate(itemVariantFrom, lowerMultiSearch);
             multiSearchPredicates.add(variantReferenceContainsPredicate);
@@ -214,21 +224,25 @@ public class StockService {
             Expression<List<AttributeValue>> attributesPath = itemVariantFrom.get(ItemVariant_.attributeValues);
             Predicate noAttributesPredicate = criteriaBuilder.isEmpty(attributesPath);
             multiSearchPredicates.add(noAttributesPredicate);
-            
+
             ListJoin<ItemVariant, AttributeValue> attributesValues = itemVariantFrom.join(ItemVariant_.attributeValues, JoinType.LEFT);
             Join<AttributeValue, LocaleText> valueTextsJoin = attributesValues.join(AttributeValue_.value, JoinType.LEFT);
-            Predicate valueContainsPredicate = createLocaleTextContainsPredicate(valueTextsJoin, multiSearch, locale);
+            Predicate valueContainsPredicate = createLocaleTextContainsPredicate(valueTextsJoin, multiSearch, locale, localeTextRestrictions);
             multiSearchPredicates.add(valueContainsPredicate);
 
             Join<AttributeValue, AttributeDefinition> definitionJoin = attributesValues.join(AttributeValue_.attributeDefinition, JoinType.LEFT);
             Join<AttributeDefinition, LocaleText> defintionNameJoin = definitionJoin.join(AttributeDefinition_.name, JoinType.LEFT);
-            Predicate definitionContainsPredicate = createLocaleTextContainsPredicate(defintionNameJoin, multiSearch, locale);
+            Predicate definitionContainsPredicate = createLocaleTextContainsPredicate(defintionNameJoin, multiSearch, locale, localeTextRestrictions);
             multiSearchPredicates.add(definitionContainsPredicate);
         }
         // combine
         Predicate[] multiSearchPredicateArray = multiSearchPredicates.toArray(new Predicate[0]);
         Predicate multiSearchPredicate = criteriaBuilder.or(multiSearchPredicateArray);
-        return multiSearchPredicate;
+
+        Predicate[] localeTextRestrictionsArray = localeTextRestrictions.toArray(new Predicate[0]);
+
+        Predicate localeTextRestrictionsPredicate = criteriaBuilder.and(localeTextRestrictionsArray);
+        return criteriaBuilder.and(multiSearchPredicate, localeTextRestrictionsPredicate);
     }
 
     private Predicate createVariantReferenceContainsPredicate(Path<ItemVariant> itemVariantPath, String referenceContains) {
@@ -257,41 +271,17 @@ public class StockService {
         return referenceContainsPredicate;
     }
 
-    private Predicate createDescriptionContainsPredicate(From<?, Item> itemPath, String descriptionContains, @CheckForNull Locale locale) {
-        Join<Item, LocaleText> descriptionJoin = itemPath.join(Item_.description);
-        Predicate descriptionPredicate = createLocaleTextContainsPredicate(descriptionJoin, descriptionContains, locale);
-        return descriptionPredicate;
-    }
-
-    private Predicate createItemNameContainsPredicate(From<?, Item> itemPath, String nameContains, @CheckForNull Locale locale) {
-        Join<Item, LocaleText> nameJoin = itemPath.join(Item_.name);
-        Predicate namePredicate = createLocaleTextContainsPredicate(nameJoin, nameContains, locale);
-        return namePredicate;
-    }
-
-    private Predicate createAttributeDefinitionNameContainsPredicate(From<?, AttributeDefinition> attributeDefinitionPath, String contains, @CheckForNull Locale locale) {
-        Join<AttributeDefinition, LocaleText> nameJoin = attributeDefinitionPath.join(AttributeDefinition_.name);
-        Predicate namePredicate = createLocaleTextContainsPredicate(nameJoin, contains, locale);
-        return namePredicate;
-    }
-
-    private Predicate createAttributeValueContainsPredicate(From<?, AttributeValue> attributeValuePath, String contains, @CheckForNull Locale locale) {
-        Join<AttributeValue, LocaleText> valueJoin = attributeValuePath.join(AttributeValue_.value);
-        Predicate namePredicate = createLocaleTextContainsPredicate(valueJoin, contains, locale);
-        return namePredicate;
-    }
-
-    private Predicate createLocaleTextContainsPredicate(From<?, LocaleText> localeTextPath, String contains, @CheckForNull Locale locale) {
+    private Predicate createLocaleTextContainsPredicate(From<?, LocaleText> localeTextPath, String contains, @CheckForNull Locale locale, List<Predicate> localeTextrestrictions) {
         MapJoin<LocaleText, Locale, String> localeTextMapJoin = localeTextPath.join(LocaleText_.localeTextMap);
         Path<String> textPath = localeTextMapJoin.value();
-        Predicate namePredicate = createContainsPredicate(textPath, contains);
 
         if (locale != null) {
             Path<Locale> localePath = localeTextMapJoin.key();
             Predicate localePredicate = createLocalePredicate(localePath, locale);
-            CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-            return criteriaBuilder.and(localePredicate, namePredicate);
+            localeTextrestrictions.add(localePredicate);
         }
+
+        Predicate namePredicate = createContainsPredicate(textPath, contains);
         return namePredicate;
     }
 
@@ -582,7 +572,8 @@ public class StockService {
 
         String nameContains = attributeSearch.getNameContains();
         if (nameContains != null) {
-            Predicate nameContainsPredicate = createAttributeDefinitionNameContainsPredicate(attributeDefinitionRoot, nameContains, locale);
+            Join<AttributeDefinition, LocaleText> attributeDefinitionNameJoin = attributeDefinitionRoot.join(AttributeDefinition_.name);
+            Predicate nameContainsPredicate = createLocaleTextContainsPredicate(attributeDefinitionNameJoin, nameContains, locale, predicates);
             predicates.add(nameContainsPredicate);
         }
 
@@ -594,7 +585,8 @@ public class StockService {
 
         String multiSearch = attributeSearch.getMultiSearch();
         if (multiSearch != null) {
-            Predicate nameContainsPredicate = createAttributeDefinitionNameContainsPredicate(attributeDefinitionRoot, multiSearch, locale);
+            Join<AttributeDefinition, LocaleText> attributeDefinitionNameJoin = attributeDefinitionRoot.join(AttributeDefinition_.name);
+            Predicate nameContainsPredicate = createLocaleTextContainsPredicate(attributeDefinitionNameJoin, nameContains, locale, predicates);
             Predicate hasValuePredicate = createAttributeHasValuePredicate(query, multiSearch, attributeDefinitionRoot, locale);
             Predicate multiSearchPredicate = criteriaBuilder.or(nameContainsPredicate, hasValuePredicate);
             predicates.add(multiSearchPredicate);
@@ -613,12 +605,18 @@ public class StockService {
         Subquery<AttributeValue> attributeValueSubquery = query.subquery(AttributeValue.class);
         Root<AttributeValue> attributeValueRoot = attributeValueSubquery.from(AttributeValue.class);
 
-        Predicate valueContainsPredicate = createAttributeValueContainsPredicate(attributeValueRoot, valueContains, locale);
+        List<Predicate> predicates = new ArrayList<>();
+        Join<AttributeValue, LocaleText> attributeValueJoin = attributeValueRoot.join(AttributeValue_.value);
+        Predicate valueContainsPredicate = createLocaleTextContainsPredicate(attributeValueJoin, valueContains, locale, predicates);
 
         Path<AttributeDefinition> attributeDefinitionPath = attributeValueRoot.get(AttributeValue_.attributeDefinition);
         Predicate attributeDefinitionPredicate = criteriaBuilder.equal(attributeDefinitionPath, attributeDefinitionRoot);
 
-        attributeValueSubquery.where(valueContainsPredicate, attributeDefinitionPredicate);
+        predicates.add(valueContainsPredicate);
+        predicates.add(attributeDefinitionPredicate);
+        Predicate[] predicatesArray = predicates.toArray(new Predicate[0]);
+        Predicate attributeHasValuePredicate = criteriaBuilder.and(predicatesArray);
+        attributeValueSubquery.where(attributeHasValuePredicate);
 
         Predicate attributeValueExistsPredicate = criteriaBuilder.exists(attributeValueSubquery);
         return attributeValueExistsPredicate;
