@@ -38,7 +38,6 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.ejb.EJB;
@@ -83,6 +82,8 @@ public class StockService {
                 itemColumn -> ItemColumnPersistenceUtil.getPath(itemRoot, itemColumn)
         );
 
+        query.distinct(true);
+        
         List<Item> items = paginatedQueryService.getResults(predicates, query, itemRoot, pagination);
 
         return items;
@@ -146,7 +147,7 @@ public class StockService {
         List<Predicate> predicates = new ArrayList<>();
 
         Path<Boolean> activePath = itemFrom.get(Item_.active);
-        Predicate activePredicate = criteriaBuilder.equal(activePath, Boolean.TRUE);
+        Predicate activePredicate = criteriaBuilder.isTrue(activePath);
         predicates.add(activePredicate);
 
         Company company = itemSearch.getCompany();
@@ -179,7 +180,8 @@ public class StockService {
         String nameContains = itemSearch.getNameContains();
         if (nameContains != null && !nameContains.trim().isEmpty()) {
             nameContains = nameContains.trim().toLowerCase(Locale.FRENCH);
-            Join<Item, LocaleText> nameJoin = itemFrom.join(Item_.name);
+            itemFrom.fetch(Item_.name, JoinType.LEFT);
+            Join<Item, LocaleText> nameJoin = itemFrom.join(Item_.name, JoinType.LEFT);
             Predicate namePredicate = createLocaleTextContainsPredicate(nameJoin, nameContains, locale, predicates);
             predicates.add(namePredicate);
         }
@@ -187,7 +189,8 @@ public class StockService {
         String descriptionContains = itemSearch.getDescriptionContains();
         if (descriptionContains != null && !descriptionContains.trim().isEmpty()) {
             descriptionContains = descriptionContains.trim().toLowerCase(Locale.FRENCH);
-            Join<Item, LocaleText> descriptionJoin = itemFrom.join(Item_.description);
+            itemFrom.fetch(Item_.description, JoinType.LEFT);
+            Join<Item, LocaleText> descriptionJoin = itemFrom.join(Item_.description, JoinType.LEFT);
             Predicate descriptionPredicate = createLocaleTextContainsPredicate(descriptionJoin, descriptionContains, locale, predicates);
             predicates.add(descriptionPredicate);
         }
@@ -208,11 +211,11 @@ public class StockService {
         Predicate referenceContainsPredicate = createReferenceContainsPredicate(itemFrom, lowerMultiSearch);
         multiSearchPredicates.add(referenceContainsPredicate);
 
-        Join<Item, LocaleText> nameJoin = itemFrom.join(Item_.name);
+        Join<Item, LocaleText> nameJoin = itemFrom.join(Item_.name, JoinType.LEFT);
         Predicate namePredicate = createLocaleTextContainsPredicate(nameJoin, lowerMultiSearch, locale, localeTextRestrictions);
         multiSearchPredicates.add(namePredicate);
 
-        Join<Item, LocaleText> descriptionJoin = itemFrom.join(Item_.description);
+        Join<Item, LocaleText> descriptionJoin = itemFrom.join(Item_.description, JoinType.LEFT);
         Predicate descriptionPredicate = createLocaleTextContainsPredicate(descriptionJoin, lowerMultiSearch, locale, localeTextRestrictions);
         multiSearchPredicates.add(descriptionPredicate);
 
@@ -259,7 +262,8 @@ public class StockService {
 
     private Predicate createLocalePredicate(Path<Locale> localePath, @Nonnull Locale locale) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        Predicate predicate = criteriaBuilder.equal(localePath, locale);
+        String language = locale.getLanguage(); // TODO: file an EL bug to remove this workaround
+        Predicate predicate = criteriaBuilder.equal(localePath, language);
         return predicate;
     }
 
@@ -272,7 +276,7 @@ public class StockService {
     }
 
     private Predicate createLocaleTextContainsPredicate(From<?, LocaleText> localeTextPath, String contains, @CheckForNull Locale locale, List<Predicate> localeTextrestrictions) {
-        MapJoin<LocaleText, Locale, String> localeTextMapJoin = localeTextPath.join(LocaleText_.localeTextMap);
+        MapJoin<LocaleText, Locale, String> localeTextMapJoin = localeTextPath.join(LocaleText_.localeTextMap, JoinType.LEFT);
         Path<String> textPath = localeTextMapJoin.value();
 
         if (locale != null) {
@@ -307,8 +311,7 @@ public class StockService {
     }
 
     /**
-     * Adapt stock values by creating a new ItemStock and updating the previous
-     * one.
+     * Adapt stock values by creating a new ItemStock and updating the previous one.
      *
      * @param fromDateTime
      * @param stock
