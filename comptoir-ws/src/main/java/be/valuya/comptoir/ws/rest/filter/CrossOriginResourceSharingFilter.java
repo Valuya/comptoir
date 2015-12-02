@@ -19,7 +19,7 @@ public class CrossOriginResourceSharingFilter implements ContainerResponseFilter
         MultivaluedMap<String, Object> headerMap = response.getHeaders();
         headerMap.putSingle("Access-Control-Allow-Origin", "*");
         headerMap.putSingle("Access-Control-Allow-Methods", "OPTIONS, GET, POST, PUT, DELETE");
-        headerMap.putSingle("Access-Control-Allow-Headers", "content-type, accept, accept-charset, authorisation");
+        headerMap.putSingle("Access-Control-Allow-Headers", "content-type, accept, accept-charset, authorization");
         headerMap.putSingle("Access-Control-Expose-Headers", HeadersConfig.LIST_RESULTS_COUNT_HEADER);
     }
     
