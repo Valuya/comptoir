@@ -13,7 +13,7 @@ import java.util.Optional;
 
 /**
  *
- * @author Yannick Majoros <yannick@valuya.be>
+ * @author Yannick
  */
 public class AccountingUtils {
 
@@ -65,14 +65,14 @@ public class AccountingUtils {
         return effectiveVatExclusive;
     }
 
-     public static SalePrice calcSaleDiscount(SalePrice salePrice, Sale sale) {
+    public static SalePrice calcSaleDiscount(SalePrice salePrice, Sale sale) {
         BigDecimal discountRatio = Optional.ofNullable(sale.getDiscountRatio()).orElse(BigDecimal.ZERO).setScale(2, RoundingMode.HALF_UP);
         BigDecimal base = salePrice.getBase();
         BigDecimal taxes = salePrice.getTaxes();
-        
+
         BigDecimal discountBaseAmount = base.multiply(discountRatio).setScale(2, RoundingMode.HALF_UP);
         BigDecimal discountTaxesAmount = taxes.multiply(discountRatio).setScale(2, RoundingMode.HALF_UP);
-        
+
         BigDecimal baseWithDiscount = base.subtract(discountBaseAmount);
         BigDecimal taxesWithDiscount = taxes.subtract(discountTaxesAmount);
         salePrice.setBase(baseWithDiscount);
@@ -80,14 +80,14 @@ public class AccountingUtils {
         sale.setDiscountAmount(discountBaseAmount);
         return salePrice;
     }
-     
+
     public static Sale calcSale(Sale sale, List<ItemVariantSale> itemSales) {
         SalePrice totalSalePrice = itemSales.stream()
                 .map(AccountingUtils::calcSalePrice)
                 .reduce(AccountingUtils::combineSalePrices)
                 .orElseGet(() -> new SalePrice(BigDecimal.ZERO, BigDecimal.ZERO));
 
-        SalePrice totalSalePriceWithDiscount  = AccountingUtils.calcSaleDiscount(totalSalePrice, sale);
+        SalePrice totalSalePriceWithDiscount = AccountingUtils.calcSaleDiscount(totalSalePrice, sale);
         BigDecimal vatExclusiveTotal = totalSalePriceWithDiscount.getBase();
         BigDecimal vatTotal = totalSalePriceWithDiscount.getTaxes();
 
@@ -109,8 +109,7 @@ public class AccountingUtils {
 
         return new SalePrice(baseTot, taxesTot);
     }
-    
-    
+
     public static MoneyPile calcMoneyPile(MoneyPile moneyPile) {
         BigDecimal count = moneyPile.getCount();
         BigDecimal unitAmount = moneyPile.getUnitAmount();
@@ -118,7 +117,7 @@ public class AccountingUtils {
         moneyPile.setTotal(totalValue);
         return moneyPile;
     }
-    
+
     public static Balance calcBalance(Balance balance, List<MoneyPile> moneyPiles) {
         BigDecimal balanceValue = moneyPiles.stream()
                 .map((moneyPile) -> moneyPile.getTotal())
