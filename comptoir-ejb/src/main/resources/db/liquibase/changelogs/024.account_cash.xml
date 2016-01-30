@@ -4,11 +4,19 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
 
-    <changeSet id="1" author="cghislai">
-        <addColumn tableName="item">
-            <column name="active" type="BIT" defaultValueBoolean="true">
+    <changeSet id="1" author="ymajoros">
+        <addColumn tableName="account">
+            <column name="cash" type="boolean" defaultValueBoolean="false">
                 <constraints nullable="false" />
             </column>
         </addColumn>
     </changeSet>
+
+    <changeSet id="2" author="ymajoros">
+        <update tableName="">
+            <column name="cash" valueBoolean="true" />
+            <where>name like 'cash'</where>
+        </update>
+    </changeSet>
+
 </databaseChangeLog>
