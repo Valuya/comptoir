@@ -22,6 +22,7 @@ public class AccountSearch {
     private Company company;
     private AccountType accountType;
     private Pos pos;
+    private Boolean cash;
 
     public Company getCompany() {
         return company;
@@ -45,6 +46,14 @@ public class AccountSearch {
 
     public void setPos(Pos pos) {
         this.pos = pos;
+    }
+
+    public Boolean getCash() {
+        return cash;
+    }
+
+    public void setCash(Boolean cash) {
+        this.cash = cash;
     }
 
 }

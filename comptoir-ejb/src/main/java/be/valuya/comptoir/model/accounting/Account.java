@@ -45,6 +45,7 @@ public class Account implements Serializable {
     @NotNull
     @Nonnull
     private AccountType accountType;
+    private boolean cash;
 
     public Long getId() {
         return id;
@@ -111,6 +112,14 @@ public class Account implements Serializable {
     public void setAccountType(@NotNull
             @Nonnull AccountType accountType) {
         this.accountType = accountType;
+    }
+
+    public boolean isCash() {
+        return cash;
+    }
+
+    public void setCash(boolean cash) {
+        this.cash = cash;
     }
 
     @Override
