@@ -115,6 +115,7 @@ public class RegistrationService {
         unkownItemName.put(Locale.FRENCH, "inconnu");
 
         unknownItem.setName(unkownItemName);
+        unknownItem.setMultipleSale(true);
 
         unknownItem.setReference("?");
 

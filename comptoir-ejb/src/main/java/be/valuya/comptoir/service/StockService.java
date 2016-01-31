@@ -161,6 +161,13 @@ public class StockService {
             Predicate multiSearchPredicate = createItemMultiSearchPredicate(multiSearch, itemFrom, itemVariantFrom, criteriaBuilder, locale);
             predicates.add(multiSearchPredicate);
         }
+        
+        Boolean multipleSale = itemSearch.getMultipleSale();
+        if (multipleSale != null) {
+            Path<Boolean> multipleSalePath = itemFrom.get(Item_.multipleSale);
+            Predicate multipleSalePredicate = criteriaBuilder.equal(multipleSalePath, multipleSale);
+            predicates.add(multipleSalePredicate);            
+        }
 
         String reference = itemSearch.getReference();
         if (reference != null && !reference.trim().isEmpty()) {

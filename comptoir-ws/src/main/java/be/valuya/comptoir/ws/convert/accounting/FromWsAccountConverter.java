@@ -45,6 +45,8 @@ public class FromWsAccountConverter {
 
         LocaleText wsDescription = fromWsLocaleTextConverter.convert(description);
         Company company = fromWsCompanyConverter.find(companyRef);
+        
+        boolean cash = wsAccount.isCash();
 
         Account account = new Account();
         account.setId(id);
@@ -56,6 +58,7 @@ public class FromWsAccountConverter {
         account.setBic(bic);
         account.setIban(iban);
         account.setName(name);
+        account.setCash(cash);
 
         return account;
     }

@@ -41,6 +41,7 @@ public class ToWsItemConverter {
         Price currentPrice = item.getCurrentPrice();
         LocaleText name = item.getName();
         String reference = item.getReference();
+        boolean multipleSale = item.isMultipleSale();
 
         WsCompanyRef companyRef = toWsCompanyConverter.reference(company);
         List<WsLocaleText> wsDescription = fromWsLocaleTextConverter.convert(description);
@@ -61,6 +62,7 @@ public class ToWsItemConverter {
         wsItem.setReference(reference);
         wsItem.setVatExclusive(vatExclusive);
         wsItem.setVatRate(vatRate);
+        wsItem.setMultipleSale(multipleSale);
 
         return wsItem;
     }

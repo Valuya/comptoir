@@ -5,17 +5,17 @@
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
 
     <changeSet id="1" author="ymajoros">
-        <addColumn tableName="account">
-            <column name="cash" type="boolean" defaultValueBoolean="false">
+        <addColumn tableName="item">
+            <column name="multiple_sale" type="boolean" defaultValueBoolean="false">
                 <constraints nullable="false" />
             </column>
         </addColumn>
     </changeSet>
 
     <changeSet id="2" author="ymajoros">
-        <update tableName="account">
-            <column name="cash" valueBoolean="true" />
-            <where>name like 'cash'</where>
+        <update tableName="item">
+            <column name="multiple_sale" valueBoolean="true" />
+            <where>reference='?'</where>
         </update>
     </changeSet>
 

@@ -43,6 +43,7 @@ public class FromWsItemConverter {
         String reference = wsItem.getReference();
         BigDecimal vatExclusive = wsItem.getVatExclusive();
         BigDecimal vatRate = wsItem.getVatRate();
+        boolean multipleSale = wsItem.isMultipleSale();
 
         List<WsLocaleText> description = wsItem.getDescription();
         LocaleText wsDescription = fromWsLocaleTextConverter.convert(description);
@@ -70,6 +71,7 @@ public class FromWsItemConverter {
         item.setReference(reference);
         item.setCurrentPrice(price);
         item.setActive(true);
+        item.setMultipleSale(multipleSale);
 
         return item;
     }
