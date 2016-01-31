@@ -30,6 +30,7 @@ public class FromWsItemSearchConverter {
         String reference = wsItemSearch.getReference();
         String referenceContains = wsItemSearch.getReferenceContains();
         Locale locale = wsItemSearch.getLocale();
+        Boolean multipleSale = wsItemSearch.getMultipleSale();
 
         Company company = fromWsCompanyConverter.find(companyRef);
 
@@ -41,6 +42,7 @@ public class FromWsItemSearchConverter {
         itemSearch.setReference(reference);
         itemSearch.setReferenceContains(referenceContains);
         itemSearch.setLocale(locale);
+        itemSearch.setMultipleSale(multipleSale);
 
         return itemSearch;
     }

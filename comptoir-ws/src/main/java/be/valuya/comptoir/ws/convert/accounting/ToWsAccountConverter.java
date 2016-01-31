@@ -40,6 +40,7 @@ public class ToWsAccountConverter {
         LocaleText description = account.getDescription();
         String iban = account.getIban();
         String name = account.getName();
+        boolean cash = account.isCash();
 
         List<WsLocaleText> wsDescription = fromWsLocaleTextConverter.convert(description);
         WsCompanyRef companyRef = toWsCompanyConverter.reference(company);
@@ -54,6 +55,7 @@ public class ToWsAccountConverter {
         wsAccount.setBic(bic);
         wsAccount.setIban(iban);
         wsAccount.setName(name);
+        wsAccount.setCash(cash);
 
         return wsAccount;
     }

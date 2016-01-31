@@ -29,6 +29,7 @@ public class FromWsAccountSearchConverter {
             return null;
         }
         AccountType accountType = wsAccountSearch.getAccountType();
+        Boolean cash = wsAccountSearch.getCash();
 
         WsCompanyRef companyRef = wsAccountSearch.getCompanyRef();
         Company company = fromWsCompanyConverter.find(companyRef);
@@ -40,6 +41,7 @@ public class FromWsAccountSearchConverter {
         accountSearch.setAccountType(accountType);
         accountSearch.setCompany(company);
         accountSearch.setPos(pos);
+        accountSearch.setCash(cash);
 
         return accountSearch;
     }

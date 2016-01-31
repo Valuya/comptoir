@@ -22,6 +22,7 @@ public class WsAccountSearch {
     private WsCompanyRef companyRef;
     private AccountType accountType;
     private WsPosRef posRef;
+    private Boolean cash;
 
     public WsCompanyRef getCompanyRef() {
         return companyRef;
@@ -45,6 +46,14 @@ public class WsAccountSearch {
 
     public void setPosRef(WsPosRef posRef) {
         this.posRef = posRef;
+    }
+
+    public Boolean getCash() {
+        return cash;
+    }
+
+    public void setCash(Boolean cash) {
+        this.cash = cash;
     }
 
 }

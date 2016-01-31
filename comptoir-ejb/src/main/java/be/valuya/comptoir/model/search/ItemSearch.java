@@ -27,6 +27,7 @@ public class ItemSearch {
     private String multiSearch;
     @CheckForNull
     private Locale locale;
+    private Boolean multipleSale;
 
     public Company getCompany() {
         return company;
@@ -82,6 +83,14 @@ public class ItemSearch {
 
     public void setLocale(Locale locale) {
         this.locale = locale;
+    }
+
+    public Boolean getMultipleSale() {
+        return multipleSale;
+    }
+
+    public void setMultipleSale(Boolean multipleSale) {
+        this.multipleSale = multipleSale;
     }
 
 }

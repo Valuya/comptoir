@@ -46,11 +46,12 @@ public class Item implements Serializable, WithId, Activable {
     @JoinColumn(name = "main_picture_id")
     private Picture mainPicture;
     private boolean active;
+    @Column(name = "multiple_sale")
+    private boolean multipleSale; // allow multiple instances of this item in a sale
 
     public Item() {
     }
 
-    
     @Override
     public Long getId() {
         return id;
@@ -117,6 +118,14 @@ public class Item implements Serializable, WithId, Activable {
     @Override
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public boolean isMultipleSale() {
+        return multipleSale;
+    }
+
+    public void setMultipleSale(boolean multipleSale) {
+        this.multipleSale = multipleSale;
     }
 
     @Override

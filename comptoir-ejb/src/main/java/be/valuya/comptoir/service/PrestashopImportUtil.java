@@ -14,7 +14,6 @@ import be.valuya.comptoir.prestashop.domain.tables.records.PsLangRecord;
 import be.valuya.comptoir.prestashop.domain.tables.records.PsProductAttributeCombinationRecord;
 import be.valuya.comptoir.prestashop.domain.tables.records.PsProductAttributeRecord;
 import be.valuya.comptoir.prestashop.domain.tables.records.PsProductLangRecord;
-import be.valuya.comptoir.prestashop.domain.tables.records.PsProductRecord;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -111,17 +110,18 @@ public class PrestashopImportUtil {
     public void importItems() throws SQLException {
         // AttributeDefinitions = ps_attribute_group in Prestashop
         DSLContext create = DSL.using(connection, SQLDialect.MYSQL);
-        TableField<PsProductRecord, String> referenceField = Tables.PS_PRODUCT.REFERENCE;
-        TableField<PsProductRecord, BigDecimal> priceField = Tables.PS_PRODUCT.PRICE;
-        TableField<PsProductRecord, Long> idProductField = Tables.PS_PRODUCT.ID_PRODUCT;
 
-        create.select(referenceField, priceField, idProductField)
+        create.select(Tables.PS_PRODUCT.REFERENCE,
+                Tables.PS_PRODUCT.PRICE,
+                Tables.PS_PRODUCT.WHOLESALE_PRICE,
+                Tables.PS_PRODUCT.ID_PRODUCT)
                 .from(Tables.PS_PRODUCT)
                 .fetch()
                 .forEach(record -> {
-                    String productReference = record.getValue(referenceField);
-                    BigDecimal vatExclusive = record.getValue(priceField);
-                    long idProduct = record.getValue(idProductField);
+                    String productReference = record.getValue(Tables.PS_PRODUCT.REFERENCE);
+                    BigDecimal vatExclusive = record.getValue(Tables.PS_PRODUCT.PRICE);
+                    BigDecimal wholesalePrice = record.getValue(Tables.PS_PRODUCT.WHOLESALE_PRICE); // prix d'achat
+                    long idProduct = record.getValue(Tables.PS_PRODUCT.ID_PRODUCT);
 
                     Item item = itemStore.computeIfAbsent(idProduct, id -> createItem());
                     item.setReference(productReference);
@@ -314,21 +314,15 @@ public class PrestashopImportUtil {
         Class<?> driverClass = Class.forName(driverClassName);
         driverClass.newInstance();
 
-        String database = prestashopImportParams.getDatabase();
-        String username = prestashopImportParams.getUsername();
-        String password = prestashopImportParams.getPassword();
-        String host = prestashopImportParams.getHost();
-        int port = prestashopImportParams.getPort();
+        String dbUrl = prestashopImportParams.getDbUrl();
+        String dbUsername = prestashopImportParams.getDbUsername();
+        String dbPassword = prestashopImportParams.getDbPassword();
 
         Properties connectionProperties = new Properties();
-        connectionProperties.put("user", username);
-        connectionProperties.put("password", password);
+        connectionProperties.put("user", dbUsername);
+        connectionProperties.put("password", dbPassword);
 
-        Connection newConnection = DriverManager.getConnection(
-                "jdbc:mysql://"
-                + host
-                + ":" + port + "/" + database,
-                connectionProperties);
+        Connection newConnection = DriverManager.getConnection(dbUrl, connectionProperties);
         return newConnection;
     }
 }

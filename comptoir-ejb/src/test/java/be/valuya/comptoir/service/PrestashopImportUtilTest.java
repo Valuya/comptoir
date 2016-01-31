@@ -5,9 +5,12 @@ import be.valuya.comptoir.model.commercial.AttributeValue;
 import be.valuya.comptoir.model.commercial.Item;
 import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.model.company.Company;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.util.Locale;
+import java.util.Properties;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -20,14 +23,23 @@ public class PrestashopImportUtilTest {
     private PrestashopImportUtil prestashopImportUtil;
 
     @Before
-    public void setup() {
+    public void setup() throws IOException {
         Company company = new Company();
+
+        Properties testDbProperties = new Properties();
+        try (InputStream testDbPropertiesInputStream = this.getClass().getResourceAsStream("/test_db.properties")) {
+            testDbProperties.load(testDbPropertiesInputStream);
+        }
+        String dbDriver = testDbProperties.getProperty("db.napo.driver");
+        String dbUrl = testDbProperties.getProperty("db.napo.url");
+        String dbUsername = testDbProperties.getProperty("db.napo.username");
+        String dbPassword = testDbProperties.getProperty("db.napo.password");
+
         PrestashopImportParams prestashopImportParams = new PrestashopImportParams();
-        prestashopImportParams.setDatabase("petitnapo");
-        prestashopImportParams.setHost("localhost");
-        prestashopImportParams.setPort(3306);
-        prestashopImportParams.setUsername("root");
-        prestashopImportParams.setPassword("aaaaa");
+        prestashopImportParams.setDriverClassName(dbDriver);
+        prestashopImportParams.setDbUrl(dbUrl);
+        prestashopImportParams.setDbUsername(dbUsername);
+        prestashopImportParams.setDbPassword(dbPassword);
 
         prestashopImportUtil = new PrestashopImportUtil(company, prestashopImportParams);
     }

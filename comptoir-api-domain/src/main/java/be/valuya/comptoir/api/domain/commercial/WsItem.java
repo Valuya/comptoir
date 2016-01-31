@@ -42,6 +42,7 @@ public class WsItem implements WithId {
     @NotNull
     @Nonnull
     private BigDecimal vatRate;
+    private boolean multipleSale;
 
     @Override
     public Long getId() {
@@ -107,6 +108,14 @@ public class WsItem implements WithId {
 
     public void setVatRate(BigDecimal vatRate) {
         this.vatRate = vatRate;
+    }
+
+    public boolean isMultipleSale() {
+        return multipleSale;
+    }
+
+    public void setMultipleSale(boolean multipleSale) {
+        this.multipleSale = multipleSale;
     }
 
     @Override

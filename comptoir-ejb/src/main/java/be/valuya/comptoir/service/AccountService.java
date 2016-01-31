@@ -80,6 +80,13 @@ public class AccountService {
         Predicate companyPredicate = criteriaBuilder.equal(companyPath, company);
         predicates.add(companyPredicate);
 
+        Boolean cash = accountSearch.getCash();
+        if (cash != null) {
+            Path<Boolean> cashPath = accountPath.get(Account_.cash);
+            Predicate cashPredicate = criteriaBuilder.equal(cashPath, cash);
+            predicates.add(cashPredicate);
+        }
+
         AccountType accountType = accountSearch.getAccountType();
         if (accountType != null) {
             Path<AccountType> accountTypePath = accountPath.get(Account_.accountType);

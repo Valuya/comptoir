@@ -64,10 +64,10 @@ public class RegistrationService {
         List<Account> otherAccounts = createDefaultAccountsOther(managedCompany);
         List<Account> paymentAccounts = createDefaultAccountsPayment(managedCompany);
 
-        otherAccounts = otherAccounts.stream()
+        List<Account>  managedOtherAccounts = otherAccounts.stream()
                 .map(entityManager::merge)
                 .collect(Collectors.toList());
-        paymentAccounts = paymentAccounts.stream()
+        List<Account>  managedPaymentAccounts = paymentAccounts.stream()
                 .map(entityManager::merge)
                 .collect(Collectors.toList());
 
@@ -80,7 +80,7 @@ public class RegistrationService {
 
         Pos managedPos = entityManager.merge(pos);
 
-        List<PosPaymentAccount> posPaymentAccounts = paymentAccounts.stream()
+        List<PosPaymentAccount> posPaymentAccounts = managedPaymentAccounts.stream()
                 .map(paymentAccount -> createPosPaymentAccount(managedPos, paymentAccount))
                 .map(entityManager::merge)
                 .collect(Collectors.toList());
@@ -115,6 +115,7 @@ public class RegistrationService {
         unkownItemName.put(Locale.FRENCH, "inconnu");
 
         unknownItem.setName(unkownItemName);
+        unknownItem.setMultipleSale(true);
 
         unknownItem.setReference("?");
 
@@ -138,6 +139,7 @@ public class RegistrationService {
         cashAccount.setAccountType(AccountType.PAYMENT);
         cashAccount.setAccountingNumber("530000");
         cashAccount.setName("cash");
+        cashAccount.setCash(true);
         LocaleText cashAccountLocaleText = localeTextFactory.createLocaleText();
         cashAccountLocaleText.put(Locale.FRENCH, "Cash");
         cashAccountLocaleText.put(Locale.ENGLISH, "Cash");

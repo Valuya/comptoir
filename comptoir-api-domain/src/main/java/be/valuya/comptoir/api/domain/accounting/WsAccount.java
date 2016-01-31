@@ -37,6 +37,7 @@ public class WsAccount implements Serializable, WithId {
     @NotNull
     @Nonnull
     private AccountType accountType;
+    private boolean cash;
 
     @Override
     public Long getId() {
@@ -105,6 +106,14 @@ public class WsAccount implements Serializable, WithId {
     public void setAccountType(@NotNull
             @Nonnull AccountType accountType) {
         this.accountType = accountType;
+    }
+
+    public boolean isCash() {
+        return cash;
+    }
+
+    public void setCash(boolean cash) {
+        this.cash = cash;
     }
 
     @Override
