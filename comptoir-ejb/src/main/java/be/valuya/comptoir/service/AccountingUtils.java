@@ -26,7 +26,7 @@ public class AccountingUtils {
 
     public static BigDecimal calcVatAmount(BigDecimal vatExclusive, BigDecimal vatRate) {
         //TODO: remove when ItemSale is correctly validated
-        vatRate = Optional.ofNullable(vatRate).orElse(BigDecimal.valueOf(2100, 2));
+        vatRate = Optional.ofNullable(vatRate).orElse(BigDecimal.valueOf(210000, 4));
 
         BigDecimal vatAmount = vatExclusive.multiply(vatRate);
         return vatAmount;
@@ -46,11 +46,11 @@ public class AccountingUtils {
 
     public static SalePrice calcSalePrice(Price price, BigDecimal quantity) {
         BigDecimal effectiveUnitBase = calcEffectivePriceWithoutTaxes(price);
-        BigDecimal effectiveBase = effectiveUnitBase.multiply(quantity).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal effectiveBase = effectiveUnitBase.multiply(quantity).setScale(4, RoundingMode.HALF_UP);
 
         BigDecimal vatRate = price.getVatRate();
 
-        BigDecimal vatAmount = AccountingUtils.calcVatAmount(effectiveBase, vatRate).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal vatAmount = AccountingUtils.calcVatAmount(effectiveBase, vatRate).setScale(4, RoundingMode.HALF_UP);
 
         return new SalePrice(effectiveBase, vatAmount);
 
@@ -58,20 +58,20 @@ public class AccountingUtils {
 
     public static BigDecimal calcEffectivePriceWithoutTaxes(Price price) {
         // TODO: shouldn't happen
-        BigDecimal vatExclusive = Optional.ofNullable(price.getVatExclusive()).orElse(BigDecimal.ZERO).setScale(2, RoundingMode.HALF_UP);
-        BigDecimal discountRatio = Optional.ofNullable(price.getDiscountRatio()).orElse(BigDecimal.ZERO).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal vatExclusive = Optional.ofNullable(price.getVatExclusive()).orElse(BigDecimal.ZERO).setScale(4, RoundingMode.HALF_UP);
+        BigDecimal discountRatio = Optional.ofNullable(price.getDiscountRatio()).orElse(BigDecimal.ZERO).setScale(4, RoundingMode.HALF_UP);
         BigDecimal ratio = BigDecimal.valueOf(1, 00).subtract(discountRatio);
-        BigDecimal effectiveVatExclusive = vatExclusive.multiply(ratio).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal effectiveVatExclusive = vatExclusive.multiply(ratio).setScale(4, RoundingMode.HALF_UP);
         return effectiveVatExclusive;
     }
 
     public static SalePrice calcSaleDiscount(SalePrice salePrice, Sale sale) {
-        BigDecimal discountRatio = Optional.ofNullable(sale.getDiscountRatio()).orElse(BigDecimal.ZERO).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal discountRatio = Optional.ofNullable(sale.getDiscountRatio()).orElse(BigDecimal.ZERO).setScale(4, RoundingMode.HALF_UP);
         BigDecimal base = salePrice.getBase();
         BigDecimal taxes = salePrice.getTaxes();
 
-        BigDecimal discountBaseAmount = base.multiply(discountRatio).setScale(2, RoundingMode.HALF_UP);
-        BigDecimal discountTaxesAmount = taxes.multiply(discountRatio).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal discountBaseAmount = base.multiply(discountRatio).setScale(4, RoundingMode.HALF_UP);
+        BigDecimal discountTaxesAmount = taxes.multiply(discountRatio).setScale(4, RoundingMode.HALF_UP);
 
         BigDecimal baseWithDiscount = base.subtract(discountBaseAmount);
         BigDecimal taxesWithDiscount = taxes.subtract(discountTaxesAmount);
