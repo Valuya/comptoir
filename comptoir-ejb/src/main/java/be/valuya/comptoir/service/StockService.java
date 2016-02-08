@@ -15,6 +15,7 @@ import be.valuya.comptoir.model.commercial.ItemVariant_;
 import be.valuya.comptoir.model.commercial.Item_;
 import be.valuya.comptoir.model.commercial.Picture;
 import be.valuya.comptoir.model.commercial.Picture_;
+import be.valuya.comptoir.model.commercial.Pricing;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.lang.LocaleText;
 import be.valuya.comptoir.model.lang.LocaleText_;
@@ -83,7 +84,7 @@ public class StockService {
         );
 
         query.distinct(true);
-        
+
         List<Item> items = paginatedQueryService.getResults(predicates, query, itemRoot, pagination);
 
         return items;
@@ -161,12 +162,12 @@ public class StockService {
             Predicate multiSearchPredicate = createItemMultiSearchPredicate(multiSearch, itemFrom, itemVariantFrom, criteriaBuilder, locale);
             predicates.add(multiSearchPredicate);
         }
-        
+
         Boolean multipleSale = itemSearch.getMultipleSale();
         if (multipleSale != null) {
             Path<Boolean> multipleSalePath = itemFrom.get(Item_.multipleSale);
             Predicate multipleSalePredicate = criteriaBuilder.equal(multipleSalePath, multipleSale);
-            predicates.add(multipleSalePredicate);            
+            predicates.add(multipleSalePredicate);
         }
 
         String reference = itemSearch.getReference();
@@ -318,7 +319,8 @@ public class StockService {
     }
 
     /**
-     * Adapt stock values by creating a new ItemStock and updating the previous one.
+     * Adapt stock values by creating a new ItemStock and updating the previous
+     * one.
      *
      * @param fromDateTime
      * @param stock
@@ -489,7 +491,23 @@ public class StockService {
 
     @Deprecated
     public Item saveItem(Item item) {
-        return entityManager.merge(item);
+        boolean newItem = item.getId() == null;
+        Item savedItem = entityManager.merge(item);
+        if (!newItem) {
+            return savedItem;
+        }
+        // 
+        createDefaultVariant(item);
+        return savedItem;
+    }
+
+    private ItemVariant createDefaultVariant(Item item) {
+        ItemVariant itemVariant = new ItemVariant();
+        itemVariant.setActive(true);
+        itemVariant.setItem(item);
+        itemVariant.setPricing(Pricing.PARENT_ITEM);
+        itemVariant.setVariantReference(item.getReference());
+        return saveItemVariant(itemVariant);
     }
 
     public Picture savePicture(Picture picture) {
