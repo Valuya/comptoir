@@ -26,7 +26,7 @@ public class AccountingUtils {
 
     public static BigDecimal calcVatAmount(BigDecimal vatExclusive, BigDecimal vatRate) {
         //TODO: remove when ItemSale is correctly validated
-        vatRate = Optional.ofNullable(vatRate).orElse(BigDecimal.valueOf(2100, 4));
+        vatRate = Optional.ofNullable(vatRate).orElse(BigDecimal.valueOf(210000, 4));
 
         BigDecimal vatAmount = vatExclusive.multiply(vatRate);
         return vatAmount;

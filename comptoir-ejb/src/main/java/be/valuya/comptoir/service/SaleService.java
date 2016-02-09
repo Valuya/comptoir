@@ -474,7 +474,7 @@ public class SaleService {
                 .map(AccountingEntry::getAmount)
                 .reduce(BigDecimal::add)
                 .orElse(BigDecimal.ZERO)
-                .setScale(2);
+                .setScale(4);
 
         return totalPayed;
     }
