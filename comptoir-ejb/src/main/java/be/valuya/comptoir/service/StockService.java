@@ -231,11 +231,6 @@ public class StockService {
             Predicate variantReferenceContainsPredicate = createVariantReferenceContainsPredicate(itemVariantFrom, lowerMultiSearch);
             multiSearchPredicates.add(variantReferenceContainsPredicate);
 
-            // FIME: item variants without any attributes will not match
-            Expression<List<AttributeValue>> attributesPath = itemVariantFrom.get(ItemVariant_.attributeValues);
-            Predicate noAttributesPredicate = criteriaBuilder.isEmpty(attributesPath);
-            multiSearchPredicates.add(noAttributesPredicate);
-
             ListJoin<ItemVariant, AttributeValue> attributesValues = itemVariantFrom.join(ItemVariant_.attributeValues, JoinType.LEFT);
             Join<AttributeValue, LocaleText> valueTextsJoin = attributesValues.join(AttributeValue_.value, JoinType.LEFT);
             Predicate valueContainsPredicate = createLocaleTextContainsPredicate(valueTextsJoin, multiSearch, locale, localeTextRestrictions, criteriaBuilder);
