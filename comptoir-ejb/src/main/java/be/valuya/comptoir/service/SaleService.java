@@ -6,6 +6,7 @@ import be.valuya.comptoir.model.accounting.Account_;
 import be.valuya.comptoir.model.accounting.AccountingEntry;
 import be.valuya.comptoir.model.accounting.AccountingTransaction;
 import be.valuya.comptoir.model.accounting.AccountingTransactionType;
+import be.valuya.comptoir.model.cash.Balance_;
 import be.valuya.comptoir.model.commercial.AttributeValue;
 import be.valuya.comptoir.model.commercial.Item;
 import be.valuya.comptoir.model.commercial.ItemVariantSale;
@@ -62,7 +63,6 @@ public class SaleService {
     private AccountService accountService;
     @EJB
     private PaginatedQueryService paginatedQueryService;
-
 
     public Sale createSale(Stock stock, Sale sale, List<ItemVariantSale> itemSales) {
         Sale managedSale = entityManager.merge(sale);
@@ -293,6 +293,17 @@ public class SaleService {
             Predicate closedPredicate = criteriaBuilder.equal(closedPath, closed);
             predicates.add(closedPredicate);
         }
+        Path<ZonedDateTime> dateTimePath = saleRoot.get(Sale_.dateTime);
+        ZonedDateTime fromDateTime = saleSearch.getFromDateTime();
+        if (fromDateTime != null) {
+            Predicate fromDateTimePredicate = criteriaBuilder.greaterThanOrEqualTo(dateTimePath, fromDateTime);
+            predicates.add(fromDateTimePredicate);
+        }
+        ZonedDateTime toDateTime = saleSearch.getToDateTime();
+        if (toDateTime != null) {
+            Predicate toDateTimePredicate = criteriaBuilder.lessThan(dateTimePath, toDateTime);
+            predicates.add(toDateTimePredicate);
+        }
         return predicates;
     }
 
@@ -342,7 +353,7 @@ public class SaleService {
         for (AccountingEntry accountingEntry : accountingEntries) {
             accountService.removeAccountingEntry(accountingEntry);
         }
-        
+
         Sale managedSale = entityManager.merge(sale);
         entityManager.remove(managedSale);
     }
@@ -445,9 +456,9 @@ public class SaleService {
             predicates.add(itemPredicate);
         }
 
-        paginatedQueryService.applySort(pagination, itemSaleRoot, query, 
-                (itemVarianSaleColumn)->ItemVariantSaleColumnPersistenceUtil.getPath(itemSaleRoot, itemVarianSaleColumn));
-        
+        paginatedQueryService.applySort(pagination, itemSaleRoot, query,
+                (itemVarianSaleColumn) -> ItemVariantSaleColumnPersistenceUtil.getPath(itemSaleRoot, itemVarianSaleColumn));
+
         List<ItemVariantSale> itemSales = paginatedQueryService.getResults(predicates, query, itemSaleRoot, pagination);
         return itemSales;
     }
