@@ -281,6 +281,8 @@ public class SaleService {
         List<Predicate> predicates = applySaleSearch(saleSearch, saleRoot, criteriaBuilder);
         Predicate[] predicateArray = predicates.toArray(new Predicate[0]);
         query.where(predicateArray);
+        paginatedQueryService.applySort(pagination, saleRoot, query,
+                saleColumn -> SaleColumnPersistenceUtils.getPath(saleRoot, saleColumn));
 
         List<Sale> results = paginatedQueryService.getResults(predicates, query, saleRoot, pagination);
         return results;
@@ -512,7 +514,7 @@ public class SaleService {
         Path<AccountingTransaction> transactionPath = accountingEntryRoot.get(AccountingEntry_.accountingTransaction);
         Path<Long> transactionIdPath = transactionPath.get(AccountingTransaction_.id);
         Predicate transactionPredicate = transactionIdPath.in(transactionIdSubquery);
-        
+
         Path<BigDecimal> amountPath = accountingEntryRoot.get(AccountingEntry_.amount);
         Join<AccountingEntry, AccountingEntry> vatAccountingEntryJoin = accountingEntryRoot.join(AccountingEntry_.vatAccountingEntry, JoinType.LEFT);
         Path<BigDecimal> vatAmountPath = vatAccountingEntryJoin.get(AccountingEntry_.amount);
