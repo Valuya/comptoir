@@ -497,7 +497,7 @@ public class StockService {
             return savedItem;
         }
         // 
-        createDefaultVariant(item);
+        createDefaultVariant(savedItem);
         return savedItem;
     }
 
