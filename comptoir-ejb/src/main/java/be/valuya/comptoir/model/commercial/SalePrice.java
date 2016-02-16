@@ -12,7 +12,7 @@ public class SalePrice {
     private BigDecimal taxes;
 
     public SalePrice() {
-        this(BigDecimal.ZERO.setScale(2), BigDecimal.ZERO.setScale(2));
+        this(BigDecimal.ZERO.setScale(4), BigDecimal.ZERO.setScale(4));
     }
 
     public SalePrice(BigDecimal base, BigDecimal taxes) {

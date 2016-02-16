@@ -4,8 +4,10 @@ import be.valuya.comptoir.model.accounting.Account;
 import be.valuya.comptoir.model.accounting.AccountType;
 import be.valuya.comptoir.model.accounting.Account_;
 import be.valuya.comptoir.model.accounting.AccountingEntry;
+import be.valuya.comptoir.model.accounting.AccountingEntry_;
 import be.valuya.comptoir.model.accounting.AccountingTransaction;
 import be.valuya.comptoir.model.accounting.AccountingTransactionType;
+import be.valuya.comptoir.model.accounting.AccountingTransaction_;
 import be.valuya.comptoir.model.cash.Balance_;
 import be.valuya.comptoir.model.commercial.AttributeValue;
 import be.valuya.comptoir.model.commercial.Item;
@@ -33,6 +35,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -40,13 +43,16 @@ import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Tuple;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
+import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Subquery;
 
 /**
  *
@@ -487,6 +493,52 @@ public class SaleService {
                 .orElse(BigDecimal.ZERO)
                 .setScale(4);
 
+        return totalPayed;
+    }
+
+    public SalePrice getSalesTotalPayed(SaleSearch saleSearch) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Tuple> query = criteriaBuilder.createTupleQuery();
+        Root<AccountingEntry> accountingEntryRoot = query.from(AccountingEntry.class);
+
+        Subquery<Long> transactionIdSubquery = query.subquery(Long.class);
+        Root<Sale> saleRoot = transactionIdSubquery.from(Sale.class);
+        List<Predicate> salesPredicate = applySaleSearch(saleSearch, saleRoot, criteriaBuilder);
+        Path<AccountingTransaction> accountingTransactionPath = saleRoot.get(Sale_.accountingTransaction);
+        Path<Long> accountingTransactionId = accountingTransactionPath.get(AccountingTransaction_.id);
+        transactionIdSubquery.select(accountingTransactionId);
+        transactionIdSubquery.where(salesPredicate.toArray(new Predicate[0]));
+
+        Path<AccountingTransaction> transactionPath = accountingEntryRoot.get(AccountingEntry_.accountingTransaction);
+        Path<Long> transactionIdPath = transactionPath.get(AccountingTransaction_.id);
+        Predicate transactionPredicate = transactionIdPath.in(transactionIdSubquery);
+        
+        Path<BigDecimal> amountPath = accountingEntryRoot.get(AccountingEntry_.amount);
+        Join<AccountingEntry, AccountingEntry> vatAccountingEntryJoin = accountingEntryRoot.join(AccountingEntry_.vatAccountingEntry, JoinType.LEFT);
+        Path<BigDecimal> vatAmountPath = vatAccountingEntryJoin.get(AccountingEntry_.amount);
+
+        query.multiselect(amountPath, vatAmountPath);
+        query.where(transactionPredicate);
+
+        TypedQuery<Tuple> typedQuery = entityManager.createQuery(query);
+        SalePrice totalPayed = typedQuery.getResultList()
+                .stream()
+                .map((Tuple tuple) -> {
+                    BigDecimal amount = tuple.get(amountPath);
+                    BigDecimal vatAmount = tuple.get(vatAmountPath);
+                    // TODO: return vat amount
+                    return new SalePrice(amount, vatAmount);
+                })
+                .reduce(new SalePrice(), (SalePrice price1, SalePrice price2) -> {
+                    BigDecimal base1 = Optional.ofNullable(price1.getBase()).orElse(BigDecimal.ZERO);
+                    BigDecimal base2 = Optional.ofNullable(price2.getBase()).orElse(BigDecimal.ZERO);
+                    BigDecimal taxes1 = Optional.ofNullable(price1.getTaxes()).orElse(BigDecimal.ZERO);
+                    BigDecimal taxes2 = Optional.ofNullable(price2.getTaxes()).orElse(BigDecimal.ZERO);
+                    BigDecimal newBase = base1.add(base2).setScale(4);
+                    BigDecimal newTaxes = taxes1.add(taxes2).setScale(4);
+                    SalePrice newPrice = new SalePrice(newBase, newTaxes);
+                    return newPrice;
+                });
         return totalPayed;
     }
 

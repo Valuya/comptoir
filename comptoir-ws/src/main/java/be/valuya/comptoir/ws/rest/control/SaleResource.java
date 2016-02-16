@@ -1,15 +1,18 @@
 package be.valuya.comptoir.ws.rest.control;
 
 import be.valuya.comptoir.api.domain.commercial.WsSale;
+import be.valuya.comptoir.api.domain.commercial.WsSalePrice;
 import be.valuya.comptoir.api.domain.commercial.WsSaleRef;
 import be.valuya.comptoir.api.domain.search.WsSaleSearch;
 import be.valuya.comptoir.model.commercial.Sale;
+import be.valuya.comptoir.model.commercial.SalePrice;
 import be.valuya.comptoir.model.search.SaleSearch;
 import be.valuya.comptoir.service.SaleService;
 import be.valuya.comptoir.util.pagination.Pagination;
 import be.valuya.comptoir.util.pagination.SaleColumn;
 import be.valuya.comptoir.ws.convert.commercial.FromWsSaleConverter;
 import be.valuya.comptoir.ws.convert.commercial.ToWsSaleConverter;
+import be.valuya.comptoir.ws.convert.commercial.ToWsSalePriceConverter;
 import be.valuya.comptoir.ws.convert.search.FromWsSaleSearchConverter;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
 import be.valuya.comptoir.ws.rest.validation.NoId;
@@ -50,6 +53,8 @@ public class SaleResource {
     private FromWsSaleSearchConverter fromWsSaleSearchConverter;
     @Inject
     private ToWsSaleConverter toWsSaleConverter;
+    @Inject
+    private ToWsSalePriceConverter toWsSalePriceConverter;
     @Inject
     private IdChecker idChecker;
     @Inject
@@ -115,6 +120,17 @@ public class SaleResource {
         restPaginationUtil.addResultCount(response, pagination);
 
         return wsSales;
+    }
+
+    @POST
+    @Path("searchTotalPayed")
+    @Valid
+    public WsSalePrice findSalesTotalPayed(@Valid WsSaleSearch wsSaleSearch) {
+        SaleSearch saleSearch = fromWsSaleSearchConverter.convert(wsSaleSearch);
+
+        SalePrice salesTotalPayed = saleService.getSalesTotalPayed(saleSearch);
+        WsSalePrice wsSalePrice = toWsSalePriceConverter.convert(salesTotalPayed);
+        return wsSalePrice;
     }
 
     @DELETE
