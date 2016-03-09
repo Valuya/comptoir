@@ -10,6 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -18,6 +19,7 @@ import javax.validation.constraints.Size;
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @Entity
+@Table(name = "employee")
 public class Employee implements Serializable {
 
     @Id
@@ -32,7 +34,7 @@ public class Employee implements Serializable {
     @Nonnull
     @Column(length = 200)
     @Size(max = 200)
-    
+
     private String login;
     @Column(name = "password_hash", length = 32)
     @Size(max = 32)

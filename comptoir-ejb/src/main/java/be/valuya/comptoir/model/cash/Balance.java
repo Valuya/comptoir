@@ -16,7 +16,7 @@ import javax.persistence.Table;
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @Entity
-@Table
+@Table(name = "balance")
 public class Balance implements Serializable {
 
     @Id

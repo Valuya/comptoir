@@ -10,6 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -17,6 +18,7 @@ import javax.validation.constraints.NotNull;
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @Entity
+@Table(name = "auth")
 public class Auth implements Serializable {
 
     @Id
