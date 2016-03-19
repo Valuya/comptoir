@@ -24,6 +24,7 @@ import be.valuya.comptoir.model.search.ItemSearch;
 import be.valuya.comptoir.model.search.ItemStockSearch;
 import be.valuya.comptoir.model.search.ItemVariantSearch;
 import be.valuya.comptoir.model.search.PictureSearch;
+import be.valuya.comptoir.model.search.StockSearch;
 import be.valuya.comptoir.model.stock.ItemStock;
 import be.valuya.comptoir.model.stock.ItemStock_;
 import be.valuya.comptoir.model.stock.Stock;
@@ -33,6 +34,7 @@ import be.valuya.comptoir.util.pagination.AttributeDefinitionColumn;
 import be.valuya.comptoir.util.pagination.ItemColumn;
 import be.valuya.comptoir.util.pagination.ItemVariantColumn;
 import be.valuya.comptoir.util.pagination.Pagination;
+import be.valuya.comptoir.util.pagination.StockColumn;
 import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.time.ZonedDateTime;
@@ -439,18 +441,56 @@ public class StockService {
     }
 
     @Nonnull
-    public List<Stock> findStocks(@Nonnull Company company) {
+    public Stock findStockById(@Nonnull Long id) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Stock> query = criteriaBuilder.createQuery(Stock.class);
         Root<Stock> stockRoot = query.from(Stock.class);
 
-        Path<Company> companyPath = stockRoot.get(Stock_.company);
-        Predicate companyPredicate = criteriaBuilder.equal(companyPath, company);
+        Path<Long> idPath = stockRoot.get(Stock_.id);
+        Predicate idPredicate = criteriaBuilder.equal(idPath, id);
 
-        query.where(companyPredicate);
+        query.where(idPredicate);
 
         TypedQuery<Stock> typedQuery = entityManager.createQuery(query);
-        return typedQuery.getResultList();
+        return typedQuery.getSingleResult();
+    }
+
+    @Nonnull
+    public List<Stock> findStocks(@Nonnull StockSearch stockSearch, @CheckForNull Pagination<Stock, StockColumn> pagination) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Stock> query = criteriaBuilder.createQuery(Stock.class);
+        Root<Stock> stockRoot = query.from(Stock.class);
+
+        List<Predicate> predicateList = applyStockPredicates(stockSearch, stockRoot, criteriaBuilder);
+
+        paginatedQueryService.applySort(pagination, stockRoot, query,
+                stockColumn -> StockColumnPersistenceUtil.getPath(stockRoot, stockColumn)
+        );
+
+        List<Stock> stocks = paginatedQueryService.getResults(predicateList, query, stockRoot, pagination);
+        return stocks;
+    }
+
+    private List<Predicate> applyStockPredicates(StockSearch stockSearch, Root<Stock> stockRoot, CriteriaBuilder criteriaBuilder) {
+        List<Predicate> predicateList = new ArrayList<>();
+
+        Company company = stockSearch.getCompany();
+        Path<Company> companyPath = stockRoot.get(Stock_.company);
+        Predicate companyPredicate = criteriaBuilder.equal(companyPath, company);
+        predicateList.add(companyPredicate);
+
+        Boolean active = stockSearch.getActive();
+        if (active != null) {
+            Path<Boolean> activePath = stockRoot.get(Stock_.active);
+            Predicate activePredicate = criteriaBuilder.equal(activePath, active);
+            predicateList.add(activePredicate);
+        }
+        return predicateList;
+    }
+
+    public Stock saveStock(Stock stock) {
+        Stock managedStock = entityManager.merge(stock);
+        return managedStock;
     }
 
     public ItemVariant saveItem(ItemVariant item, Stock stock, BigDecimal initialQuantity) {

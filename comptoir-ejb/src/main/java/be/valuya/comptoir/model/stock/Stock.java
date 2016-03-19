@@ -1,5 +1,7 @@
 package be.valuya.comptoir.model.stock;
 
+import be.valuya.comptoir.model.common.Activable;
+import be.valuya.comptoir.model.common.WithId;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.lang.LocaleText;
 import java.io.Serializable;
@@ -18,7 +20,7 @@ import javax.validation.constraints.NotNull;
  */
 @Entity
 @Table(name = "stock")
-public class Stock implements Serializable {
+public class Stock implements Serializable, Activable, WithId {
 
     @Id
     @GeneratedValue
@@ -29,6 +31,7 @@ public class Stock implements Serializable {
     private Company company;
     @ManyToOne
     private LocaleText description;
+    private boolean active;
 
     public Long getId() {
         return id;
@@ -52,6 +55,14 @@ public class Stock implements Serializable {
 
     public void setDescription(LocaleText description) {
         this.description = description;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
     @Override
