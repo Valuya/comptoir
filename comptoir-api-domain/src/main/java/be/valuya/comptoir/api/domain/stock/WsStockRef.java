@@ -22,6 +22,13 @@ public class WsStockRef implements WithId {
     @XmlElement
     private Long id;
 
+    public WsStockRef() {
+    }
+
+    public WsStockRef(Long id) {
+        this.id = id;
+    }
+
     public URI getLink() {
         return link;
     }
