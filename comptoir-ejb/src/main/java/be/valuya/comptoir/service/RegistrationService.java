@@ -58,6 +58,7 @@ public class RegistrationService {
         Stock stock = new Stock();
         stock.setDescription(stockDescription);
         stock.setCompany(managedCompany);
+        stock.setActive(true);
 
         Stock managedStock = entityManager.merge(stock);
 

@@ -34,6 +34,7 @@ public class ToWsStockConverter {
         Company company = stock.getCompany();
         LocaleText description = stock.getDescription();
         Long id = stock.getId();
+        boolean active = stock.isActive();
 
         WsCompanyRef companyRef = toWsCompanyConverter.reference(company);
 
@@ -42,6 +43,7 @@ public class ToWsStockConverter {
         WsStock wsStock = new WsStock();
         wsStock.setId(id);
         wsStock.setCompanyRef(companyRef);
+        wsStock.setActive(active);
         wsStock.setDescription(wsDescription);
         return wsStock;
     }

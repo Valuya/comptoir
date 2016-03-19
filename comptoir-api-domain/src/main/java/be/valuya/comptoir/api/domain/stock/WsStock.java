@@ -22,6 +22,7 @@ public class WsStock implements Serializable, WithId {
     private Long id;
     private WsCompanyRef companyRef;
     private List<WsLocaleText> description;
+    private boolean active;
 
     @Override
     public Long getId() {
@@ -47,6 +48,14 @@ public class WsStock implements Serializable, WithId {
 
     public void setDescription(List<WsLocaleText> description) {
         this.description = description;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
     @Override

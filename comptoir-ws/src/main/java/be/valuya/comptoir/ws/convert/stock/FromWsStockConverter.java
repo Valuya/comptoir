@@ -42,6 +42,7 @@ public class FromWsStockConverter {
         Long id = wsStock.getId();
         WsCompanyRef companyRef = wsStock.getCompanyRef();
         List<WsLocaleText> description = wsStock.getDescription();
+        boolean active = wsStock.isActive();
 
         Company company = fromWsCompanyConverter.find(companyRef);
 
@@ -50,6 +51,7 @@ public class FromWsStockConverter {
 
         stock.setId(id);
         stock.setCompany(company);
+        stock.setActive(active);
         stock.setDescription(updatedDescription);
         return stock;
     }
