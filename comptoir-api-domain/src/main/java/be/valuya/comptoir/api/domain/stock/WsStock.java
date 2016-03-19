@@ -1,9 +1,11 @@
 package be.valuya.comptoir.api.domain.stock;
 
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
+import be.valuya.comptoir.api.domain.lang.WsLocaleText;
 import be.valuya.comptoir.model.common.WithId;
 import be.valuya.comptoir.model.lang.LocaleText;
 import java.io.Serializable;
+import java.util.List;
 import java.util.Objects;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -19,7 +21,7 @@ public class WsStock implements Serializable, WithId {
 
     private Long id;
     private WsCompanyRef companyRef;
-    private LocaleText description;
+    private List<WsLocaleText> description;
 
     @Override
     public Long getId() {
@@ -39,11 +41,11 @@ public class WsStock implements Serializable, WithId {
         this.companyRef = companyRef;
     }
 
-    public LocaleText getDescription() {
+    public List<WsLocaleText> getDescription() {
         return description;
     }
 
-    public void setDescription(LocaleText description) {
+    public void setDescription(List<WsLocaleText> description) {
         this.description = description;
     }
 
