@@ -312,6 +312,7 @@ public class StockService {
         itemStock.setQuantity(newQuantity);
         itemStock.setComment(comment);
         itemStock.setStockChangeType(stockChangeType);
+        itemStock.setPreviousItemStock(managedPreviousItemStock);
 
         // persist
         ItemStock managedItemStock = entityManager.merge(itemStock);
@@ -348,7 +349,7 @@ public class StockService {
 
         ItemVariant itemVariant = itemStockSearch.getItemVariant();
         if (itemVariant != null) {
-            Predicate itemPredicate = criteriaBuilder.equal(itemJoin, itemVariant);
+            Predicate itemPredicate = criteriaBuilder.equal(itemVariantJoin, itemVariant);
             predicates.add(itemPredicate);
         }
 
@@ -357,13 +358,14 @@ public class StockService {
             Path<ZonedDateTime> startDateTimePath = itemStockRoot.get(ItemStock_.startDateTime);
             Predicate startDateTimePredicate = criteriaBuilder.lessThanOrEqualTo(startDateTimePath, atDateTime);
             predicates.add(startDateTimePredicate);
+
+            Path<ZonedDateTime> toDateTimePath = itemStockRoot.get(ItemStock_.endDateTime);
+            Predicate noEndPredicate = criteriaBuilder.isNull(toDateTimePath);
+            Predicate endAfterPredicate = criteriaBuilder.greaterThan(toDateTimePath, atDateTime);
+            Predicate endDateTimePredicate = criteriaBuilder.or(noEndPredicate, endAfterPredicate);
+            predicates.add(endDateTimePredicate);
         }
 
-        Path<ZonedDateTime> toDateTimePath = itemStockRoot.get(ItemStock_.endDateTime);
-        Predicate noEndPredicate = criteriaBuilder.isNull(toDateTimePath);
-        Predicate endAfterPredicate = criteriaBuilder.lessThan(toDateTimePath, atDateTime);
-        Predicate endDateTimePredicate = criteriaBuilder.or(noEndPredicate, endAfterPredicate);
-        predicates.add(endDateTimePredicate);
 
         paginatedQueryService.applySort(pagination, itemStockRoot, query,
                 stockColumn -> ItemVariantStockColumnPersistenceUtil.getPath(itemStockRoot, stockColumn)

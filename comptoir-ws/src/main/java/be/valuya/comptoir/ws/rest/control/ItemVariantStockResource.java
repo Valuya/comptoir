@@ -76,7 +76,6 @@ public class ItemVariantStockResource {
         ItemVariant itemVariant = itemStock.getItemVariant();
         ZonedDateTime now = ZonedDateTime.now();
 
-        stockChangeChecker.checkPreviousStockExists(itemStock, stockChangeType != StockChangeType.INITIAL);
         ItemStock adaptedItemStock = stockService.adaptStock(now, stock, itemVariant, quantity, comment, stockChangeType);
         WsItemStockRef wsItemStockRef = toWsItemVariantStockConverter.reference(adaptedItemStock);
         return wsItemStockRef;
@@ -98,7 +97,7 @@ public class ItemVariantStockResource {
         Pagination<ItemStock, ItemVariantStockColumn> pagination = restPaginationUtil.extractPagination(uriInfo, ItemVariantStockColumn::valueOf);
 
         ItemStockSearch variantStockSearch = fromWsItemVariantStockSearchConverter.convert(wsItemVariantStockSearch);
-        List<ItemStock> itemStocks = stockService.findItemStocks(variantStockSearch);
+        List<ItemStock> itemStocks = stockService.findItemStocks(variantStockSearch, pagination);
 
         List<WsItemStock> wsItemStocks = itemStocks.stream()
                 .map(toWsItemVariantStockConverter::convert)

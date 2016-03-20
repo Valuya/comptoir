@@ -4,12 +4,14 @@ import be.valuya.comptoir.api.domain.commercial.WsItemVariantRef;
 import be.valuya.comptoir.api.domain.commercial.WsSaleRef;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.api.domain.stock.WsStockRef;
+import be.valuya.comptoir.api.utils.ZonedDateTimeXmlAdapter;
 
 import javax.annotation.Nonnull;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.time.ZonedDateTime;
 
 /**
@@ -25,6 +27,7 @@ public class WsItemVariantStockSearch {
     private WsCompanyRef companyRef;
     private WsItemVariantRef itemVariantRef;
     private WsStockRef stockRef;
+    @XmlJavaTypeAdapter(ZonedDateTimeXmlAdapter.class)
     private ZonedDateTime atDateTime;
 
     @Nonnull

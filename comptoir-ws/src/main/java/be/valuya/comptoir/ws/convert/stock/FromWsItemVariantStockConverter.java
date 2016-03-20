@@ -27,7 +27,6 @@ import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 
 /**
- *
  * @author cghislai
  */
 @ApplicationScoped
@@ -65,8 +64,6 @@ public class FromWsItemVariantStockConverter {
 
         ItemVariant itemVariant = fromWsItemVariantConverter.find(itemVariantRef);
         Stock stock = fromWsStockConverter.find(stockRef);
-        ItemStock previouseItemStock = find(previousItemStockRef);
-        Sale stockChangeSale = fromWsSaleConverter.find(stockChangeSaleRef);
 
         itemStock.setComment(comment);
         itemStock.setEndDateTime(endDateTime);
@@ -75,11 +72,17 @@ public class FromWsItemVariantStockConverter {
         itemStock.setQuantity(quantity);
         itemStock.setStartDateTime(startDateTime);
         itemStock.setStock(stock);
-        itemStock.setPreviousItemStock(previouseItemStock);
-        itemStock.setStockChangeSale(stockChangeSale);
         itemStock.setStockChangeType(stockChangeType);
 
-        return  itemStock;
+        if (previousItemStockRef != null) {
+            ItemStock previousItemStock = find(previousItemStockRef);
+            itemStock.setPreviousItemStock(previousItemStock);
+        }
+        if (stockChangeSaleRef != null) {
+            Sale stockChangeSale = fromWsSaleConverter.find(stockChangeSaleRef);
+            itemStock.setStockChangeSale(stockChangeSale);
+        }
+        return itemStock;
     }
 
     public ItemStock find(WsItemStockRef wsItemStockRef) {

@@ -27,12 +27,4 @@ public class StockChangeChecker {
         }
     }
 
-    public void checkPreviousStockExists(ItemStock itemStock, boolean expectedExists) {
-        ItemStock previousItemStock = itemStock.getPreviousItemStock();
-        boolean previousExists = previousItemStock != null;
-        if (previousExists != expectedExists) {
-            throw new AssertionError("Previous stock " + (expectedExists ? "": "not ") + "expected");
-        }
-    }
-
 }

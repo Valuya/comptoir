@@ -51,8 +51,6 @@ public class ToWsItemVariantStockConverter {
 
         WsItemVariantRef itemVariantRef= toWsItemVariantConverter.reference(itemVariant);
         WsStockRef stockRef = toWsStockConverter.reference(stock);
-        WsItemStockRef previousItemStockref = reference(previousItemStock);
-        WsSaleRef stockChangeSaleRef = toWsSaleConverter.reference(stockChangeSale);
 
         WsItemStock wsItemStock = new WsItemStock();
         wsItemStock.setId(id);
@@ -62,10 +60,16 @@ public class ToWsItemVariantStockConverter {
         wsItemStock.setQuantity(quantity);
         wsItemStock.setItemVariantRef(itemVariantRef);
         wsItemStock.setStockRef(stockRef);
-        wsItemStock.setPreviousItemStockRef(previousItemStockref);
-        wsItemStock.setStockChangeSaleRef(stockChangeSaleRef);
         wsItemStock.setStockChangeType(stockChangeType);
 
+        if (previousItemStock != null) {
+            WsItemStockRef previousItemStockref = reference(previousItemStock);
+            wsItemStock.setPreviousItemStockRef(previousItemStockref);
+        }
+        if (stockChangeSale != null) {
+            WsSaleRef stockChangeSaleRef = toWsSaleConverter.reference(stockChangeSale);
+            wsItemStock.setStockChangeSaleRef(stockChangeSaleRef);
+        }
         return wsItemStock;
     }
 

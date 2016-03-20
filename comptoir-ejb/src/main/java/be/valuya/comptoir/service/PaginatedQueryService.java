@@ -51,7 +51,9 @@ public class PaginatedQueryService {
         paginate(pagination, typedQuery);
 
         long allResultCount = countResults(root, predicates);
-        pagination.setAllResultCount(allResultCount);
+        if (pagination != null) {
+            pagination.setAllResultCount(allResultCount);
+        }
 
         return typedQuery.getResultList();
     }
