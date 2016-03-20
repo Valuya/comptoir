@@ -5,7 +5,9 @@
  */
 package be.valuya.comptoir.model.search;
 
+import be.valuya.comptoir.model.commercial.Pos;
 import be.valuya.comptoir.model.company.Company;
+
 import javax.annotation.Nonnull;
 import javax.validation.constraints.NotNull;
 
@@ -19,6 +21,7 @@ public class StockSearch {
     @Nonnull
     private Company company;
     private Boolean active;
+    private Pos pos;
 
     public Company getCompany() {
         return company;
@@ -36,4 +39,11 @@ public class StockSearch {
         this.active = active;
     }
 
+    public Pos getPos() {
+        return pos;
+    }
+
+    public void setPos(Pos pos) {
+        this.pos = pos;
+    }
 }

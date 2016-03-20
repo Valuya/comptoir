@@ -2,12 +2,7 @@ package be.valuya.comptoir.service;
 
 import be.valuya.comptoir.model.accounting.Account;
 import be.valuya.comptoir.model.accounting.AccountType;
-import be.valuya.comptoir.model.commercial.Item;
-import be.valuya.comptoir.model.commercial.ItemVariant;
-import be.valuya.comptoir.model.commercial.Pos;
-import be.valuya.comptoir.model.commercial.PosPaymentAccount;
-import be.valuya.comptoir.model.commercial.Price;
-import be.valuya.comptoir.model.commercial.Pricing;
+import be.valuya.comptoir.model.commercial.*;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.factory.ItemFactory;
 import be.valuya.comptoir.model.factory.LocaleTextFactory;
@@ -86,6 +81,10 @@ public class RegistrationService {
                 .map(entityManager::merge)
                 .collect(Collectors.toList());
 
+        PosStock posStock = createPosStock(pos, stock);
+        PosStock managedPosStock = entityManager.merge(posStock);
+
+
         Customer defaultPosCustomer = new Customer();
         defaultPosCustomer.setCompany(managedCompany);
         defaultPosCustomer.setFirstName("default");
@@ -131,6 +130,13 @@ public class RegistrationService {
         posPaymentAccount.setAccount(account);
 
         return posPaymentAccount;
+    }
+
+    public PosStock createPosStock(Pos pos, Stock stock) {
+        PosStock posStock = new PosStock();
+        posStock.setStock(stock);
+        posStock.setPointOfSale(pos);
+        return posStock;
     }
 
     public List<Account> createDefaultAccountsPayment(Company managedCompany) {

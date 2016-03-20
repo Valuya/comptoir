@@ -12,4 +12,33 @@
         </addColumn>
     </changeSet>
 
+    <changeSet id="2-pos-stock" author="cghislai">
+        <createTable tableName="pos_stock">
+            <column name="id" type="bigint(20)">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="pos_id" type="bigint(20)" />
+            <column name="stock_id" type="bigint(20)" />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="3-fk-pstock-pos" author="cghislai">
+        <addForeignKeyConstraint
+                constraintName="fk_pstock_pos"
+                baseTableName="pos_stock"
+                baseColumnNames="pos_id"
+                referencedTableName="pos"
+                referencedColumnNames="id"
+        />
+    </changeSet>
+
+    <changeSet id="4-fk-pstock-stock" author="cghislai">
+        <addForeignKeyConstraint
+                constraintName="fk_pstock_stock"
+                baseTableName="pos_stock"
+                baseColumnNames="stock_id"
+                referencedTableName="stock"
+                referencedColumnNames="ID"
+        />
+    </changeSet>
 </databaseChangeLog>

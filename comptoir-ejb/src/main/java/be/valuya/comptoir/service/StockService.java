@@ -1,5 +1,6 @@
 package be.valuya.comptoir.service;
 
+import be.valuya.comptoir.model.accounting.Account;
 import be.valuya.comptoir.model.commercial.*;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.lang.LocaleText;
@@ -454,7 +455,7 @@ public class StockService {
         CriteriaQuery<Stock> query = criteriaBuilder.createQuery(Stock.class);
         Root<Stock> stockRoot = query.from(Stock.class);
 
-        List<Predicate> predicateList = applyStockPredicates(stockSearch, stockRoot, criteriaBuilder);
+        List<Predicate> predicateList = applyStockPredicates(stockSearch, stockRoot, criteriaBuilder, query);
 
         paginatedQueryService.applySort(pagination, stockRoot, query,
                 stockColumn -> StockColumnPersistenceUtil.getPath(stockRoot, stockColumn)
@@ -464,7 +465,7 @@ public class StockService {
         return stocks;
     }
 
-    private List<Predicate> applyStockPredicates(StockSearch stockSearch, Root<Stock> stockRoot, CriteriaBuilder criteriaBuilder) {
+    private List<Predicate> applyStockPredicates(StockSearch stockSearch, Root<Stock> stockRoot, CriteriaBuilder criteriaBuilder, CriteriaQuery query) {
         List<Predicate> predicateList = new ArrayList<>();
 
         Company company = stockSearch.getCompany();
@@ -477,6 +478,23 @@ public class StockService {
             Path<Boolean> activePath = stockRoot.get(Stock_.active);
             Predicate activePredicate = criteriaBuilder.equal(activePath, active);
             predicateList.add(activePredicate);
+        }
+
+        Pos pos = stockSearch.getPos();
+        if (pos != null) {
+            Subquery<PosStock> posStockSubquery = query.subquery(PosStock.class);
+            Root<PosStock> posStockRoot = posStockSubquery.from(PosStock.class);
+
+            Join<PosStock, Pos> posPaymentAccountPosJoin = posStockRoot.join(PosStock_.pointOfSale);
+            Predicate posStockPosPredicate = criteriaBuilder.equal(posPaymentAccountPosJoin, pos);
+
+            Join<PosStock, Stock> posStockStockJoin = posStockRoot.join(PosStock_.stock);
+            Predicate stockPredicate = criteriaBuilder.equal(posStockStockJoin, stockRoot);
+
+            posStockSubquery.where(posStockPosPredicate, stockPredicate);
+
+            Predicate posPredicate = criteriaBuilder.exists(posStockSubquery);
+            predicateList.add(posPredicate);
         }
         return predicateList;
     }
