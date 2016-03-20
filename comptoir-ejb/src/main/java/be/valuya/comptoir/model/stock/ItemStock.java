@@ -1,19 +1,14 @@
 package be.valuya.comptoir.model.stock;
 
 import be.valuya.comptoir.model.commercial.ItemVariant;
+import be.valuya.comptoir.model.commercial.Sale;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.Objects;
 import javax.annotation.Nonnull;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -37,11 +32,22 @@ public class ItemStock implements Serializable {
     @NotNull
     @Nonnull
     private Stock stock;
+    @JoinColumn(name="ITEM_ID")
     @ManyToOne
     private ItemVariant itemVariant;
     private BigDecimal quantity;
     @Column(columnDefinition = "TEXT")
     private String comment;
+    @JoinColumn(name = "previous_item_stock_id")
+    @OneToOne
+    private ItemStock previousItemStock;
+    @Column
+    @Enumerated(EnumType.STRING)
+    private StockChangeType stockChangeType;
+    @JoinColumn(name="stock_change_sale_id")
+    @ManyToOne
+    private Sale stockChangeSale;
+
 
     public Long getId() {
         return id;
@@ -98,6 +104,30 @@ public class ItemStock implements Serializable {
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public ItemStock getPreviousItemStock() {
+        return previousItemStock;
+    }
+
+    public void setPreviousItemStock(ItemStock previousItemStock) {
+        this.previousItemStock = previousItemStock;
+    }
+
+    public StockChangeType getStockChangeType() {
+        return stockChangeType;
+    }
+
+    public void setStockChangeType(StockChangeType stockChangeType) {
+        this.stockChangeType = stockChangeType;
+    }
+
+    public Sale getStockChangeSale() {
+        return stockChangeSale;
+    }
+
+    public void setStockChangeSale(Sale stockChangeSale) {
+        this.stockChangeSale = stockChangeSale;
     }
 
     @Override

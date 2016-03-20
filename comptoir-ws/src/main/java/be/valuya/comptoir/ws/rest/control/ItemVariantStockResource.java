@@ -1,0 +1,110 @@
+package be.valuya.comptoir.ws.rest.control;
+
+import be.valuya.comptoir.api.domain.commercial.WsItemVariantSale;
+import be.valuya.comptoir.api.domain.commercial.WsItemVariantSaleRef;
+import be.valuya.comptoir.api.domain.search.WsItemVariantStockSearch;
+import be.valuya.comptoir.api.domain.stock.WsItemStock;
+import be.valuya.comptoir.api.domain.stock.WsItemStockRef;
+import be.valuya.comptoir.model.commercial.ItemVariant;
+import be.valuya.comptoir.model.commercial.ItemVariantSale;
+import be.valuya.comptoir.model.search.ItemStockSearch;
+import be.valuya.comptoir.model.stock.ItemStock;
+import be.valuya.comptoir.model.stock.Stock;
+import be.valuya.comptoir.model.stock.StockChangeType;
+import be.valuya.comptoir.service.StockService;
+import be.valuya.comptoir.util.pagination.ItemVariantStockColumn;
+import be.valuya.comptoir.util.pagination.Pagination;
+import be.valuya.comptoir.ws.convert.search.FromWsItemVariantStockSearchConverter;
+import be.valuya.comptoir.ws.convert.stock.FromWsItemVariantStockConverter;
+import be.valuya.comptoir.ws.convert.stock.ToWsItemVariantStockConverter;
+import be.valuya.comptoir.ws.rest.validation.IdChecker;
+import be.valuya.comptoir.ws.rest.validation.NoId;
+import be.valuya.comptoir.ws.rest.validation.StockChangeChecker;
+
+import javax.ejb.EJB;
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
+import java.math.BigDecimal;
+import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
+/**
+ *
+ * @author Yannick Majoros <yannick@valuya.be>
+ */
+@Path("/itemVariantStock")
+@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+public class ItemVariantStockResource {
+
+    @EJB
+    private StockService stockService;
+    @Inject
+    private FromWsItemVariantStockConverter fromWsItemVariantStockConverter;
+    @Inject
+    private ToWsItemVariantStockConverter toWsItemVariantStockConverter;
+    @Inject
+    private FromWsItemVariantStockSearchConverter fromWsItemVariantStockSearchConverter;
+    @Inject
+    private IdChecker idChecker;
+    @Context
+    private HttpServletResponse response;
+    @Context
+    private UriInfo uriInfo;
+    @Inject
+    private RestPaginationUtil restPaginationUtil;
+    @Inject
+    private StockChangeChecker stockChangeChecker;
+
+    @POST
+    @Valid
+    public WsItemStockRef createItemStock(@NoId @Valid WsItemStock wsItemStock) {
+        ItemStock itemStock = fromWsItemVariantStockConverter.convert(wsItemStock);
+        // TODO: handle transfers in another resource
+        stockChangeChecker.checkStockChangeType(itemStock, StockChangeType.INITIAL, StockChangeType.ADJUSTMENT);
+
+        StockChangeType stockChangeType = itemStock.getStockChangeType();
+        Stock stock = itemStock.getStock();
+        String comment = itemStock.getComment();
+        BigDecimal quantity = itemStock.getQuantity();
+        ItemVariant itemVariant = itemStock.getItemVariant();
+        ZonedDateTime now = ZonedDateTime.now();
+
+        stockChangeChecker.checkPreviousStockExists(itemStock, stockChangeType != StockChangeType.INITIAL);
+        ItemStock adaptedItemStock = stockService.adaptStock(now, stock, itemVariant, quantity, comment, stockChangeType);
+        WsItemStockRef wsItemStockRef = toWsItemVariantStockConverter.reference(adaptedItemStock);
+        return wsItemStockRef;
+    }
+
+    @Path("{id}")
+    @GET
+    @Valid
+    public WsItemStock getItemStock(@PathParam("id") long id) {
+        ItemStock itemStock = stockService.findItemStockById(id);
+        WsItemStock wsItemStock = toWsItemVariantStockConverter.convert(itemStock);
+        return wsItemStock;
+    }
+
+    @POST
+    @Path("search")
+    @Valid
+    public List<WsItemStock> findItemStocks(@Valid WsItemVariantStockSearch wsItemVariantStockSearch) {
+        Pagination<ItemStock, ItemVariantStockColumn> pagination = restPaginationUtil.extractPagination(uriInfo, ItemVariantStockColumn::valueOf);
+
+        ItemStockSearch variantStockSearch = fromWsItemVariantStockSearchConverter.convert(wsItemVariantStockSearch);
+        List<ItemStock> itemStocks = stockService.findItemStocks(variantStockSearch);
+
+        List<WsItemStock> wsItemStocks = itemStocks.stream()
+                .map(toWsItemVariantStockConverter::convert)
+                .collect(Collectors.toList());
+
+        restPaginationUtil.addResultCount(response, pagination);
+        return wsItemStocks;
+    }
+}

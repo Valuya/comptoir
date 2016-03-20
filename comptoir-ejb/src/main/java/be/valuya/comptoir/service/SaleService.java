@@ -24,6 +24,7 @@ import be.valuya.comptoir.model.lang.LocaleText;
 import be.valuya.comptoir.model.search.AccountingEntrySearch;
 import be.valuya.comptoir.model.search.ItemVariantSaleSearch;
 import be.valuya.comptoir.model.search.SaleSearch;
+import be.valuya.comptoir.model.stock.ItemStock;
 import be.valuya.comptoir.model.stock.Stock;
 import be.valuya.comptoir.model.stock.StockChangeType;
 import be.valuya.comptoir.model.thirdparty.Customer;
@@ -77,7 +78,7 @@ public class SaleService {
             ItemVariantSale managedItemSale = entityManager.merge(itemSale);
             managedItemSale.setSale(managedSale);
             ZonedDateTime zonedDateTime = ZonedDateTime.now();
-            stockService.adaptStockFromItemSale(zonedDateTime, stock, managedItemSale, StockChangeType.SALE, null);
+            ItemStock itemStock = stockService.adaptStockFromItemSale(zonedDateTime, stock, managedItemSale, StockChangeType.SALE, null);
         }
 
         // TODO: create accounting entry

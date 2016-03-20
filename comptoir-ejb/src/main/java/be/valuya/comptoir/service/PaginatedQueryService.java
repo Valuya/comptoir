@@ -65,7 +65,7 @@ public class PaginatedQueryService {
         }
     }
 
-    public <T, C extends Column<T>> List<Order> createOrders(Pagination<T, C> pagination, From<?, T> from, Function<C, Path<?>> sortToPathFunction) {
+    private <T, C extends Column<T>> List<Order> createOrders(Pagination<T, C> pagination, From<?, T> from, Function<C, Path<?>> sortToPathFunction) {
         List<Sort<C>> sortings = pagination.getSortings();
         if (sortings == null) {
             return Arrays.asList();

@@ -1,8 +1,11 @@
 package be.valuya.comptoir.api.domain.stock;
 
 import be.valuya.comptoir.api.domain.commercial.WsItemVariantRef;
+import be.valuya.comptoir.api.domain.commercial.WsSaleRef;
 import be.valuya.comptoir.model.common.WithId;
 import be.valuya.comptoir.api.utils.ZonedDateTimeXmlAdapter;
+import be.valuya.comptoir.model.stock.StockChangeType;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
@@ -30,6 +33,9 @@ public class WsItemStock implements Serializable, WithId {
     private WsItemVariantRef itemVariantRef;
     private BigDecimal quantity;
     private String comment;
+    private WsItemStockRef previousItemStockRef;
+    private StockChangeType stockChangeType;
+    private WsSaleRef stockChangeSaleRef;
 
     @Override
     public Long getId() {
@@ -88,6 +94,30 @@ public class WsItemStock implements Serializable, WithId {
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public WsItemStockRef getPreviousItemStockRef() {
+        return previousItemStockRef;
+    }
+
+    public void setPreviousItemStockRef(WsItemStockRef previousItemStockRef) {
+        this.previousItemStockRef = previousItemStockRef;
+    }
+
+    public WsSaleRef getStockChangeSaleRef() {
+        return stockChangeSaleRef;
+    }
+
+    public void setStockChangeSaleRef(WsSaleRef stockChangeSaleRef) {
+        this.stockChangeSaleRef = stockChangeSaleRef;
+    }
+
+    public StockChangeType getStockChangeType() {
+        return stockChangeType;
+    }
+
+    public void setStockChangeType(StockChangeType stockChangeType) {
+        this.stockChangeType = stockChangeType;
     }
 
     @Override

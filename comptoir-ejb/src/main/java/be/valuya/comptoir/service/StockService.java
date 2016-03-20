@@ -1,46 +1,13 @@
 package be.valuya.comptoir.service;
 
-import be.valuya.comptoir.model.commercial.AttributeDefinition;
-import be.valuya.comptoir.model.commercial.AttributeDefinition_;
-import be.valuya.comptoir.model.commercial.AttributeValue;
-import be.valuya.comptoir.model.commercial.AttributeValue_;
-import be.valuya.comptoir.model.commercial.Item;
-import be.valuya.comptoir.model.commercial.ItemPicture;
-import be.valuya.comptoir.model.commercial.ItemPicture_;
-import be.valuya.comptoir.model.commercial.ItemVariant;
-import be.valuya.comptoir.model.commercial.ItemVariantPicture;
-import be.valuya.comptoir.model.commercial.ItemVariantPicture_;
-import be.valuya.comptoir.model.commercial.ItemVariantSale;
-import be.valuya.comptoir.model.commercial.ItemVariant_;
-import be.valuya.comptoir.model.commercial.Item_;
-import be.valuya.comptoir.model.commercial.Picture;
-import be.valuya.comptoir.model.commercial.Picture_;
-import be.valuya.comptoir.model.commercial.Pricing;
+import be.valuya.comptoir.model.commercial.*;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.lang.LocaleText;
 import be.valuya.comptoir.model.lang.LocaleText_;
-import be.valuya.comptoir.model.search.AttributeSearch;
-import be.valuya.comptoir.model.search.ItemSearch;
-import be.valuya.comptoir.model.search.ItemStockSearch;
-import be.valuya.comptoir.model.search.ItemVariantSearch;
-import be.valuya.comptoir.model.search.PictureSearch;
-import be.valuya.comptoir.model.search.StockSearch;
-import be.valuya.comptoir.model.stock.ItemStock;
-import be.valuya.comptoir.model.stock.ItemStock_;
-import be.valuya.comptoir.model.stock.Stock;
-import be.valuya.comptoir.model.stock.StockChangeType;
-import be.valuya.comptoir.model.stock.Stock_;
-import be.valuya.comptoir.util.pagination.AttributeDefinitionColumn;
-import be.valuya.comptoir.util.pagination.ItemColumn;
-import be.valuya.comptoir.util.pagination.ItemVariantColumn;
-import be.valuya.comptoir.util.pagination.Pagination;
-import be.valuya.comptoir.util.pagination.StockColumn;
-import java.math.BigDecimal;
-import java.text.MessageFormat;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import be.valuya.comptoir.model.search.*;
+import be.valuya.comptoir.model.stock.*;
+import be.valuya.comptoir.util.pagination.*;
+
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.ejb.EJB;
@@ -48,18 +15,13 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.From;
-import javax.persistence.criteria.Join;
-import javax.persistence.criteria.JoinType;
-import javax.persistence.criteria.ListJoin;
-import javax.persistence.criteria.MapJoin;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import javax.persistence.criteria.Subquery;
+import javax.persistence.criteria.*;
+import java.math.BigDecimal;
+import java.text.MessageFormat;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 /**
  *
@@ -313,8 +275,12 @@ public class StockService {
 
         // adapt quantities
         BigDecimal newQuantity = oldQuantity.subtract(soldQuantity);
+        ItemStock adaptedStock = adaptStock(fromDateTime, stock, managedItem, newQuantity, comment, stockChangeType);
 
-        return adaptStock(fromDateTime, stock, managedItem, newQuantity, comment);
+        // Reference sale
+        Sale sale = managedItemSale.getSale();
+        adaptedStock.setStockChangeSale(sale);
+        return saveItemStock(adaptedStock);
     }
 
     /**
@@ -329,7 +295,14 @@ public class StockService {
      * @return
      */
     @Nonnull
-    public ItemStock adaptStock(@Nonnull ZonedDateTime fromDateTime, @Nonnull Stock stock, @Nonnull ItemVariant managedItem, @Nonnull BigDecimal newQuantity, @CheckForNull String comment) {
+    public ItemStock adaptStock(@Nonnull ZonedDateTime fromDateTime, @Nonnull Stock stock, @Nonnull ItemVariant managedItem, @Nonnull BigDecimal newQuantity, @CheckForNull String comment, @Nonnull StockChangeType stockChangeType) {
+        // find previous stock
+        ItemStock managedPreviousItemStock = findItemStock(managedItem, stock, fromDateTime);
+        if (managedPreviousItemStock != null) {
+            managedPreviousItemStock.setEndDateTime(fromDateTime);
+            entityManager.merge(managedPreviousItemStock);
+        }
+
         // create new stock value
         ItemStock itemStock = new ItemStock();
         itemStock.setStock(stock);
@@ -337,6 +310,7 @@ public class StockService {
         itemStock.setStartDateTime(fromDateTime);
         itemStock.setQuantity(newQuantity);
         itemStock.setComment(comment);
+        itemStock.setStockChangeType(stockChangeType);
 
         // persist
         ItemStock managedItemStock = entityManager.merge(itemStock);
@@ -346,6 +320,11 @@ public class StockService {
 
     @Nonnull
     public List<ItemStock> findItemStocks(@Nonnull ItemStockSearch itemStockSearch) {
+        return findItemStocks(itemStockSearch, null);
+    }
+
+    @Nonnull
+    public List<ItemStock> findItemStocks(@Nonnull ItemStockSearch itemStockSearch, Pagination<ItemStock, ItemVariantStockColumn> pagination) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<ItemStock> query = criteriaBuilder.createQuery(ItemStock.class);
         Root<ItemStock> itemStockRoot = query.from(ItemStock.class);
@@ -385,12 +364,11 @@ public class StockService {
         Predicate endDateTimePredicate = criteriaBuilder.or(noEndPredicate, endAfterPredicate);
         predicates.add(endDateTimePredicate);
 
-        Predicate[] predicateArray = predicates.toArray(new Predicate[0]);
-        query.where(predicateArray);
-
-        TypedQuery<ItemStock> typedQuery = entityManager.createQuery(query);
-
-        return typedQuery.getResultList();
+        paginatedQueryService.applySort(pagination, itemStockRoot, query,
+                stockColumn -> ItemVariantStockColumnPersistenceUtil.getPath(itemStockRoot, stockColumn)
+        );
+        List<ItemStock> itemStockList = paginatedQueryService.getResults(predicates, query, itemStockRoot, pagination);
+        return itemStockList;
     }
 
     @Nonnull
@@ -409,6 +387,21 @@ public class StockService {
     public List<ItemStock> findItemStocks(ItemVariant item) {
         ZonedDateTime dateTime = ZonedDateTime.now();
         return findItemStocks(item, dateTime);
+    }
+
+    @CheckForNull
+    public ItemStock findItemStockById(@Nonnull Long id) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<ItemStock> query = criteriaBuilder.createQuery(ItemStock.class);
+        Root<ItemStock> itemStockRoot = query.from(ItemStock.class);
+
+        Path<Long> idPath = itemStockRoot.get(ItemStock_.id);
+        Predicate idPredicate = criteriaBuilder.equal(idPath, id);
+
+        query.where(idPredicate);
+
+        TypedQuery<ItemStock> typedQuery = entityManager.createQuery(query);
+        return typedQuery.getSingleResult();
     }
 
     /**
@@ -492,12 +485,16 @@ public class StockService {
         Stock managedStock = entityManager.merge(stock);
         return managedStock;
     }
+    private ItemStock saveItemStock(ItemStock itemStock) {
+        ItemStock managedStock = entityManager.merge(itemStock);
+        return managedStock;
+    }
 
     public ItemVariant saveItem(ItemVariant item, Stock stock, BigDecimal initialQuantity) {
         ItemVariant managedItem = entityManager.merge(item);
         ZonedDateTime dateTime = ZonedDateTime.now();
 
-        adaptStock(dateTime, stock, managedItem, initialQuantity, null);
+        adaptStock(dateTime, stock, managedItem, initialQuantity, null,StockChangeType.INITIAL);
 
         return managedItem;
     }

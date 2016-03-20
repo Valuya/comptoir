@@ -5,16 +5,21 @@
  */
 package be.valuya.comptoir.ws.convert.stock;
 
+import be.valuya.comptoir.api.domain.commercial.WsItemVariantRef;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.api.domain.lang.WsLocaleText;
 import be.valuya.comptoir.api.domain.stock.WsStock;
+import be.valuya.comptoir.api.domain.stock.WsStockRef;
+import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.lang.LocaleText;
 import be.valuya.comptoir.model.stock.Stock;
+import be.valuya.comptoir.service.StockService;
 import be.valuya.comptoir.ws.convert.company.FromWsCompanyConverter;
 import be.valuya.comptoir.ws.convert.text.FromWsLocaleTextConverter;
 import java.util.List;
 import javax.annotation.Nonnull;
+import javax.ejb.EJB;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
@@ -25,6 +30,8 @@ import javax.inject.Inject;
 @ApplicationScoped
 public class FromWsStockConverter {
 
+    @EJB
+    private StockService stockService;
     @Inject
     private FromWsLocaleTextConverter fromWsLocaleTextConverter;
     @Inject
@@ -53,6 +60,15 @@ public class FromWsStockConverter {
         stock.setCompany(company);
         stock.setActive(active);
         stock.setDescription(updatedDescription);
+        return stock;
+    }
+
+    public Stock find(WsStockRef stockRef) {
+        if (stockRef == null) {
+            return null;
+        }
+        Long stockId = stockRef.getId();
+        Stock stock = stockService.findStockById(stockId);
         return stock;
     }
 }
