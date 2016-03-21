@@ -259,9 +259,10 @@ public class StockService {
         return namePredicate;
     }
 
-    public ItemStock adaptStockFromItemSale(ZonedDateTime fromDateTime, Stock stock, ItemVariantSale managedItemSale, StockChangeType stockChangeType, String comment) {
+    public ItemStock adaptStockFromItemSale(ZonedDateTime fromDateTime,ItemVariantSale managedItemSale, StockChangeType stockChangeType, String comment) {
         ItemVariant managedItem = managedItemSale.getItemVariant();
         BigDecimal soldQuantity = managedItemSale.getQuantity();
+        Stock stock = managedItemSale.getStock();
 
         // find previous stock value
         ItemStock managedPreviousItemStock = findItemStock(managedItem, stock, fromDateTime);

@@ -24,6 +24,7 @@ import be.valuya.comptoir.model.lang.LocaleText;
 import be.valuya.comptoir.model.search.AccountingEntrySearch;
 import be.valuya.comptoir.model.search.ItemVariantSaleSearch;
 import be.valuya.comptoir.model.search.SaleSearch;
+import be.valuya.comptoir.model.search.StockSearch;
 import be.valuya.comptoir.model.stock.ItemStock;
 import be.valuya.comptoir.model.stock.Stock;
 import be.valuya.comptoir.model.stock.StockChangeType;
@@ -41,7 +42,9 @@ import java.util.stream.Collectors;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.ejb.EJB;
+import javax.ejb.EJBException;
 import javax.ejb.Stateless;
+import javax.jms.IllegalStateException;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Tuple;
@@ -71,19 +74,6 @@ public class SaleService {
     @EJB
     private PaginatedQueryService paginatedQueryService;
 
-    public Sale createSale(Stock stock, Sale sale, List<ItemVariantSale> itemSales) {
-        Sale managedSale = entityManager.merge(sale);
-
-        for (ItemVariantSale itemSale : itemSales) {
-            ItemVariantSale managedItemSale = entityManager.merge(itemSale);
-            managedItemSale.setSale(managedSale);
-            ZonedDateTime zonedDateTime = ZonedDateTime.now();
-            ItemStock itemStock = stockService.adaptStockFromItemSale(zonedDateTime, stock, managedItemSale, StockChangeType.SALE, null);
-        }
-
-        // TODO: create accounting entry
-        return managedSale;
-    }
 
     @Nonnull
     public List<ItemVariantSale> findItemSales(@Nonnull Sale sale) {
@@ -417,11 +407,37 @@ public class SaleService {
         itemSale.setPrice(specificPrice);
         itemSale.setTotal(total);
 
+        // Assign a stock
+        try {
+            assignStockToVariantSale(itemSale);
+        } catch (IllegalStateException e) {
+            throw new EJBException(e);
+        }
+
         ItemVariantSale managedItemSale = entityManager.merge(itemSale);
         Sale managedSale = managedItemSale.getSale();
         managedSale = calcSale(managedSale);
 
         return managedItemSale;
+    }
+
+    private void assignStockToVariantSale(ItemVariantSale itemSale) throws IllegalStateException {
+        if (itemSale.getStock() != null) {
+            return;
+        }
+        Sale sale = itemSale.getSale();
+        Company company = sale.getCompany();
+
+        StockSearch stockSearch = new StockSearch();
+        stockSearch.setCompany(company);
+        stockSearch.setActive(true);
+
+        List<Stock> stocks = stockService.findStocks(stockSearch, null);
+        if (stocks == null || stocks.isEmpty()) {
+            throw new IllegalStateException("No active stock for company "+company.getId());
+        }
+        Stock firstStock = stocks.get(0);
+        itemSale.setStock(firstStock);
     }
 
     public void removeItemSale(ItemVariantSale itemSale) {
@@ -475,6 +491,17 @@ public class SaleService {
     public Sale closeSale(Sale sale) {
         sale.setClosed(true);
         Sale managedSale = saveSale(sale);
+
+        List<ItemVariantSale> itemSales = findItemSales(managedSale);
+
+        for (ItemVariantSale itemSale : itemSales) {
+            ItemVariantSale managedItemSale = entityManager.merge(itemSale);
+            managedItemSale.setSale(managedSale);
+            ZonedDateTime zonedDateTime = ZonedDateTime.now();
+            ItemStock itemStock = stockService.adaptStockFromItemSale(zonedDateTime, managedItemSale, StockChangeType.SALE, null);
+        }
+
+        // TODO: create accounting entry
 
         return managedSale;
 
