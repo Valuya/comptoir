@@ -1,20 +1,22 @@
 package be.valuya.comptoir.api.domain.commercial;
 
-import be.valuya.comptoir.model.common.WithId;
 import be.valuya.comptoir.api.domain.lang.WsLocaleText;
+import be.valuya.comptoir.api.domain.stock.WsStockRef;
 import be.valuya.comptoir.api.utils.ZonedDateTimeXmlAdapter;
-import java.math.BigDecimal;
-import java.time.ZonedDateTime;
-import java.util.List;
+import be.valuya.comptoir.model.common.WithId;
+
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.math.BigDecimal;
+import java.time.ZonedDateTime;
+import java.util.List;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @XmlRootElement(name = "ItemVariantSale")
@@ -36,6 +38,8 @@ public class WsItemVariantSale implements WithId {
     @Nonnull
     private BigDecimal vatRate;
     private BigDecimal discountRatio;
+    @CheckForNull
+    private WsStockRef stockRef;
 
     @Override
     public Long getId() {
@@ -119,4 +123,11 @@ public class WsItemVariantSale implements WithId {
         this.discountRatio = discountRatio;
     }
 
+    public WsStockRef getStockRef() {
+        return stockRef;
+    }
+
+    public void setStockRef(WsStockRef stockRef) {
+        this.stockRef = stockRef;
+    }
 }

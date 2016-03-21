@@ -5,12 +5,15 @@ import be.valuya.comptoir.api.domain.commercial.WsItemVariantSaleRef;
 import be.valuya.comptoir.api.domain.commercial.WsItemVariantRef;
 import be.valuya.comptoir.api.domain.commercial.WsSaleRef;
 import be.valuya.comptoir.api.domain.lang.WsLocaleText;
+import be.valuya.comptoir.api.domain.stock.WsStockRef;
 import be.valuya.comptoir.model.commercial.ItemVariantSale;
 import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.model.commercial.Price;
 import be.valuya.comptoir.model.commercial.Sale;
 import be.valuya.comptoir.model.lang.LocaleText;
+import be.valuya.comptoir.model.stock.Stock;
 import be.valuya.comptoir.service.SaleService;
+import be.valuya.comptoir.ws.convert.stock.FromWsStockConverter;
 import be.valuya.comptoir.ws.convert.text.FromWsLocaleTextConverter;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
@@ -32,6 +35,8 @@ public class FromWsItemVariantSaleConverter {
     private FromWsSaleConverter fromWsSaleConverter;
     @Inject
     private FromWsItemVariantConverter fromWsItemConverter;
+    @Inject
+    private FromWsStockConverter fromWsStockConverter;
     @EJB
     private SaleService saleService;
 
@@ -59,6 +64,10 @@ public class FromWsItemVariantSaleConverter {
         WsSaleRef saleRef = wsItemSale.getSaleRef();
         Sale sale = fromWsSaleConverter.find(saleRef);
 
+        WsStockRef stockRef = wsItemSale.getStockRef();
+        Stock stock = fromWsStockConverter.find(stockRef);
+
+
         BigDecimal vatExclusive = wsItemSale.getVatExclusive();
         BigDecimal vatRate = wsItemSale.getVatRate();
 
@@ -79,6 +88,7 @@ public class FromWsItemVariantSaleConverter {
         itemSale.setDateTime(dateTime);
         itemSale.setPrice(price);
         itemSale.setTotal(total);
+        itemSale.setStock(stock);
 
         return itemSale;
     }

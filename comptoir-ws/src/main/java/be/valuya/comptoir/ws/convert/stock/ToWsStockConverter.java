@@ -49,6 +49,9 @@ public class ToWsStockConverter {
     }
 
     public WsStockRef reference(Stock stock) {
+        if (stock == null) {
+            return null;
+        }
         Long id = stock.getId();
         WsStockRef wsStocKRef = new WsStockRef(id);
         return wsStocKRef;

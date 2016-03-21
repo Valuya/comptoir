@@ -5,13 +5,16 @@ import be.valuya.comptoir.api.domain.commercial.WsItemVariantSaleRef;
 import be.valuya.comptoir.api.domain.commercial.WsItemVariantRef;
 import be.valuya.comptoir.api.domain.commercial.WsSaleRef;
 import be.valuya.comptoir.api.domain.lang.WsLocaleText;
+import be.valuya.comptoir.api.domain.stock.WsStockRef;
 import be.valuya.comptoir.model.accounting.AccountingEntry;
 import be.valuya.comptoir.model.commercial.ItemVariantSale;
 import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.model.commercial.Price;
 import be.valuya.comptoir.model.commercial.Sale;
 import be.valuya.comptoir.model.lang.LocaleText;
+import be.valuya.comptoir.model.stock.Stock;
 import be.valuya.comptoir.ws.convert.company.ToWsCompanyConverter;
+import be.valuya.comptoir.ws.convert.stock.ToWsStockConverter;
 import be.valuya.comptoir.ws.convert.text.ToWsLocaleTextConverter;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
@@ -33,6 +36,8 @@ public class ToWsItemVariantSaleConverter {
     private ToWsItemVariantConverter toWsItemConverter;
     @Inject
     private ToWsCompanyConverter toWsCompanyConverter;
+    @Inject
+    private ToWsStockConverter toWsStockConverter;
 
     public WsItemVariantSale convert(ItemVariantSale itemSale) {
         if (itemSale == null) {
@@ -53,6 +58,9 @@ public class ToWsItemVariantSaleConverter {
         Sale sale = itemSale.getSale();
         WsSaleRef saleRef = toWsSaleConverter.reference(sale);
 
+        Stock stock = itemSale.getStock();
+        WsStockRef stockRef = toWsStockConverter.reference(stock);
+
         ItemVariant itemVariant = itemSale.getItemVariant();
         WsItemVariantRef itemVariantRef = toWsItemConverter.reference(itemVariant);
 
@@ -70,7 +78,7 @@ public class ToWsItemVariantSaleConverter {
         wsItemSale.setSaleRef(saleRef);
         wsItemSale.setDiscountRatio(discountRatio);
         wsItemSale.setTotal(total);
-
+        wsItemSale.setStockRef(stockRef);
         return wsItemSale;
     }
 

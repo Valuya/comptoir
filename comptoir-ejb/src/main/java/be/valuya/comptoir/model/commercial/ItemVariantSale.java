@@ -2,10 +2,13 @@ package be.valuya.comptoir.model.commercial;
 
 import be.valuya.comptoir.model.accounting.AccountingEntry;
 import be.valuya.comptoir.model.lang.LocaleText;
+import be.valuya.comptoir.model.stock.Stock;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.Objects;
+import javax.annotation.Nonnull;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,6 +17,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 /**
  *
@@ -40,6 +44,10 @@ public class ItemVariantSale implements Serializable {
     private LocaleText comment;
     @OneToOne
     private AccountingEntry accountingEntry;
+    @ManyToOne
+    @NotNull
+    @Nonnull
+    private Stock stock;
 
     public Long getId() {
         return id;
@@ -111,6 +119,14 @@ public class ItemVariantSale implements Serializable {
 
     public void setTotal(BigDecimal total) {
         this.total = total;
+    }
+
+    public Stock getStock() {
+        return stock;
+    }
+
+    public void setStock(Stock stock) {
+        this.stock = stock;
     }
 
     @Override

@@ -1,15 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <databaseChangeLog
-    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
 
     <changeSet id="1-active" author="cghislai">
         <addColumn tableName="stock">
             <column name="ACTIVE" type="BIT" defaultValueBoolean="true">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
         </addColumn>
     </changeSet>
+
+    <changeSet id="2-itemsale-stock" author="cghislai">
+        <addColumn tableName="itemvariant_sale">
+            <column name="stock_ID" type="BIGINT(20)" defaultValueNumeric="null"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="3-fk_itemsale_stock" author="cghislai">
+        <addForeignKeyConstraint baseTableName="itemvariant_sale"
+                                 baseColumnNames="stock_ID"
+                                 constraintName="FK_itemvariant_sale_stock_ID"
+                                 referencedTableName="stock"
+                                 referencedColumnNames="ID"/>
+    </changeSet>
+
+
+    <changeSet id="4-update-stock-id" author="cghislai">
+        <sql>
+            UPDATE itemvariant_sale ivs
+            JOIN sale s ON s.ID = ivs.SALE_ID
+            SET ivs.stock_ID = (
+            SELECT stock.ID
+            FROM stock stock
+            WHERE stock.COMPANY_ID = s.COMPANY_ID
+            LIMIT 0, 1
+            )
+            WHERE ivs.stock_ID IS NULL
+        </sql>
+    </changeSet>
+
+    <changeSet id="5-itemsale-stock-notnull" author="cghislai">
+        <addNotNullConstraint tableName="itemvariant_sale" columnName="stock_ID"
+                              columnDataType="BIGINT(20)"/>
+    </changeSet>
+
 
 </databaseChangeLog>
