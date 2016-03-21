@@ -21,7 +21,6 @@ public class StockSearch {
     @Nonnull
     private Company company;
     private Boolean active;
-    private Pos pos;
 
     public Company getCompany() {
         return company;
@@ -39,11 +38,4 @@ public class StockSearch {
         this.active = active;
     }
 
-    public Pos getPos() {
-        return pos;
-    }
-
-    public void setPos(Pos pos) {
-        this.pos = pos;
-    }
 }

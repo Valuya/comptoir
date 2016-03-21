@@ -482,22 +482,6 @@ public class StockService {
             predicateList.add(activePredicate);
         }
 
-        Pos pos = stockSearch.getPos();
-        if (pos != null) {
-            Subquery<PosStock> posStockSubquery = query.subquery(PosStock.class);
-            Root<PosStock> posStockRoot = posStockSubquery.from(PosStock.class);
-
-            Join<PosStock, Pos> posPaymentAccountPosJoin = posStockRoot.join(PosStock_.pointOfSale);
-            Predicate posStockPosPredicate = criteriaBuilder.equal(posPaymentAccountPosJoin, pos);
-
-            Join<PosStock, Stock> posStockStockJoin = posStockRoot.join(PosStock_.stock);
-            Predicate stockPredicate = criteriaBuilder.equal(posStockStockJoin, stockRoot);
-
-            posStockSubquery.where(posStockPosPredicate, stockPredicate);
-
-            Predicate posPredicate = criteriaBuilder.exists(posStockSubquery);
-            predicateList.add(posPredicate);
-        }
         return predicateList;
     }
 

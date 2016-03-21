@@ -81,9 +81,6 @@ public class RegistrationService {
                 .map(entityManager::merge)
                 .collect(Collectors.toList());
 
-        PosStock posStock = createPosStock(pos, stock);
-        PosStock managedPosStock = entityManager.merge(posStock);
-
 
         Customer defaultPosCustomer = new Customer();
         defaultPosCustomer.setCompany(managedCompany);
@@ -130,13 +127,6 @@ public class RegistrationService {
         posPaymentAccount.setAccount(account);
 
         return posPaymentAccount;
-    }
-
-    public PosStock createPosStock(Pos pos, Stock stock) {
-        PosStock posStock = new PosStock();
-        posStock.setStock(stock);
-        posStock.setPointOfSale(pos);
-        return posStock;
     }
 
     public List<Account> createDefaultAccountsPayment(Company managedCompany) {

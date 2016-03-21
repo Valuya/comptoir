@@ -30,14 +30,11 @@ public class FromWsStockSearchConverter {
         WsCompanyRef companyRef = wsStockSearch.getCompanyRef();
         Company company = fromWsCompanyConverter.find(companyRef);
         Boolean active = wsStockSearch.getActive();
-        WsPosRef posRef = wsStockSearch.getPosRef();
-        Pos pos = fromWsPosConverter.find(posRef);
 
 
         StockSearch stockSearch = new StockSearch();
         stockSearch.setActive(active);
         stockSearch.setCompany(company);
-        stockSearch.setPos(pos);
         return stockSearch;
     }
 

@@ -25,7 +25,6 @@ public class WsStockSearch {
     @NotNull
     private WsCompanyRef companyRef;
     private Boolean active;
-    private WsPosRef posRef;
 
     public WsCompanyRef getCompanyRef() {
         return companyRef;
@@ -43,11 +42,4 @@ public class WsStockSearch {
         this.active = active;
     }
 
-    public WsPosRef getPosRef() {
-        return posRef;
-    }
-
-    public void setPosRef(WsPosRef posRef) {
-        this.posRef = posRef;
-    }
 }
