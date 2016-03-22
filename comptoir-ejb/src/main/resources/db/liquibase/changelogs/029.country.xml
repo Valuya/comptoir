@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
+    <changeSet id="0-country" author="cghislai">
+        <createTable tableName="country">
+            <column name="ID" type="BIGINT(20)" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"></constraints>
+            </column>
+            <column name="CODE" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"></constraints>
+            </column>
+            <column name="DEFAULT_VAT_RATE" type="DECIMAL(14,4)">
+                <constraints nullable="false"></constraints>
+            </column>
+        </createTable>
+    </changeSet>
+
+
+
+    <changeSet id="1-company-country" author="cghislai">
+        <addColumn tableName="company">
+            <column name="COUNTRY_ID" type="BIGINT(20)"/>
+        </addColumn>
+    </changeSet>
+
+
+    <changeSet id="2-fk-company-country" author="cghislai">
+        <addForeignKeyConstraint baseTableName="company"
+                                 baseColumnNames="COUNTRY_ID"
+                                 constraintName="FK_COMPANY_COUNTRY_ID"
+                                 referencedTableName="country"
+                                 referencedColumnNames="ID"/>
+    </changeSet>
+
+    <changeSet id="3-country-belgium" author="cghislai">
+      <insert tableName="country">
+          <column name="CODE" value="be"></column>
+          <column name="DEFAULT_VAT_RATE" valueNumeric="0.21"/>
+      </insert>
+    </changeSet>
+
+    <changeSet id="4-update company country" author="cghislai">
+        <update tableName="company">
+            <column name="COUNTRY_ID" valueComputed="(SELECT c.ID from country c WHERE c.CODE = 'be')"/>
+        </update>
+    </changeSet>
+
+    <changeSet id="5-company country not null" author="cghislai">
+        <addNotNullConstraint tableName="company" columnName="COUNTRY_ID" columnDataType="BIGINT(20)"/>
+    </changeSet>
+</databaseChangeLog>

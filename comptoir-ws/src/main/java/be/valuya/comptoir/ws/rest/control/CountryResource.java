@@ -1,7 +1,12 @@
 package be.valuya.comptoir.ws.rest.control;
 
 import be.valuya.comptoir.api.domain.company.WsCountry;
+import be.valuya.comptoir.model.company.Country;
+import be.valuya.comptoir.service.CountryService;
+import be.valuya.comptoir.ws.convert.company.ToWsCountryConverter;
+
 import java.math.BigDecimal;
+import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.BadRequestException;
@@ -21,17 +26,18 @@ import javax.ws.rs.core.MediaType;
 @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 public class CountryResource {
 
+    @Inject
+    private ToWsCountryConverter toWsCountryConverter;
+    @Inject
+    private CountryService countryService;
+
     @Path("{code}")
     @Valid
     @GET
     public WsCountry getCountry(@NotNull @PathParam("code") String code) {
-        if (!code.equals("be")) {
-            throw new BadRequestException("Only supported country is BELGIUM(be) for now! Vive le Grand Jojo !");
-        }
-
-        WsCountry belgiumWsCountry = new WsCountry();
-        belgiumWsCountry.setCode("be");
-        belgiumWsCountry.setDefaultVatRate(BigDecimal.valueOf(21, 2));
-        return belgiumWsCountry;
+        Country country = countryService.getCountryByCode(code);
+        WsCountry wsCountry = toWsCountryConverter.convert(country);
+        return wsCountry;
     }
+
 }

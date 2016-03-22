@@ -1,17 +1,14 @@
 package be.valuya.comptoir.model.company;
 
 import be.valuya.comptoir.model.lang.LocaleText;
+
+import javax.annotation.Nonnull;
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Objects;
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @Entity
@@ -25,6 +22,10 @@ public class Company implements Serializable {
     private LocaleText name;
     @ManyToOne(cascade = CascadeType.ALL)
     private LocaleText description;
+    @ManyToOne
+    @NotNull
+    @Nonnull
+    private Country country;
 
     public Company() {
     }
@@ -51,6 +52,15 @@ public class Company implements Serializable {
 
     public void setDescription(LocaleText description) {
         this.description = description;
+    }
+
+    @Nonnull
+    public Country getCountry() {
+        return country;
+    }
+
+    public void setCountry(@Nonnull Country country) {
+        this.country = country;
     }
 
     @Override
