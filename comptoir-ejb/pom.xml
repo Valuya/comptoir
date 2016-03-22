@@ -55,6 +55,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derby</artifactId>
+            <version>10.12.1.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <scope>test</scope>
@@ -138,7 +144,7 @@
                         </target>
                     </generator>
                 </configuration>
-            </plugin>        
+            </plugin>
         </plugins>
         <testResources>
             <testResource>

@@ -156,6 +156,20 @@ public class SaleResource {
         return saleRef;
     }
 
+    @PUT
+    @Path("{id}/state/OPEN")
+    @Valid
+    public WsSaleRef openSale(@PathParam("id") long id) {
+        Sale sale = saleService.findSaleById(id);
+        saleStateChecker.checkState(sale, true); // TODO: replace with bean validation
+
+        sale = saleService.reopenSale(sale);
+
+        WsSaleRef saleRef = toWsSaleConverter.reference(sale);
+
+        return saleRef;
+    }
+
     @GET
     @Path("{id}/payed")
     public BigDecimal getSaleTotalPayed(@PathParam("id") long id) {

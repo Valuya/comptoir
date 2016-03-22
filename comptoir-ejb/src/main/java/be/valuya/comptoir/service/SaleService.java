@@ -1,24 +1,7 @@
 package be.valuya.comptoir.service;
 
-import be.valuya.comptoir.model.accounting.Account;
-import be.valuya.comptoir.model.accounting.AccountType;
-import be.valuya.comptoir.model.accounting.Account_;
-import be.valuya.comptoir.model.accounting.AccountingEntry;
-import be.valuya.comptoir.model.accounting.AccountingEntry_;
-import be.valuya.comptoir.model.accounting.AccountingTransaction;
-import be.valuya.comptoir.model.accounting.AccountingTransactionType;
-import be.valuya.comptoir.model.accounting.AccountingTransaction_;
-import be.valuya.comptoir.model.cash.Balance_;
-import be.valuya.comptoir.model.commercial.AttributeValue;
-import be.valuya.comptoir.model.commercial.Item;
-import be.valuya.comptoir.model.commercial.ItemVariantSale;
-import be.valuya.comptoir.model.commercial.ItemVariant;
-import be.valuya.comptoir.model.commercial.ItemVariantSale_;
-import be.valuya.comptoir.model.commercial.Price;
-import be.valuya.comptoir.model.commercial.Pricing;
-import be.valuya.comptoir.model.commercial.Sale;
-import be.valuya.comptoir.model.commercial.SalePrice;
-import be.valuya.comptoir.model.commercial.Sale_;
+import be.valuya.comptoir.model.accounting.*;
+import be.valuya.comptoir.model.commercial.*;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.lang.LocaleText;
 import be.valuya.comptoir.model.search.AccountingEntrySearch;
@@ -32,13 +15,7 @@ import be.valuya.comptoir.model.thirdparty.Customer;
 import be.valuya.comptoir.util.pagination.ItemVariantSaleColumn;
 import be.valuya.comptoir.util.pagination.Pagination;
 import be.valuya.comptoir.util.pagination.SaleColumn;
-import java.math.BigDecimal;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.ejb.EJB;
@@ -49,17 +26,18 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Tuple;
 import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Join;
-import javax.persistence.criteria.JoinType;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import javax.persistence.criteria.Subquery;
+import javax.persistence.criteria.*;
+import java.math.BigDecimal;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @Stateless
@@ -434,7 +412,7 @@ public class SaleService {
 
         List<Stock> stocks = stockService.findStocks(stockSearch, null);
         if (stocks == null || stocks.isEmpty()) {
-            throw new IllegalStateException("No active stock for company "+company.getId());
+            throw new IllegalStateException("No active stock for company " + company.getId());
         }
         Stock firstStock = stocks.get(0);
         itemSale.setStock(firstStock);
@@ -505,6 +483,30 @@ public class SaleService {
 
         return managedSale;
 
+    }
+
+    public Sale reopenSale(Sale sale) {
+        List<ItemVariantSale> itemSales = findItemSales(sale);
+        for (ItemVariantSale variantSale : itemSales) {
+            try {
+                stockService.adaptStockForRemovedItemSale(variantSale);
+            } catch (IllegalStateException e) {
+                switch (e.getErrorCode()) {
+                    case "NonUniqueStock":
+                        throw new EJBException(e);
+                    case "MissingStock":
+                        // Discard sales which do not have stocks (yet)
+                        Logger logger = Logger.getLogger(getClass().getName());
+                        logger.log(Level.WARNING, "Missing stock entry for an itemvariant sale", e);
+                        break;
+                }
+            }
+        }
+
+        // TODO: remove accounting entries
+        sale.setClosed(false);
+        Sale managedSale = saveSale(sale);
+        return managedSale;
     }
 
     public BigDecimal getSaleTotalPayed(Sale sale) {

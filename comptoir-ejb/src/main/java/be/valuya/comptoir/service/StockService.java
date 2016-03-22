@@ -1,6 +1,5 @@
 package be.valuya.comptoir.service;
 
-import be.valuya.comptoir.model.accounting.Account;
 import be.valuya.comptoir.model.commercial.*;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.lang.LocaleText;
@@ -13,6 +12,7 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.jms.IllegalStateException;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @Stateless
@@ -259,7 +258,7 @@ public class StockService {
         return namePredicate;
     }
 
-    public ItemStock adaptStockFromItemSale(ZonedDateTime fromDateTime,ItemVariantSale managedItemSale, StockChangeType stockChangeType, String comment) {
+    public ItemStock adaptStockFromItemSale(ZonedDateTime fromDateTime, ItemVariantSale managedItemSale, StockChangeType stockChangeType, String comment) {
         ItemVariant managedItem = managedItemSale.getItemVariant();
         BigDecimal soldQuantity = managedItemSale.getQuantity();
         Stock stock = managedItemSale.getStock();
@@ -283,6 +282,78 @@ public class StockService {
         Sale sale = managedItemSale.getSale();
         adaptedStock.setStockChangeSale(sale);
         return saveItemStock(adaptedStock);
+    }
+
+    public void adaptStockForRemovedItemSale(ItemVariantSale itemVariantSale) throws IllegalStateException {
+        Stock stock = itemVariantSale.getStock();
+        Sale sale = itemVariantSale.getSale();
+        ItemVariant itemVariant = itemVariantSale.getItemVariant();
+        Company company = sale.getCompany();
+
+        // Find the stock entry for that sale
+        ItemStockSearch stockSearch = new ItemStockSearch();
+        stockSearch.setCompany(company);
+        stockSearch.setItemVariant(itemVariant);
+        stockSearch.setSale(sale);
+        stockSearch.setStock(stock);
+        List<ItemStock> saleItemStocks = findItemStocks(stockSearch);
+        if (saleItemStocks.size() > 1) {
+            throw new IllegalStateException("Non unique stock entry for item sale #" + itemVariantSale.getId(), "NonUniqueStock");
+        }
+        if (saleItemStocks.isEmpty()) {
+            throw new IllegalStateException("Missing stock entry for item sale #"+itemVariantSale.getId(), "MissingStock");
+        }
+        ItemStock toRemoveItemStock = saleItemStocks.get(0);
+
+        // Check if stock entries have been added since then
+        ZonedDateTime stockEndDate = toRemoveItemStock.getEndDateTime();
+        ItemStock previousItemStock = toRemoveItemStock.getPreviousItemStock();
+
+        if (stockEndDate == null) {
+            // No entries, we can safely remove it
+            previousItemStock.setEndDateTime(null);
+            saveItemStock(previousItemStock);
+        } else {
+            // Find following entry
+            stockSearch = new ItemStockSearch();
+            stockSearch.setCompany(company);
+            stockSearch.setItemVariant(itemVariant);
+            stockSearch.setStock(stock);
+            stockSearch.setPreviousItemStock(toRemoveItemStock);
+            List<ItemStock> nextItemStocks = findItemStocks(stockSearch);
+            if (nextItemStocks.size() != 1) {
+                throw new IllegalStateException("Non unique item stock following #" + toRemoveItemStock.getId(), "NonUniqueStock");
+            }
+
+            // Fix previous endDate
+            ItemStock nexItemStock = nextItemStocks.get(0);
+            previousItemStock.setEndDateTime(nexItemStock.getStartDateTime());
+            ItemStock managedPreviousItemStock = saveItemStock(previousItemStock);
+
+            nexItemStock.setPreviousItemStock(managedPreviousItemStock);
+
+            // Fix quantities
+            final BigDecimal quantityDiff = itemVariantSale.getQuantity();
+            while (nexItemStock != null) {
+                BigDecimal quantity = nexItemStock.getQuantity();
+                quantity = quantity.subtract(quantityDiff);
+                nexItemStock.setQuantity(quantity);
+                ItemStock managedNextItemStock = saveItemStock(nexItemStock);
+
+                stockSearch.setPreviousItemStock(managedNextItemStock);
+                nextItemStocks = findItemStocks(stockSearch);
+                if (nextItemStocks.size() > 1) {
+                    throw new IllegalStateException("Non unique item stock following #" + managedNextItemStock.getId(), "NonUniqueStock");
+                }
+                if (nextItemStocks.isEmpty()) {
+                    break;
+                }
+                nexItemStock = nextItemStocks.get(0);
+            }
+        }
+        toRemoveItemStock.setPreviousItemStock(null);
+        ItemStock managedStockToRemove = saveItemStock(toRemoveItemStock);
+        entityManager.remove(managedStockToRemove);
     }
 
     /**
@@ -332,6 +403,17 @@ public class StockService {
         CriteriaQuery<ItemStock> query = criteriaBuilder.createQuery(ItemStock.class);
         Root<ItemStock> itemStockRoot = query.from(ItemStock.class);
 
+        List<Predicate> predicates = applyVariantStockPredicates(itemStockSearch, criteriaBuilder, itemStockRoot);
+
+
+        paginatedQueryService.applySort(pagination, itemStockRoot, query,
+                stockColumn -> ItemVariantStockColumnPersistenceUtil.getPath(itemStockRoot, stockColumn)
+        );
+        List<ItemStock> itemStockList = paginatedQueryService.getResults(predicates, query, itemStockRoot, pagination);
+        return itemStockList;
+    }
+
+    private List<Predicate> applyVariantStockPredicates(@Nonnull ItemStockSearch itemStockSearch, CriteriaBuilder criteriaBuilder, Root<ItemStock> itemStockRoot) {
         List<Predicate> predicates = new ArrayList<>();
 
         Company company = itemStockSearch.getCompany();
@@ -367,12 +449,27 @@ public class StockService {
             predicates.add(endDateTimePredicate);
         }
 
+        ZonedDateTime fromDateTime = itemStockSearch.getFromDateTime();
+        if (fromDateTime != null) {
+            Path<ZonedDateTime> startDateTimePath = itemStockRoot.get(ItemStock_.startDateTime);
+            Predicate startDateTimePredicate = criteriaBuilder.lessThanOrEqualTo(startDateTimePath, fromDateTime);
+            predicates.add(startDateTimePredicate);
+        }
 
-        paginatedQueryService.applySort(pagination, itemStockRoot, query,
-                stockColumn -> ItemVariantStockColumnPersistenceUtil.getPath(itemStockRoot, stockColumn)
-        );
-        List<ItemStock> itemStockList = paginatedQueryService.getResults(predicates, query, itemStockRoot, pagination);
-        return itemStockList;
+        Sale sale = itemStockSearch.getSale();
+        if (sale != null) {
+            Path<Sale> salePath = itemStockRoot.get(ItemStock_.stockChangeSale);
+            Predicate salePredicate = criteriaBuilder.equal(salePath, sale);
+            predicates.add(salePredicate);
+        }
+
+        ItemStock previousItemStock = itemStockSearch.getPreviousItemStock();
+        if (previousItemStock != null) {
+            Path<ItemStock> previousItemStockPath = itemStockRoot.get(ItemStock_.previousItemStock);
+            Predicate previousItemStockPredicate = criteriaBuilder.equal(previousItemStockPath, previousItemStock);
+            predicates.add(previousItemStockPredicate);
+        }
+        return predicates;
     }
 
     @Nonnull
@@ -490,6 +587,7 @@ public class StockService {
         Stock managedStock = entityManager.merge(stock);
         return managedStock;
     }
+
     private ItemStock saveItemStock(ItemStock itemStock) {
         ItemStock managedStock = entityManager.merge(itemStock);
         return managedStock;
@@ -499,7 +597,7 @@ public class StockService {
         ItemVariant managedItem = entityManager.merge(item);
         ZonedDateTime dateTime = ZonedDateTime.now();
 
-        adaptStock(dateTime, stock, managedItem, initialQuantity, null,StockChangeType.INITIAL);
+        adaptStock(dateTime, stock, managedItem, initialQuantity, null, StockChangeType.INITIAL);
 
         return managedItem;
     }
