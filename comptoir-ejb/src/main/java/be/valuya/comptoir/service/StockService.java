@@ -340,7 +340,7 @@ public class StockService {
             final BigDecimal quantityDiff = itemVariantSale.getQuantity();
             while (nexItemStock != null) {
                 BigDecimal quantity = nexItemStock.getQuantity();
-                quantity = quantity.subtract(quantityDiff);
+                quantity = quantity.add(quantityDiff);
                 nexItemStock.setQuantity(quantity);
                 ItemStock managedNextItemStock = saveItemStock(nexItemStock);
 
