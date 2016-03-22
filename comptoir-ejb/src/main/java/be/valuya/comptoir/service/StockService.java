@@ -309,6 +309,10 @@ public class StockService {
         ZonedDateTime stockEndDate = toRemoveItemStock.getEndDateTime();
         ItemStock previousItemStock = toRemoveItemStock.getPreviousItemStock();
 
+        if (previousItemStock == null) {
+            entityManager.remove(toRemoveItemStock);
+            return;
+        }
         if (stockEndDate == null) {
             // No entries, we can safely remove it
             previousItemStock.setEndDateTime(null);
