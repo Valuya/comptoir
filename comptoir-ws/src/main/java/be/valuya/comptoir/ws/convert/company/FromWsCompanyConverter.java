@@ -2,18 +2,20 @@ package be.valuya.comptoir.ws.convert.company;
 
 import be.valuya.comptoir.api.domain.company.WsCompany;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
+import be.valuya.comptoir.api.domain.company.WsCountryRef;
 import be.valuya.comptoir.api.domain.lang.WsLocaleText;
 import be.valuya.comptoir.model.company.Company;
+import be.valuya.comptoir.model.company.Country;
 import be.valuya.comptoir.model.lang.LocaleText;
 import be.valuya.comptoir.service.CompanyService;
 import be.valuya.comptoir.ws.convert.text.FromWsLocaleTextConverter;
-import java.util.List;
+
 import javax.ejb.EJB;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.util.List;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @ApplicationScoped
@@ -23,6 +25,8 @@ public class FromWsCompanyConverter {
     private CompanyService companyService;
     @Inject
     private FromWsLocaleTextConverter fromWsLocaleTextConverter;
+    @Inject
+    private FromWsCountryConverter fromWsCountryConverter;
 
     public Company convert(WsCompany wsCompany) {
         if (wsCompany == null) {
@@ -44,9 +48,13 @@ public class FromWsCompanyConverter {
         LocaleText existingDescription = company.getDescription();
         LocaleText description = fromWsLocaleTextConverter.update(newDescription, existingDescription);
 
+        WsCountryRef countryRef = wsCompany.getCountryRef();
+        Country country = fromWsCountryConverter.find(countryRef);
+
         company.setId(id);
         company.setDescription(description);
         company.setName(name);
+        company.setCountry(country);
 
         return company;
     }
