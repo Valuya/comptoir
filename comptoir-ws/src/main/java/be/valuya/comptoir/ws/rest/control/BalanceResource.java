@@ -8,29 +8,23 @@ import be.valuya.comptoir.model.search.BalanceSearch;
 import be.valuya.comptoir.service.AccountService;
 import be.valuya.comptoir.util.pagination.BalanceColumn;
 import be.valuya.comptoir.util.pagination.Pagination;
-import be.valuya.comptoir.ws.config.HeadersConfig;
 import be.valuya.comptoir.ws.convert.accounting.FromWsBalanceConverter;
-import be.valuya.comptoir.ws.convert.balanceing.ToWsBalanceConverter;
+import be.valuya.comptoir.ws.convert.accounting.ToWsBalanceConverter;
 import be.valuya.comptoir.ws.convert.search.FromWsBalanceSearchConverter;
 import be.valuya.comptoir.ws.rest.validation.BalanceStateChecker;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
 import be.valuya.comptoir.ws.rest.validation.NoId;
-import java.util.List;
-import java.util.stream.Collectors;
+
 import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  *

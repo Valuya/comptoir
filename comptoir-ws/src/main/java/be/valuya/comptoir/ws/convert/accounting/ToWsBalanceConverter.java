@@ -1,15 +1,15 @@
-package be.valuya.comptoir.ws.convert.balanceing;
+package be.valuya.comptoir.ws.convert.accounting;
 
 import be.valuya.comptoir.api.domain.accounting.WsAccountRef;
 import be.valuya.comptoir.api.domain.accounting.WsBalance;
 import be.valuya.comptoir.api.domain.accounting.WsBalanceRef;
 import be.valuya.comptoir.model.accounting.Account;
 import be.valuya.comptoir.model.cash.Balance;
-import be.valuya.comptoir.ws.convert.accounting.ToWsAccountConverter;
-import java.math.BigDecimal;
-import java.time.ZonedDateTime;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.math.BigDecimal;
+import java.time.ZonedDateTime;
 
 /**
  *

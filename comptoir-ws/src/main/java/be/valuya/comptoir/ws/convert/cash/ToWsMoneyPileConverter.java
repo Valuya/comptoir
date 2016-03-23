@@ -2,17 +2,18 @@ package be.valuya.comptoir.ws.convert.cash;
 
 import be.valuya.comptoir.api.domain.accounting.WsAccountRef;
 import be.valuya.comptoir.api.domain.accounting.WsBalanceRef;
-import be.valuya.comptoir.api.domain.cash.WsMoneyPileRef;
 import be.valuya.comptoir.api.domain.cash.WsMoneyPile;
+import be.valuya.comptoir.api.domain.cash.WsMoneyPileRef;
 import be.valuya.comptoir.model.accounting.Account;
 import be.valuya.comptoir.model.cash.Balance;
 import be.valuya.comptoir.model.cash.MoneyPile;
 import be.valuya.comptoir.ws.convert.accounting.ToWsAccountConverter;
-import be.valuya.comptoir.ws.convert.balanceing.ToWsBalanceConverter;
-import java.math.BigDecimal;
-import java.time.ZonedDateTime;
+import be.valuya.comptoir.ws.convert.accounting.ToWsBalanceConverter;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.math.BigDecimal;
+import java.time.ZonedDateTime;
 
 /**
  *

@@ -6,6 +6,8 @@ import be.valuya.comptoir.api.domain.thirdparty.WsCustomerRef;
 import be.valuya.comptoir.model.search.CustomerSearch;
 import be.valuya.comptoir.model.thirdparty.Customer;
 import be.valuya.comptoir.service.CustomerService;
+import be.valuya.comptoir.util.pagination.CustomerColumn;
+import be.valuya.comptoir.util.pagination.Pagination;
 import be.valuya.comptoir.ws.convert.search.FromWsCustomerSearchConverter;
 import be.valuya.comptoir.ws.convert.thirdparty.FromWsCustomerConverter;
 import be.valuya.comptoir.ws.convert.thirdparty.ToWsCustomerConverter;
@@ -14,22 +16,27 @@ import be.valuya.comptoir.ws.rest.validation.NoId;
 
 import javax.ejb.EJB;
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @Path("/customer")
 @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public class CustomerResource {
+@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+public class CustomerResource {
 
     @EJB
     private CustomerService customerService;
+    @Inject
+    private RestPaginationUtil restPaginationUtil;
     @Inject
     private FromWsCustomerConverter fromWsCustomerConverter;
     @Inject
@@ -38,6 +45,10 @@ import java.util.stream.Collectors;
     private IdChecker idChecker;
     @Inject
     private FromWsCustomerSearchConverter fromWsCustomerSearchConverter;
+    @Context
+    private HttpServletResponse response;
+    @Context
+    private UriInfo uriInfo;
 
     @POST
     public WsCustomerRef createCustomer(@NoId WsCustomer wsCustomer) {
@@ -79,13 +90,16 @@ import java.util.stream.Collectors;
     @POST
     @Path("/search")
     public List<WsCustomer> findCustomers(@Valid WsCustomerSearch wsCustomerSearch) {
+        Pagination<Customer, CustomerColumn> pagination = restPaginationUtil.extractPagination(uriInfo, CustomerColumn::valueOf);
+
         CustomerSearch customerSearch = fromWsCustomerSearchConverter.convert(wsCustomerSearch);
-        List<Customer> customers = customerService.findCustomers(customerSearch);
+        List<Customer> customers = customerService.findCustomers(customerSearch, pagination);
 
         List<WsCustomer> wsCustomers = customers.stream()
                 .map(toWsCustomerConverter::convert)
                 .collect(Collectors.toList());
 
+        restPaginationUtil.addResultCount(response, pagination);
         return wsCustomers;
     }
 
