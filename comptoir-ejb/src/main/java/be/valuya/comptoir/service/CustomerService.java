@@ -99,27 +99,33 @@ public class CustomerService {
         }
         String multiSearch = customerSearch.getMultiSearch();
         if (multiSearch != null) {
-            Predicate firstNamePredicate = createContainsPredicate(firstNamePath, multiSearch);
-            Predicate lastNamePredicate = createContainsPredicate(lastNamePath, multiSearch);
-            Predicate address1Predicate = createContainsPredicate(address1Path, multiSearch);
-            Predicate address2Predicate = createContainsPredicate(address2Path, multiSearch);
-            Predicate zipPredicate = createContainsPredicate(zipPath, multiSearch);
-            Predicate cityPredicate = createContainsPredicate(cityPath, multiSearch);
-            Predicate phone1Predicate = createContainsPredicate(phone1Path, multiSearch);
-            Predicate phone2Predicate = createContainsPredicate(phone2Path, multiSearch);
-            Predicate mailPredicate = createContainsPredicate(emailPath, multiSearch);
-            Predicate notesPredicate = createContainsPredicate(notesPath, multiSearch);
-            Predicate multiSearchPredicate = criteriaBuilder.or(
-                    firstNamePredicate,
-                    lastNamePredicate,
-                    address1Predicate,
-                    address2Predicate,
-                    zipPredicate,
-                    cityPredicate,
-                    phone1Predicate,
-                    phone2Predicate,
-                    mailPredicate,
-                    notesPredicate);
+            String[] stringParts = multiSearch.split(" ");
+            List<Predicate> multiPredicates = new ArrayList<>();
+            for (String part : stringParts) {
+                Predicate firstNamePredicate = createContainsPredicate(firstNamePath, part);
+                Predicate lastNamePredicate = createContainsPredicate(lastNamePath, part);
+                Predicate address1Predicate = createContainsPredicate(address1Path, part);
+                Predicate address2Predicate = createContainsPredicate(address2Path, part);
+                Predicate zipPredicate = createContainsPredicate(zipPath, part);
+                Predicate cityPredicate = createContainsPredicate(cityPath, part);
+                Predicate phone1Predicate = createContainsPredicate(phone1Path, part);
+                Predicate phone2Predicate = createContainsPredicate(phone2Path, part);
+                Predicate mailPredicate = createContainsPredicate(emailPath, part);
+                Predicate notesPredicate = createContainsPredicate(notesPath, part);
+                Predicate multiSearchPartPredicate = criteriaBuilder.or(
+                        firstNamePredicate,
+                        lastNamePredicate,
+                        address1Predicate,
+                        address2Predicate,
+                        zipPredicate,
+                        cityPredicate,
+                        phone1Predicate,
+                        phone2Predicate,
+                        mailPredicate,
+                        notesPredicate);
+                multiPredicates.add(multiSearchPartPredicate);
+            }
+            Predicate multiSearchPredicate = criteriaBuilder.and(multiPredicates.toArray(new Predicate[0]));
             predicates.add(multiSearchPredicate);
         }
         return predicates;
