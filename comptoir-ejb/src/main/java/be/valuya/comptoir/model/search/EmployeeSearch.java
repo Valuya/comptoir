@@ -11,8 +11,6 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  * @author Yannick Majoros <yannick@valuya.be>
  */
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
 public class EmployeeSearch {
 
     @NotNull

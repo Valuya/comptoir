@@ -27,6 +27,14 @@ public class FromWsCustomerConverter {
         if (wsCustomer == null) {
             return null;
         }
+        Customer customer = new Customer();
+
+        customer = patch(customer, wsCustomer);
+
+        return customer;
+    }
+
+    public Customer patch(Customer customer, WsCustomer wsCustomer) {
         Long id = wsCustomer.getId();
         String firstName = wsCustomer.getFirstName();
         String lastName = wsCustomer.getLastName();
@@ -42,7 +50,6 @@ public class FromWsCustomerConverter {
         WsCompanyRef companyRef = wsCustomer.getCompanyRef();
         Company company = fromWsCompanyConverter.find(companyRef);
 
-        Customer customer = new Customer();
         customer.setId(id);
         customer.setCompany(company);
         customer.setFirstName(firstName);
@@ -55,7 +62,6 @@ public class FromWsCustomerConverter {
         customer.setNotes(notes);
         customer.setPhone1(phone1);
         customer.setPhone2(phone2);
-
         return customer;
     }
 
