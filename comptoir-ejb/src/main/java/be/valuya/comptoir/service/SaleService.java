@@ -284,7 +284,7 @@ public class SaleService {
         Customer customer = saleSearch.getCustomer();
         if (customer != null) {
             Path<Customer> customerPath = saleRoot.get(Sale_.customer);
-            Predicate customerPredicate = criteriaBuilder.equal(companyPath, customer);
+            Predicate customerPredicate = criteriaBuilder.equal(customerPath, customer);
             predicates.add(customerPredicate);
         }
         return predicates;
