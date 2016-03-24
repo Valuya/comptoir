@@ -4,20 +4,13 @@ import be.valuya.comptoir.model.accounting.AccountingEntry;
 import be.valuya.comptoir.model.lang.LocaleText;
 import be.valuya.comptoir.model.stock.Stock;
 
+import javax.annotation.Nonnull;
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.Objects;
-import javax.annotation.Nonnull;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 
 /**
  *
@@ -48,6 +41,8 @@ public class ItemVariantSale implements Serializable {
     @NotNull
     @Nonnull
     private Stock stock;
+    @Column(name = "FORCE_CUSTOMER_LOYALTY")
+    private Boolean forceCustomerLoyalty;
 
     public Long getId() {
         return id;
@@ -127,6 +122,14 @@ public class ItemVariantSale implements Serializable {
 
     public void setStock(Stock stock) {
         this.stock = stock;
+    }
+
+    public Boolean getForceCustomerLoyalty() {
+        return forceCustomerLoyalty;
+    }
+
+    public void setForceCustomerLoyalty(Boolean forceCustomerLoyalty) {
+        this.forceCustomerLoyalty = forceCustomerLoyalty;
     }
 
     @Override

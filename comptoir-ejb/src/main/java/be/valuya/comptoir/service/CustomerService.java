@@ -1,6 +1,11 @@
 package be.valuya.comptoir.service;
 
+import be.valuya.comptoir.model.accounting.CustomerLoyaltyAccountingEntry;
+import be.valuya.comptoir.model.accounting.CustomerLoyaltyAccountingEntry_;
+import be.valuya.comptoir.model.commercial.Sale;
+import be.valuya.comptoir.model.commercial.Sale_;
 import be.valuya.comptoir.model.company.Company;
+import be.valuya.comptoir.model.search.CustomerLoyaltyAccountingEntrySearch;
 import be.valuya.comptoir.model.search.CustomerSearch;
 import be.valuya.comptoir.model.thirdparty.Customer;
 import be.valuya.comptoir.model.thirdparty.Customer_;
@@ -11,7 +16,10 @@ import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.*;
+import java.math.BigDecimal;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,6 +59,91 @@ public class CustomerService {
         );
         List<Customer> customerList = paginatedQueryService.getResults(predicates, query, customerRoot, pagination);
         return customerList;
+    }
+
+    public CustomerLoyaltyAccountingEntry saveCustomerLoyaltyAccountingEntry(CustomerLoyaltyAccountingEntry accountingEntry) {
+        CustomerLoyaltyAccountingEntry managedAccountingEntry = entityManager.merge(accountingEntry);
+        return managedAccountingEntry;
+    }
+
+    public void removeCustomerLoyaltyAccountingEntry(CustomerLoyaltyAccountingEntry accountingEntry) {
+        CustomerLoyaltyAccountingEntry managedAccountingEntry = entityManager.merge(accountingEntry);
+        entityManager.remove(managedAccountingEntry);
+    }
+
+    public List<CustomerLoyaltyAccountingEntry> findCustomerLoyaltyAccountingEntries(CustomerLoyaltyAccountingEntrySearch accountingEntrySearch, Pagination pagination) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<CustomerLoyaltyAccountingEntry> query = criteriaBuilder.createQuery(CustomerLoyaltyAccountingEntry.class);
+        Root<CustomerLoyaltyAccountingEntry> accountingEntryRoot = query.from(CustomerLoyaltyAccountingEntry.class);
+
+        List<Predicate> predicates = createCustomerLoyaltyAccountingEntryPredicates(accountingEntrySearch, criteriaBuilder, accountingEntryRoot);
+
+        Path<ZonedDateTime> dateTimePath = accountingEntryRoot.get(CustomerLoyaltyAccountingEntry_.dateTime);
+        Order dateOrder = criteriaBuilder.desc(dateTimePath);
+
+        query.select(accountingEntryRoot);
+        query.where(predicates.toArray(new Predicate[0]));
+        query.orderBy(dateOrder);
+
+        TypedQuery<CustomerLoyaltyAccountingEntry> typedQuery = entityManager.createQuery(query);
+        paginatedQueryService.paginate(pagination, typedQuery);
+        List<CustomerLoyaltyAccountingEntry> resultList = typedQuery.getResultList();
+
+        return resultList;
+    }
+
+    public BigDecimal getCustomerLoyaltyAccountBalance(CustomerLoyaltyAccountingEntrySearch accountingEntrySearch) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<BigDecimal> query = criteriaBuilder.createQuery(BigDecimal.class);
+        Root<CustomerLoyaltyAccountingEntry> accountingEntryRoot = query.from(CustomerLoyaltyAccountingEntry.class);
+
+        List<Predicate> predicates = createCustomerLoyaltyAccountingEntryPredicates(accountingEntrySearch, criteriaBuilder, accountingEntryRoot);
+
+        Path<BigDecimal> amountPath = accountingEntryRoot.get(CustomerLoyaltyAccountingEntry_.amount);
+        Expression<BigDecimal> amountSumExpression = criteriaBuilder.sum(amountPath);
+
+        query.select(amountSumExpression);
+        query.where(predicates.toArray(new Predicate[0]));
+
+        TypedQuery<BigDecimal> typedQuery = entityManager.createQuery(query);
+        BigDecimal accountBalance = typedQuery.getSingleResult();
+        return accountBalance;
+    }
+
+    private List<Predicate> createCustomerLoyaltyAccountingEntryPredicates(CustomerLoyaltyAccountingEntrySearch accountingEntrySearch, CriteriaBuilder criteriaBuilder, Root<CustomerLoyaltyAccountingEntry> accountingEntryRoot) {
+        List<Predicate> predicates = new ArrayList<>();
+
+        Company company = accountingEntrySearch.getCompany();
+        Join<CustomerLoyaltyAccountingEntry, Sale> saleJoin = accountingEntryRoot.join(CustomerLoyaltyAccountingEntry_.sale);
+        Path<Company> companyPath = saleJoin.get(Sale_.company);
+        Predicate companyPredicate = criteriaBuilder.equal(companyPath, company);
+        predicates.add(companyPredicate);
+
+        Customer customer = accountingEntrySearch.getCustomer();
+        if (customer != null) {
+            Path<Customer> customerPath = accountingEntryRoot.get(CustomerLoyaltyAccountingEntry_.customer);
+            Predicate customerPredicate = criteriaBuilder.equal(customerPath, customer);
+            predicates.add(customerPredicate);
+        }
+
+        Sale sale = accountingEntrySearch.getSale();
+        if (sale != null) {
+            Predicate salePredicate = criteriaBuilder.equal(saleJoin, sale);
+            predicates.add(salePredicate);
+        }
+
+        Path<ZonedDateTime> dateTimePath = accountingEntryRoot.get(CustomerLoyaltyAccountingEntry_.dateTime);
+        ZonedDateTime fromDateTime = accountingEntrySearch.getFromDateTime();
+        if (fromDateTime != null) {
+            Predicate fromDateTimePredicate = criteriaBuilder.greaterThanOrEqualTo(dateTimePath, fromDateTime);
+            predicates.add(fromDateTimePredicate);
+        }
+        ZonedDateTime toDateTime = accountingEntrySearch.getToDateTime();
+        if (toDateTime != null) {
+            Predicate toDateTimePredicate = criteriaBuilder.lessThan(dateTimePath, toDateTime);
+            predicates.add(toDateTimePredicate);
+        }
+        return predicates;
     }
 
     private List<Predicate> createCustomerPredicates(CustomerSearch customerSearch, CriteriaBuilder criteriaBuilder, Root<Customer> customerRoot) {

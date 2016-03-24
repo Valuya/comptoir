@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
+    <changeSet id="0-loyalty_accounting_entry table" author="cghislai">
+        <createTable tableName="customer_loyalty_accounting_entry">
+            <column name="ID" type="BIGINT(20)">
+                <constraints nullable="false" primaryKey="true"></constraints>
+            </column>
+            <column name="CUSTOMER_ID" type="BIGINT(20)">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="SALE_ID" type="BIGINT(20)">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="AMOUNT" type="DECIMAL(14,4)">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="DATETIME" type="DATETIME">
+                <constraints nullable="false"></constraints>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="1-FK_cla_entry_customer_id" author="cghislai">
+        <addForeignKeyConstraint baseTableName="customer_loyalty_accounting_entry"
+                                 baseColumnNames="CUSTOMER_ID"
+                                 constraintName="FK_cla_entry_CUSTOMER_ID"
+                                 referencedTableName="customer"
+                                 referencedColumnNames="ID"/>
+    </changeSet>
+    <changeSet id="2-FK_cla_entry_sale_id" author="cghislai">
+        <addForeignKeyConstraint baseTableName="customer_loyalty_accounting_entry"
+                                 baseColumnNames="SALE_ID"
+                                 constraintName="FK_cla_entry_SALE_ID"
+                                 referencedTableName="sale"
+                                 referencedColumnNames="ID"/>
+    </changeSet>
+
+    <changeSet id="3-company_loyalty_rate" author="cghidlai">
+        <addColumn tableName="company">
+            <column name="CUSTOMER_LOYALTY_RATE" type="DECIMAL(14, 4)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="4-itemvariant_sale_force_loyalty" author="cghislai">
+        <addColumn tableName="itemvariant_sale">
+            <column name="FORCE_CUSTOMER_LOYALTY" type="BIT"/>
+        </addColumn>
+    </changeSet>
+
+
+</databaseChangeLog>
