@@ -647,7 +647,7 @@ public class StockService {
         itemVariant.setActive(true);
         itemVariant.setItem(item);
         itemVariant.setPricing(Pricing.PARENT_ITEM);
-        itemVariant.setVariantReference(item.getReference());
+        itemVariant.setVariantReference("default");
         return saveItemVariant(itemVariant);
     }
 
