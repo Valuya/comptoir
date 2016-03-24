@@ -13,6 +13,7 @@ import be.valuya.comptoir.ws.convert.text.FromWsLocaleTextConverter;
 import javax.ejb.EJB;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -51,10 +52,13 @@ public class FromWsCompanyConverter {
         WsCountryRef countryRef = wsCompany.getCountryRef();
         Country country = fromWsCountryConverter.find(countryRef);
 
+        BigDecimal customerLoyaltyRate = wsCompany.getCustomerLoyaltyRate();
+
         company.setId(id);
         company.setDescription(description);
         company.setName(name);
         company.setCountry(country);
+        company.setCustomerLoyaltyRate(customerLoyaltyRate);
 
         return company;
     }

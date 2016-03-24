@@ -1,14 +1,14 @@
 package be.valuya.comptoir.ws.convert.commercial;
 
+import be.valuya.comptoir.api.domain.commercial.WsItemVariantRef;
 import be.valuya.comptoir.api.domain.commercial.WsItemVariantSale;
 import be.valuya.comptoir.api.domain.commercial.WsItemVariantSaleRef;
-import be.valuya.comptoir.api.domain.commercial.WsItemVariantRef;
 import be.valuya.comptoir.api.domain.commercial.WsSaleRef;
 import be.valuya.comptoir.api.domain.lang.WsLocaleText;
 import be.valuya.comptoir.api.domain.stock.WsStockRef;
 import be.valuya.comptoir.model.accounting.AccountingEntry;
-import be.valuya.comptoir.model.commercial.ItemVariantSale;
 import be.valuya.comptoir.model.commercial.ItemVariant;
+import be.valuya.comptoir.model.commercial.ItemVariantSale;
 import be.valuya.comptoir.model.commercial.Price;
 import be.valuya.comptoir.model.commercial.Sale;
 import be.valuya.comptoir.model.lang.LocaleText;
@@ -16,11 +16,12 @@ import be.valuya.comptoir.model.stock.Stock;
 import be.valuya.comptoir.ws.convert.company.ToWsCompanyConverter;
 import be.valuya.comptoir.ws.convert.stock.ToWsStockConverter;
 import be.valuya.comptoir.ws.convert.text.ToWsLocaleTextConverter;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.List;
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 
 /**
  *
@@ -67,6 +68,8 @@ public class ToWsItemVariantSaleConverter {
         LocaleText comment = itemSale.getComment();
         List<WsLocaleText> wsComment = fromWsLocaleTextConverter.convert(comment);
 
+        Boolean forceCustomerLoyalty = itemSale.getForceCustomerLoyalty();
+
         WsItemVariantSale wsItemSale = new WsItemVariantSale();
         wsItemSale.setId(id);
         wsItemSale.setComment(wsComment);
@@ -79,6 +82,7 @@ public class ToWsItemVariantSaleConverter {
         wsItemSale.setDiscountRatio(discountRatio);
         wsItemSale.setTotal(total);
         wsItemSale.setStockRef(stockRef);
+        wsItemSale.setForceCustomerLoyalty(forceCustomerLoyalty);
         return wsItemSale;
     }
 

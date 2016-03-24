@@ -4,6 +4,7 @@ import be.valuya.comptoir.model.accounting.AccountingEntry;
 import be.valuya.comptoir.model.lang.LocaleText;
 import be.valuya.comptoir.model.stock.Stock;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -42,6 +43,7 @@ public class ItemVariantSale implements Serializable {
     @Nonnull
     private Stock stock;
     @Column(name = "FORCE_CUSTOMER_LOYALTY")
+    @CheckForNull
     private Boolean forceCustomerLoyalty;
 
     public Long getId() {
@@ -124,6 +126,7 @@ public class ItemVariantSale implements Serializable {
         this.stock = stock;
     }
 
+    @CheckForNull
     public Boolean getForceCustomerLoyalty() {
         return forceCustomerLoyalty;
     }
