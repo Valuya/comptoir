@@ -3,6 +3,8 @@ package be.valuya.comptoir.ws.rest.control;
 import be.valuya.comptoir.api.domain.search.WsCustomerSearch;
 import be.valuya.comptoir.api.domain.thirdparty.WsCustomer;
 import be.valuya.comptoir.api.domain.thirdparty.WsCustomerRef;
+import be.valuya.comptoir.model.company.Company;
+import be.valuya.comptoir.model.search.CustomerLoyaltyAccountingEntrySearch;
 import be.valuya.comptoir.model.search.CustomerSearch;
 import be.valuya.comptoir.model.thirdparty.Customer;
 import be.valuya.comptoir.service.CustomerService;
@@ -22,6 +24,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -87,6 +90,23 @@ public class CustomerResource {
     }
 
     @Valid
+    @GET
+    @Path("/{id}/loyaltyBalance")
+    public BigDecimal getLoyaltyBalance(@PathParam("id") long id) {
+        Customer customer = customerService.findCustomerById(id);
+        Company company = customer.getCompany();
+
+        CustomerLoyaltyAccountingEntrySearch accountingEntrySearch = new CustomerLoyaltyAccountingEntrySearch();
+        accountingEntrySearch.setCustomer(customer);
+        accountingEntrySearch.setCompany(company);
+        BigDecimal customerLoyaltyAccountBalance = customerService.getCustomerLoyaltyAccountBalance(accountingEntrySearch);
+        if (customerLoyaltyAccountBalance == null) {
+            return BigDecimal.ZERO;
+        }
+        return customerLoyaltyAccountBalance;
+    }
+
+    @Valid
     @POST
     @Path("/search")
     public List<WsCustomer> findCustomers(@Valid WsCustomerSearch wsCustomerSearch) {
@@ -102,5 +122,6 @@ public class CustomerResource {
         restPaginationUtil.addResultCount(response, pagination);
         return wsCustomers;
     }
+
 
 }
