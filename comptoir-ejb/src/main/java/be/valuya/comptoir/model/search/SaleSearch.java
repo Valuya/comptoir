@@ -1,9 +1,11 @@
 package be.valuya.comptoir.model.search;
 
 import be.valuya.comptoir.model.company.Company;
-import java.time.ZonedDateTime;
+import be.valuya.comptoir.model.thirdparty.Customer;
+
 import javax.annotation.Nonnull;
 import javax.validation.constraints.NotNull;
+import java.time.ZonedDateTime;
 
 /**
  *
@@ -17,6 +19,7 @@ public class SaleSearch {
     private Boolean closed;
     private ZonedDateTime fromDateTime;
     private ZonedDateTime toDateTime;
+    private Customer customer;
 
     public Company getCompany() {
         return company;
@@ -50,4 +53,11 @@ public class SaleSearch {
         this.toDateTime = toDateTime;
     }
 
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
 }
