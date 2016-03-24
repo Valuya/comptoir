@@ -153,6 +153,7 @@ public class AccountingUtils {
         accountingEntry.setCustomer(customer);
         accountingEntry.setAmount(customerLoyaltyAmount);
         accountingEntry.setDateTime(dateTime);
+        accountingEntry.setSale(sale);
         return accountingEntry;
     }
 

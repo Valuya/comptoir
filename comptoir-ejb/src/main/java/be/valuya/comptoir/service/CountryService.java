@@ -8,6 +8,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.*;
+import java.util.List;
 
 /**
  * Created by cghislai on 22/03/16.
@@ -29,6 +30,15 @@ public class CountryService {
         query.where(codePredicate);
         TypedQuery<Country> typedQuery = entityManager.createQuery(query);
         return typedQuery.getSingleResult();
+    }
+
+    public List<Country> findAllCountries() {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Country> query = criteriaBuilder.createQuery(Country.class);
+        Root<Country> countryRoot = query.from(Country.class);
+        query.select(countryRoot);
+        TypedQuery<Country> typedQuery = entityManager.createQuery(query);
+        return typedQuery.getResultList();
     }
 
     public Country saveCountry(Country country) {
