@@ -4,10 +4,7 @@ import be.valuya.comptoir.model.accounting.*;
 import be.valuya.comptoir.model.commercial.*;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.lang.LocaleText;
-import be.valuya.comptoir.model.search.AccountingEntrySearch;
-import be.valuya.comptoir.model.search.ItemVariantSaleSearch;
-import be.valuya.comptoir.model.search.SaleSearch;
-import be.valuya.comptoir.model.search.StockSearch;
+import be.valuya.comptoir.model.search.*;
 import be.valuya.comptoir.model.stock.ItemStock;
 import be.valuya.comptoir.model.stock.Stock;
 import be.valuya.comptoir.model.stock.StockChangeType;
@@ -27,6 +24,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Tuple;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.*;
+import javax.swing.text.html.Option;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -49,6 +47,8 @@ public class SaleService {
     private StockService stockService;
     @EJB
     private AccountService accountService;
+    @EJB
+    private CustomerService customerService;
     @EJB
     private PaginatedQueryService paginatedQueryService;
 
@@ -312,6 +312,7 @@ public class SaleService {
         }
 
         calcSale(sale);
+        updateCustomerLoyaltyEntry(sale);
 
         Sale managedSale = entityManager.merge(sale);
         managedSale = calcSale(managedSale);
@@ -324,9 +325,8 @@ public class SaleService {
             throw new IllegalArgumentException("The sale is closed");
         }
         List<ItemVariantSale> itemSaleList = findItemSales(sale);
-        for (ItemVariantSale itemSale : itemSaleList) {
-            removeItemSale(itemSale);
-        }
+        itemSaleList.forEach(this::removeItemSale);
+
         AccountingTransaction accountingTransaction = sale.getAccountingTransaction();
         Company company = sale.getCompany();
         AccountingEntrySearch accountingEntrySearch = new AccountingEntrySearch();
@@ -478,6 +478,7 @@ public class SaleService {
 
         List<ItemVariantSale> itemSales = findItemSales(managedSale);
 
+        // Add stock entries
         for (ItemVariantSale itemSale : itemSales) {
             ItemVariantSale managedItemSale = entityManager.merge(itemSale);
             managedItemSale.setSale(managedSale);
@@ -493,18 +494,20 @@ public class SaleService {
 
     public Sale reopenSale(Sale sale) {
         List<ItemVariantSale> itemSales = findItemSales(sale);
+        // Remove stock entries
         for (ItemVariantSale variantSale : itemSales) {
             try {
                 stockService.adaptStockForRemovedItemSale(variantSale);
             } catch (IllegalStateException e) {
                 switch (e.getErrorCode()) {
-                    case "NonUniqueStock":
-                        throw new EJBException(e);
-                    case "MissingStock":
+                    case StockService.ERROR_MISSING_STOCK:
                         // Discard sales which do not have stocks (yet)
                         Logger logger = Logger.getLogger(getClass().getName());
                         logger.log(Level.WARNING, "Missing stock entry for an itemvariant sale", e);
                         break;
+                    default: {
+                        throw new EJBException(e);
+                    }
                 }
             }
         }
@@ -514,6 +517,61 @@ public class SaleService {
         Sale managedSale = saveSale(sale);
         return managedSale;
     }
+
+    private void updateCustomerLoyaltyEntry(Sale sale) {
+        // Remove existing
+        try {
+            CustomerLoyaltyAccountingEntry customerLoyaltyEntry = findSaleCustomerLoyaltyEntry(sale);
+            Optional.ofNullable(customerLoyaltyEntry)
+                    .ifPresent(this::removeCustomerLoyaltyAccountingEntry);
+        } catch (IllegalStateException e) {
+            throw new EJBException("Error while fetching customer loyalty entry for sale #"+sale.getId());
+        }
+
+        // Create new one
+        List<ItemVariantSale> itemSales = findItemSales(sale);
+        createSaleCustomerLoyaltyAccountingEntry(sale, itemSales);
+    }
+
+    private void createSaleCustomerLoyaltyAccountingEntry(Sale sale, List<ItemVariantSale> itemSales) {
+        // Check itemSales included
+        itemSales = itemSales.stream()
+                .map(item -> {
+                    if (item.getIncludeCustomerLoyalty() != null) {
+                        return item;
+                    }
+                    boolean shouldIncludeCustomerLoyalty = AccountingUtils.shouldIncludeCustomerLoyalty(item);
+                    item.setIncludeCustomerLoyalty(shouldIncludeCustomerLoyalty);
+                    return saveItemSale(item);
+                })
+                .collect(Collectors.toList());
+        // Create entry
+        CustomerLoyaltyAccountingEntry accountingEntry = AccountingUtils.calcCustomerLoyalty(sale, itemSales);
+        Optional.ofNullable(accountingEntry)
+                .ifPresent(customerService::saveCustomerLoyaltyAccountingEntry);
+    }
+
+    @CheckForNull
+    private CustomerLoyaltyAccountingEntry findSaleCustomerLoyaltyEntry(Sale sale) throws IllegalStateException {
+        CustomerLoyaltyAccountingEntrySearch accountingEntrySearch = new CustomerLoyaltyAccountingEntrySearch();
+        Company company = sale.getCompany();
+        accountingEntrySearch.setCompany(company);
+        accountingEntrySearch.setSale(sale);
+        Pagination pagination = new Pagination(0, 1, null);
+        List<CustomerLoyaltyAccountingEntry> customerLoyaltyAccountingEntries = customerService.findCustomerLoyaltyAccountingEntries(accountingEntrySearch, pagination);
+        if (pagination.getAllResultCount() > 1L) {
+            throw new IllegalStateException("Multiple customer loyality entries for sale #" + sale.getId());
+        }
+        return customerLoyaltyAccountingEntries
+                .stream()
+                .findFirst()
+                .orElse(null);
+    }
+
+    private void removeCustomerLoyaltyAccountingEntry(CustomerLoyaltyAccountingEntry customerLoyaltyAccountingEntry) {
+        customerService.removeCustomerLoyaltyAccountingEntry(customerLoyaltyAccountingEntry);
+    }
+
 
     public BigDecimal getSaleTotalPayed(Sale sale) {
         AccountingTransaction accountingTransaction = sale.getAccountingTransaction();

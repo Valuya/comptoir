@@ -2,10 +2,12 @@ package be.valuya.comptoir.model.company;
 
 import be.valuya.comptoir.model.lang.LocaleText;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Objects;
 
 /**
@@ -26,6 +28,9 @@ public class Company implements Serializable {
     @NotNull
     @Nonnull
     private Country country;
+    @CheckForNull
+    @Column(name="CUSTOMER_LOYALTY_RATE")
+    private BigDecimal customerLoyaltyRate;
 
     public Company() {
     }
@@ -61,6 +66,15 @@ public class Company implements Serializable {
 
     public void setCountry(@Nonnull Country country) {
         this.country = country;
+    }
+
+    @CheckForNull
+    public BigDecimal getCustomerLoyaltyRate() {
+        return customerLoyaltyRate;
+    }
+
+    public void setCustomerLoyaltyRate(BigDecimal customerLayaltyRate) {
+        this.customerLoyaltyRate = customerLayaltyRate;
     }
 
     @Override

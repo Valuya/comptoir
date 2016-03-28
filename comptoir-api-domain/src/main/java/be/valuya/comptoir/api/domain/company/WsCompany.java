@@ -1,11 +1,13 @@
 package be.valuya.comptoir.api.domain.company;
 
-import be.valuya.comptoir.model.common.WithId;
 import be.valuya.comptoir.api.domain.lang.WsLocaleText;
-import java.util.List;
+import be.valuya.comptoir.model.common.WithId;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.math.BigDecimal;
+import java.util.List;
 
 /**
  *
@@ -19,6 +21,7 @@ public class WsCompany implements WithId {
     private List<WsLocaleText> name;
     private List<WsLocaleText> description;
     private WsCountryRef countryRef;
+    private BigDecimal customerLoyaltyRate;
 
     @Override
     public Long getId() {
@@ -54,4 +57,11 @@ public class WsCompany implements WithId {
         this.name = name;
     }
 
+    public BigDecimal getCustomerLoyaltyRate() {
+        return customerLoyaltyRate;
+    }
+
+    public void setCustomerLoyaltyRate(BigDecimal customerLoyaltyRate) {
+        this.customerLoyaltyRate = customerLoyaltyRate;
+    }
 }

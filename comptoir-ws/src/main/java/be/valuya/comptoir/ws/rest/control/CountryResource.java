@@ -5,20 +5,15 @@ import be.valuya.comptoir.model.company.Country;
 import be.valuya.comptoir.service.CountryService;
 import be.valuya.comptoir.ws.convert.company.ToWsCountryConverter;
 
-import java.math.BigDecimal;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @Path("/country")
@@ -38,6 +33,16 @@ public class CountryResource {
         Country country = countryService.getCountryByCode(code);
         WsCountry wsCountry = toWsCountryConverter.convert(country);
         return wsCountry;
+    }
+
+    @Path("/search")
+    @POST
+    public List<WsCountry> findContries() {
+        List<Country> allCountries = countryService.findAllCountries();
+        List<WsCountry> wsCountries = allCountries.stream()
+                .map(toWsCountryConverter::convert)
+                .collect(Collectors.toList());
+        return wsCountries;
     }
 
 }

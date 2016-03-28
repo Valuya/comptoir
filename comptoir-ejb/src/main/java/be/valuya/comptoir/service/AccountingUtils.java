@@ -1,13 +1,20 @@
 package be.valuya.comptoir.service;
 
+import be.valuya.comptoir.model.accounting.CustomerLoyaltyAccountingEntry;
 import be.valuya.comptoir.model.cash.Balance;
 import be.valuya.comptoir.model.cash.MoneyPile;
 import be.valuya.comptoir.model.commercial.ItemVariantSale;
 import be.valuya.comptoir.model.commercial.Price;
 import be.valuya.comptoir.model.commercial.Sale;
 import be.valuya.comptoir.model.commercial.SalePrice;
+import be.valuya.comptoir.model.company.Company;
+import be.valuya.comptoir.model.thirdparty.Customer;
+
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -124,5 +131,64 @@ public class AccountingUtils {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         balance.setBalance(balanceValue);
         return balance;
+    }
+
+    @CheckForNull
+    public static CustomerLoyaltyAccountingEntry calcCustomerLoyalty(@Nonnull  Sale sale, @Nonnull List<ItemVariantSale> itemSales) {
+        Customer customer = sale.getCustomer();
+        if (customer == null) {
+            return null;
+        }
+
+        BigDecimal customerLoyaltyAmount = itemSales.stream()
+                .map(AccountingUtils::calcItemVariantSaleCustomerLoyaltyAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        if (customerLoyaltyAmount.compareTo(BigDecimal.ZERO) <= 0) {
+            return null;
+        }
+
+        ZonedDateTime dateTime = sale.getDateTime();
+
+        CustomerLoyaltyAccountingEntry accountingEntry = new CustomerLoyaltyAccountingEntry();
+        accountingEntry.setCustomer(customer);
+        accountingEntry.setAmount(customerLoyaltyAmount);
+        accountingEntry.setDateTime(dateTime);
+        accountingEntry.setSale(sale);
+        return accountingEntry;
+    }
+
+    public static boolean shouldIncludeCustomerLoyalty(ItemVariantSale itemVariantSale) {
+        Price price = itemVariantSale.getPrice();
+        if (price == null) {
+            return false;
+        }
+        BigDecimal discountRatio = Optional.ofNullable(price.getDiscountRatio())
+                .orElse(BigDecimal.ZERO);
+        // Not included if there is a discount
+        if (discountRatio.compareTo(BigDecimal.ZERO) > 0) {
+            return false;
+        }
+        return true;
+    }
+    public static BigDecimal calcItemVariantSaleCustomerLoyaltyAmount(ItemVariantSale itemVariantSale) {
+        Sale sale = itemVariantSale.getSale();
+        Company company = sale.getCompany();
+        BigDecimal customerLoyaltyRate = company.getCustomerLoyaltyRate();
+        if (customerLoyaltyRate == null) {
+            return BigDecimal.ZERO;
+        }
+
+        BigDecimal quantity = itemVariantSale.getQuantity();
+        Price price = itemVariantSale.getPrice();
+        BigDecimal vatExclusive = price.getVatExclusive();
+        Boolean customerLoyalty = itemVariantSale.getIncludeCustomerLoyalty();
+
+        if (!customerLoyalty) {
+            return BigDecimal.ZERO;
+        }
+
+        BigDecimal totalVatExclusive = quantity.multiply(vatExclusive);
+        BigDecimal totalLoyaltyAmount = totalVatExclusive.multiply(customerLoyaltyRate);
+        return totalLoyaltyAmount;
     }
 }

@@ -1,13 +1,13 @@
 package be.valuya.comptoir.ws.convert.commercial;
 
+import be.valuya.comptoir.api.domain.commercial.WsItemVariantRef;
 import be.valuya.comptoir.api.domain.commercial.WsItemVariantSale;
 import be.valuya.comptoir.api.domain.commercial.WsItemVariantSaleRef;
-import be.valuya.comptoir.api.domain.commercial.WsItemVariantRef;
 import be.valuya.comptoir.api.domain.commercial.WsSaleRef;
 import be.valuya.comptoir.api.domain.lang.WsLocaleText;
 import be.valuya.comptoir.api.domain.stock.WsStockRef;
-import be.valuya.comptoir.model.commercial.ItemVariantSale;
 import be.valuya.comptoir.model.commercial.ItemVariant;
+import be.valuya.comptoir.model.commercial.ItemVariantSale;
 import be.valuya.comptoir.model.commercial.Price;
 import be.valuya.comptoir.model.commercial.Sale;
 import be.valuya.comptoir.model.lang.LocaleText;
@@ -15,12 +15,13 @@ import be.valuya.comptoir.model.stock.Stock;
 import be.valuya.comptoir.service.SaleService;
 import be.valuya.comptoir.ws.convert.stock.FromWsStockConverter;
 import be.valuya.comptoir.ws.convert.text.FromWsLocaleTextConverter;
-import java.math.BigDecimal;
-import java.time.ZonedDateTime;
-import java.util.List;
+
 import javax.ejb.EJB;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.math.BigDecimal;
+import java.time.ZonedDateTime;
+import java.util.List;
 
 /**
  *
@@ -74,6 +75,7 @@ public class FromWsItemVariantSaleConverter {
         BigDecimal total = wsItemSale.getTotal();
 
         BigDecimal discountRatio = wsItemSale.getDiscountRatio();
+        Boolean includeCustomerLoyalty = wsItemSale.getIncludeCustomerLoyalty();
 
         Price price = new Price();
         price.setVatExclusive(vatExclusive);
@@ -89,6 +91,7 @@ public class FromWsItemVariantSaleConverter {
         itemSale.setPrice(price);
         itemSale.setTotal(total);
         itemSale.setStock(stock);
+        itemSale.setIncludeCustomerLoyalty(includeCustomerLoyalty);
 
         return itemSale;
     }

@@ -40,6 +40,8 @@ public class WsItemVariantSale implements WithId {
     private BigDecimal discountRatio;
     @CheckForNull
     private WsStockRef stockRef;
+    @CheckForNull
+    private Boolean includeCustomerLoyalty;
 
     @Override
     public Long getId() {
@@ -129,5 +131,14 @@ public class WsItemVariantSale implements WithId {
 
     public void setStockRef(WsStockRef stockRef) {
         this.stockRef = stockRef;
+    }
+
+    @CheckForNull
+    public Boolean getIncludeCustomerLoyalty() {
+        return includeCustomerLoyalty;
+    }
+
+    public void setIncludeCustomerLoyalty(Boolean includeCustomerLoyalty) {
+        this.includeCustomerLoyalty = includeCustomerLoyalty;
     }
 }

@@ -8,9 +8,11 @@ import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.company.Country;
 import be.valuya.comptoir.model.lang.LocaleText;
 import be.valuya.comptoir.ws.convert.text.ToWsLocaleTextConverter;
-import java.util.List;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.math.BigDecimal;
+import java.util.List;
 
 /**
  *
@@ -38,11 +40,14 @@ public class ToWsCompanyConverter {
         Country country = company.getCountry();
         WsCountryRef wsCountryRef = toWsCountryConverter.reference(country);
 
+        BigDecimal customerLoyaltyRate = company.getCustomerLoyaltyRate();
+
         WsCompany wsCompany = new WsCompany();
         wsCompany.setId(id);
         wsCompany.setDescription(wsDescription);
         wsCompany.setName(wsName);
         wsCompany.setCountryRef(wsCountryRef);
+        wsCompany.setCustomerLoyaltyRate(customerLoyaltyRate);
 
         return wsCompany;
     }

@@ -1,6 +1,7 @@
 package be.valuya.comptoir.model.stock;
 
 import be.valuya.comptoir.model.commercial.ItemVariant;
+import be.valuya.comptoir.model.commercial.ItemVariantSale;
 import be.valuya.comptoir.model.commercial.Sale;
 
 import java.io.Serializable;
@@ -44,9 +45,9 @@ public class ItemStock implements Serializable {
     @Column
     @Enumerated(EnumType.STRING)
     private StockChangeType stockChangeType;
-    @JoinColumn(name="stock_change_sale_id")
+    @JoinColumn(name="stock_change_variant_sale_id")
     @ManyToOne
-    private Sale stockChangeSale;
+    private ItemVariantSale stockChangeVariantSale;
 
 
     public Long getId() {
@@ -122,12 +123,12 @@ public class ItemStock implements Serializable {
         this.stockChangeType = stockChangeType;
     }
 
-    public Sale getStockChangeSale() {
-        return stockChangeSale;
+    public ItemVariantSale getStockChangeVariantSale() {
+        return stockChangeVariantSale;
     }
 
-    public void setStockChangeSale(Sale stockChangeSale) {
-        this.stockChangeSale = stockChangeSale;
+    public void setStockChangeVariantSale(ItemVariantSale stockChangeVariantSale) {
+        this.stockChangeVariantSale = stockChangeVariantSale;
     }
 
     @Override

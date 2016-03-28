@@ -6,18 +6,18 @@
 package be.valuya.comptoir.ws.convert.stock;
 
 import be.valuya.comptoir.api.domain.commercial.WsItemVariantRef;
-import be.valuya.comptoir.api.domain.commercial.WsSaleRef;
+import be.valuya.comptoir.api.domain.commercial.WsItemVariantSaleRef;
 import be.valuya.comptoir.api.domain.stock.WsItemStock;
 import be.valuya.comptoir.api.domain.stock.WsItemStockRef;
 import be.valuya.comptoir.api.domain.stock.WsStockRef;
 import be.valuya.comptoir.model.commercial.ItemVariant;
-import be.valuya.comptoir.model.commercial.Sale;
+import be.valuya.comptoir.model.commercial.ItemVariantSale;
 import be.valuya.comptoir.model.stock.ItemStock;
 import be.valuya.comptoir.model.stock.Stock;
 import be.valuya.comptoir.model.stock.StockChangeType;
 import be.valuya.comptoir.service.StockService;
 import be.valuya.comptoir.ws.convert.commercial.FromWsItemVariantConverter;
-import be.valuya.comptoir.ws.convert.commercial.FromWsSaleConverter;
+import be.valuya.comptoir.ws.convert.commercial.FromWsItemVariantSaleConverter;
 
 import javax.annotation.Nonnull;
 import javax.ejb.EJB;
@@ -39,7 +39,7 @@ public class FromWsItemVariantStockConverter {
     @Inject
     private FromWsItemVariantConverter fromWsItemVariantConverter;
     @Inject
-    private FromWsSaleConverter fromWsSaleConverter;
+    private FromWsItemVariantSaleConverter fromWsItemVariantSaleConverter;
 
     public ItemStock convert(WsItemStock wsItemStock) {
         if (wsItemStock == null) {
@@ -60,7 +60,7 @@ public class FromWsItemVariantStockConverter {
         WsStockRef stockRef = wsItemStock.getStockRef();
         WsItemStockRef previousItemStockRef = wsItemStock.getPreviousItemStockRef();
         StockChangeType stockChangeType = wsItemStock.getStockChangeType();
-        WsSaleRef stockChangeSaleRef = wsItemStock.getStockChangeSaleRef();
+        WsItemVariantSaleRef stockChangeSaleRef = wsItemStock.getStockChangeVariantSaleRef();
 
         ItemVariant itemVariant = fromWsItemVariantConverter.find(itemVariantRef);
         Stock stock = fromWsStockConverter.find(stockRef);
@@ -79,8 +79,8 @@ public class FromWsItemVariantStockConverter {
             itemStock.setPreviousItemStock(previousItemStock);
         }
         if (stockChangeSaleRef != null) {
-            Sale stockChangeSale = fromWsSaleConverter.find(stockChangeSaleRef);
-            itemStock.setStockChangeSale(stockChangeSale);
+            ItemVariantSale stockChangeSale = fromWsItemVariantSaleConverter.find(stockChangeSaleRef);
+            itemStock.setStockChangeVariantSale(stockChangeSale);
         }
         return itemStock;
     }
