@@ -1,6 +1,7 @@
 package be.valuya.comptoir.model.search;
 
 import be.valuya.comptoir.model.commercial.ItemVariant;
+import be.valuya.comptoir.model.commercial.ItemVariantSale;
 import be.valuya.comptoir.model.commercial.Sale;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.stock.ItemStock;
@@ -26,6 +27,8 @@ public class ItemStockSearch {
     private Company company;
     @CheckForNull
     private ItemVariant itemVariant;
+    @CheckForNull
+    private ItemVariantSale itemVariantSale;
     @CheckForNull
     private Stock stock;
     @CheckForNull
@@ -99,5 +102,13 @@ public class ItemStockSearch {
 
     public void setPreviousItemStock(ItemStock previousItemStock) {
         this.previousItemStock = previousItemStock;
+    }
+
+    public ItemVariantSale getItemVariantSale() {
+        return itemVariantSale;
+    }
+
+    public void setItemVariantSale(ItemVariantSale itemVariantSale) {
+        this.itemVariantSale = itemVariantSale;
     }
 }

@@ -24,6 +24,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Tuple;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.*;
+import javax.swing.text.html.Option;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -76,25 +77,6 @@ public class SaleService {
         List<ItemVariantSale> itemSales = findItemSales(sale);
 
         return AccountingUtils.calcSale(sale, itemSales);
-    }
-
-    public void createSaleCustomerLoyaltyAccountingEntry(Sale sale, List<ItemVariantSale> itemSales) {
-        // Check if customer loyalty is needed
-        itemSales = itemSales.stream()
-                .map(item->{
-                    if (item.getIncludeCustomerLoyalty() == null)  {
-                        boolean shouldIncludeCustomerLoyalty = AccountingUtils.shouldIncludeCustomerLoyalty(item);
-                        item.setIncludeCustomerLoyalty(shouldIncludeCustomerLoyalty);
-                        return saveItemSale(item);
-                    }
-                    return item;
-                })
-                .collect(Collectors.toList());
-        // Create entries
-        CustomerLoyaltyAccountingEntry accountingEntry = AccountingUtils.calcCustomerLoyalty(sale, itemSales);
-        if (accountingEntry != null) {
-            customerService.saveCustomerLoyaltyAccountingEntry(accountingEntry);
-        }
     }
 
     public void createSaleAccountingEntries(Sale sale, List<ItemVariantSale> itemSales) {
@@ -330,6 +312,7 @@ public class SaleService {
         }
 
         calcSale(sale);
+        updateCustomerLoyaltyEntry(sale);
 
         Sale managedSale = entityManager.merge(sale);
         managedSale = calcSale(managedSale);
@@ -342,9 +325,8 @@ public class SaleService {
             throw new IllegalArgumentException("The sale is closed");
         }
         List<ItemVariantSale> itemSaleList = findItemSales(sale);
-        for (ItemVariantSale itemSale : itemSaleList) {
-            removeItemSale(itemSale);
-        }
+        itemSaleList.forEach(this::removeItemSale);
+
         AccountingTransaction accountingTransaction = sale.getAccountingTransaction();
         Company company = sale.getCompany();
         AccountingEntrySearch accountingEntrySearch = new AccountingEntrySearch();
@@ -504,10 +486,6 @@ public class SaleService {
             ItemStock itemStock = stockService.adaptStockFromItemSale(zonedDateTime, managedItemSale, StockChangeType.SALE, null);
         }
 
-
-        // Add customer loyalty entry
-        createSaleCustomerLoyaltyAccountingEntry(sale, itemSales);
-
         // TODO: create accounting entry
 
         return managedSale;
@@ -522,31 +500,14 @@ public class SaleService {
                 stockService.adaptStockForRemovedItemSale(variantSale);
             } catch (IllegalStateException e) {
                 switch (e.getErrorCode()) {
-                    case "NonUniqueStock":
-                        throw new EJBException(e);
-                    case "MissingStock":
+                    case StockService.ERROR_MISSING_STOCK:
                         // Discard sales which do not have stocks (yet)
                         Logger logger = Logger.getLogger(getClass().getName());
                         logger.log(Level.WARNING, "Missing stock entry for an itemvariant sale", e);
                         break;
-                }
-            }
-        }
-
-        // Remove customer loyalty entry
-        Customer customer = sale.getCustomer();
-        if (customer != null) {
-            try {
-                removeSaleCustomerLoyaltyAccountingEntry(sale, customer);
-            } catch (IllegalStateException e) {
-                switch (e.getErrorCode()) {
-                    case "NonUniqueLoyaltyEntry":
+                    default: {
                         throw new EJBException(e);
-                    case "MissingLoyaltyEntry":
-                        // Discard sales which do not have loyalty enties (yet)
-                        Logger logger = Logger.getLogger(getClass().getName());
-                        logger.log(Level.WARNING, "Missing loyalty entry for a sale", e);
-                        break;
+                    }
                 }
             }
         }
@@ -557,23 +518,60 @@ public class SaleService {
         return managedSale;
     }
 
-    private void removeSaleCustomerLoyaltyAccountingEntry(Sale sale, Customer customer) throws IllegalStateException {
+    private void updateCustomerLoyaltyEntry(Sale sale) {
+        // Remove existing
+        try {
+            CustomerLoyaltyAccountingEntry customerLoyaltyEntry = findSaleCustomerLoyaltyEntry(sale);
+            Optional.ofNullable(customerLoyaltyEntry)
+                    .ifPresent(this::removeCustomerLoyaltyAccountingEntry);
+        } catch (IllegalStateException e) {
+            throw new EJBException("Error while fetching customer loyalty entry for sale #"+sale.getId());
+        }
+
+        // Create new one
+        List<ItemVariantSale> itemSales = findItemSales(sale);
+        createSaleCustomerLoyaltyAccountingEntry(sale, itemSales);
+    }
+
+    private void createSaleCustomerLoyaltyAccountingEntry(Sale sale, List<ItemVariantSale> itemSales) {
+        // Check itemSales included
+        itemSales = itemSales.stream()
+                .map(item -> {
+                    if (item.getIncludeCustomerLoyalty() != null) {
+                        return item;
+                    }
+                    boolean shouldIncludeCustomerLoyalty = AccountingUtils.shouldIncludeCustomerLoyalty(item);
+                    item.setIncludeCustomerLoyalty(shouldIncludeCustomerLoyalty);
+                    return saveItemSale(item);
+                })
+                .collect(Collectors.toList());
+        // Create entry
+        CustomerLoyaltyAccountingEntry accountingEntry = AccountingUtils.calcCustomerLoyalty(sale, itemSales);
+        Optional.ofNullable(accountingEntry)
+                .ifPresent(customerService::saveCustomerLoyaltyAccountingEntry);
+    }
+
+    @CheckForNull
+    private CustomerLoyaltyAccountingEntry findSaleCustomerLoyaltyEntry(Sale sale) throws IllegalStateException {
         CustomerLoyaltyAccountingEntrySearch accountingEntrySearch = new CustomerLoyaltyAccountingEntrySearch();
         Company company = sale.getCompany();
         accountingEntrySearch.setCompany(company);
         accountingEntrySearch.setSale(sale);
-        accountingEntrySearch.setCustomer(customer);
-        Pagination pagination = new Pagination(0, 2, null);
-        List<CustomerLoyaltyAccountingEntry> loyaltyAccountingEntries = customerService.findCustomerLoyaltyAccountingEntries(accountingEntrySearch, pagination);
-        if (loyaltyAccountingEntries.size() > 1) {
-            throw new IllegalStateException("Multiple customer loyalty accounting entries for sale #"+sale.getId(), "NonUniqueLoyaltyEntry");
+        Pagination pagination = new Pagination(0, 1, null);
+        List<CustomerLoyaltyAccountingEntry> customerLoyaltyAccountingEntries = customerService.findCustomerLoyaltyAccountingEntries(accountingEntrySearch, pagination);
+        if (pagination.getAllResultCount() > 1L) {
+            throw new IllegalStateException("Multiple customer loyality entries for sale #" + sale.getId());
         }
-        if (loyaltyAccountingEntries.isEmpty()) {
-            throw new IllegalStateException("No customer loyalty accounting entry for sale #"+sale.getId(), "MissingLoyaltyEntry");
-        }
-        CustomerLoyaltyAccountingEntry customerLoyaltyAccountingEntry = loyaltyAccountingEntries.get(0);
+        return customerLoyaltyAccountingEntries
+                .stream()
+                .findFirst()
+                .orElse(null);
+    }
+
+    private void removeCustomerLoyaltyAccountingEntry(CustomerLoyaltyAccountingEntry customerLoyaltyAccountingEntry) {
         customerService.removeCustomerLoyaltyAccountingEntry(customerLoyaltyAccountingEntry);
     }
+
 
     public BigDecimal getSaleTotalPayed(Sale sale) {
         AccountingTransaction accountingTransaction = sale.getAccountingTransaction();

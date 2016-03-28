@@ -1,23 +1,22 @@
 package be.valuya.comptoir.api.domain.stock;
 
 import be.valuya.comptoir.api.domain.commercial.WsItemVariantRef;
-import be.valuya.comptoir.api.domain.commercial.WsSaleRef;
-import be.valuya.comptoir.model.common.WithId;
+import be.valuya.comptoir.api.domain.commercial.WsItemVariantSaleRef;
 import be.valuya.comptoir.api.utils.ZonedDateTimeXmlAdapter;
+import be.valuya.comptoir.model.common.WithId;
 import be.valuya.comptoir.model.stock.StockChangeType;
 
-import java.io.Serializable;
-import java.math.BigDecimal;
-import java.time.ZonedDateTime;
-import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.time.ZonedDateTime;
+import java.util.Objects;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @XmlRootElement(name = "ItemStock")
@@ -35,7 +34,7 @@ public class WsItemStock implements Serializable, WithId {
     private String comment;
     private WsItemStockRef previousItemStockRef;
     private StockChangeType stockChangeType;
-    private WsSaleRef stockChangeSaleRef;
+    private WsItemVariantSaleRef stockChangeVariantSaleRef;
 
     @Override
     public Long getId() {
@@ -104,12 +103,12 @@ public class WsItemStock implements Serializable, WithId {
         this.previousItemStockRef = previousItemStockRef;
     }
 
-    public WsSaleRef getStockChangeSaleRef() {
-        return stockChangeSaleRef;
+    public WsItemVariantSaleRef getStockChangeVariantSaleRef() {
+        return stockChangeVariantSaleRef;
     }
 
-    public void setStockChangeSaleRef(WsSaleRef stockChangeSaleRef) {
-        this.stockChangeSaleRef = stockChangeSaleRef;
+    public void setStockChangeVariantSaleRef(WsItemVariantSaleRef stockChangeVariantSaleRef) {
+        this.stockChangeVariantSaleRef = stockChangeVariantSaleRef;
     }
 
     public StockChangeType getStockChangeType() {

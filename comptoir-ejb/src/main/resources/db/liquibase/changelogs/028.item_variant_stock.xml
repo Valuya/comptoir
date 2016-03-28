@@ -1,11 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <databaseChangeLog
-    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
 
-   <changeSet id="0-rename table" author="cghislai">
-       <renameTable oldTableName="item_stock" newTableName="itemvariant_stock"/>
-   </changeSet>
+    <changeSet id="0-rename table" author="cghislai">
+        <renameTable oldTableName="item_stock" newTableName="itemvariant_stock"/>
+    </changeSet>
+
+    <changeSet id="1a-drop previous references" author="cghislai">
+        <update tableName="itemvariant_stock">
+            <column name="previous_item_stock_id"
+                    value="NULL"/>
+        </update>
+    </changeSet>
+    <changeSet id="1b-drop data" author="cghislai">
+        <delete tableName="itemvariant_stock"/>
+    </changeSet>
+
+    <changeSet id="2-drop-sale-constraint" author="cghislai">
+        <dropForeignKeyConstraint baseTableName="itemvariant_stock"
+                                  constraintName="FK_item_stock_stock_change_sale_id"/>
+    </changeSet>
+
+    <changeSet id="3-renbame-column" author="cghislai">
+        <renameColumn tableName="itemvariant_stock" oldColumnName="stock_change_sale_id"
+                      newColumnName="stock_change_variant_sale_id"
+                      columnDataType="BIGINT(20)"/>
+    </changeSet>
+
+    <changeSet id="4-add variantSale fk" author="cghislai">
+        <addForeignKeyConstraint baseTableName="itemvariant_stock"
+                                 baseColumnNames="stock_change_variant_sale_id"
+                                 constraintName="FK_variant_stock_variant_sale_ID"
+                                 referencedTableName="itemvariant_sale"
+                                 referencedColumnNames="ID"/>
+    </changeSet>
 
 </databaseChangeLog>
