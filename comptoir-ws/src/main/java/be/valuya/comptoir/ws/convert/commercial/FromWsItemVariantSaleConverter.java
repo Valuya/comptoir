@@ -75,7 +75,7 @@ public class FromWsItemVariantSaleConverter {
         BigDecimal total = wsItemSale.getTotal();
 
         BigDecimal discountRatio = wsItemSale.getDiscountRatio();
-        Boolean forceCustomerLoyalty = wsItemSale.getForceCustomerLoyalty();
+        Boolean includeCustomerLoyalty = wsItemSale.getIncludeCustomerLoyalty();
 
         Price price = new Price();
         price.setVatExclusive(vatExclusive);
@@ -91,7 +91,7 @@ public class FromWsItemVariantSaleConverter {
         itemSale.setPrice(price);
         itemSale.setTotal(total);
         itemSale.setStock(stock);
-        itemSale.setForceCustomerLoyalty(forceCustomerLoyalty);
+        itemSale.setIncludeCustomerLoyalty(includeCustomerLoyalty);
 
         return itemSale;
     }

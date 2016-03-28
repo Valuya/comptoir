@@ -45,9 +45,9 @@
         </addColumn>
     </changeSet>
 
-    <changeSet id="4-itemvariant_sale_force_loyalty" author="cghislai">
+    <changeSet id="4-itemvariant_sale_customer_loyalty" author="cghislai">
         <addColumn tableName="itemvariant_sale">
-            <column name="FORCE_CUSTOMER_LOYALTY" type="BIT"/>
+            <column name="CUSTOMER_LOYALTY" type="BIT" />
         </addColumn>
     </changeSet>
 

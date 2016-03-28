@@ -41,7 +41,7 @@ public class WsItemVariantSale implements WithId {
     @CheckForNull
     private WsStockRef stockRef;
     @CheckForNull
-    private Boolean forceCustomerLoyalty;
+    private Boolean includeCustomerLoyalty;
 
     @Override
     public Long getId() {
@@ -134,11 +134,11 @@ public class WsItemVariantSale implements WithId {
     }
 
     @CheckForNull
-    public Boolean getForceCustomerLoyalty() {
-        return forceCustomerLoyalty;
+    public Boolean getIncludeCustomerLoyalty() {
+        return includeCustomerLoyalty;
     }
 
-    public void setForceCustomerLoyalty(Boolean forceCustomerLoyalty) {
-        this.forceCustomerLoyalty = forceCustomerLoyalty;
+    public void setIncludeCustomerLoyalty(Boolean includeCustomerLoyalty) {
+        this.includeCustomerLoyalty = includeCustomerLoyalty;
     }
 }

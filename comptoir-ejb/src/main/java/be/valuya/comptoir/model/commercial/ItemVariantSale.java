@@ -4,8 +4,6 @@ import be.valuya.comptoir.model.accounting.AccountingEntry;
 import be.valuya.comptoir.model.lang.LocaleText;
 import be.valuya.comptoir.model.stock.Stock;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -40,11 +38,9 @@ public class ItemVariantSale implements Serializable {
     private AccountingEntry accountingEntry;
     @ManyToOne
     @NotNull
-    @Nonnull
     private Stock stock;
-    @Column(name = "FORCE_CUSTOMER_LOYALTY")
-    @CheckForNull
-    private Boolean forceCustomerLoyalty;
+    @Column(name = "CUSTOMER_LOYALTY")
+    private Boolean includeCustomerLoyalty;
 
     public Long getId() {
         return id;
@@ -126,13 +122,12 @@ public class ItemVariantSale implements Serializable {
         this.stock = stock;
     }
 
-    @CheckForNull
-    public Boolean getForceCustomerLoyalty() {
-        return forceCustomerLoyalty;
+    public Boolean getIncludeCustomerLoyalty() {
+        return includeCustomerLoyalty;
     }
 
-    public void setForceCustomerLoyalty(Boolean forceCustomerLoyalty) {
-        this.forceCustomerLoyalty = forceCustomerLoyalty;
+    public void setIncludeCustomerLoyalty(Boolean customerLoyalty) {
+        this.includeCustomerLoyalty = customerLoyalty;
     }
 
     @Override

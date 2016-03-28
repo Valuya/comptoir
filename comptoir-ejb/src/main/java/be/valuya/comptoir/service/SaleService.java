@@ -79,6 +79,18 @@ public class SaleService {
     }
 
     public void createSaleCustomerLoyaltyAccountingEntry(Sale sale, List<ItemVariantSale> itemSales) {
+        // Check if customer loyalty is needed
+        itemSales = itemSales.stream()
+                .map(item->{
+                    if (item.getIncludeCustomerLoyalty() == null)  {
+                        boolean shouldIncludeCustomerLoyalty = AccountingUtils.shouldIncludeCustomerLoyalty(item);
+                        item.setIncludeCustomerLoyalty(shouldIncludeCustomerLoyalty);
+                        return saveItemSale(item);
+                    }
+                    return item;
+                })
+                .collect(Collectors.toList());
+        // Create entries
         CustomerLoyaltyAccountingEntry accountingEntry = AccountingUtils.calcCustomerLoyalty(sale, itemSales);
         if (accountingEntry != null) {
             customerService.saveCustomerLoyaltyAccountingEntry(accountingEntry);
@@ -491,6 +503,7 @@ public class SaleService {
             ZonedDateTime zonedDateTime = ZonedDateTime.now();
             ItemStock itemStock = stockService.adaptStockFromItemSale(zonedDateTime, managedItemSale, StockChangeType.SALE, null);
         }
+
 
         // Add customer loyalty entry
         createSaleCustomerLoyaltyAccountingEntry(sale, itemSales);

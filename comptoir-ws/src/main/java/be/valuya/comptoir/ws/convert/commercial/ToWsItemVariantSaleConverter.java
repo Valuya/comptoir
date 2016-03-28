@@ -68,7 +68,7 @@ public class ToWsItemVariantSaleConverter {
         LocaleText comment = itemSale.getComment();
         List<WsLocaleText> wsComment = fromWsLocaleTextConverter.convert(comment);
 
-        Boolean forceCustomerLoyalty = itemSale.getForceCustomerLoyalty();
+        Boolean includeCustomerLyalty = itemSale.getIncludeCustomerLoyalty();
 
         WsItemVariantSale wsItemSale = new WsItemVariantSale();
         wsItemSale.setId(id);
@@ -82,7 +82,7 @@ public class ToWsItemVariantSaleConverter {
         wsItemSale.setDiscountRatio(discountRatio);
         wsItemSale.setTotal(total);
         wsItemSale.setStockRef(stockRef);
-        wsItemSale.setForceCustomerLoyalty(forceCustomerLoyalty);
+        wsItemSale.setIncludeCustomerLoyalty(includeCustomerLyalty);
         return wsItemSale;
     }
 

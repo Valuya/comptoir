@@ -157,6 +157,19 @@ public class AccountingUtils {
         return accountingEntry;
     }
 
+    public static boolean shouldIncludeCustomerLoyalty(ItemVariantSale itemVariantSale) {
+        Price price = itemVariantSale.getPrice();
+        if (price == null) {
+            return false;
+        }
+        BigDecimal discountRatio = Optional.ofNullable(price.getDiscountRatio())
+                .orElse(BigDecimal.ZERO);
+        // Not included if there is a discount
+        if (discountRatio.compareTo(BigDecimal.ZERO) > 0) {
+            return false;
+        }
+        return true;
+    }
     public static BigDecimal calcItemVariantSaleCustomerLoyaltyAmount(ItemVariantSale itemVariantSale) {
         Sale sale = itemVariantSale.getSale();
         Company company = sale.getCompany();
@@ -167,19 +180,11 @@ public class AccountingUtils {
 
         BigDecimal quantity = itemVariantSale.getQuantity();
         Price price = itemVariantSale.getPrice();
-        BigDecimal discountRatio = price.getDiscountRatio();
         BigDecimal vatExclusive = price.getVatExclusive();
-        Boolean forceCustomerLoyalty = itemVariantSale.getForceCustomerLoyalty();
+        Boolean customerLoyalty = itemVariantSale.getIncludeCustomerLoyalty();
 
-        if (forceCustomerLoyalty == null) {
-            // Discard items with discount
-            if (discountRatio != null && discountRatio.compareTo(BigDecimal.ZERO) > 0) {
-                return BigDecimal.ZERO;
-            }
-        } else {
-            if (!forceCustomerLoyalty) {
-                return BigDecimal.ZERO;
-            }
+        if (!customerLoyalty) {
+            return BigDecimal.ZERO;
         }
 
         BigDecimal totalVatExclusive = quantity.multiply(vatExclusive);

@@ -15,26 +15,19 @@ import be.valuya.comptoir.ws.convert.search.FromWsItemVariantSaleSearchConverter
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
 import be.valuya.comptoir.ws.rest.validation.NoId;
 import be.valuya.comptoir.ws.rest.validation.SaleStateChecker;
-import java.util.List;
-import java.util.stream.Collectors;
+
 import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @Path("/itemVariantSale")
@@ -78,6 +71,9 @@ public class ItemVariantSaleResource {
         idChecker.checkId(id, wsItemSale);
 
         ItemVariantSale existingItemSale = saleService.findItemSaleById(id);
+        Sale sale = existingItemSale.getSale();
+        saleStateChecker.checkState(sale, false);
+
         ItemVariantSale updatedItemSale = fromWsItemSaleConverter.patch(existingItemSale, wsItemSale);
 
         ItemVariantSale savedItemSale = saleService.saveItemSale(updatedItemSale);
