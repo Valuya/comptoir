@@ -7,7 +7,6 @@ import be.valuya.comptoir.model.lang.LocaleText;
 import be.valuya.comptoir.model.search.*;
 import be.valuya.comptoir.model.stock.ItemStock;
 import be.valuya.comptoir.model.stock.Stock;
-import be.valuya.comptoir.model.stock.StockChangeType;
 import be.valuya.comptoir.model.thirdparty.Customer;
 import be.valuya.comptoir.util.pagination.ItemVariantSaleColumn;
 import be.valuya.comptoir.util.pagination.Pagination;
@@ -24,7 +23,6 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Tuple;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.*;
-import javax.swing.text.html.Option;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -479,11 +477,15 @@ public class SaleService {
         List<ItemVariantSale> itemSales = findItemSales(managedSale);
 
         // Add stock entries
+        // Add an order position as they will be created at once
+        // and maybe multiple entries for a single variant (multipleSale items)
+        int orderPosition = 0;
         for (ItemVariantSale itemSale : itemSales) {
             ItemVariantSale managedItemSale = entityManager.merge(itemSale);
             managedItemSale.setSale(managedSale);
             ZonedDateTime zonedDateTime = ZonedDateTime.now();
-            ItemStock itemStock = stockService.adaptStockFromItemSale(zonedDateTime, managedItemSale, StockChangeType.SALE, null);
+            ItemStock itemStock = stockService.adaptStockFromItemSale(zonedDateTime, managedItemSale, orderPosition, null);
+            orderPosition++;
         }
 
         // TODO: create accounting entry
@@ -557,9 +559,9 @@ public class SaleService {
         Company company = sale.getCompany();
         accountingEntrySearch.setCompany(company);
         accountingEntrySearch.setSale(sale);
-        Pagination pagination = new Pagination(0, 1, null);
+        Pagination pagination = new Pagination(0, 2, null);
         List<CustomerLoyaltyAccountingEntry> customerLoyaltyAccountingEntries = customerService.findCustomerLoyaltyAccountingEntries(accountingEntrySearch, pagination);
-        if (pagination.getAllResultCount() > 1L) {
+        if (customerLoyaltyAccountingEntries.size() > 1) {
             throw new IllegalStateException("Multiple customer loyality entries for sale #" + sale.getId());
         }
         return customerLoyaltyAccountingEntries

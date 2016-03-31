@@ -6,7 +6,6 @@
 package be.valuya.comptoir.util.pagination;
 
 import be.valuya.comptoir.model.stock.ItemStock;
-import be.valuya.comptoir.model.stock.Stock;
 
 /**
  *
@@ -16,6 +15,7 @@ public enum ItemVariantStockColumn implements Column<ItemStock> {
 
     START_DATE_TIME,
     END_DATE_TIME,
+    ORDER,
     STOCK,
     ITEM_VARIANT,
     QUANTITY,

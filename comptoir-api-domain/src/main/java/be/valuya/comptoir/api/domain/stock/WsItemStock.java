@@ -6,6 +6,7 @@ import be.valuya.comptoir.api.utils.ZonedDateTimeXmlAdapter;
 import be.valuya.comptoir.model.common.WithId;
 import be.valuya.comptoir.model.stock.StockChangeType;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -28,6 +29,8 @@ public class WsItemStock implements Serializable, WithId {
     private ZonedDateTime startDateTime;
     @XmlJavaTypeAdapter(ZonedDateTimeXmlAdapter.class)
     private ZonedDateTime endDateTime;
+    @CheckForNull
+    private Integer orderPosition;
     private WsStockRef stockRef;
     private WsItemVariantRef itemVariantRef;
     private BigDecimal quantity;
@@ -117,6 +120,14 @@ public class WsItemStock implements Serializable, WithId {
 
     public void setStockChangeType(StockChangeType stockChangeType) {
         this.stockChangeType = stockChangeType;
+    }
+
+    public Integer getOrderPosition() {
+        return orderPosition;
+    }
+
+    public void setOrderPosition(Integer orderPosition) {
+        this.orderPosition = orderPosition;
     }
 
     @Override

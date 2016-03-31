@@ -5,14 +5,10 @@
  */
 package be.valuya.comptoir.service;
 
-import be.valuya.comptoir.model.commercial.ItemVariantSale;
 import be.valuya.comptoir.model.stock.ItemStock;
 import be.valuya.comptoir.model.stock.ItemStock_;
-import be.valuya.comptoir.util.pagination.Column;
-import be.valuya.comptoir.util.pagination.ItemVariantSaleColumn;
 import be.valuya.comptoir.util.pagination.ItemVariantStockColumn;
 
-import javax.jms.IllegalStateException;
 import javax.persistence.criteria.From;
 import javax.persistence.criteria.Path;
 
@@ -27,6 +23,8 @@ public class ItemVariantStockColumnPersistenceUtil {
                 return variantStockFrom.get(ItemStock_.startDateTime);
             case END_DATE_TIME:
                 return variantStockFrom.get(ItemStock_.endDateTime);
+            case ORDER:
+                return variantStockFrom.get(ItemStock_.orderPosition);
             case STOCK:
                 return variantStockFrom.get(ItemStock_.stock);
             case ITEM_VARIANT:
