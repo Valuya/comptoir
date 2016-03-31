@@ -30,7 +30,6 @@ public class CustomerLoyaltyAccountingEntry implements Serializable {
     @NotNull
     @Nonnull
     private BigDecimal amount;
-    @Temporal(TemporalType.TIMESTAMP)
     @NotNull
     @Nonnull
     private ZonedDateTime dateTime;

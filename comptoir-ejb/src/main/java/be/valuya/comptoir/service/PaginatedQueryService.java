@@ -3,23 +3,18 @@ package be.valuya.comptoir.service;
 import be.valuya.comptoir.util.pagination.Column;
 import be.valuya.comptoir.util.pagination.Pagination;
 import be.valuya.comptoir.util.pagination.Sort;
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.From;
-import javax.persistence.criteria.Order;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -107,7 +102,16 @@ public class PaginatedQueryService {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Long> query = criteriaBuilder.createQuery(Long.class);
 
-        Expression<Long> countExpression = criteriaBuilder.count(root);
+        // No root in the query prevent it to be validated by Hibernate JPA
+        // Joins are required as predicates as applied
+        // FIXME: probably subqueries root should be added as well
+        Root<? extends T> countRoot = query.from(root.getJavaType());
+        Set<Join<T, ?>> joins = root.getJoins();
+        for (Join join : joins) {
+            countRoot.join(join.getAttribute().getName(), join.getJoinType());
+        }
+
+        Expression<Long> countExpression = criteriaBuilder.count(countRoot);
         query.select(countExpression);
 
         Predicate[] predicateArray = predicates.toArray(new Predicate[0]);

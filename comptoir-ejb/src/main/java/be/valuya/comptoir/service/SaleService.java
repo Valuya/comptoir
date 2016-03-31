@@ -310,10 +310,11 @@ public class SaleService {
         }
 
         calcSale(sale);
-        updateCustomerLoyaltyEntry(sale);
-
         Sale managedSale = entityManager.merge(sale);
+
+        updateCustomerLoyaltyEntry(managedSale);
         managedSale = calcSale(managedSale);
+
 
         return managedSale;
     }
