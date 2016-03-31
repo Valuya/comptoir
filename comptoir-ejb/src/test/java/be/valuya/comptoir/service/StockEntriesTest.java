@@ -15,9 +15,7 @@ import be.valuya.comptoir.model.stock.StockChangeType;
 import be.valuya.comptoir.model.thirdparty.Employee;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.Node;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.Asset;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Assert;
@@ -25,8 +23,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import javax.ejb.EJB;
-import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -44,19 +40,6 @@ public class StockEntriesTest {
                 .deleteClass(DbInitProducer.class)
                 .addAsManifestResource("META-INF/persistence.xml", "persistence.xml")
                 .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
-        System.out.println(javaArchive.toString(true));
-        Node node = javaArchive.get("/META-INF/persistence.xml");
-        Asset asset = node.getAsset();
-        InputStream inputStream = asset.openStream();
-        try {
-            while (inputStream.available() > 0) {
-                int read = inputStream.read();
-                System.out.write(read);
-            }
-        } catch (IOException e) {
-
-
-        }
         return javaArchive;
     }
 
