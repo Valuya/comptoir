@@ -108,20 +108,8 @@
                     <version>8.1.0.Final</version>
                 </dependency>
                 <dependency>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-simple</artifactId>
-                    <version>1.6.4</version>
-                    <scope>test</scope>
-                </dependency>
-                <dependency>
                     <groupId>junit</groupId>
                     <artifactId>junit</artifactId>
-                    <scope>test</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.apache.derby</groupId>
-                    <artifactId>derby</artifactId>
-                    <version>10.12.1.1</version>
                     <scope>test</scope>
                 </dependency>
                 <dependency>
