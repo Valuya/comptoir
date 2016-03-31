@@ -12,7 +12,6 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.*;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -102,16 +101,9 @@ public class PaginatedQueryService {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Long> query = criteriaBuilder.createQuery(Long.class);
 
-        // No root in the query prevent it to be validated by Hibernate JPA
-        // Joins are required as predicates as applied
-        // FIXME: probably subqueries root should be added as well
-        Root<? extends T> countRoot = query.from(root.getJavaType());
-        Set<Join<T, ?>> joins = root.getJoins();
-        for (Join join : joins) {
-            countRoot.join(join.getAttribute().getName(), join.getJoinType());
-        }
+        query.getRoots().add(root);
 
-        Expression<Long> countExpression = criteriaBuilder.count(countRoot);
+        Expression<Long> countExpression = criteriaBuilder.count(root);
         query.select(countExpression);
 
         Predicate[] predicateArray = predicates.toArray(new Predicate[0]);
