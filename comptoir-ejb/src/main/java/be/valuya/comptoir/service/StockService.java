@@ -260,7 +260,7 @@ public class StockService {
         return namePredicate;
     }
 
-    public ItemStock adaptStockFromItemSale(ZonedDateTime fromDateTime, ItemVariantSale managedItemSale, StockChangeType stockChangeType, String comment) {
+    public ItemStock adaptStockFromItemSale(ZonedDateTime fromDateTime, ItemVariantSale managedItemSale, Integer orderPosition, String comment) {
         ItemVariant managedItem = managedItemSale.getItemVariant();
         BigDecimal soldQuantity = managedItemSale.getQuantity();
         Stock stock = managedItemSale.getStock();
@@ -278,7 +278,7 @@ public class StockService {
 
         // adapt quantities
         BigDecimal newQuantity = oldQuantity.subtract(soldQuantity);
-        ItemStock adaptedStock = adaptStock(fromDateTime, stock, managedItem, newQuantity, comment, stockChangeType);
+        ItemStock adaptedStock = adaptStock(fromDateTime, stock, managedItem, newQuantity, comment, StockChangeType.SALE, orderPosition);
 
         // Reference sale
         adaptedStock.setStockChangeVariantSale(managedItemSale);
@@ -377,7 +377,10 @@ public class StockService {
      * @return
      */
     @Nonnull
-    public ItemStock adaptStock(@Nonnull ZonedDateTime fromDateTime, @Nonnull Stock stock, @Nonnull ItemVariant itemVariant, @Nonnull BigDecimal newQuantity, @CheckForNull String comment, @Nonnull StockChangeType stockChangeType) {
+    public ItemStock adaptStock(@Nonnull ZonedDateTime fromDateTime, @Nonnull Stock stock,
+                                @Nonnull ItemVariant itemVariant, @Nonnull BigDecimal newQuantity,
+                                @CheckForNull String comment, @Nonnull StockChangeType stockChangeType,
+                                @CheckForNull Integer orderPosition) {
         // find previous stock
         ItemStock managedPreviousItemStock = findItemStock(itemVariant, stock, fromDateTime);
         if (managedPreviousItemStock != null) {
@@ -394,6 +397,7 @@ public class StockService {
         itemStock.setComment(comment);
         itemStock.setStockChangeType(stockChangeType);
         itemStock.setPreviousItemStock(managedPreviousItemStock);
+        itemStock.setOrderPosition(orderPosition);
 
         // persist
         ItemStock managedItemStock = entityManager.merge(itemStock);
@@ -413,7 +417,6 @@ public class StockService {
         Root<ItemStock> itemStockRoot = query.from(ItemStock.class);
 
         List<Predicate> predicates = applyVariantStockPredicates(itemStockSearch, criteriaBuilder, itemStockRoot);
-
 
         paginatedQueryService.applySort(pagination, itemStockRoot, query,
                 stockColumn -> ItemVariantStockColumnPersistenceUtil.getPath(itemStockRoot, stockColumn)
@@ -614,7 +617,7 @@ public class StockService {
         ItemVariant managedItem = entityManager.merge(item);
         ZonedDateTime dateTime = ZonedDateTime.now();
 
-        adaptStock(dateTime, stock, managedItem, initialQuantity, null, StockChangeType.INITIAL);
+        adaptStock(dateTime, stock, managedItem, initialQuantity, null, StockChangeType.INITIAL, null);
 
         return managedItem;
     }

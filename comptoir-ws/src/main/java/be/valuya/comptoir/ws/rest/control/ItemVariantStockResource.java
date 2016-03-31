@@ -1,12 +1,9 @@
 package be.valuya.comptoir.ws.rest.control;
 
-import be.valuya.comptoir.api.domain.commercial.WsItemVariantSale;
-import be.valuya.comptoir.api.domain.commercial.WsItemVariantSaleRef;
 import be.valuya.comptoir.api.domain.search.WsItemVariantStockSearch;
 import be.valuya.comptoir.api.domain.stock.WsItemStock;
 import be.valuya.comptoir.api.domain.stock.WsItemStockRef;
 import be.valuya.comptoir.model.commercial.ItemVariant;
-import be.valuya.comptoir.model.commercial.ItemVariantSale;
 import be.valuya.comptoir.model.search.ItemStockSearch;
 import be.valuya.comptoir.model.stock.ItemStock;
 import be.valuya.comptoir.model.stock.Stock;
@@ -76,7 +73,7 @@ public class ItemVariantStockResource {
         ItemVariant itemVariant = itemStock.getItemVariant();
         ZonedDateTime now = ZonedDateTime.now();
 
-        ItemStock adaptedItemStock = stockService.adaptStock(now, stock, itemVariant, quantity, comment, stockChangeType);
+        ItemStock adaptedItemStock = stockService.adaptStock(now, stock, itemVariant, quantity, comment, stockChangeType, null);
         WsItemStockRef wsItemStockRef = toWsItemVariantStockConverter.reference(adaptedItemStock);
         return wsItemStockRef;
     }

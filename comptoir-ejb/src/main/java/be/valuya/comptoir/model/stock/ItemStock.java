@@ -2,15 +2,15 @@ package be.valuya.comptoir.model.stock;
 
 import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.model.commercial.ItemVariantSale;
-import be.valuya.comptoir.model.commercial.Sale;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.Objects;
-import javax.annotation.Nonnull;
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 
 /**
  *
@@ -29,6 +29,9 @@ public class ItemStock implements Serializable {
     @Column(name = "end_date_time")
     @Temporal(TemporalType.TIMESTAMP)
     private ZonedDateTime endDateTime;
+    @Column(name = "order_position")
+    @CheckForNull
+    private Integer orderPosition;
     @ManyToOne(optional = false)
     @NotNull
     @Nonnull
@@ -129,6 +132,14 @@ public class ItemStock implements Serializable {
 
     public void setStockChangeVariantSale(ItemVariantSale stockChangeVariantSale) {
         this.stockChangeVariantSale = stockChangeVariantSale;
+    }
+
+    public Integer getOrderPosition() {
+        return orderPosition;
+    }
+
+    public void setOrderPosition(Integer orderPosition) {
+        this.orderPosition = orderPosition;
     }
 
     @Override

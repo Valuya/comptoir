@@ -61,6 +61,7 @@ public class FromWsItemVariantStockConverter {
         WsItemStockRef previousItemStockRef = wsItemStock.getPreviousItemStockRef();
         StockChangeType stockChangeType = wsItemStock.getStockChangeType();
         WsItemVariantSaleRef stockChangeSaleRef = wsItemStock.getStockChangeVariantSaleRef();
+        Integer orderPosition = wsItemStock.getOrderPosition();
 
         ItemVariant itemVariant = fromWsItemVariantConverter.find(itemVariantRef);
         Stock stock = fromWsStockConverter.find(stockRef);
@@ -73,6 +74,7 @@ public class FromWsItemVariantStockConverter {
         itemStock.setStartDateTime(startDateTime);
         itemStock.setStock(stock);
         itemStock.setStockChangeType(stockChangeType);
+        itemStock.setOrderPosition(orderPosition);
 
         if (previousItemStockRef != null) {
             ItemStock previousItemStock = find(previousItemStockRef);

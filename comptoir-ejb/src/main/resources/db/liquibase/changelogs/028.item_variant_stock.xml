@@ -37,4 +37,9 @@
                                  referencedColumnNames="ID"/>
     </changeSet>
 
+    <changeSet id="5-order position" author="cghislai">
+        <addColumn tableName="itemvariant_stock">
+            <column name="order_position" type="INT(11)"></column>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>
