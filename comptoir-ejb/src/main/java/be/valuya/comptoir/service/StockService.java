@@ -385,7 +385,7 @@ public class StockService {
         ItemStock managedPreviousItemStock = findItemStock(itemVariant, stock, fromDateTime);
         if (managedPreviousItemStock != null) {
             managedPreviousItemStock.setEndDateTime(fromDateTime);
-            entityManager.merge(managedPreviousItemStock);
+            managedPreviousItemStock = entityManager.merge(managedPreviousItemStock);
         }
 
         // create new stock value

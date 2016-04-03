@@ -326,6 +326,7 @@ public class SaleService {
         List<ItemVariantSale> itemSaleList = findItemSales(sale);
         itemSaleList.forEach(this::removeItemSale);
 
+        // Remove accounting entries
         AccountingTransaction accountingTransaction = sale.getAccountingTransaction();
         Company company = sale.getCompany();
         AccountingEntrySearch accountingEntrySearch = new AccountingEntrySearch();
@@ -334,6 +335,16 @@ public class SaleService {
         List<AccountingEntry> accountingEntries = accountService.findAccountingEntries(accountingEntrySearch);
         for (AccountingEntry accountingEntry : accountingEntries) {
             accountService.removeAccountingEntry(accountingEntry);
+        }
+
+        // remove customer loyalty entry
+        try {
+            CustomerLoyaltyAccountingEntry saleCustomerLoyaltyEntry = findSaleCustomerLoyaltyEntry(sale);
+            if (saleCustomerLoyaltyEntry != null) {
+                removeCustomerLoyaltyAccountingEntry(saleCustomerLoyaltyEntry);
+            }
+        } catch (IllegalStateException e) {
+            throw new EJBException(e);
         }
 
         Sale managedSale = entityManager.merge(sale);
