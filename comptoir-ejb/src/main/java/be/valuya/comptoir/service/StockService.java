@@ -746,6 +746,18 @@ public class StockService {
         CriteriaQuery<AttributeDefinition> query = criteriaBuilder.createQuery(AttributeDefinition.class);
         Root<AttributeDefinition> attributeDefinitionRoot = query.from(AttributeDefinition.class);
 
+        List<Predicate> predicates = createAttributeDefinitionPredicates(attributeSearch, criteriaBuilder, query, attributeDefinitionRoot);
+        Locale locale = attributeSearch.getLocale();
+/*
+        paginatedQueryService.applySort(pagination, attributeDefinitionRoot, query,
+                (column) -> AttributeDefinitionColumnPersistenceUtil.getPath(attributeDefinitionRoot, column, locale, criteriaBuilder));
+*/
+
+        List<AttributeDefinition> attributeDefinitions = paginatedQueryService.getResults(predicates, query, attributeDefinitionRoot, pagination);
+        return attributeDefinitions;
+    }
+
+    private List<Predicate> createAttributeDefinitionPredicates(AttributeSearch attributeSearch, CriteriaBuilder criteriaBuilder, CriteriaQuery<AttributeDefinition> query, Root<AttributeDefinition> attributeDefinitionRoot) {
         List<Predicate> predicates = new ArrayList<>();
 
         Company company = attributeSearch.getCompany();
@@ -776,12 +788,7 @@ public class StockService {
             Predicate multiSearchPredicate = criteriaBuilder.or(nameContainsPredicate, hasValuePredicate);
             predicates.add(multiSearchPredicate);
         }
-
-        Predicate[] predicateArray = predicates.toArray(new Predicate[0]);
-        query.where(predicateArray);
-
-        TypedQuery<AttributeDefinition> typedQuery = entityManager.createQuery(query);
-        return typedQuery.getResultList();
+        return predicates;
     }
 
     private Predicate createAttributeHasValuePredicate(CriteriaQuery<AttributeDefinition> query, String valueContains, Root<AttributeDefinition> attributeDefinitionRoot, @CheckForNull Locale locale) {

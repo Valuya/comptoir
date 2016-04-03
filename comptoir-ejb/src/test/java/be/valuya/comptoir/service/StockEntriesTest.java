@@ -139,7 +139,7 @@ public class StockEntriesTest extends JPATestBase {
         BigDecimal quantity = variantStock.getQuantity();
         BigDecimal expectedQuantity = BigDecimal.valueOf(expectedValue);
         int comparisonValue = quantity.compareTo(expectedQuantity);
-        Assert.assertEquals(comparisonValue, 0);
+        Assert.assertEquals(0, comparisonValue);
         return variantStock;
     }
 
