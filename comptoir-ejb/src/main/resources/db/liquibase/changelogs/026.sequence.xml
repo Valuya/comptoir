@@ -4,7 +4,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
 
-    <changeSet id="CLONE sequence -> SEQUENCE" author="cghislai" onFail="WARN">
+    <changeSet id="CLONE sequence -> SEQUENCE" author="cghislai">
         <preConditions>
             <not>
                 <tableExists tableName="SEQUENCE" />
@@ -18,7 +18,7 @@
         </createTable>
     </changeSet>
     <changeSet id="CLONE sequence -> SEQUENCE values" author="cghislai" >
-        <preConditions onFail="WARN">
+        <preConditions>
             <not>
                 <sqlCheck expectedResult="SEQ_GEN">
                     SELECT SEQ_NAME 
