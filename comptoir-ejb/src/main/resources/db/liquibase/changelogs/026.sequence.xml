@@ -22,8 +22,8 @@
             <not>
                 <sqlCheck expectedResult="SEQ_GEN">
                     SELECT SEQ_NAME 
-                    FROM sequence 
-                    WHERE sequence.SEQ_NAME = 'SEQ_GEN';
+                    FROM SEQUENCE 
+                    WHERE SEQUENCE.SEQ_NAME = 'SEQ_GEN';
                 </sqlCheck>
             </not>
         </preConditions>
