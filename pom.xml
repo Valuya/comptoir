@@ -126,6 +126,38 @@
                         <ejbVersion>3.2</ejbVersion>
                     </configuration>
                 </plugin>
+                <plugin>
+                    <groupId>org.codehaus.cargo</groupId>
+                    <artifactId>cargo-maven2-plugin</artifactId>
+                    <version>1.5.0</version>
+                    <configuration>
+                        <!-- Container configuration -->
+                        <container>
+                            <containerId>glassfish</containerId>
+                            <type>remote</type>
+                        </container>
+
+                        <!-- Configuration to use with the container (which will also configure the deployer) -->
+                        <configuration>
+                            <type>runtime</type>
+                            <properties>
+                                <cargo.hostname>${env.GLASSFISH_HOST}</cargo.hostname>
+                                <cargo.rmi.port>${env.GLASSFISH_PORT}</cargo.rmi.port>
+                                <cargo.remote.username>${env.GLASSFISH_USER}</cargo.remote.username>
+                                <cargo.remote.password>${env.GLASSFISH_PASSWORD}</cargo.remote.password>
+                            </properties>
+                        </configuration>
+
+                        <!-- Deployables configuration -->
+                        <deployables>
+                            <deployable>
+                                <groupId>be.valuya.comptoir</groupId>
+                                <artifactId>comptoir-ear</artifactId>
+                                <type>ear</type>
+                            </deployable>
+                        </deployables>
+                    </configuration>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
