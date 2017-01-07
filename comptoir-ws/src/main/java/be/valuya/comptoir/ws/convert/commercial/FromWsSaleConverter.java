@@ -15,11 +15,12 @@ import be.valuya.comptoir.service.SaleService;
 import be.valuya.comptoir.ws.convert.accounting.FromWsAccountingTransactionConverter;
 import be.valuya.comptoir.ws.convert.company.FromWsCompanyConverter;
 import be.valuya.comptoir.ws.convert.thirdparty.FromWsCustomerConverter;
-import java.math.BigDecimal;
-import java.time.ZonedDateTime;
+
 import javax.ejb.EJB;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.math.BigDecimal;
+import java.time.ZonedDateTime;
 
 /**
  *
@@ -74,7 +75,6 @@ public class FromWsSaleConverter {
         sale.setId(id);
         sale.setCompany(company);
         sale.setReference(reference);
-        sale.setAccountingTransaction(accountingTransaction);
         sale.setClosed(closed);
         sale.setCustomer(customer);
         sale.setDateTime(dateTime);
@@ -84,6 +84,9 @@ public class FromWsSaleConverter {
         sale.setDiscountAmount(discountAmount);
         sale.setDiscountRatio(discountRatio);
 
+        if (accountingTransaction != null) {
+            sale.setAccountingTransaction(accountingTransaction);
+        }
         return sale;
     }
 
