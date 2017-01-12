@@ -2,14 +2,14 @@ package be.valuya.comptoir.ws.convert;
 
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.ws.convert.company.WsCompanyParameterProvider;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
+
 import javax.ws.rs.ext.ParamConverter;
 import javax.ws.rs.ext.ParamConverterProvider;
 import javax.ws.rs.ext.Provider;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @Provider
