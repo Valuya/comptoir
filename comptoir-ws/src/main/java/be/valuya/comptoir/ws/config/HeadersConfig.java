@@ -1,7 +1,6 @@
 package be.valuya.comptoir.ws.config;
 
 /**
- *
  * @author cghislai
  */
 public class HeadersConfig {
