@@ -13,7 +13,18 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <be.valuya.comptoir.ws.cors-allowed-hosts>*</be.valuya.comptoir.ws.cors-allowed-hosts>
+        <be.valuya.comptoir.ws.cors-allow-any-with-credentials>true</be.valuya.comptoir.ws.cors-allow-any-with-credentials>
     </properties>
+
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources-filtered</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+    </build>
 
     <dependencies>
         <dependency>
