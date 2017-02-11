@@ -1,21 +1,18 @@
 package be.valuya.comptoir.ws.convert.commercial;
 
-import be.valuya.comptoir.api.domain.commercial.WsPictureRef;
 import be.valuya.comptoir.api.domain.commercial.WsItemRef;
 import be.valuya.comptoir.api.domain.commercial.WsItemVariant;
 import be.valuya.comptoir.api.domain.commercial.WsItemVariantRef;
-import be.valuya.comptoir.model.commercial.AttributeValue;
-import be.valuya.comptoir.model.commercial.Item;
-import be.valuya.comptoir.model.commercial.Picture;
-import be.valuya.comptoir.model.commercial.ItemVariant;
-import be.valuya.comptoir.model.commercial.Pricing;
+import be.valuya.comptoir.api.domain.commercial.WsPictureRef;
+import be.valuya.comptoir.model.commercial.*;
 import be.valuya.comptoir.service.StockService;
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.stream.Collectors;
+
 import javax.ejb.EJB;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  *

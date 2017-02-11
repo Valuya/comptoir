@@ -4,16 +4,17 @@ import be.valuya.comptoir.util.pagination.Column;
 import be.valuya.comptoir.util.pagination.Pagination;
 import be.valuya.comptoir.util.pagination.Sort;
 import be.valuya.comptoir.ws.config.HeadersConfig;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.BadRequestException;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.UriInfo;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import javax.enterprise.context.ApplicationScoped;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.UriInfo;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @ApplicationScoped
@@ -48,6 +49,7 @@ public class RestPaginationUtil {
             List<String> sortValues = pathParameters.get(SORT_PARAMETER);
             sorts = sortValues.stream()
                     .map(sortDef -> parseSort(sortDef, conversionFunction))
+                    .filter(sort -> sort != null)
                     .collect(Collectors.toList());
         }
 
@@ -55,11 +57,17 @@ public class RestPaginationUtil {
     }
 
     private <T, C extends Column<T>> Sort<C> parseSort(String sortDef, Function<String, C> conversionFunction) {
-        String[] sortDefs = sortDef.split("-");
+        String[] sortDefs = sortDef.split(":");
         if (sortDefs.length != 2) {
             return null;
         }
-        return new Sort<>(conversionFunction.apply(sortDefs[0]), sortDefs[1].equals("asc"));
+        C column;
+        try {
+            column = conversionFunction.apply(sortDefs[0]);
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("Invalid sort column: " + sortDefs[0], e);
+        }
+        return new Sort<>(column, sortDefs[1].equalsIgnoreCase("asc"));
     }
 
     public <T, C extends Column<T>> void addResultCount(HttpServletResponse response, Pagination<T, C> pagination) {

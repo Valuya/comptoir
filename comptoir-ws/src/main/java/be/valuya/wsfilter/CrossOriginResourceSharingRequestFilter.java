@@ -1,4 +1,4 @@
-package be.valuya.comptoir.ws.rest.filter;
+package be.valuya.wsfilter;
 
 import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
