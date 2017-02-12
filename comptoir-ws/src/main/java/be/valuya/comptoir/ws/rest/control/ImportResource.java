@@ -6,22 +6,21 @@ import be.valuya.comptoir.service.ImportService;
 import be.valuya.comptoir.service.ImportSummary;
 import be.valuya.comptoir.service.PrestashopImportParams;
 import be.valuya.comptoir.ws.convert.company.FromWsCompanyConverter;
+import be.valuya.comptoir.ws.security.Roles;
+
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.inject.Inject;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @Path("/import")
 @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+@RolesAllowed({Roles.EMPLOYEE})
 public class ImportResource {
 
     @EJB

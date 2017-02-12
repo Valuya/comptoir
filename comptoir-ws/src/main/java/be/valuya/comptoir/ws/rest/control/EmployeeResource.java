@@ -11,21 +11,19 @@ import be.valuya.comptoir.ws.convert.thirdparty.FromWsEmployeeConverter;
 import be.valuya.comptoir.ws.convert.thirdparty.ToWsEmployeeConverter;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
 import be.valuya.comptoir.ws.rest.validation.NoId;
-import java.util.List;
-import java.util.stream.Collectors;
+import be.valuya.comptoir.ws.security.Roles;
+
+import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.validation.Valid;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @Path("/employee")
@@ -44,6 +42,7 @@ public class EmployeeResource {
     private FromWsEmployeeSearchConverter fromWsEmployeeSearchConverter;
 
     @POST
+    @PermitAll
     public WsEmployeeRef createEmployee(@NoId WsEmployee wsEmployee) {
         Employee employee = fromWsEmployeeConverter.convert(wsEmployee);
         Employee savedEmployee = employeeService.saveEmployee(employee);
@@ -53,20 +52,6 @@ public class EmployeeResource {
         return employeeRef;
     }
 
-    @Path("{id}")
-    @Valid
-    @PUT
-    public WsEmployeeRef saveEmployee(@PathParam("id") long id, @Valid WsEmployee wsEmployee) {
-        idChecker.checkId(id, wsEmployee);
-
-        Employee existingEmployee = employeeService.findEmployeeById(id);
-        Employee employee = fromWsEmployeeConverter.patch(existingEmployee, wsEmployee);
-
-        Employee savedEmployee = employeeService.saveEmployee(employee);
-        WsEmployeeRef employeeRef = toWsEmployeeConverter.reference(savedEmployee);
-
-        return employeeRef;
-    }
 
     @Path("{id}")
     @Valid
@@ -79,9 +64,26 @@ public class EmployeeResource {
         return wsEmployee;
     }
 
+    @Path("{id}")
+    @Valid
+    @PUT
+    @RolesAllowed({Roles.EMPLOYEE})
+    public WsEmployeeRef saveEmployee(@PathParam("id") long id, @Valid WsEmployee wsEmployee) {
+        idChecker.checkId(id, wsEmployee);
+
+        Employee existingEmployee = employeeService.findEmployeeById(id);
+        Employee employee = fromWsEmployeeConverter.patch(existingEmployee, wsEmployee);
+
+        Employee savedEmployee = employeeService.saveEmployee(employee);
+        WsEmployeeRef employeeRef = toWsEmployeeConverter.reference(savedEmployee);
+
+        return employeeRef;
+    }
+
     @Valid
     @POST
     @Path("/search")
+    @RolesAllowed({Roles.EMPLOYEE})
     public List<WsEmployee> findEmployees(@Valid WsEmployeeSearch wsEmployeeSearch) {
         EmployeeSearch employeeSearch = fromWsEmployeeSearchConverter.convert(wsEmployeeSearch);
         List<Employee> employees = employeeService.findEmployees(employeeSearch);
@@ -95,6 +97,7 @@ public class EmployeeResource {
 
     @Path("/{employeeId}/password/{password}")
     @PUT
+    @RolesAllowed({Roles.EMPLOYEE})
     public void setPassword(@PathParam("employeeId") long employeeId, @PathParam("password") String password) {
         Employee employee = employeeService.findEmployeeById(employeeId);
         employeeService.setPassword(employee, password);

@@ -14,7 +14,9 @@ import be.valuya.comptoir.ws.convert.search.FromWsBalanceSearchConverter;
 import be.valuya.comptoir.ws.rest.validation.BalanceStateChecker;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
 import be.valuya.comptoir.ws.rest.validation.NoId;
+import be.valuya.comptoir.ws.security.Roles;
 
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
@@ -32,6 +34,7 @@ import java.util.stream.Collectors;
  */
 @Path("/balance")
 @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+@RolesAllowed({Roles.EMPLOYEE})
 public class BalanceResource {
 
     @EJB

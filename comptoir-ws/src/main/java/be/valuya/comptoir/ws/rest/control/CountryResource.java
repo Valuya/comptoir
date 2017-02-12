@@ -4,7 +4,9 @@ import be.valuya.comptoir.api.domain.company.WsCountry;
 import be.valuya.comptoir.model.company.Country;
 import be.valuya.comptoir.service.CountryService;
 import be.valuya.comptoir.ws.convert.company.ToWsCountryConverter;
+import be.valuya.comptoir.ws.security.Roles;
 
+import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -19,6 +21,7 @@ import java.util.stream.Collectors;
 @Path("/country")
 @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+@RolesAllowed({Roles.EMPLOYEE})
 public class CountryResource {
 
     @Inject

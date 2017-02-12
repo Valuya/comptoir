@@ -15,7 +15,9 @@ import be.valuya.comptoir.ws.convert.thirdparty.FromWsCustomerConverter;
 import be.valuya.comptoir.ws.convert.thirdparty.ToWsCustomerConverter;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
 import be.valuya.comptoir.ws.rest.validation.NoId;
+import be.valuya.comptoir.ws.security.Roles;
 
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
@@ -34,6 +36,7 @@ import java.util.stream.Collectors;
 @Path("/customer")
 @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+@RolesAllowed({Roles.EMPLOYEE})
 public class CustomerResource {
 
     @EJB
