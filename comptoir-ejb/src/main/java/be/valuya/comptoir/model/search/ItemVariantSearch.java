@@ -1,6 +1,7 @@
 package be.valuya.comptoir.model.search;
 
 import be.valuya.comptoir.model.commercial.Item;
+
 import javax.annotation.Nonnull;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -8,7 +9,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- *
  * @author cghislai
  */
 @XmlRootElement

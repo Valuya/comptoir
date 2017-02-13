@@ -1,14 +1,15 @@
 package be.valuya.comptoir.model.search;
 
+import be.valuya.comptoir.model.common.WithCompany;
 import be.valuya.comptoir.model.company.Company;
+
 import javax.annotation.Nonnull;
 import javax.validation.constraints.NotNull;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
-public class InvoiceSearch {
+public class InvoiceSearch implements WithCompany {
 
     @NotNull
     @Nonnull

@@ -1,5 +1,6 @@
 package be.valuya.comptoir.auth.dao;
 
+import be.valuya.comptoir.auth.domain.EmployeePrincipal;
 import be.valuya.comptoir.auth.glassfish.ComptoirRealmOptions;
 import com.sun.enterprise.connectors.ConnectorRuntime;
 
@@ -73,14 +74,17 @@ public class AuthenticationDao implements ComptoirAuthenticationDao {
     }
 
     @Override
-    public List<String> fetchEmployeeGroups(long id) {
-        boolean employeeActive = this.isEmployeeActive(id);
-        List<String> groups = new ArrayList<>();
-        groups.add("employee");
-        if (employeeActive) {
-            groups.add("active");
-        }
-        return groups;
+    public EmployeePrincipal fetchEmployeeInfo(long employeeId) {
+        boolean employeeActive = this.isEmployeeActive(employeeId);
+        long companyId = this.findEmployeeCompany(employeeId);
+        String login = this.findEmployeeLogin(employeeId);
+        EmployeePrincipal employeePrincipal = new EmployeePrincipal();
+        employeePrincipal.setEmployeeId(employeeId);
+        employeePrincipal.setActive(employeeActive);
+        employeePrincipal.setName(login);
+        employeePrincipal.setLogin(login);
+        employeePrincipal.setCompanyId(companyId);
+        return employeePrincipal;
     }
 
     @Override
@@ -171,6 +175,28 @@ public class AuthenticationDao implements ComptoirAuthenticationDao {
         } catch (SQLException e) {
             LOG.log(Level.SEVERE, "Failed to find employee login", e);
             return false;
+        }
+    }
+
+    private Long findEmployeeCompany(long employeeId) {
+        try (Connection connection = this.getConnection()) {
+            String sql = "SELECT COMPANY_ID FROM employee WHERE ID = ?";
+            this.debugSql(sql);
+
+            PreparedStatement statement = connection.prepareStatement(sql);
+
+            statement.setLong(1, employeeId);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                long companyId = resultSet.getLong(1);
+                return companyId;
+            } else {
+                LOG.log(Level.SEVERE, "Failed to check employee is active");
+                return null;
+            }
+        } catch (SQLException e) {
+            LOG.log(Level.SEVERE, "Failed to find employee login", e);
+            return null;
         }
     }
 

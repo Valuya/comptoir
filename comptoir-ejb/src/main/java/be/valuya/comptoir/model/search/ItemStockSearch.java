@@ -3,6 +3,7 @@ package be.valuya.comptoir.model.search;
 import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.model.commercial.ItemVariantSale;
 import be.valuya.comptoir.model.commercial.Sale;
+import be.valuya.comptoir.model.common.WithCompany;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.stock.ItemStock;
 import be.valuya.comptoir.model.stock.Stock;
@@ -20,7 +21,7 @@ import java.time.ZonedDateTime;
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ItemStockSearch {
+public class ItemStockSearch implements WithCompany {
 
     @NotNull
     @Nonnull

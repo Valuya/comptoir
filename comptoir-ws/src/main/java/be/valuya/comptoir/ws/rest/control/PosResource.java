@@ -11,6 +11,7 @@ import be.valuya.comptoir.util.pagination.PosColumn;
 import be.valuya.comptoir.ws.convert.commercial.FromWsPosConverter;
 import be.valuya.comptoir.ws.convert.commercial.ToWsPosConverter;
 import be.valuya.comptoir.ws.convert.search.FromWsPosSearchConverter;
+import be.valuya.comptoir.ws.rest.validation.EmployeeAccessChecker;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
 import be.valuya.comptoir.ws.rest.validation.NoId;
 import be.valuya.comptoir.ws.security.Roles;
@@ -28,7 +29,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @Path("/pos")
@@ -53,11 +53,14 @@ public class PosResource {
     private RestPaginationUtil restPaginationUtil;
     @Context
     private HttpServletResponse response;
+    @Inject
+    private EmployeeAccessChecker accessChecker;
 
     @POST
     @Valid
     public WsPosRef createPos(@NoId @Valid WsPos wsPos) {
         Pos pos = fromWsPosConverter.convert(wsPos);
+        accessChecker.checkOwnCompany(pos);
         Pos savedPos = posService.savePos(pos);
 
         WsPosRef posRef = toWsPosConverter.reference(savedPos);
@@ -71,6 +74,7 @@ public class PosResource {
     public WsPosRef savePos(@PathParam("id") long id, @Valid WsPos wsPos) {
         idChecker.checkId(id, wsPos);
         Pos pos = fromWsPosConverter.convert(wsPos);
+        accessChecker.checkOwnCompany(pos);
         Pos savedPos = posService.savePos(pos);
 
         WsPosRef posRef = toWsPosConverter.reference(savedPos);
@@ -83,6 +87,7 @@ public class PosResource {
     @Valid
     public WsPos getPos(@PathParam("id") long id) {
         Pos pos = posService.findPosById(id);
+        accessChecker.checkOwnCompany(pos);
 
         WsPos wsPos = toWsPosConverter.convert(pos);
 
@@ -95,6 +100,7 @@ public class PosResource {
     public List<WsPos> findPosList(@Valid WsPosSearch wsPosSearch) {
         Pagination<Pos, PosColumn> pagination = restPaginationUtil.extractPagination(uriInfo, PosColumn::valueOf);
         PosSearch posSearch = fromWsPosSearchConverter.convert(wsPosSearch);
+        accessChecker.checkOwnCompany(posSearch);
         List<Pos> posList = posService.findPosList(posSearch, pagination);
 
         List<WsPos> wsPosList = posList.stream()

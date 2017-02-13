@@ -69,6 +69,11 @@
             <groupId>org.jooq</groupId>
             <artifactId>jooq</artifactId>
         </dependency>
+        <dependency>
+            <groupId>be.valuya.comptoir</groupId>
+            <artifactId>comptoir-security</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <build>

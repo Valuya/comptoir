@@ -9,11 +9,11 @@ import be.valuya.comptoir.service.EmployeeService;
 import be.valuya.comptoir.ws.convert.search.FromWsEmployeeSearchConverter;
 import be.valuya.comptoir.ws.convert.thirdparty.FromWsEmployeeConverter;
 import be.valuya.comptoir.ws.convert.thirdparty.ToWsEmployeeConverter;
+import be.valuya.comptoir.ws.rest.validation.EmployeeAccessChecker;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
 import be.valuya.comptoir.ws.rest.validation.NoId;
 import be.valuya.comptoir.ws.security.Roles;
 
-import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.inject.Inject;
@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
  */
 @Path("/employee")
 @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+@RolesAllowed({Roles.EMPLOYEE})
 public class EmployeeResource {
 
     @EJB
@@ -40,11 +41,13 @@ public class EmployeeResource {
     private IdChecker idChecker;
     @Inject
     private FromWsEmployeeSearchConverter fromWsEmployeeSearchConverter;
+    @Inject
+    private EmployeeAccessChecker accessChecker;
 
     @POST
-    @PermitAll
     public WsEmployeeRef createEmployee(@NoId WsEmployee wsEmployee) {
         Employee employee = fromWsEmployeeConverter.convert(wsEmployee);
+        accessChecker.checkSelf(employee); //TODO: limit to some role
         Employee savedEmployee = employeeService.saveEmployee(employee);
 
         WsEmployeeRef employeeRef = toWsEmployeeConverter.reference(savedEmployee);
@@ -58,6 +61,7 @@ public class EmployeeResource {
     @GET
     public WsEmployee getEmployee(@PathParam("id") long id) {
         Employee employee = employeeService.findEmployeeById(id);
+        accessChecker.checkSelf(employee); //TODO: limit to some role
 
         WsEmployee wsEmployee = toWsEmployeeConverter.convert(employee);
 
@@ -67,11 +71,11 @@ public class EmployeeResource {
     @Path("{id}")
     @Valid
     @PUT
-    @RolesAllowed({Roles.EMPLOYEE})
     public WsEmployeeRef saveEmployee(@PathParam("id") long id, @Valid WsEmployee wsEmployee) {
         idChecker.checkId(id, wsEmployee);
 
         Employee existingEmployee = employeeService.findEmployeeById(id);
+        accessChecker.checkSelf(existingEmployee); //TODO: limit to some role
         Employee employee = fromWsEmployeeConverter.patch(existingEmployee, wsEmployee);
 
         Employee savedEmployee = employeeService.saveEmployee(employee);
@@ -83,9 +87,9 @@ public class EmployeeResource {
     @Valid
     @POST
     @Path("/search")
-    @RolesAllowed({Roles.EMPLOYEE})
     public List<WsEmployee> findEmployees(@Valid WsEmployeeSearch wsEmployeeSearch) {
         EmployeeSearch employeeSearch = fromWsEmployeeSearchConverter.convert(wsEmployeeSearch);
+        accessChecker.checkOwnCompany(employeeSearch);
         List<Employee> employees = employeeService.findEmployees(employeeSearch);
 
         List<WsEmployee> wsEmployees = employees.stream()
@@ -97,9 +101,9 @@ public class EmployeeResource {
 
     @Path("/{employeeId}/password/{password}")
     @PUT
-    @RolesAllowed({Roles.EMPLOYEE})
     public void setPassword(@PathParam("employeeId") long employeeId, @PathParam("password") String password) {
         Employee employee = employeeService.findEmployeeById(employeeId);
+        accessChecker.checkSelf(employee); //TODO: limit to some role
         employeeService.setPassword(employee, password);
     }
 

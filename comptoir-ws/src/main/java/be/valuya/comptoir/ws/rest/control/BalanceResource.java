@@ -12,6 +12,7 @@ import be.valuya.comptoir.ws.convert.accounting.FromWsBalanceConverter;
 import be.valuya.comptoir.ws.convert.accounting.ToWsBalanceConverter;
 import be.valuya.comptoir.ws.convert.search.FromWsBalanceSearchConverter;
 import be.valuya.comptoir.ws.rest.validation.BalanceStateChecker;
+import be.valuya.comptoir.ws.rest.validation.EmployeeAccessChecker;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
 import be.valuya.comptoir.ws.rest.validation.NoId;
 import be.valuya.comptoir.ws.security.Roles;
@@ -55,12 +56,15 @@ public class BalanceResource {
     private UriInfo uriInfo;
     @Inject
     private RestPaginationUtil restPaginationUtil;
+    @Inject
+    private EmployeeAccessChecker accessChecker;
 
 
     @POST
     @Valid
     public WsBalanceRef createBalance(@Valid @NoId WsBalance wsBalance) {
         Balance balance = fromWsBalanceConverter.convert(wsBalance);
+        accessChecker.checkOwnCompany(balance.getAccount());
         Balance savedBalance = accountService.saveBalance(balance);
 
         WsBalanceRef balanceRef = toWsBalanceConverter.reference(savedBalance);
@@ -74,6 +78,7 @@ public class BalanceResource {
     public WsBalanceRef saveBalance(@PathParam("id") long id, @Valid WsBalance wsBalance) {
         idChecker.checkId(id, wsBalance);
         Balance balance = fromWsBalanceConverter.convert(wsBalance);
+        accessChecker.checkOwnCompany(balance.getAccount());
         Balance savedBalance = accountService.saveBalance(balance);
 
         WsBalanceRef balanceRef = toWsBalanceConverter.reference(savedBalance);
@@ -86,6 +91,7 @@ public class BalanceResource {
     @Valid
     public WsBalance getBalance(@PathParam("id") long id) {
         Balance balance = accountService.findBalanceById(id);
+        accessChecker.checkOwnCompany(balance.getAccount());
 
         WsBalance wsBalance = toWsBalanceConverter.convert(balance);
 
@@ -98,6 +104,7 @@ public class BalanceResource {
     public List<WsBalance> findBalances(@Valid WsBalanceSearch wsBalanceSearch) {
         Pagination<Balance, BalanceColumn> pagination = restPaginationUtil.extractPagination(uriInfo, BalanceColumn::valueOf);
         BalanceSearch balanceSearch = fromWsBalanceSearchConverter.convert(wsBalanceSearch);
+        accessChecker.checkOwnCompany(balanceSearch);
         List<Balance> balances = accountService.findBalances(balanceSearch, pagination);
 
         List<WsBalance> wsBalances = balances.stream()

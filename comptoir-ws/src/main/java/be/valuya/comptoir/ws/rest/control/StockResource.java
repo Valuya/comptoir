@@ -12,6 +12,7 @@ import be.valuya.comptoir.ws.convert.search.FromWsStockSearchConverter;
 import be.valuya.comptoir.ws.convert.stock.FromWsStockConverter;
 import be.valuya.comptoir.ws.convert.stock.ToWsStockConverter;
 import be.valuya.comptoir.ws.rest.validation.ActiveStateChecker;
+import be.valuya.comptoir.ws.rest.validation.EmployeeAccessChecker;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
 import be.valuya.comptoir.ws.rest.validation.NoId;
 import be.valuya.comptoir.ws.security.Roles;
@@ -29,7 +30,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @Path("/stock")
@@ -56,11 +56,14 @@ public class StockResource {
     private RestPaginationUtil restPaginationUtil;
     @Inject
     private ActiveStateChecker activeStateChecker;
+    @Inject
+    private EmployeeAccessChecker accessChecker;
 
     @POST
     @Valid
     public WsStockRef createStock(@NoId @Valid WsStock wsStock) {
         Stock stock = fromWsStockConverter.convert(wsStock);
+        accessChecker.checkOwnCompany(stock);
         Stock savedStock = stockService.saveStock(stock);
 
         WsStockRef stockRef = toWsStockConverter.reference(savedStock);
@@ -73,9 +76,10 @@ public class StockResource {
     public WsStockRef updateStock(@PathParam("id") long id, @Valid WsStock wsStock) {
         idChecker.checkId(id, wsStock);
         Stock stock = fromWsStockConverter.convert(wsStock);
+        accessChecker.checkOwnCompany(stock);
         Stock savedStock = stockService.saveStock(stock);
 
-        WsStockRef stockRef = toWsStockConverter.reference(stock);
+        WsStockRef stockRef = toWsStockConverter.reference(savedStock);
         return stockRef;
     }
 
@@ -84,6 +88,7 @@ public class StockResource {
     @Valid
     public WsStock getStock(@PathParam("id") long id) {
         Stock stock = stockService.findStockById(id);
+        accessChecker.checkOwnCompany(stock);
         WsStock wsStock = toWsStockConverter.convert(stock);
         return wsStock;
     }
@@ -92,6 +97,7 @@ public class StockResource {
     @DELETE
     public void deleteStock(@PathParam("id") long id) {
         Stock stock = stockService.findStockById(id);
+        accessChecker.checkOwnCompany(stock);
 
         activeStateChecker.checkState(stock, true);
         stock.setActive(false);
@@ -105,6 +111,7 @@ public class StockResource {
         Pagination<Stock, StockColumn> pagination = restPaginationUtil.extractPagination(uriInfo, StockColumn::valueOf);
 
         StockSearch stockSearch = fromWsStockSearchConverter.convert(wsStockSearch);
+        accessChecker.checkOwnCompany(stockSearch);
 
         List<Stock> stocks = stockService.findStocks(stockSearch, pagination);
 

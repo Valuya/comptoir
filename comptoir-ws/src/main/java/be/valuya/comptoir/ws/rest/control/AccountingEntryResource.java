@@ -10,6 +10,7 @@ import be.valuya.comptoir.ws.config.HeadersConfig;
 import be.valuya.comptoir.ws.convert.accounting.FromWsAccountingEntryConverter;
 import be.valuya.comptoir.ws.convert.accounting.ToWsAccountingEntryConverter;
 import be.valuya.comptoir.ws.convert.search.FromWsAccountingEntrySearchConverter;
+import be.valuya.comptoir.ws.rest.validation.EmployeeAccessChecker;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
 import be.valuya.comptoir.ws.rest.validation.NoId;
 import be.valuya.comptoir.ws.security.Roles;
@@ -44,6 +45,8 @@ public class AccountingEntryResource {
     private ToWsAccountingEntryConverter toWsAccountingEntryConverter;
     @Inject
     private IdChecker idChecker;
+    @Inject
+    private EmployeeAccessChecker employeeAccessChecker;
     @Context
     private HttpServletResponse response;
 
@@ -51,6 +54,7 @@ public class AccountingEntryResource {
     @Valid
     public WsAccountingEntryRef createAccountingEntry(@NoId @Valid WsAccountingEntry wsAccountingEntry) {
         AccountingEntry accountingEntry = fromWsAccountingEntryConverter.convert(wsAccountingEntry);
+        employeeAccessChecker.checkOwnCompany(accountingEntry);
         AccountingEntry savedAccountingEntry = accountingEntryService.saveAccountingEntry(accountingEntry);
 
         WsAccountingEntryRef accountingEntryRef = toWsAccountingEntryConverter.reference(savedAccountingEntry);
@@ -64,6 +68,7 @@ public class AccountingEntryResource {
     public WsAccountingEntryRef saveAccountingEntry(@PathParam("id") long id, @Valid WsAccountingEntry wsAccountingEntry) {
         idChecker.checkId(id, wsAccountingEntry);
         AccountingEntry accountingEntry = fromWsAccountingEntryConverter.convert(wsAccountingEntry);
+        employeeAccessChecker.checkOwnCompany(accountingEntry);
         AccountingEntry savedAccountingEntry = accountingEntryService.saveAccountingEntry(accountingEntry);
 
         WsAccountingEntryRef accountingEntryRef = toWsAccountingEntryConverter.reference(savedAccountingEntry);
@@ -76,6 +81,7 @@ public class AccountingEntryResource {
     @Valid
     public WsAccountingEntry getAccountingEntry(@PathParam("id") long id) {
         AccountingEntry accountingEntry = accountingEntryService.findAccountingEntryById(id);
+        employeeAccessChecker.checkOwnCompany(accountingEntry);
 
         WsAccountingEntry wsAccountingEntry = toWsAccountingEntryConverter.convert(accountingEntry);
 
@@ -86,6 +92,7 @@ public class AccountingEntryResource {
     @DELETE
     public void deleteAccountingEntry(@PathParam("id") long id) {
         AccountingEntry accountingEntry = accountingEntryService.findAccountingEntryById(id);
+        employeeAccessChecker.checkOwnCompany(accountingEntry);
         accountingEntryService.removeAccountingEntry(accountingEntry);
     }
 
@@ -94,6 +101,7 @@ public class AccountingEntryResource {
     @Valid
     public List<WsAccountingEntry> findAccountingEntrys(@Valid WsAccountingEntrySearch wsAccountingEntrySearch) {
         AccountingEntrySearch accountingEntrySearch = fromWsAccountingEntrySearchConverter.convert(wsAccountingEntrySearch);
+        employeeAccessChecker.checkOwnCompany(accountingEntrySearch);
         List<AccountingEntry> accountingEntrys = accountingEntryService.findAccountingEntries(accountingEntrySearch);
 
         List<WsAccountingEntry> wsAccountingEntrys = accountingEntrys.stream()

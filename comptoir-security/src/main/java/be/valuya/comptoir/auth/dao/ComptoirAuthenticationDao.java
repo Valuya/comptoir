@@ -1,8 +1,8 @@
 package be.valuya.comptoir.auth.dao;
 
+import be.valuya.comptoir.auth.domain.EmployeePrincipal;
 import be.valuya.comptoir.auth.glassfish.ComptoirRealmOptions;
 
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -16,7 +16,7 @@ public interface ComptoirAuthenticationDao {
 
     boolean checkEmployeePassword(long id, char[] password);
 
-    List<String> fetchEmployeeGroups(long id);
+    EmployeePrincipal fetchEmployeeInfo(long employeeId);
 
     Optional<Long> findAuthWithToken(String token);
 

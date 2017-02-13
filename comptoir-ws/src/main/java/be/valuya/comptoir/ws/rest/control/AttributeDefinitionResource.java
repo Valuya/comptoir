@@ -11,6 +11,7 @@ import be.valuya.comptoir.util.pagination.Pagination;
 import be.valuya.comptoir.ws.convert.commercial.FromWsAttributeDefinitionConverter;
 import be.valuya.comptoir.ws.convert.commercial.ToWsAttributeDefinitionConverter;
 import be.valuya.comptoir.ws.convert.search.FromWsAttributeSearchConverter;
+import be.valuya.comptoir.ws.rest.validation.EmployeeAccessChecker;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
 import be.valuya.comptoir.ws.rest.validation.NoId;
 import be.valuya.comptoir.ws.security.Roles;
@@ -47,6 +48,8 @@ public class AttributeDefinitionResource {
     private ToWsAttributeDefinitionConverter toWsAttributeDefinitionConverter;
     @Inject
     private IdChecker idChecker;
+    @Inject
+    private EmployeeAccessChecker employeeAccessChecker;
     @Context
     private HttpServletResponse response;
     @Context
@@ -58,6 +61,7 @@ public class AttributeDefinitionResource {
     @Valid
     public WsAttributeDefinitionRef createAttributeDefinition(@NoId @Valid WsAttributeDefinition wsAttributeDefinition) {
         AttributeDefinition attributeDefinition = fromWsAttributeDefinitionConverter.convert(wsAttributeDefinition);
+        employeeAccessChecker.checkOwnCompany(attributeDefinition);
         AttributeDefinition savedAttributeDefinition = stockService.saveAttributeDefinition(attributeDefinition);
 
         WsAttributeDefinitionRef attributeDefinitionRef = toWsAttributeDefinitionConverter.reference(savedAttributeDefinition);
@@ -71,6 +75,7 @@ public class AttributeDefinitionResource {
     public WsAttributeDefinitionRef updateAttributeDefinition(@PathParam("id") long id, @Valid WsAttributeDefinition wsAttributeDefinition) {
         idChecker.checkId(id, wsAttributeDefinition);
         AttributeDefinition attributeDefinition = fromWsAttributeDefinitionConverter.convert(wsAttributeDefinition);
+        employeeAccessChecker.checkOwnCompany(attributeDefinition);
         AttributeDefinition savedAttributeDefinition = stockService.saveAttributeDefinition(attributeDefinition);
 
         WsAttributeDefinitionRef attributeDefinitionRef = toWsAttributeDefinitionConverter.reference(savedAttributeDefinition);
@@ -83,6 +88,7 @@ public class AttributeDefinitionResource {
     @Valid
     public WsAttributeDefinition getAttributeDefinition(@PathParam("id") long id) {
         AttributeDefinition attributeDefinition = stockService.findAttributeDefinitionById(id);
+        employeeAccessChecker.checkOwnCompany(attributeDefinition);
 
         WsAttributeDefinition wsAttributeDefinition = toWsAttributeDefinitionConverter.convert(attributeDefinition);
 
@@ -96,6 +102,7 @@ public class AttributeDefinitionResource {
         Pagination<AttributeDefinition, AttributeDefinitionColumn> pagination = restPaginationUtil.extractPagination(uriInfo, AttributeDefinitionColumn::valueOf);
 
         AttributeSearch attributeSearch = fromWsAttributeSearchConverter.convert(wsAttributeSearch);
+        employeeAccessChecker.checkOwnCompany(attributeSearch);
 
         List<AttributeDefinition> attributeDefinitions = stockService.findAttributeDefinitions(attributeSearch, pagination);
 

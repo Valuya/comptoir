@@ -8,6 +8,7 @@ import com.sun.enterprise.security.BaseRealm;
 import com.sun.enterprise.security.auth.realm.*;
 
 import javax.jms.IllegalStateException;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
@@ -42,7 +43,7 @@ public class ComptoirRealm extends BaseRealm {
         }
         EmployeePrincipal authenticatedEmployee = this.authenticationDao.findEmployeeWithLogin(login)
                 .filter(id -> this.authenticationDao.checkEmployeePassword(id, password))
-                .map(id -> this.getEmployeePrincipal(id, login))
+                .map(id -> this.authenticationDao.fetchEmployeeInfo(id))
                 .orElse(null);
         return authenticatedEmployee;
     }
@@ -53,10 +54,7 @@ public class ComptoirRealm extends BaseRealm {
         }
         EmployeePrincipal authenticatedEmployee = this.authenticationDao.findAuthWithToken(token)
                 .map(authId -> this.authenticationDao.findEmployeeIdForAuthId(authId))
-                .map(id -> {
-                    String login = this.authenticationDao.findEmployeeLogin(id);
-                    return this.getEmployeePrincipal(id, login);
-                })
+                .map(id -> this.authenticationDao.fetchEmployeeInfo(id))
                 .orElse(null);
         return authenticatedEmployee;
     }
@@ -68,8 +66,11 @@ public class ComptoirRealm extends BaseRealm {
         }
         if (principal instanceof EmployeePrincipal) {
             EmployeePrincipal employeePrincipal = (EmployeePrincipal) principal;
-            long employeeId = employeePrincipal.getEmployeeId();
-            List<String> groups = this.authenticationDao.fetchEmployeeGroups(employeeId);
+            List<String> groups = new ArrayList<>();
+            groups.add("employee");
+            if (employeePrincipal.isActive()) {
+                groups.add("active");
+            }
             return groups.toArray(new String[0]);
         }
         return null;
@@ -94,10 +95,4 @@ public class ComptoirRealm extends BaseRealm {
         this.setProperty(IASRealm.JAAS_CONTEXT_PARAM, jaasContextProperty);
     }
 
-    private EmployeePrincipal getEmployeePrincipal(Long id, String login) {
-        EmployeePrincipal employeePrincipal = new EmployeePrincipal();
-        employeePrincipal.setName(login);
-        employeePrincipal.setEmployeeId(id);
-        return employeePrincipal;
-    }
 }

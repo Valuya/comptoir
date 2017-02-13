@@ -9,6 +9,7 @@ import be.valuya.comptoir.service.InvoiceService;
 import be.valuya.comptoir.ws.convert.commercial.FromWsInvoiceConverter;
 import be.valuya.comptoir.ws.convert.commercial.ToWsInvoiceConverter;
 import be.valuya.comptoir.ws.convert.search.FromWsInvoiceSearchConverter;
+import be.valuya.comptoir.ws.rest.validation.EmployeeAccessChecker;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
 import be.valuya.comptoir.ws.rest.validation.NoId;
 import be.valuya.comptoir.ws.security.Roles;
@@ -23,7 +24,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @Path("/invoice")
@@ -41,10 +41,13 @@ public class InvoiceResource {
     private ToWsInvoiceConverter toWsInvoiceConverter;
     @Inject
     private IdChecker idChecker;
+    @Inject
+    private EmployeeAccessChecker accessChecker;
 
     @POST
     public WsInvoiceRef createInvoice(@NoId WsInvoice wsInvoice) {
         Invoice invoice = fromWsInvoiceConverter.convert(wsInvoice);
+        accessChecker.checkOwnCompany(invoice);
         Invoice savedInvoice = invoiceService.saveInvoice(invoice);
         WsInvoiceRef invoiceRef = toWsInvoiceConverter.reference(savedInvoice);
         return invoiceRef;
@@ -56,6 +59,7 @@ public class InvoiceResource {
     public WsInvoiceRef saveInvoice(@PathParam("id") long id, @Valid WsInvoice wsInvoice) {
         idChecker.checkId(id, wsInvoice);
         Invoice invoice = fromWsInvoiceConverter.convert(wsInvoice);
+        accessChecker.checkOwnCompany(invoice);
         Invoice savedInvoice = invoiceService.saveInvoice(invoice);
         WsInvoiceRef invoiceRef = toWsInvoiceConverter.reference(savedInvoice);
         return invoiceRef;
@@ -66,6 +70,7 @@ public class InvoiceResource {
     @GET
     public WsInvoice getInvoice(@PathParam("id") long id) {
         Invoice invoice = invoiceService.findInvoiceById(id);
+        accessChecker.checkOwnCompany(invoice);
 
         WsInvoice wsInvoice = toWsInvoiceConverter.convert(invoice);
 
@@ -77,6 +82,7 @@ public class InvoiceResource {
     @POST
     public List<WsInvoice> findInvoices(@Valid WsInvoiceSearch wsInvoiceSearch) {
         InvoiceSearch invoiceSearch = fromWsInvoiceSearchConverter.convert(wsInvoiceSearch);
+        accessChecker.checkOwnCompany(invoiceSearch);
         List<Invoice> invoices = invoiceService.findInvoices(invoiceSearch);
 
         List<WsInvoice> wsInvoices = invoices.stream()

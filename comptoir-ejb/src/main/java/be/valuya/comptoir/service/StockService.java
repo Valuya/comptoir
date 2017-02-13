@@ -37,6 +37,7 @@ public class StockService {
     @EJB
     private PaginatedQueryService paginatedQueryService;
 
+
     @Nonnull
     public List<Item> findItems(@Nonnull ItemSearch itemSearch, @CheckForNull Pagination<Item, ItemColumn> pagination) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();

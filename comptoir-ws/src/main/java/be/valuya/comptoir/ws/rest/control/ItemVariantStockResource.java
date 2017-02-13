@@ -14,6 +14,7 @@ import be.valuya.comptoir.util.pagination.Pagination;
 import be.valuya.comptoir.ws.convert.search.FromWsItemVariantStockSearchConverter;
 import be.valuya.comptoir.ws.convert.stock.FromWsItemVariantStockConverter;
 import be.valuya.comptoir.ws.convert.stock.ToWsItemVariantStockConverter;
+import be.valuya.comptoir.ws.rest.validation.EmployeeAccessChecker;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
 import be.valuya.comptoir.ws.rest.validation.NoId;
 import be.valuya.comptoir.ws.rest.validation.StockChangeChecker;
@@ -34,7 +35,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @Path("/itemVariantStock")
@@ -61,11 +61,14 @@ public class ItemVariantStockResource {
     private RestPaginationUtil restPaginationUtil;
     @Inject
     private StockChangeChecker stockChangeChecker;
+    @Inject
+    private EmployeeAccessChecker accessChecker;
 
     @POST
     @Valid
     public WsItemStockRef createItemStock(@NoId @Valid WsItemStock wsItemStock) {
         ItemStock itemStock = fromWsItemVariantStockConverter.convert(wsItemStock);
+        accessChecker.checkOwnCompany(itemStock.getStock());
         // TODO: handle transfers in another resource
         stockChangeChecker.checkStockChangeType(itemStock, StockChangeType.INITIAL, StockChangeType.ADJUSTMENT);
 
@@ -86,6 +89,7 @@ public class ItemVariantStockResource {
     @Valid
     public WsItemStock getItemStock(@PathParam("id") long id) {
         ItemStock itemStock = stockService.findItemStockById(id);
+        accessChecker.checkOwnCompany(itemStock.getStock());
         WsItemStock wsItemStock = toWsItemVariantStockConverter.convert(itemStock);
         return wsItemStock;
     }
@@ -97,6 +101,7 @@ public class ItemVariantStockResource {
         Pagination<ItemStock, ItemVariantStockColumn> pagination = restPaginationUtil.extractPagination(uriInfo, ItemVariantStockColumn::valueOf);
 
         ItemStockSearch variantStockSearch = fromWsItemVariantStockSearchConverter.convert(wsItemVariantStockSearch);
+        accessChecker.checkOwnCompany(variantStockSearch);
         List<ItemStock> itemStocks = stockService.findItemStocks(variantStockSearch, pagination);
 
         List<WsItemStock> wsItemStocks = itemStocks.stream()

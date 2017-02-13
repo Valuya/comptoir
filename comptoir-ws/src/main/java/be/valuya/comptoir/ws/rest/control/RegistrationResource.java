@@ -10,9 +10,9 @@ import be.valuya.comptoir.service.RegistrationService;
 import be.valuya.comptoir.ws.convert.company.FromWsCompanyConverter;
 import be.valuya.comptoir.ws.convert.company.ToWsCompanyConverter;
 import be.valuya.comptoir.ws.convert.thirdparty.FromWsEmployeeConverter;
-import be.valuya.comptoir.ws.security.Roles;
+import be.valuya.comptoir.ws.rest.validation.EmployeeAccessChecker;
 
-import javax.annotation.security.RolesAllowed;
+import javax.annotation.security.PermitAll;
 import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -23,13 +23,12 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @Path("/registration")
 @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-@RolesAllowed({Roles.EMPLOYEE})
+@PermitAll
 public class RegistrationResource {
 
     @EJB
@@ -40,6 +39,8 @@ public class RegistrationResource {
     private FromWsEmployeeConverter fromWsEmployeeConverter;
     @Inject
     private ToWsCompanyConverter toWsCompanyConverter;
+    @Inject
+    private EmployeeAccessChecker accessChecker;
 
     @POST
     @Valid

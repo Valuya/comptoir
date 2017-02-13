@@ -12,6 +12,7 @@ import be.valuya.comptoir.ws.convert.commercial.FromWsItemConverter;
 import be.valuya.comptoir.ws.convert.commercial.ToWsItemConverter;
 import be.valuya.comptoir.ws.convert.search.FromWsItemSearchConverter;
 import be.valuya.comptoir.ws.rest.validation.ActiveStateChecker;
+import be.valuya.comptoir.ws.rest.validation.EmployeeAccessChecker;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
 import be.valuya.comptoir.ws.rest.validation.NoId;
 import be.valuya.comptoir.ws.security.Roles;
@@ -29,7 +30,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @Path("/item")
@@ -56,11 +56,14 @@ public class ItemResource {
     private RestPaginationUtil restPaginationUtil;
     @Inject
     private ActiveStateChecker activeStateChecker;
+    @Inject
+    private EmployeeAccessChecker employeeAccessChecker;
 
     @POST
     @Valid
     public WsItemRef createItem(@NoId @Valid WsItem wsItem) {
         Item item = fromWsItemConverter.convert(wsItem);
+        employeeAccessChecker.checkOwnCompany(item);
         Item savedItem = stockService.saveItem(item);
 
         WsItemRef itemRef = toWsItemConverter.reference(savedItem);
@@ -74,6 +77,7 @@ public class ItemResource {
     public WsItemRef updateItem(@PathParam("id") long id, @Valid WsItem wsItem) {
         idChecker.checkId(id, wsItem);
         Item item = fromWsItemConverter.convert(wsItem);
+        employeeAccessChecker.checkOwnCompany(item);
         Item savedItem = stockService.saveItem(item);
 
         WsItemRef itemRef = toWsItemConverter.reference(savedItem);
@@ -86,6 +90,7 @@ public class ItemResource {
     @Valid
     public WsItem getItem(@PathParam("id") long id) {
         Item item = stockService.findItemById(id);
+        employeeAccessChecker.checkOwnCompany(item);
 
         WsItem wsItem = toWsItemConverter.convert(item);
 
@@ -96,6 +101,7 @@ public class ItemResource {
     @DELETE
     public void deleteItem(@PathParam("id") long id) {
         Item item = stockService.findItemById(id);
+        employeeAccessChecker.checkOwnCompany(item);
         activeStateChecker.checkState(item, true);
         item.setActive(false);
         stockService.saveItem(item);
@@ -108,6 +114,7 @@ public class ItemResource {
         Pagination<Item, ItemColumn> pagination = restPaginationUtil.extractPagination(uriInfo, ItemColumn::valueOf);
 
         ItemSearch itemSearch = fromWsItemSearchConverter.convert(wsItemSearch);
+        employeeAccessChecker.checkOwnCompany(itemSearch);
 
         List<Item> items = stockService.findItems(itemSearch, pagination);
 

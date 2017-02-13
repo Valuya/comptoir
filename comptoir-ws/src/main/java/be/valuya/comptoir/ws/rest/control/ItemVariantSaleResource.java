@@ -12,6 +12,7 @@ import be.valuya.comptoir.util.pagination.Pagination;
 import be.valuya.comptoir.ws.convert.commercial.FromWsItemVariantSaleConverter;
 import be.valuya.comptoir.ws.convert.commercial.ToWsItemVariantSaleConverter;
 import be.valuya.comptoir.ws.convert.search.FromWsItemVariantSaleSearchConverter;
+import be.valuya.comptoir.ws.rest.validation.EmployeeAccessChecker;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
 import be.valuya.comptoir.ws.rest.validation.NoId;
 import be.valuya.comptoir.ws.rest.validation.SaleStateChecker;
@@ -56,11 +57,14 @@ public class ItemVariantSaleResource {
     private UriInfo uriInfo;
     @Inject
     private RestPaginationUtil restPaginationUtil;
+    @Inject
+    private EmployeeAccessChecker accessChecker;
 
     @POST
     @Valid
     public WsItemVariantSaleRef createItemSale(@NoId @Valid WsItemVariantSale wsItemSale) {
         ItemVariantSale itemSale = fromWsItemSaleConverter.convert(wsItemSale);
+        accessChecker.checkOwnCompany(itemSale.getSale());
         ItemVariantSale savedItemSale = saleService.saveItemSale(itemSale);
         WsItemVariantSaleRef itemSaleRef = toWsItemSaleConverter.reference(savedItemSale);
         WsItemVariantSaleRef savedItemSaleRef = itemSaleRef;
@@ -74,6 +78,7 @@ public class ItemVariantSaleResource {
         idChecker.checkId(id, wsItemSale);
 
         ItemVariantSale existingItemSale = saleService.findItemSaleById(id);
+        accessChecker.checkOwnCompany(existingItemSale.getSale());
         Sale sale = existingItemSale.getSale();
         saleStateChecker.checkState(sale, false);
 
@@ -90,6 +95,7 @@ public class ItemVariantSaleResource {
     @Valid
     public WsItemVariantSale getItemSale(@PathParam("id") long id) {
         ItemVariantSale itemSale = saleService.findItemSaleById(id);
+        accessChecker.checkOwnCompany(itemSale.getSale());
 
         WsItemVariantSale wsItemSale = toWsItemSaleConverter.convert(itemSale);
 
@@ -102,6 +108,7 @@ public class ItemVariantSaleResource {
     public List<WsItemVariantSale> findItemSales(@Valid WsItemVariantSaleSearch wsItemSaleSearch) {
         Pagination<ItemVariantSale, ItemVariantSaleColumn> pagination = restPaginationUtil.extractPagination(uriInfo, ItemVariantSaleColumn::valueOf);
         ItemVariantSaleSearch itemSaleSearch = fromWsItemSaleSearchConverter.convert(wsItemSaleSearch);
+        accessChecker.checkOwnCompany(itemSaleSearch);
         List<ItemVariantSale> itemSales = saleService.findItemSales(itemSaleSearch, pagination);
 
         List<WsItemVariantSale> wsItemSales = itemSales.stream()
@@ -119,6 +126,7 @@ public class ItemVariantSaleResource {
         if (itemSale == null) {
             return;
         }
+        accessChecker.checkOwnCompany(itemSale.getSale());
         Sale sale = itemSale.getSale();
         saleStateChecker.checkState(sale, false); // TODO: replace with bean validation
 

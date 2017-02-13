@@ -6,6 +6,7 @@ import be.valuya.comptoir.model.thirdparty.Employee;
 import be.valuya.comptoir.service.AuthService;
 import be.valuya.comptoir.service.EmployeeService;
 import be.valuya.comptoir.ws.convert.auth.ToWsAuthConverter;
+import be.valuya.comptoir.ws.rest.validation.EmployeeAccessChecker;
 import be.valuya.comptoir.ws.security.Roles;
 
 import javax.annotation.security.RolesAllowed;
@@ -22,6 +23,7 @@ import java.security.Principal;
 @Path("/auth")
 @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+@RolesAllowed({Roles.EMPLOYEE})
 public class AuthResource {
 
     @EJB
@@ -32,14 +34,15 @@ public class AuthResource {
     private ToWsAuthConverter toWsAuthConverter;
     @Inject
     private Principal principal;
+    @Inject
+    private EmployeeAccessChecker accessChecker;
 
     @POST
     @Path("/refresh/{refreshToken}")
     @Valid
-    @RolesAllowed({Roles.EMPLOYEE})
     public WsAuth refreshAuth(@PathParam("refreshToken") String refreshToken) {
         Auth auth = authService.refreshAuth(refreshToken);
-
+        accessChecker.checkSelf(auth.getEmployee());
         WsAuth wsAuth = toWsAuthConverter.convert(auth);
 
         return wsAuth;
@@ -47,7 +50,6 @@ public class AuthResource {
 
     @POST
     @Valid
-    @RolesAllowed({Roles.EMPLOYEE})
     public WsAuth login() {
         String loggedEmployeePrincipalName = this.principal.getName();
         Employee employee = employeeService.findEmployeeByLogin(loggedEmployeePrincipalName);

@@ -12,6 +12,7 @@ import be.valuya.comptoir.ws.convert.commercial.FromWsItemVariantConverter;
 import be.valuya.comptoir.ws.convert.commercial.ToWsItemVariantConverter;
 import be.valuya.comptoir.ws.convert.search.FromWsItemVariantSearchConverter;
 import be.valuya.comptoir.ws.rest.validation.ActiveStateChecker;
+import be.valuya.comptoir.ws.rest.validation.EmployeeAccessChecker;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
 import be.valuya.comptoir.ws.rest.validation.NoId;
 import be.valuya.comptoir.ws.security.Roles;
@@ -29,7 +30,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @Path("/itemVariant")
@@ -56,11 +56,14 @@ public class ItemVariantResource {
     private RestPaginationUtil restPaginationUtil;
     @Inject
     private ActiveStateChecker activeStateChecker;
+    @Inject
+    private EmployeeAccessChecker accessChecker;
 
     @POST
     @Valid
     public WsItemVariantRef createItemVariant(@NoId @Valid WsItemVariant wsItem) {
         ItemVariant itemVariant = fromWsItemConverter.convert(wsItem);
+        accessChecker.checkOwnCompany(itemVariant.getItem());
         ItemVariant savedItem = stockService.saveItemVariant(itemVariant);
 
         WsItemVariantRef itemVariantRef = toWsItemConverter.reference(savedItem);
@@ -74,6 +77,7 @@ public class ItemVariantResource {
     public WsItemVariantRef updateItemVariant(@PathParam("id") long id, @Valid WsItemVariant wsItem) {
         idChecker.checkId(id, wsItem);
         ItemVariant itemVariant = fromWsItemConverter.convert(wsItem);
+        accessChecker.checkOwnCompany(itemVariant.getItem());
         ItemVariant savedItem = stockService.saveItemVariant(itemVariant);
 
         WsItemVariantRef itemVariantRef = toWsItemConverter.reference(savedItem);
@@ -86,6 +90,7 @@ public class ItemVariantResource {
     @Valid
     public WsItemVariant getItemVariant(@PathParam("id") long id) {
         ItemVariant itemVariant = stockService.findItemVariantById(id);
+        accessChecker.checkOwnCompany(itemVariant.getItem());
 
         WsItemVariant wsItem = toWsItemConverter.convert(itemVariant);
 
@@ -96,6 +101,7 @@ public class ItemVariantResource {
     @DELETE
     public void deleteItemVariant(@PathParam("id") long id) {
         ItemVariant itemVariant = stockService.findItemVariantById(id);
+        accessChecker.checkOwnCompany(itemVariant.getItem());
         activeStateChecker.checkState(itemVariant, true);
         itemVariant.setActive(false);
         stockService.saveItemVariant(itemVariant);
@@ -108,6 +114,7 @@ public class ItemVariantResource {
         Pagination<ItemVariant, ItemVariantColumn> pagination = restPaginationUtil.extractPagination(uriInfo, ItemVariantColumn::valueOf);
 
         ItemVariantSearch itemVariantSearch = fromWsItemVariantSearchConverter.convert(wsItemVariantSearch);
+        accessChecker.checkOwnCompany(itemVariantSearch.getItemSearch());
 
         List<ItemVariant> items = stockService.findItemVariants(itemVariantSearch, pagination);
 

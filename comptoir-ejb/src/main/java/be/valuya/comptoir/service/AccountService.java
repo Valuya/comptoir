@@ -1,11 +1,6 @@
 package be.valuya.comptoir.service;
 
-import be.valuya.comptoir.model.accounting.Account;
-import be.valuya.comptoir.model.accounting.AccountType;
-import be.valuya.comptoir.model.accounting.Account_;
-import be.valuya.comptoir.model.accounting.AccountingEntry;
-import be.valuya.comptoir.model.accounting.AccountingEntry_;
-import be.valuya.comptoir.model.accounting.AccountingTransaction;
+import be.valuya.comptoir.model.accounting.*;
 import be.valuya.comptoir.model.cash.Balance;
 import be.valuya.comptoir.model.cash.Balance_;
 import be.valuya.comptoir.model.cash.MoneyPile;
@@ -20,9 +15,7 @@ import be.valuya.comptoir.model.search.BalanceSearch;
 import be.valuya.comptoir.util.pagination.AccountColumn;
 import be.valuya.comptoir.util.pagination.BalanceColumn;
 import be.valuya.comptoir.util.pagination.Pagination;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
+
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.ejb.EJB;
@@ -30,17 +23,12 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.From;
-import javax.persistence.criteria.Join;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import javax.persistence.criteria.Subquery;
+import javax.persistence.criteria.*;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @Stateless

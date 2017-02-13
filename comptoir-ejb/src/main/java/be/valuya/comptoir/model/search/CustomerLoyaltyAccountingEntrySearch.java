@@ -1,6 +1,7 @@
 package be.valuya.comptoir.model.search;
 
 import be.valuya.comptoir.model.commercial.Sale;
+import be.valuya.comptoir.model.common.WithCompany;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.thirdparty.Customer;
 
@@ -11,7 +12,7 @@ import java.time.ZonedDateTime;
 /**
  * Created by cghislai on 24/03/16.
  */
-public class CustomerLoyaltyAccountingEntrySearch {
+public class CustomerLoyaltyAccountingEntrySearch implements WithCompany {
     @NotNull
     @Nonnull
     private Company company;

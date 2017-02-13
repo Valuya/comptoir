@@ -11,6 +11,7 @@ import be.valuya.comptoir.util.pagination.Pagination;
 import be.valuya.comptoir.ws.convert.accounting.FromWsAccountConverter;
 import be.valuya.comptoir.ws.convert.accounting.ToWsAccountConverter;
 import be.valuya.comptoir.ws.convert.search.FromWsAccountSearchConverter;
+import be.valuya.comptoir.ws.rest.validation.EmployeeAccessChecker;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
 import be.valuya.comptoir.ws.rest.validation.NoId;
 import be.valuya.comptoir.ws.security.Roles;
@@ -52,11 +53,14 @@ public class AccountResource {
     private UriInfo uriInfo;
     @Inject
     private RestPaginationUtil restPaginationUtil;
+    @Inject
+    private EmployeeAccessChecker employeeAccessChecker;
 
     @POST
     @Valid
     public WsAccountRef createAccount(@NoId @Valid WsAccount wsAccount) {
         Account account = fromWsAccountConverter.convert(wsAccount);
+        employeeAccessChecker.checkOwnCompany(account);
         Account savedAccount = accountService.saveAccount(account);
 
         WsAccountRef accountRef = toWsAccountConverter.reference(savedAccount);
@@ -70,6 +74,7 @@ public class AccountResource {
     public WsAccountRef saveAccount(@PathParam("id") long id, @Valid WsAccount wsAccount) {
         idChecker.checkId(id, wsAccount);
         Account account = fromWsAccountConverter.convert(wsAccount);
+        employeeAccessChecker.checkOwnCompany(account);
         Account savedAccount = accountService.saveAccount(account);
 
         WsAccountRef accountRef = toWsAccountConverter.reference(savedAccount);
@@ -81,6 +86,7 @@ public class AccountResource {
     @GET
     public WsAccount getAccount(@PathParam("id") long id) {
         Account account = accountService.findAccountById(id);
+        employeeAccessChecker.checkOwnCompany(account);
 
         WsAccount wsAccount = toWsAccountConverter.convert(account);
 
@@ -94,6 +100,7 @@ public class AccountResource {
         Pagination<Account, AccountColumn> pagination = restPaginationUtil.extractPagination(uriInfo, AccountColumn::valueOf);
 
         AccountSearch accountSearch = fromWsAccountSearchConverter.convert(wsAccountSearch);
+        employeeAccessChecker.checkOwnCompany(accountSearch);
         List<Account> accounts = accountService.findAccounts(accountSearch, pagination);
 
         List<WsAccount> wsAccounts = accounts.stream()

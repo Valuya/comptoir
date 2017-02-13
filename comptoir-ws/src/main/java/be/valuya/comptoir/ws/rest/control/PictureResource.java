@@ -9,6 +9,7 @@ import be.valuya.comptoir.service.StockService;
 import be.valuya.comptoir.ws.convert.commercial.FromWsPictureConverter;
 import be.valuya.comptoir.ws.convert.commercial.ToWsPictureConverter;
 import be.valuya.comptoir.ws.convert.search.FromWsPictureSearchConverter;
+import be.valuya.comptoir.ws.rest.validation.EmployeeAccessChecker;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
 import be.valuya.comptoir.ws.rest.validation.NoId;
 import be.valuya.comptoir.ws.security.Roles;
@@ -23,7 +24,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @Path("/picture")
@@ -42,11 +42,14 @@ public class PictureResource {
     private FromWsPictureSearchConverter fromWsPictureSearchConverter;
     @Inject
     private IdChecker idChecker;
+    @Inject
+    private EmployeeAccessChecker accessChecker;
 
     @POST
     @Valid
     public WsPictureRef createPicture(@NoId @Valid WsPicture wsPicture) {
         Picture picture = fromWsPictureConverter.convert(wsPicture);
+        accessChecker.checkOwnCompany(picture);
         Picture savedPicture = stockService.savePicture(picture);
         WsPictureRef pictureRef = toWsPictureConverter.reference(savedPicture);
         return pictureRef;
@@ -58,6 +61,7 @@ public class PictureResource {
     public WsPictureRef updatePicture(@PathParam("id") long id, WsPicture wsPicture) {
         idChecker.checkId(id, wsPicture);
         Picture picture = fromWsPictureConverter.convert(wsPicture);
+        accessChecker.checkOwnCompany(picture);
         Picture savedPicture = stockService.savePicture(picture);
         WsPictureRef pictureRef = toWsPictureConverter.reference(savedPicture);
         return pictureRef;
@@ -68,6 +72,7 @@ public class PictureResource {
     @Valid
     public List<WsPicture> findPictures(WsPictureSearch wsPictureSearch) {
         PictureSearch pictureSearch = fromWsPictureSearchConverter.convert(wsPictureSearch);
+        accessChecker.checkOwnCompany(pictureSearch);
         List<Picture> pictures = stockService.findPictures(pictureSearch);
 
         List<WsPicture> wsPictures = pictures.stream()
@@ -82,6 +87,7 @@ public class PictureResource {
     @Valid
     public WsPicture getPicture(@PathParam("id") long id) {
         Picture picture = stockService.findPictureById(id);
+        accessChecker.checkOwnCompany(picture);
 
         WsPicture wsPicture = toWsPictureConverter.convert(picture);
 

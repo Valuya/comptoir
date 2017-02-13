@@ -13,6 +13,7 @@ import be.valuya.comptoir.util.pagination.Pagination;
 import be.valuya.comptoir.ws.convert.search.FromWsCustomerSearchConverter;
 import be.valuya.comptoir.ws.convert.thirdparty.FromWsCustomerConverter;
 import be.valuya.comptoir.ws.convert.thirdparty.ToWsCustomerConverter;
+import be.valuya.comptoir.ws.rest.validation.EmployeeAccessChecker;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
 import be.valuya.comptoir.ws.rest.validation.NoId;
 import be.valuya.comptoir.ws.security.Roles;
@@ -55,10 +56,13 @@ public class CustomerResource {
     private HttpServletResponse response;
     @Context
     private UriInfo uriInfo;
+    @Inject
+    private EmployeeAccessChecker accessChecker;
 
     @POST
     public WsCustomerRef createCustomer(@NoId WsCustomer wsCustomer) {
         Customer customer = fromWsCustomerConverter.convert(wsCustomer);
+        accessChecker.checkOwnCompany(customer);
         Customer savedCustomer = customerService.saveCustomer(customer);
 
         WsCustomerRef customerRef = toWsCustomerConverter.reference(savedCustomer);
@@ -73,6 +77,7 @@ public class CustomerResource {
         idChecker.checkId(id, wsCustomer);
 
         Customer existingCustomer = customerService.findCustomerById(id);
+        accessChecker.checkOwnCompany(existingCustomer);
         Customer customer = fromWsCustomerConverter.patch(existingCustomer, wsCustomer);
 
         Customer savedCustomer = customerService.saveCustomer(customer);
@@ -86,6 +91,7 @@ public class CustomerResource {
     @GET
     public WsCustomer getCustomer(@PathParam("id") long id) {
         Customer customer = customerService.findCustomerById(id);
+        accessChecker.checkOwnCompany(customer);
 
         WsCustomer wsCustomer = toWsCustomerConverter.convert(customer);
 
@@ -97,6 +103,7 @@ public class CustomerResource {
     @Path("/{id}/loyaltyBalance")
     public BigDecimal getLoyaltyBalance(@PathParam("id") long id) {
         Customer customer = customerService.findCustomerById(id);
+        accessChecker.checkOwnCompany(customer);
         Company company = customer.getCompany();
 
         CustomerLoyaltyAccountingEntrySearch accountingEntrySearch = new CustomerLoyaltyAccountingEntrySearch();
@@ -116,6 +123,7 @@ public class CustomerResource {
         Pagination<Customer, CustomerColumn> pagination = restPaginationUtil.extractPagination(uriInfo, CustomerColumn::valueOf);
 
         CustomerSearch customerSearch = fromWsCustomerSearchConverter.convert(wsCustomerSearch);
+        accessChecker.checkOwnCompany(customerSearch);
         List<Customer> customers = customerService.findCustomers(customerSearch, pagination);
 
         List<WsCustomer> wsCustomers = customers.stream()

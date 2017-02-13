@@ -7,6 +7,7 @@ import be.valuya.comptoir.service.StockService;
 import be.valuya.comptoir.ws.convert.commercial.FromWsAttributeValueConverter;
 import be.valuya.comptoir.ws.convert.commercial.ToWsAttributeValueConverter;
 import be.valuya.comptoir.ws.convert.search.FromWsAttributeSearchConverter;
+import be.valuya.comptoir.ws.rest.validation.EmployeeAccessChecker;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
 import be.valuya.comptoir.ws.rest.validation.NoId;
 import be.valuya.comptoir.ws.security.Roles;
@@ -41,6 +42,8 @@ public class AttributeValueResource {
     private ToWsAttributeValueConverter toWsAttributeValueConverter;
     @Inject
     private IdChecker idChecker;
+    @Inject
+    private EmployeeAccessChecker employeeAccessChecker;
     @Context
     private HttpServletResponse response;
     @Context
@@ -52,6 +55,7 @@ public class AttributeValueResource {
     @Valid
     public WsAttributeValueRef createAttributeValue(@NoId @Valid WsAttributeValue wsAttributeValue) {
         AttributeValue attributeValue = fromWsAttributeValueConverter.convert(wsAttributeValue);
+        employeeAccessChecker.checkOwnCompany(attributeValue.getAttributeDefinition());
         AttributeValue savedAttributeValue = stockService.saveAttributeValue(attributeValue);
 
         WsAttributeValueRef attributeValueRef = toWsAttributeValueConverter.reference(savedAttributeValue);
@@ -65,6 +69,7 @@ public class AttributeValueResource {
     public WsAttributeValueRef updateAttributeValue(@PathParam("id") long id, @Valid WsAttributeValue wsAttributeValue) {
         idChecker.checkId(id, wsAttributeValue);
         AttributeValue attributeValue = fromWsAttributeValueConverter.convert(wsAttributeValue);
+        employeeAccessChecker.checkOwnCompany(attributeValue.getAttributeDefinition());
         AttributeValue savedAttributeValue = stockService.saveAttributeValue(attributeValue);
 
         WsAttributeValueRef attributeValueRef = toWsAttributeValueConverter.reference(savedAttributeValue);
@@ -77,6 +82,7 @@ public class AttributeValueResource {
     @Valid
     public WsAttributeValue getAttributeValue(@PathParam("id") long id) {
         AttributeValue attributeValue = stockService.findAttributeValueById(id);
+        employeeAccessChecker.checkOwnCompany(attributeValue.getAttributeDefinition());
 
         WsAttributeValue wsAttributeValue = toWsAttributeValueConverter.convert(attributeValue);
 

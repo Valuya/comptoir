@@ -1,24 +1,24 @@
 package be.valuya.comptoir.api.domain.accounting;
 
-import be.valuya.comptoir.model.common.WithId;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.api.domain.lang.WsLocaleText;
 import be.valuya.comptoir.api.domain.thirdparty.WsCustomerRef;
 import be.valuya.comptoir.api.utils.ZonedDateTimeXmlAdapter;
-import java.io.Serializable;
-import java.math.BigDecimal;
-import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.Objects;
+import be.valuya.comptoir.model.common.WithId;
+
 import javax.annotation.Nonnull;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.Objects;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @XmlRootElement(name = "AccountingEntry")
@@ -84,7 +84,7 @@ public class WsAccountingEntry implements Serializable, WithId {
     }
 
     public void setAmount(@NotNull
-            @Nonnull BigDecimal amount) {
+                          @Nonnull BigDecimal amount) {
         this.amount = amount;
     }
 
@@ -103,7 +103,7 @@ public class WsAccountingEntry implements Serializable, WithId {
     }
 
     public void setDateTime(@NotNull
-            @Nonnull ZonedDateTime dateTime) {
+                            @Nonnull ZonedDateTime dateTime) {
         this.dateTime = dateTime;
     }
 
