@@ -77,19 +77,20 @@ public class ComptoirAuthModule implements ServerAuthModule {
         final HttpServletRequest request = (HttpServletRequest) messageInfo.getRequestMessage();
         final HttpServletResponse response = (HttpServletResponse) messageInfo.getResponseMessage();
 
-        if (!request.isSecure() && !requestPolicy.isMandatory()) {
-            return AuthStatus.SUCCESS;
-        }
-        if (!request.isSecure()) {
-            return this.handleMandatoryAuthenticationFailure(request, response);
-        }
-
         // Extract credential
         this.extractedCredentials = new HashSet<>();
         this.credentialProviders.stream()
                 .map(provider -> provider.extractCredentials(request))
                 .forEach(credOptional -> credOptional.ifPresent(extractedCredentials::add));
         clientSubject.getPrivateCredentials().addAll(extractedCredentials);
+
+        if (extractedCredentials.isEmpty()) {
+            boolean isOptions = "OPTIONS".equals(request.getMethod());
+            boolean mandatory = requestPolicy.isMandatory();
+            if (!isOptions && mandatory) {
+                return this.handleMandatoryAuthenticationFailure(request, response);
+            }
+        }
 
         // Attempt to authenticate using them
         AuthStatus authStatus = AuthStatus.SUCCESS;
