@@ -130,7 +130,7 @@
                             <name>org.jooq.util.mysql.MySQLDatabase</name>
                             <includes>ps_attribute.*|ps_product.*|ps_lang</includes>
                             <excludes></excludes>
-                            <inputSchema>petitnapo</inputSchema>
+                            <inputSchema>${db.napo.schema}</inputSchema>
                             <forcedTypes>
                                 <forcedType>
                                     <name>BOOLEAN</name>
