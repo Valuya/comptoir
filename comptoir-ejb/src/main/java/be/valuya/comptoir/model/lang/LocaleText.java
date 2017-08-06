@@ -1,9 +1,5 @@
 package be.valuya.comptoir.model.lang;
 
-import java.io.Serializable;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -14,9 +10,12 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.Table;
+import java.io.Serializable;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @Entity

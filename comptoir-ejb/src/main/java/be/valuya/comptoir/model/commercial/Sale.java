@@ -6,7 +6,16 @@ import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.thirdparty.Customer;
 
 import javax.annotation.Nonnull;
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
@@ -35,7 +44,6 @@ public class Sale implements Serializable, WithCompany {
     @OneToOne(mappedBy = "sale", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Invoice invoice;
     @NotNull
-    @Nonnull
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "accounting_transaction_id")
     private AccountingTransaction accountingTransaction;
@@ -96,12 +104,11 @@ public class Sale implements Serializable, WithCompany {
     }
 
     @NotNull
-    @Nonnull
     public AccountingTransaction getAccountingTransaction() {
         return accountingTransaction;
     }
 
-    public void setAccountingTransaction(@NotNull @Nonnull AccountingTransaction accountingTransaction) {
+    public void setAccountingTransaction(@NotNull AccountingTransaction accountingTransaction) {
         this.accountingTransaction = accountingTransaction;
     }
 

@@ -3,8 +3,8 @@ package be.valuya.comptoir.ws.config;
 import be.valuya.comptoir.ws.ComptoirWsRoot;
 import be.valuya.wsfilter.CrossOriginResourceSharingResponseFilter;
 import be.valuya.wsfilter.WsExceptionMapper;
+import org.glassfish.jersey.message.filtering.SecurityEntityFilteringFeature;
 import org.glassfish.jersey.server.ResourceConfig;
-import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 
 import javax.ws.rs.ApplicationPath;
 
@@ -18,7 +18,7 @@ public class ComptoirWsApplication extends ResourceConfig {
         packages(true, ComptoirWsRoot.class.getPackage().getName());
         register(CrossOriginResourceSharingResponseFilter.class);
         register(WsExceptionMapper.class);
-        register(RolesAllowedDynamicFeature.class);
+        register(SecurityEntityFilteringFeature.class);
     }
 
 }

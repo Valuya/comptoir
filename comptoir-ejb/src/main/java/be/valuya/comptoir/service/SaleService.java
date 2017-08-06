@@ -397,6 +397,7 @@ public class SaleService {
         }
 
         ItemVariantSale managedItemSale = entityManager.merge(itemSale);
+        entityManager.flush();
         Sale managedSale = managedItemSale.getSale();
         managedSale = calcSale(managedSale);
 

@@ -23,4 +23,5 @@ public interface ComptoirAuthenticationDao {
     Long findEmployeeIdForAuthId(long authId);
 
     String findEmployeeLogin(long id);
+
 }

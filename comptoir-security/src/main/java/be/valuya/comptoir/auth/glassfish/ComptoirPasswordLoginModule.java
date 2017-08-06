@@ -33,11 +33,10 @@ public class ComptoirPasswordLoginModule extends BasePasswordLoginModule {
         } else {
             comptoirPrincipal = comptoirRealm.authenticateUserLoginPassword(_username, _passwd);
         }
-        String[] groups = comptoirRealm.fetchGroups(comptoirPrincipal);
-
-        if (comptoirPrincipal == null || groups == null) {
+        if (comptoirPrincipal == null) {
             throw new LoginException("Login failed for " + _username);
         }
+        String[] groups = comptoirRealm.fetchGroups(comptoirPrincipal.getName());
 
         LOG.fine("Login suceeded for " + comptoirPrincipal.toString() + " : " + Arrays.toString(groups));
         _subject.getPrincipals().add(comptoirPrincipal);

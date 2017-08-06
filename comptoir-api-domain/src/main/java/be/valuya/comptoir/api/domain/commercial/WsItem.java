@@ -3,23 +3,24 @@ package be.valuya.comptoir.api.domain.commercial;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.api.domain.lang.WsLocaleText;
 import be.valuya.comptoir.model.common.WithId;
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Objects;
+
 import javax.annotation.Nonnull;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Objects;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @XmlRootElement(name = "Item")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class WsItem implements WithId {
+public class WsItem implements WithId, Serializable {
 
     private Long id;
     @NotNull

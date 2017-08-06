@@ -4,7 +4,18 @@
 <glassfish-web-app error-url="" httpservlet-security-provider="ComptoirSAM">
     <context-root>/comptoir-ws</context-root>
     <class-loader delegate="true"/>
-
     <parameter-encoding default-charset="UTF-8"/>
 
+    <security-role-mapping>
+        <role-name>anonymous</role-name>
+        <group-name>anonymous</group-name>
+    </security-role-mapping>
+    <security-role-mapping>
+        <role-name>active</role-name>
+        <group-name>active</group-name>
+    </security-role-mapping>
+    <security-role-mapping>
+        <role-name>employee</role-name>
+        <group-name>employee</group-name>
+    </security-role-mapping>
 </glassfish-web-app>
