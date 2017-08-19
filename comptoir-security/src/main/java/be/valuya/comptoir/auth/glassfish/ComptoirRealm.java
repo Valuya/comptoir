@@ -89,7 +89,6 @@ public class ComptoirRealm extends BaseRealm {
 
     @Override
     public Enumeration getGroupNames(String username) throws InvalidOperationException, NoSuchUserException {
-        System.out.println("Get group name");
         return Collections.enumeration(Arrays.asList(this.fetchGroups(username)));
     }
 

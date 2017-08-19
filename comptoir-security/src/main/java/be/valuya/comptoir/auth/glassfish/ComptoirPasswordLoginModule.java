@@ -27,8 +27,8 @@ public class ComptoirPasswordLoginModule extends BasePasswordLoginModule {
 
         final ComptoirRealm comptoirRealm = (ComptoirRealm) _currentRealm;
         ComptoirPrincipal comptoirPrincipal;
-        if (this._username.startsWith(AuthTokenAuthenticator.TOKEN_LOGIN_PREFIX)) {
-            String token = this._username.substring(AuthTokenAuthenticator.TOKEN_LOGIN_PREFIX.length());
+        if (this._username.equals(AuthTokenAuthenticator.TOKEN_LOGIN)) {
+            String token = new String(this._passwd);
             comptoirPrincipal = comptoirRealm.authenticateUserToken(token);
         } else {
             comptoirPrincipal = comptoirRealm.authenticateUserLoginPassword(_username, _passwd);

@@ -17,7 +17,7 @@ import java.util.logging.Logger;
  * Created by cghislai on 12/02/17.
  */
 public class AuthTokenAuthenticator implements Authenticator {
-    public final static String TOKEN_LOGIN_PREFIX = "ComptoirAuthToken:";
+    public final static String TOKEN_LOGIN = "ComptoirAuthToken";
 
     private final static Logger LOG = Logger.getLogger(AuthTokenAuthenticator.class.getCanonicalName());
 
@@ -56,9 +56,10 @@ public class AuthTokenAuthenticator implements Authenticator {
     }
 
     // Currently delegates to the JAAS using vendor bridge.
+    // TODO: check login availability in ejbs & ws
     private PasswordValidationCallback createCallback(Subject subject, AuthTokenCredential cred) {
-        String token = TOKEN_LOGIN_PREFIX + cred.getToken();
-        PasswordValidationCallback validationCallback = new PasswordValidationCallback(subject, token, null);
+        PasswordValidationCallback validationCallback = new PasswordValidationCallback(
+                subject, TOKEN_LOGIN, cred.getToken().toCharArray());
         return validationCallback;
     }
 

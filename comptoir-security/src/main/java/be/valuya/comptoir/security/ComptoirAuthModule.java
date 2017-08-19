@@ -22,8 +22,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.Principal;
-import java.util.*;
-import java.util.logging.Level;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 /**
@@ -163,7 +166,7 @@ public class ComptoirAuthModule implements ServerAuthModule {
         } catch (IOException e) {
             throw new AuthException(e.getMessage());
         }
-        debug("Mandatory authentification missing");
+        LOG.fine("Mandatory authentification missing");
         return AuthStatus.SEND_FAILURE;
     }
 
@@ -177,7 +180,7 @@ public class ComptoirAuthModule implements ServerAuthModule {
         String callbackValues = subject.getPrincipals().stream()
                 .map(this::getPrincipalString)
                 .reduce("", (cur, next) -> cur + " " + next, String::concat);
-        debug("Authentication result: " + authStatus + " with principals : " + callbackValues);
+        LOG.info("Authentication result: " + authStatus + " with principals : " + callbackValues);
     }
 
     private String getPrincipalString(Principal principal) {
@@ -189,10 +192,4 @@ public class ComptoirAuthModule implements ServerAuthModule {
                 && authStatus != AuthStatus.SEND_FAILURE;
     }
 
-
-    private void debug(String s) {
-        if (this.authModuleOptions.isDebug() && LOG.isLoggable(Level.FINE)) {
-            LOG.fine(s);
-        }
-    }
 }
