@@ -13,9 +13,9 @@ pipeline {
     stages {
         stage ('Build') {
             steps {
-                withMaven(maven: 'maven', mavenSettingsConfig: 'nexus-mvn-settings') {
+               withMaven(maven: 'maven', mavenSettingsConfig: 'db-napo-settings-xml') {
                     sh "mvn -DskipTests=${params.SKIP_TESTS} clean compile install"
-                }
+               }
             }
         }
         stage ('Publish') {
@@ -26,7 +26,7 @@ pipeline {
                         env.MVN_ARGS="-DaltDeploymentRepository=${params.ALT_DEPLOYMENT_REPOSITORY}"
                     }
                 }
-                withMaven(maven: 'maven', mavenSettingsConfig: 'nexus-mvn-settings',
+                withMaven(maven: 'maven', mavenSettingsConfig: 'db-napo-settings-xml',
                           mavenOpts: '-DskipTests=true') {
                     sh "mvn deploy $MVN_ARGS"
                 }
