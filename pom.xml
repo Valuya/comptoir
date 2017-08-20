@@ -13,6 +13,20 @@
         <module>comptoir-ws</module>
         <module>comptoir-security</module>
     </modules>
+
+    <distributionManagement>
+        <repository>
+            <id>nexus@valuya</id>
+            <name>Nexus</name>
+            <url>https://valuya.be:50443/nexus/repository/maven-releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>nexus@valuya</id>
+            <name>Nexus</name>
+            <url>https://valuya.be:50443/nexus/repository/maven-snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
