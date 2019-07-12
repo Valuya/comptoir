@@ -6,7 +6,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import org.glassfish.jersey.linking.InjectLink;
+//import org.glassfish.jersey.linking.InjectLink;
 
 /**
  *
@@ -16,7 +16,7 @@ import org.glassfish.jersey.linking.InjectLink;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class WsAccountRef implements WithId {
 
-    @InjectLink(value = "account/${instance.id}")
+    //@InjectLink(value = "account/${instance.id}")
     @XmlElement
     private URI link;
     @XmlElement

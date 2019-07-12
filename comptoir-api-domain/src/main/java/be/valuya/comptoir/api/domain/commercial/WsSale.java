@@ -1,21 +1,21 @@
 package be.valuya.comptoir.api.domain.commercial;
 
-import be.valuya.comptoir.api.utils.ZonedDateTimeXmlAdapter;
 import be.valuya.comptoir.api.domain.accounting.WsAccountingTransactionRef;
-import be.valuya.comptoir.model.common.WithId;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.api.domain.thirdparty.WsCustomerRef;
-import java.math.BigDecimal;
-import java.time.ZonedDateTime;
-import java.util.Objects;
+import be.valuya.comptoir.api.utils.ZonedDateTimeXmlAdapter;
+import be.valuya.comptoir.model.common.WithId;
+
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.math.BigDecimal;
+import java.time.ZonedDateTime;
+import java.util.Objects;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @XmlRootElement(name = "Sale")

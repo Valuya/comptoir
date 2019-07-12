@@ -1,0 +1,9 @@
+target/
+~*
+/comptoir-ejb/nbproject/
+.idea
+**/*.iml
+./Jenkinsfile
+./Dockerfile
+./docker-compose.yml
+./*.sh

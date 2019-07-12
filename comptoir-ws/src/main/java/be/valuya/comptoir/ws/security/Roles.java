@@ -5,7 +5,8 @@ package be.valuya.comptoir.ws.security;
  */
 public class Roles {
 
+    public static final String ANONYMOUS = "anonymous";
     public static final String ACTIVE = "active";
     public static final String EMPLOYEE = "employee";
-    public static final String ANONYMOUS = "anonymous";
+    public static final String MAINTENANCE = "maintenance";
 }

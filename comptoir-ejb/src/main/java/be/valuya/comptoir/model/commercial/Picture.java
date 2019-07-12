@@ -23,8 +23,9 @@ public class Picture implements Serializable, WithCompany {
     @ManyToOne(optional = false)
     private Company company;
     @Column(name = "picture_data")
+//    @NotNull // cause issue with the jpa modelgen
     @Lob
-    @NotNull
+    @Basic(fetch = FetchType.LAZY)
     private byte[] data;
     @Column(name = "content_type")
     @Size(min = 1, max = 128)

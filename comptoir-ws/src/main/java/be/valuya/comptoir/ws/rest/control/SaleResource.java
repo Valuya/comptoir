@@ -26,11 +26,17 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -179,10 +185,10 @@ public class SaleResource {
 
     @GET
     @Path("{id}/payed")
-    public BigDecimal getSaleTotalPayed(@PathParam("id") long id) {
+    public String getSaleTotalPayed(@PathParam("id") long id) {
         Sale sale = saleService.findSaleById(id);
         accessChecker.checkOwnCompany(sale);
-        return saleService.getSaleTotalPayed(sale);
+        return saleService.getSaleTotalPayed(sale).toPlainString();
     }
 
 }

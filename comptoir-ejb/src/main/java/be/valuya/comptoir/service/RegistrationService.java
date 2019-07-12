@@ -2,7 +2,12 @@ package be.valuya.comptoir.service;
 
 import be.valuya.comptoir.model.accounting.Account;
 import be.valuya.comptoir.model.accounting.AccountType;
-import be.valuya.comptoir.model.commercial.*;
+import be.valuya.comptoir.model.commercial.Item;
+import be.valuya.comptoir.model.commercial.ItemVariant;
+import be.valuya.comptoir.model.commercial.Pos;
+import be.valuya.comptoir.model.commercial.PosPaymentAccount;
+import be.valuya.comptoir.model.commercial.Price;
+import be.valuya.comptoir.model.commercial.Pricing;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.factory.ItemFactory;
 import be.valuya.comptoir.model.factory.LocaleTextFactory;
@@ -10,16 +15,17 @@ import be.valuya.comptoir.model.lang.LocaleText;
 import be.valuya.comptoir.model.stock.Stock;
 import be.valuya.comptoir.model.thirdparty.Customer;
 import be.valuya.comptoir.model.thirdparty.Employee;
+
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
-import javax.ejb.EJB;
-import javax.ejb.Stateless;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 
 /**
  *

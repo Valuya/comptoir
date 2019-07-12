@@ -5,8 +5,8 @@
  */
 package be.valuya.comptoir.ws.rest.validation;
 
-import be.valuya.comptoir.auth.domain.ComptoirPrincipal;
-import be.valuya.comptoir.auth.domain.EmployeePrincipal;
+import be.valuya.comptoir.model.auth.ComptoirPrincipal;
+import be.valuya.comptoir.model.auth.EmployeePrincipal;
 import be.valuya.comptoir.model.common.WithCompany;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.thirdparty.Employee;

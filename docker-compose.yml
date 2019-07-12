@@ -1,0 +1,44 @@
+version: '3.6'
+
+services:
+  comptoir:
+    image: comptoir-back
+    environment:
+      - COMPTOIR_DB_URL=db:3306/comptoir
+      - COMPTOIR_DB_USER=root
+      - COMPTOIR_DB_PASSWORD=password
+    ports:
+      - 8443:8443
+      - 9990:9990
+
+  db:
+    image: mariadb:10
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: comptoir
+    volumes:
+      - db-data:/var/lib/mysql
+      - ../res/comptoir.sql:/docker-entrypoint-initdb.d/comptoir.sql
+    ports:
+      - 22307:3306
+
+  napo-db:
+    image: mariadb:10
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: napo
+    volumes:
+      - napo-db-data:/var/lib/mysql
+      - ../res/petitnapo.sql:/docker-entrypoint-initdb.d/petitnapo.sql
+    networks:
+      - napo-db
+    ports:
+      - 22306:3306
+
+volumes:
+  db-data: {}
+  napo-db-data: {}
+
+networks:
+  napo-db:
+    name: comptoir-napo-db

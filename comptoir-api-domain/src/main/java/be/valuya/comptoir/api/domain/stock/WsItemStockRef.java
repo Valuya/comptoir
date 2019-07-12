@@ -3,7 +3,7 @@ package be.valuya.comptoir.api.domain.stock;
 import be.valuya.comptoir.api.domain.commercial.WsItemVariantRef;
 import be.valuya.comptoir.api.utils.ZonedDateTimeXmlAdapter;
 import be.valuya.comptoir.model.common.WithId;
-import org.glassfish.jersey.linking.InjectLink;
+//import org.glassfish.jersey.linking.InjectLink;
 
 import javax.annotation.Nonnull;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -27,7 +27,7 @@ public class WsItemStockRef implements Serializable, WithId {
 
     @XmlElement
     private Long id;
-    @InjectLink(value = "itemStock/${instance.id}")
+    //@InjectLink(value = "itemStock/${instance.id}")
     @XmlElement
     private URI link;
 
