@@ -1,10 +1,12 @@
 package be.valuya.comptoir.model.auth;
 
 import be.valuya.comptoir.model.thirdparty.Employee;
+
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.Objects;
 import javax.annotation.Nonnull;
+import javax.enterprise.inject.Vetoed;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -14,7 +16,6 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @Entity

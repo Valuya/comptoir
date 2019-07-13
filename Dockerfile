@@ -43,4 +43,4 @@ RUN bash /tmp/setup-wildfly.sh
 COPY --from=BUILD_IMAGE /src/comptoir-ear/target/comptoir-ear-${version}.ear \
     /opt/jboss/wildfly/standalone/deployments/
 
-CMD ["/opt/jboss/wildfly/bin/standalone.sh","-c", "standalone-full.xml", "-b", "0.0.0.0", "-bmanagement", "0.0.0.0"]
+CMD ["/opt/jboss/wildfly/bin/standalone.sh","-c", "standalone-full.xml", "-b", "0.0.0.0", "-bmanagement", "0.0.0.0", "--debug", "*:8787"]

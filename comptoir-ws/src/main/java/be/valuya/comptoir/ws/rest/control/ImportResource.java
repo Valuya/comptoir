@@ -7,7 +7,7 @@ import be.valuya.comptoir.service.ImportSummary;
 import be.valuya.comptoir.service.PrestashopImportParams;
 import be.valuya.comptoir.ws.convert.company.FromWsCompanyConverter;
 import be.valuya.comptoir.ws.rest.validation.EmployeeAccessChecker;
-import be.valuya.comptoir.ws.security.Roles;
+import be.valuya.comptoir.security.ComptoirRoles;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
@@ -21,7 +21,7 @@ import javax.ws.rs.core.MediaType;
 @Path("/import")
 @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-@RolesAllowed({Roles.EMPLOYEE})
+@RolesAllowed({ComptoirRoles.EMPLOYEE})
 public class ImportResource {
 
     @EJB

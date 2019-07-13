@@ -12,10 +12,11 @@ import be.valuya.comptoir.ws.convert.thirdparty.ToWsEmployeeConverter;
 import be.valuya.comptoir.ws.rest.validation.EmployeeAccessChecker;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
 import be.valuya.comptoir.ws.rest.validation.NoId;
-import be.valuya.comptoir.ws.security.Roles;
+import be.valuya.comptoir.security.ComptoirRoles;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
+import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.ws.rs.*;
@@ -28,7 +29,8 @@ import java.util.stream.Collectors;
  */
 @Path("/employee")
 @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-@RolesAllowed({Roles.EMPLOYEE})
+@RolesAllowed({ComptoirRoles.EMPLOYEE})
+@RequestScoped
 public class EmployeeResource {
 
     @EJB

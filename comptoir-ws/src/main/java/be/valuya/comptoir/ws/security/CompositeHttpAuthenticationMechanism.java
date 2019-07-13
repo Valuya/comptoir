@@ -2,7 +2,7 @@ package be.valuya.comptoir.ws.security;
 
 import be.valuya.comptoir.ws.security.credential.CredentialExtractor;
 
-import javax.enterprise.inject.Alternative;
+import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.security.enterprise.AuthenticationStatus;
@@ -16,7 +16,6 @@ import java.util.Optional;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-@Alternative
 public class CompositeHttpAuthenticationMechanism implements HttpAuthenticationMechanism {
 
     @Inject

@@ -1,5 +1,7 @@
 package be.valuya.comptoir.ws.security.credential;
 
+import be.valuya.comptoir.security.AuthTokenCredential;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.security.enterprise.credential.Credential;
 import javax.servlet.http.HttpServletRequest;

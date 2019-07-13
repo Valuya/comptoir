@@ -10,7 +10,7 @@ import be.valuya.comptoir.ws.convert.search.FromWsAttributeSearchConverter;
 import be.valuya.comptoir.ws.rest.validation.EmployeeAccessChecker;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
 import be.valuya.comptoir.ws.rest.validation.NoId;
-import be.valuya.comptoir.ws.security.Roles;
+import be.valuya.comptoir.security.ComptoirRoles;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
@@ -29,7 +29,7 @@ import javax.ws.rs.core.UriInfo;
 @Path("/attribute/value")
 @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-@RolesAllowed({Roles.EMPLOYEE})
+@RolesAllowed({ComptoirRoles.EMPLOYEE})
 public class AttributeValueResource {
 
     @EJB

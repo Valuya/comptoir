@@ -6,6 +6,11 @@ import be.valuya.comptoir.model.lang.LocaleText;
 import be.valuya.comptoir.model.lang.LocaleText_;
 import be.valuya.comptoir.model.search.*;
 import be.valuya.comptoir.model.stock.*;
+import be.valuya.comptoir.persistence.util.ItemColumnPersistenceUtil;
+import be.valuya.comptoir.persistence.util.ItemVariantColumnPersistenceUtil;
+import be.valuya.comptoir.persistence.util.ItemVariantStockColumnPersistenceUtil;
+import be.valuya.comptoir.persistence.util.PaginatedQueryService;
+import be.valuya.comptoir.persistence.util.StockColumnPersistenceUtil;
 import be.valuya.comptoir.util.pagination.*;
 
 import javax.annotation.CheckForNull;

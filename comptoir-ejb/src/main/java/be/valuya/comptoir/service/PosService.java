@@ -4,6 +4,8 @@ import be.valuya.comptoir.model.commercial.Pos;
 import be.valuya.comptoir.model.commercial.Pos_;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.search.PosSearch;
+import be.valuya.comptoir.persistence.util.PaginatedQueryService;
+import be.valuya.comptoir.persistence.util.PosColumnPersistenceUtil;
 import be.valuya.comptoir.util.pagination.Pagination;
 import be.valuya.comptoir.util.pagination.PosColumn;
 import java.util.ArrayList;

@@ -9,6 +9,8 @@ import be.valuya.comptoir.model.search.CustomerLoyaltyAccountingEntrySearch;
 import be.valuya.comptoir.model.search.CustomerSearch;
 import be.valuya.comptoir.model.thirdparty.Customer;
 import be.valuya.comptoir.model.thirdparty.Customer_;
+import be.valuya.comptoir.persistence.util.CustomerColumnPersistenceUtils;
+import be.valuya.comptoir.persistence.util.PaginatedQueryService;
 import be.valuya.comptoir.util.pagination.CustomerColumn;
 import be.valuya.comptoir.util.pagination.Pagination;
 

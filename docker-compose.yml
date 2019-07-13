@@ -10,6 +10,7 @@ services:
     ports:
       - 8443:8443
       - 9990:9990
+      - 8787:8787 # debugger
 
   db:
     image: mariadb:10

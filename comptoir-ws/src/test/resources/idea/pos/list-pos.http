@@ -1,0 +1,12 @@
+POST https://{{ws-uri}}/pos/search
+Authorization: Basic {{ws-username}} {{ws-password}}
+Content-Type: application/json
+Accept: application/json
+
+{
+ "companyRef": {
+   "id": {{company_id}}
+ }
+}
+
+###
