@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 @TransactionManagement(TransactionManagementType.BEAN)
 public class LiquibaseService {
 
-    @Resource(lookup = "java:/jdbc/comptoir")
+    @Resource(lookup = "java:jboss/datasources/comptoir")
     private DataSource dataSource;
 
     public void run(String changelogFilePath) {

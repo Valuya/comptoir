@@ -3,7 +3,7 @@ deploy --name=mariadb /tmp/mariadb-client.jar
 data-source add \
     --name=ComptoirDataSource \
     --driver-name=mariadb \
-    --jndi-name=java:/jdbc/comptoir \
+    --jndi-name=java:jboss/datasources/comptoir \
     --connectable=true \
     --connection-url="jdbc:mariadb://${env.COMPTOIR_DB_URL:þworkaroundð}" \
     --driver-class="org.mariadb.jdbc.Driver" \
@@ -16,7 +16,7 @@ data-source add \
 data-source add \
     --name=ComptoirNonJtaDataSource \
     --driver-name=mariadb \
-    --jndi-name=java:/jdbc/comptoirNonJta \
+    --jndi-name=java:jboss/datasources/comptoirNonJta \
     --jta=false \
     --connectable=true \
     --connection-url="jdbc:mariadb://${env.COMPTOIR_DB_URL:þworkaroundð}" \

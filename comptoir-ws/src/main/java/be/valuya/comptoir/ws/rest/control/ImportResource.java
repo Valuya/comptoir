@@ -19,8 +19,8 @@ import javax.ws.rs.core.MediaType;
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @Path("/import")
-@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 @RolesAllowed({ComptoirRoles.EMPLOYEE})
 public class ImportResource {
 

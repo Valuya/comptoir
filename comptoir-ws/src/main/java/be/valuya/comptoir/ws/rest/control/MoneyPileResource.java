@@ -8,7 +8,7 @@ import be.valuya.comptoir.ws.convert.cash.FromWsMoneyPileConverter;
 import be.valuya.comptoir.ws.convert.cash.ToWsMoneyPileConverter;
 import be.valuya.comptoir.ws.rest.validation.EmployeeAccessChecker;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
-import be.valuya.comptoir.ws.rest.validation.NoId;
+import be.valuya.comptoir.ws.api.validation.NoId;
 import be.valuya.comptoir.security.ComptoirRoles;
 
 import javax.annotation.security.RolesAllowed;
@@ -25,8 +25,8 @@ import javax.ws.rs.core.MediaType;
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @Path("/moneyPile")
-@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 @RolesAllowed({ComptoirRoles.EMPLOYEE})
 public class MoneyPileResource {
 

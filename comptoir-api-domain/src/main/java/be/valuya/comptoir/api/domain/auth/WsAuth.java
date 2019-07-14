@@ -2,6 +2,8 @@ package be.valuya.comptoir.api.domain.auth;
 
 import be.valuya.comptoir.api.domain.thirdparty.WsEmployeeRef;
 import be.valuya.comptoir.api.utils.ZonedDateTimeXmlAdapter;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+
 import java.time.ZonedDateTime;
 import java.util.Objects;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -10,17 +12,22 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @XmlRootElement(name = "LoginResponse")
 @XmlAccessorType(XmlAccessType.FIELD)
+@Schema(description = "Auth token")
 public class WsAuth {
 
+    @Schema(required = true)
     private Long id;
+    @Schema(required = true)
     private WsEmployeeRef employeeRef;
+    @Schema(required = true)
     private String token;
+    @Schema(required = true)
     private String refreshToken;
+    @Schema(required = true)
     @XmlJavaTypeAdapter(ZonedDateTimeXmlAdapter.class)
     private ZonedDateTime expirationDateTime;
 

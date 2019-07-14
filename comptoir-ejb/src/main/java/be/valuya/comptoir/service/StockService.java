@@ -1,27 +1,68 @@
 package be.valuya.comptoir.service;
 
-import be.valuya.comptoir.model.commercial.*;
+import be.valuya.comptoir.model.commercial.AttributeDefinition;
+import be.valuya.comptoir.model.commercial.AttributeDefinition_;
+import be.valuya.comptoir.model.commercial.AttributeValue;
+import be.valuya.comptoir.model.commercial.AttributeValue_;
+import be.valuya.comptoir.model.commercial.Item;
+import be.valuya.comptoir.model.commercial.ItemPicture;
+import be.valuya.comptoir.model.commercial.ItemPicture_;
+import be.valuya.comptoir.model.commercial.ItemVariant;
+import be.valuya.comptoir.model.commercial.ItemVariantPicture;
+import be.valuya.comptoir.model.commercial.ItemVariantPicture_;
+import be.valuya.comptoir.model.commercial.ItemVariantSale;
+import be.valuya.comptoir.model.commercial.ItemVariantSale_;
+import be.valuya.comptoir.model.commercial.ItemVariant_;
+import be.valuya.comptoir.model.commercial.Item_;
+import be.valuya.comptoir.model.commercial.Picture;
+import be.valuya.comptoir.model.commercial.Picture_;
+import be.valuya.comptoir.model.commercial.Pricing;
+import be.valuya.comptoir.model.commercial.Sale;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.lang.LocaleText;
 import be.valuya.comptoir.model.lang.LocaleText_;
-import be.valuya.comptoir.model.search.*;
-import be.valuya.comptoir.model.stock.*;
+import be.valuya.comptoir.model.search.AttributeSearch;
+import be.valuya.comptoir.model.search.ItemSearch;
+import be.valuya.comptoir.model.search.ItemStockSearch;
+import be.valuya.comptoir.model.search.ItemVariantSearch;
+import be.valuya.comptoir.model.search.PictureSearch;
+import be.valuya.comptoir.model.search.StockSearch;
+import be.valuya.comptoir.model.stock.ItemStock;
+import be.valuya.comptoir.model.stock.ItemStock_;
+import be.valuya.comptoir.model.stock.Stock;
+import be.valuya.comptoir.model.stock.StockChangeType;
+import be.valuya.comptoir.model.stock.Stock_;
 import be.valuya.comptoir.persistence.util.ItemColumnPersistenceUtil;
 import be.valuya.comptoir.persistence.util.ItemVariantColumnPersistenceUtil;
 import be.valuya.comptoir.persistence.util.ItemVariantStockColumnPersistenceUtil;
 import be.valuya.comptoir.persistence.util.PaginatedQueryService;
 import be.valuya.comptoir.persistence.util.StockColumnPersistenceUtil;
-import be.valuya.comptoir.util.pagination.*;
+import be.valuya.comptoir.util.pagination.AttributeDefinitionColumn;
+import be.valuya.comptoir.util.pagination.ItemColumn;
+import be.valuya.comptoir.util.pagination.ItemVariantColumn;
+import be.valuya.comptoir.util.pagination.ItemVariantStockColumn;
+import be.valuya.comptoir.util.pagination.Pagination;
+import be.valuya.comptoir.util.pagination.StockColumn;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
-import javax.jms.IllegalStateException;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
-import javax.persistence.criteria.*;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.From;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.JoinType;
+import javax.persistence.criteria.ListJoin;
+import javax.persistence.criteria.MapJoin;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Subquery;
 import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.time.ZonedDateTime;
@@ -302,10 +343,10 @@ public class StockService {
         List<ItemStock> saleItemStocks = findItemStocks(stockSearch);
 
         if (saleItemStocks.size() > 1) {
-            throw new IllegalStateException("Non unique stock entry for item sale #" + itemVariantSale.getId(), ERROR_NON_UNIQUE_STOCK);
+            throw new IllegalStateException("Non unique stock entry for item sale #" + itemVariantSale.getId());
         }
         if (saleItemStocks.isEmpty()) {
-            throw new IllegalStateException("Missing stock entry for item sale #" + itemVariantSale.getId(), ERROR_MISSING_STOCK);
+            throw new IllegalStateException("Missing stock entry for item sale #" + itemVariantSale.getId());
         }
         ItemStock toRemoveItemStock = saleItemStocks.get(0);
 
@@ -332,7 +373,7 @@ public class StockService {
             stockSearch.setPreviousItemStock(toRemoveItemStock);
             List<ItemStock> nextItemStocks = findItemStocks(stockSearch);
             if (nextItemStocks.size() != 1) {
-                throw new IllegalStateException("Non unique item stock following #" + toRemoveItemStock.getId(), ERROR_NON_UNIQUE_STOCK);
+                throw new IllegalStateException("Non unique item stock following #" + toRemoveItemStock.getId());
             }
 
             // Fix previous endDate and ref
@@ -358,7 +399,7 @@ public class StockService {
                 stockSearch.setPreviousItemStock(managedNextItemStock);
                 nextItemStocks = findItemStocks(stockSearch);
                 if (nextItemStocks.size() > 1) {
-                    throw new IllegalStateException("Non unique item stock following #" + managedNextItemStock.getId(), ERROR_NON_UNIQUE_STOCK);
+                    throw new IllegalStateException("Non unique item stock following #" + managedNextItemStock.getId());
                 }
                 if (nextItemStocks.isEmpty()) {
                     break;

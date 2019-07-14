@@ -8,22 +8,21 @@ import be.valuya.comptoir.model.search.PosSearch;
 import be.valuya.comptoir.service.PosService;
 import be.valuya.comptoir.util.pagination.Pagination;
 import be.valuya.comptoir.util.pagination.PosColumn;
+import be.valuya.comptoir.ws.api.PosResourceApi;
+import be.valuya.comptoir.ws.api.parameters.PaginationParams;
+import be.valuya.comptoir.ws.convert.RestPaginationUtil;
 import be.valuya.comptoir.ws.convert.commercial.FromWsPosConverter;
 import be.valuya.comptoir.ws.convert.commercial.ToWsPosConverter;
 import be.valuya.comptoir.ws.convert.search.FromWsPosSearchConverter;
 import be.valuya.comptoir.ws.rest.validation.EmployeeAccessChecker;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
-import be.valuya.comptoir.ws.rest.validation.NoId;
 import be.valuya.comptoir.security.ComptoirRoles;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,11 +30,8 @@ import java.util.stream.Collectors;
 /**
  * @author Yannick Majoros <yannick@valuya.be>
  */
-@Path("/pos")
-@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 @RolesAllowed({ComptoirRoles.EMPLOYEE})
-public class PosResource {
+public class PosResource implements PosResourceApi {
 
     @EJB
     private PosService posService;
@@ -56,9 +52,7 @@ public class PosResource {
     @Inject
     private EmployeeAccessChecker accessChecker;
 
-    @POST
-    @Valid
-    public WsPosRef createPos(@NoId @Valid WsPos wsPos) {
+    public WsPosRef createPos(WsPos wsPos) {
         Pos pos = fromWsPosConverter.convert(wsPos);
         accessChecker.checkOwnCompany(pos);
         Pos savedPos = posService.savePos(pos);
@@ -68,10 +62,7 @@ public class PosResource {
         return posRef;
     }
 
-    @Path("{id}")
-    @PUT
-    @Valid
-    public WsPosRef savePos(@PathParam("id") long id, @Valid WsPos wsPos) {
+    public WsPosRef savePos(long id, WsPos wsPos) {
         idChecker.checkId(id, wsPos);
         Pos pos = fromWsPosConverter.convert(wsPos);
         accessChecker.checkOwnCompany(pos);
@@ -82,10 +73,7 @@ public class PosResource {
         return posRef;
     }
 
-    @Path("{id}")
-    @GET
-    @Valid
-    public WsPos getPos(@PathParam("id") long id) {
+    public WsPos getPos(long id) {
         Pos pos = posService.findPosById(id);
         accessChecker.checkOwnCompany(pos);
 
@@ -94,10 +82,7 @@ public class PosResource {
         return wsPos;
     }
 
-    @Path("search")
-    @POST
-    @Valid
-    public List<WsPos> findPosList(@Valid WsPosSearch wsPosSearch) {
+    public List<WsPos> findPosList(PaginationParams paginationParams, WsPosSearch wsPosSearch) {
         Pagination<Pos, PosColumn> pagination = restPaginationUtil.extractPagination(uriInfo, PosColumn::valueOf);
         PosSearch posSearch = fromWsPosSearchConverter.convert(wsPosSearch);
         accessChecker.checkOwnCompany(posSearch);

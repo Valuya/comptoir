@@ -4,11 +4,12 @@ import be.valuya.comptoir.api.domain.company.WsCompany;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.service.CompanyService;
+import be.valuya.comptoir.ws.api.CompanyResourceApi;
 import be.valuya.comptoir.ws.convert.company.FromWsCompanyConverter;
 import be.valuya.comptoir.ws.convert.company.ToWsCompanyConverter;
 import be.valuya.comptoir.ws.rest.validation.EmployeeAccessChecker;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
-import be.valuya.comptoir.ws.rest.validation.NoId;
+import be.valuya.comptoir.ws.api.validation.NoId;
 import be.valuya.comptoir.security.ComptoirRoles;
 
 import javax.annotation.security.RolesAllowed;
@@ -22,11 +23,8 @@ import java.util.Optional;
 /**
  * @author Yannick Majoros <yannick@valuya.be>
  */
-@Path("/company")
-@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 @RolesAllowed({ComptoirRoles.EMPLOYEE})
-public class CompanyResource {
+public class CompanyResource implements CompanyResourceApi {
 
     @EJB
     private CompanyService companyService;
@@ -39,9 +37,7 @@ public class CompanyResource {
     @Inject
     private EmployeeAccessChecker accessChecker;
 
-    @POST
-    @Valid  //TODO: limit to some role
-    public WsCompanyRef createCompany(@NoId @Valid WsCompany wsCompany) {
+    public WsCompanyRef createCompany(WsCompany wsCompany) {
         Company company = fromWsCompanyConverter.convert(wsCompany);
         Company savedCompany = companyService.saveCompany(company);
 
@@ -50,10 +46,7 @@ public class CompanyResource {
         return companyRef;
     }
 
-    @Path("{id}")
-    @PUT
-    @Valid
-    public WsCompanyRef saveCompany(@PathParam("id") long id, @Valid WsCompany wsCompany) {
+    public WsCompanyRef saveCompany(long id, WsCompany wsCompany) {
         idChecker.checkId(id, wsCompany);
         accessChecker.checkOwnCompany(id);
         Company existingCompany = companyService.findCompanyById(id);
@@ -64,10 +57,7 @@ public class CompanyResource {
         return wsCompanyRef;
     }
 
-    @Path("{id}")
-    @Valid
-    @GET
-    public WsCompany getCompany(@PathParam("id") Long id) {
+    public WsCompany getCompany(Long id) {
         accessChecker.checkOwnCompany(id);
         WsCompany wsCompany = Optional.ofNullable(companyService.findCompanyById(id))
                 .map(toWsCompanyConverter::convert)
@@ -76,13 +66,10 @@ public class CompanyResource {
         return wsCompany;
     }
 
-    @POST
-    @Path("{id}/import")
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public WsCompanyRef importItems(@PathParam("id") Long companyId, byte[] data) {
-        accessChecker.checkOwnCompany(companyId);
-        return Optional.ofNullable(companyService.findCompanyById(companyId))
-                .map(toWsCompanyConverter::reference)
-                .orElseThrow(NotFoundException::new);
-    }
+//    public WsCompanyRef importItems(Long companyId, byte[] data) {
+//        accessChecker.checkOwnCompany(companyId);
+//        return Optional.ofNullable(companyService.findCompanyById(companyId))
+//                .map(toWsCompanyConverter::reference)
+//                .orElseThrow(NotFoundException::new);
+//    }
 }

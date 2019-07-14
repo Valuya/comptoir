@@ -1,6 +1,8 @@
 package be.valuya.comptoir.api.domain.accounting;
 
 import be.valuya.comptoir.model.common.WithId;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+
 import java.net.URI;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -9,11 +11,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 //import org.glassfish.jersey.linking.InjectLink;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @XmlRootElement(name = "AccountingEntryRef")
 @XmlAccessorType(XmlAccessType.FIELD)
+@Schema(description = "An accounting entry reference")
 public class WsAccountingEntryRef implements WithId {
 
     //@InjectLink(value = "accountingEntry/${instance.id}")

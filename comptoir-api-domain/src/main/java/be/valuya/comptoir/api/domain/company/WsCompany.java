@@ -2,6 +2,7 @@ package be.valuya.comptoir.api.domain.company;
 
 import be.valuya.comptoir.api.domain.lang.WsLocaleText;
 import be.valuya.comptoir.model.common.WithId;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -10,11 +11,11 @@ import java.math.BigDecimal;
 import java.util.List;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @XmlRootElement(name = "company")
 @XmlAccessorType(XmlAccessType.FIELD)
+@Schema(description = "A company")
 public class WsCompany implements WithId {
 
     private Long id;

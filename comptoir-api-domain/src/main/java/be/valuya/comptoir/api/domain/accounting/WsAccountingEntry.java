@@ -5,6 +5,7 @@ import be.valuya.comptoir.api.domain.lang.WsLocaleText;
 import be.valuya.comptoir.api.domain.thirdparty.WsCustomerRef;
 import be.valuya.comptoir.api.utils.ZonedDateTimeXmlAdapter;
 import be.valuya.comptoir.model.common.WithId;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
 import javax.annotation.Nonnull;
 import javax.validation.constraints.NotNull;
@@ -23,26 +24,32 @@ import java.util.Objects;
  */
 @XmlRootElement(name = "AccountingEntry")
 @XmlAccessorType(XmlAccessType.FIELD)
+@Schema(description = "An accounting entry")
 public class WsAccountingEntry implements Serializable, WithId {
 
     private Long id;
     @NotNull
     @Nonnull
+    @Schema(required = true)
     private WsCompanyRef companyRef;
     @NotNull
     @Nonnull
+    @Schema(required = true)
     private WsAccountRef accountRef;
     @NotNull
     @Nonnull
+    @Schema(required = true)
     private BigDecimal amount;
     private BigDecimal vatRate;
     @NotNull
     @Nonnull
+    @Schema(required = true)
     @XmlJavaTypeAdapter(ZonedDateTimeXmlAdapter.class)
     private ZonedDateTime dateTime;
     private List<WsLocaleText> description;
     @NotNull
     @Nonnull
+    @Schema(required = true)
     private WsAccountingTransactionRef accountingTransactionRef;
     private WsAccountingEntryRef vatAccountingEntryRef;
     private WsCustomerRef customerRef;

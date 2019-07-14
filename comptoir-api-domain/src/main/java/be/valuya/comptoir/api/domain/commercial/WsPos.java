@@ -4,6 +4,8 @@ import be.valuya.comptoir.model.common.WithId;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.api.domain.lang.WsLocaleText;
 import be.valuya.comptoir.api.domain.thirdparty.WsCustomerRef;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
@@ -14,16 +16,17 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @XmlRootElement(name = "Pos")
 @XmlAccessorType(XmlAccessType.FIELD)
+@Schema(description = "Point of sale")
 public class WsPos implements Serializable, WithId {
 
     private Long id;
     @NotNull
     @Nonnull
+    @Schema(required = true)
     private WsCompanyRef companyRef;
     private String name;
     private List<WsLocaleText> description;

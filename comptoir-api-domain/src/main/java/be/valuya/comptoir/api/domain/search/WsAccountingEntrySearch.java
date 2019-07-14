@@ -3,6 +3,8 @@ package be.valuya.comptoir.api.domain.search;
 import be.valuya.comptoir.api.domain.accounting.WsAccountingTransactionRef;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.api.utils.ZonedDateTimeXmlAdapter;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+
 import java.time.ZonedDateTime;
 import javax.annotation.Nonnull;
 import javax.validation.constraints.NotNull;
@@ -12,15 +14,16 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @XmlRootElement(name = "AccountingEntrySearch")
 @XmlAccessorType(XmlAccessType.FIELD)
+@Schema(description = "An accounting entry filter")
 public class WsAccountingEntrySearch {
 
     @Nonnull
     @NotNull
+    @Schema(required = true)
     private WsCompanyRef companyRef;
     private WsAccountingTransactionRef accountingTransactionRef;
     private WsAccountSearch accountSearch;

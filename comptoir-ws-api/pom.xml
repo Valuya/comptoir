@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>comptoir</artifactId>
+        <groupId>be.valuya.comptoir</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>comptoir-ws-api</artifactId>
+    <properties>
+        <openapi.spec.url>https://comptoir.local:8443/openapi</openapi.spec.url>
+        <openapi.skip>true</openapi.skip>
+        <openapi.snapshot>true</openapi.snapshot>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.microprofile.openapi</groupId>
+            <artifactId>microprofile-openapi-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>be.valuya.comptoir</groupId>
+            <artifactId>comptoir-api-domain</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+                <version>4.0.3</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${openapi.skip}</skip>
+                            <inputSpec>${project.build.directory}/comptoir-openapi-spec.yml</inputSpec>
+                            <generatorName>typescript-angular</generatorName>
+                            <configOptions>
+                                <npmName>@valuya/comptoir-ws-api</npmName>
+                                <npmVersion>${project.version}</npmVersion>
+                                <snapshot>${openapi.snapshot}</snapshot>
+                                <ngVersion>8.0</ngVersion>
+<!--                                <fileNaming>kebab-case</fileNaming>-->
+                                <withInterfaces>true</withInterfaces>
+                                <debug>true</debug>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>openapi-codegen</id>
+            <properties>
+                <openapi.skip>false</openapi.skip>
+            </properties>
+        </profile>
+        <profile>
+            <id>release</id>
+            <properties>
+                <openapi.snapshot>false</openapi.snapshot>
+            </properties>
+        </profile>
+    </profiles>
+</project>

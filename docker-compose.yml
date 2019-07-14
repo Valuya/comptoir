@@ -2,15 +2,25 @@ version: '3.6'
 
 services:
   comptoir:
-    image: comptoir-back
+    image: comptoir-uber
     environment:
-      - COMPTOIR_DB_URL=db:3306/comptoir
-      - COMPTOIR_DB_USER=root
-      - COMPTOIR_DB_PASSWORD=password
+      - THORNTAIL_HTTPS_KEYSTORE_PATH=/certs/comptoir.local.p12
+      - THORNTAIL_HTTPS_KEYSTORE_PASSWORD=password
+      - THORNTAIL_HTTPS_KEY_ALIAS=comptoir.local
+      - THORNTAIL_HTTPS_KEY_PASSWORD=password
+      - THORNTAIL_HTTPS_ONLY=false
+      - THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_COMPTOIR_USER_DASH_NAME=root
+      - THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_COMPTOIR_PASSWORD=password
+      - THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_COMPTOIR_CONNECTION_DASH_URL=jdbc:mariadb://db:3306/comptoir
+      - THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_COMPTOIR_DASH_NON_DASH_JTA_USER_DASH_NAME=root
+      - THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_COMPTOIR_DASH_NON_DASH_JTA_PASSWORD=password
+      - THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_COMPTOIR_DASH_NON_DASH_JTA_CONNECTION_DASH_URL=jdbc:mariadb://db:3306/comptoir
     ports:
       - 8443:8443
       - 9990:9990
       - 8787:8787 # debugger
+    volumes:
+      - valuya_dev-certs:/certs
 
   db:
     image: mariadb:10
@@ -39,6 +49,9 @@ services:
 volumes:
   db-data: {}
   napo-db-data: {}
+  valuya_dev-certs:
+    external: true
+
 
 networks:
   napo-db:

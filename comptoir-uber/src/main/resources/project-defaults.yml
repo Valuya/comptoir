@@ -1,0 +1,18 @@
+thorntail:
+  datasources:
+    data-sources:
+      comptoir:
+        driver-name: mariadb
+        connection-url: 'jdbc:mariadb://'
+        user-name: ''
+        password: ''
+        jndi-name: 'java:jboss/datasources/comptoir'
+      comptoir-non-jta:
+        driver-name: mariadb
+        connection-url: 'jdbc:mariadb://'
+        user-name: ''
+        password: ''
+        jta: false
+        jndi-name: 'java:jboss/datasources/comptoirNonJta'
+
+

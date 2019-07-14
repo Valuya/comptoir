@@ -3,7 +3,7 @@
 pipeline {
     agent any
     parameters {
-        booleanParam(name: 'SKIP_TESTS', defaultValue: true, description: 'Skip tests')
+        booleanParam(name: 'SKIP_TESTS', defaultValue: false, description: 'Skip tests')
         string(name: 'ALT_DEPLOYMENT_REPOSITORY', defaultValue: '', description: 'Alternative deployment repo')
     }
     options {

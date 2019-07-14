@@ -9,12 +9,13 @@ import be.valuya.comptoir.model.search.ItemVariantSaleSearch;
 import be.valuya.comptoir.service.SaleService;
 import be.valuya.comptoir.util.pagination.ItemVariantSaleColumn;
 import be.valuya.comptoir.util.pagination.Pagination;
+import be.valuya.comptoir.ws.convert.RestPaginationUtil;
 import be.valuya.comptoir.ws.convert.commercial.FromWsItemVariantSaleConverter;
 import be.valuya.comptoir.ws.convert.commercial.ToWsItemVariantSaleConverter;
 import be.valuya.comptoir.ws.convert.search.FromWsItemVariantSaleSearchConverter;
 import be.valuya.comptoir.ws.rest.validation.EmployeeAccessChecker;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
-import be.valuya.comptoir.ws.rest.validation.NoId;
+import be.valuya.comptoir.ws.api.validation.NoId;
 import be.valuya.comptoir.ws.rest.validation.SaleStateChecker;
 import be.valuya.comptoir.security.ComptoirRoles;
 
@@ -34,8 +35,8 @@ import java.util.stream.Collectors;
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @Path("/itemVariantSale")
-@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 @RolesAllowed({ComptoirRoles.EMPLOYEE})
 public class ItemVariantSaleResource {
 

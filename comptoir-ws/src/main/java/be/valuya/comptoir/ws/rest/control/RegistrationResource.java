@@ -7,6 +7,7 @@ import be.valuya.comptoir.api.domain.thirdparty.WsRegistration;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.thirdparty.Employee;
 import be.valuya.comptoir.service.RegistrationService;
+import be.valuya.comptoir.ws.api.RegistrationResourceApi;
 import be.valuya.comptoir.ws.convert.company.FromWsCompanyConverter;
 import be.valuya.comptoir.ws.convert.company.ToWsCompanyConverter;
 import be.valuya.comptoir.ws.convert.thirdparty.FromWsEmployeeConverter;
@@ -25,11 +26,8 @@ import javax.ws.rs.core.MediaType;
 /**
  * @author Yannick Majoros <yannick@valuya.be>
  */
-@Path("/registration")
-@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 @PermitAll
-public class RegistrationResource {
+public class RegistrationResource implements RegistrationResourceApi {
 
     @EJB
     private RegistrationService registrationService;
@@ -39,12 +37,8 @@ public class RegistrationResource {
     private FromWsEmployeeConverter fromWsEmployeeConverter;
     @Inject
     private ToWsCompanyConverter toWsCompanyConverter;
-    @Inject
-    private EmployeeAccessChecker accessChecker;
 
-    @POST
-    @Valid
-    public WsCompanyRef register(@Valid WsRegistration registration) {
+    public WsCompanyRef register(WsRegistration registration) {
         WsCompany wsCompany = registration.getCompany();
         WsEmployee wsEmployee = registration.getEmployee();
         String employeePassword = registration.getEmployeePassword();

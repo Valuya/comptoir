@@ -3,6 +3,8 @@ package be.valuya.comptoir.api.domain.thirdparty;
 import be.valuya.comptoir.model.common.WithId;
 import be.valuya.comptoir.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.api.utils.LocaleXmlAdapter;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+
 import java.io.Serializable;
 import java.util.Locale;
 import java.util.Objects;
@@ -15,25 +17,29 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @XmlRootElement(name = "Employee")
 @XmlAccessorType(XmlAccessType.FIELD)
+@Schema(description = "An employee")
 public class WsEmployee implements Serializable, WithId {
 
     private Long id;
     private boolean active;
     @NotNull
     @Nonnull
+    @Schema(required = true, implementation = WsCompanyRef.class)
     private WsCompanyRef companyRef;
     @NotNull
     @Nonnull
     @Size(max = 200)
+    @Schema(required = true, maxLength = 200)
     private String login;
     @Size(max = 200)
+    @Schema(maxLength = 200)
     private String firstName;
     @Size(max = 200)
+    @Schema(maxLength = 200)
     private String lastName;
     @XmlJavaTypeAdapter(LocaleXmlAdapter.class)
     private Locale locale;

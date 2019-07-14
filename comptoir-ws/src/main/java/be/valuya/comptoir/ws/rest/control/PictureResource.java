@@ -11,7 +11,7 @@ import be.valuya.comptoir.ws.convert.commercial.ToWsPictureConverter;
 import be.valuya.comptoir.ws.convert.search.FromWsPictureSearchConverter;
 import be.valuya.comptoir.ws.rest.validation.EmployeeAccessChecker;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
-import be.valuya.comptoir.ws.rest.validation.NoId;
+import be.valuya.comptoir.ws.api.validation.NoId;
 import be.valuya.comptoir.security.ComptoirRoles;
 
 import javax.annotation.security.RolesAllowed;
@@ -27,8 +27,8 @@ import java.util.stream.Collectors;
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @Path("/picture")
-@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 @RolesAllowed({ComptoirRoles.EMPLOYEE})
 public class PictureResource {
 

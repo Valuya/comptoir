@@ -8,12 +8,14 @@ import be.valuya.comptoir.model.search.AccountSearch;
 import be.valuya.comptoir.service.AccountService;
 import be.valuya.comptoir.util.pagination.AccountColumn;
 import be.valuya.comptoir.util.pagination.Pagination;
+import be.valuya.comptoir.ws.api.AccountResourceApi;
+import be.valuya.comptoir.ws.convert.RestPaginationUtil;
 import be.valuya.comptoir.ws.convert.accounting.FromWsAccountConverter;
 import be.valuya.comptoir.ws.convert.accounting.ToWsAccountConverter;
 import be.valuya.comptoir.ws.convert.search.FromWsAccountSearchConverter;
 import be.valuya.comptoir.ws.rest.validation.EmployeeAccessChecker;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
-import be.valuya.comptoir.ws.rest.validation.NoId;
+import be.valuya.comptoir.ws.api.validation.NoId;
 import be.valuya.comptoir.security.ComptoirRoles;
 
 import javax.annotation.security.RolesAllowed;
@@ -29,13 +31,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
-@Path("/account")
-@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 @RolesAllowed({ComptoirRoles.EMPLOYEE})
-public class AccountResource {
+public class AccountResource implements AccountResourceApi {
 
     @EJB
     private AccountService accountService;
@@ -56,9 +55,7 @@ public class AccountResource {
     @Inject
     private EmployeeAccessChecker employeeAccessChecker;
 
-    @POST
-    @Valid
-    public WsAccountRef createAccount(@NoId @Valid WsAccount wsAccount) {
+    public WsAccountRef createAccount(WsAccount wsAccount) {
         Account account = fromWsAccountConverter.convert(wsAccount);
         employeeAccessChecker.checkOwnCompany(account);
         Account savedAccount = accountService.saveAccount(account);
@@ -68,10 +65,7 @@ public class AccountResource {
         return accountRef;
     }
 
-    @Path("{id}")
-    @PUT
-    @Valid
-    public WsAccountRef saveAccount(@PathParam("id") long id, @Valid WsAccount wsAccount) {
+    public WsAccountRef saveAccount(long id, WsAccount wsAccount) {
         idChecker.checkId(id, wsAccount);
         Account account = fromWsAccountConverter.convert(wsAccount);
         employeeAccessChecker.checkOwnCompany(account);
@@ -82,9 +76,7 @@ public class AccountResource {
         return accountRef;
     }
 
-    @Path("{id}")
-    @GET
-    public WsAccount getAccount(@PathParam("id") long id) {
+    public WsAccount getAccount(long id) {
         Account account = accountService.findAccountById(id);
         employeeAccessChecker.checkOwnCompany(account);
 
@@ -93,10 +85,7 @@ public class AccountResource {
         return wsAccount;
     }
 
-    @POST
-    @Path("search")
-    @Valid
-    public List<WsAccount> findAccounts(@Valid WsAccountSearch wsAccountSearch) {
+    public List<WsAccount> findAccounts(WsAccountSearch wsAccountSearch) {
         Pagination<Account, AccountColumn> pagination = restPaginationUtil.extractPagination(uriInfo, AccountColumn::valueOf);
 
         AccountSearch accountSearch = fromWsAccountSearchConverter.convert(wsAccountSearch);

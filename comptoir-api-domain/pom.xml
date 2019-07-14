@@ -35,5 +35,9 @@
             <artifactId>javaee-api</artifactId>
             <version>8.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.eclipse.microprofile.openapi</groupId>
+            <artifactId>microprofile-openapi-api</artifactId>
+        </dependency>
     </dependencies>
 </project>
