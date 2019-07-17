@@ -10,6 +10,7 @@ import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.Optional;
 
 /**
  * @author Yannick Majoros <yannick@valuya.be>
@@ -24,6 +25,7 @@ public class AccountSearch implements WithCompany {
     private AccountType accountType;
     private Pos pos;
     private Boolean cash;
+    private Optional<String> multiSearchOptional = Optional.empty();
 
     public Company getCompany() {
         return company;
@@ -57,4 +59,11 @@ public class AccountSearch implements WithCompany {
         this.cash = cash;
     }
 
+    public Optional<String> getMultiSearchOptional() {
+        return multiSearchOptional;
+    }
+
+    public void setMultiSearchOptional(Optional<String> multiSearchOptional) {
+        this.multiSearchOptional = multiSearchOptional;
+    }
 }

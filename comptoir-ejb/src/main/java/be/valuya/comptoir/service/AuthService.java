@@ -5,6 +5,7 @@ import be.valuya.comptoir.model.auth.Auth_;
 import be.valuya.comptoir.model.thirdparty.Employee;
 import be.valuya.comptoir.security.ComptoirPrincipal;
 import be.valuya.comptoir.security.ComptoirRoles;
+import be.valuya.comptoir.util.LoggedUser;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -16,6 +17,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import javax.ejb.Stateless;
+import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -40,7 +42,14 @@ public class AuthService {
     private EntityManager entityManager;
     @Inject
     private Pbkdf2PasswordHash pbkdf2Hash;
+    @Inject
+    @LoggedUser
+    private Instance<Auth> userAuthInstance;
 
+    public Optional<Auth> getAuthOptional() {
+        return this.userAuthInstance.stream()
+                .findAny();
+    }
 
     public CredentialValidationResult validateAuth(Employee employee, String passwordHash) {
         String expectedPasswordHash = employee.getPasswordHash();

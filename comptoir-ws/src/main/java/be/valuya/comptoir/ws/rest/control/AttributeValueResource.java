@@ -1,37 +1,40 @@
 package be.valuya.comptoir.ws.rest.control;
 
-import be.valuya.comptoir.api.domain.commercial.WsAttributeValue;
-import be.valuya.comptoir.api.domain.commercial.WsAttributeValueRef;
+import be.valuya.comptoir.model.search.AttributeSearch;
+import be.valuya.comptoir.util.pagination.AttributeValueColumn;
+import be.valuya.comptoir.util.pagination.Pagination;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsAttributeValue;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsAttributeValueRef;
 import be.valuya.comptoir.model.commercial.AttributeValue;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsAttributeValueSearchResult;
+import be.valuya.comptoir.ws.rest.api.domain.search.WsAttributeSearch;
+import be.valuya.comptoir.ws.rest.api.util.ComptoirRoles;
 import be.valuya.comptoir.service.StockService;
 import be.valuya.comptoir.ws.convert.RestPaginationUtil;
 import be.valuya.comptoir.ws.convert.commercial.FromWsAttributeValueConverter;
 import be.valuya.comptoir.ws.convert.commercial.ToWsAttributeValueConverter;
 import be.valuya.comptoir.ws.convert.search.FromWsAttributeSearchConverter;
+import be.valuya.comptoir.ws.rest.api.AttributeValueResourceApi;
+import be.valuya.comptoir.ws.rest.api.util.PaginationParams;
 import be.valuya.comptoir.ws.rest.validation.EmployeeAccessChecker;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
-import be.valuya.comptoir.ws.api.validation.NoId;
-import be.valuya.comptoir.security.ComptoirRoles;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
-@Path("/attribute/value")
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
+
+
 @RolesAllowed({ComptoirRoles.EMPLOYEE})
-public class AttributeValueResource {
+public class AttributeValueResource implements AttributeValueResourceApi {
 
     @EJB
     private StockService stockService;
@@ -52,9 +55,7 @@ public class AttributeValueResource {
     @Inject
     private RestPaginationUtil restPaginationUtil;
 
-    @POST
-    @Valid
-    public WsAttributeValueRef createAttributeValue(@NoId @Valid WsAttributeValue wsAttributeValue) {
+    public WsAttributeValueRef createAttributeValue(WsAttributeValue wsAttributeValue) {
         AttributeValue attributeValue = fromWsAttributeValueConverter.convert(wsAttributeValue);
         employeeAccessChecker.checkOwnCompany(attributeValue.getAttributeDefinition());
         AttributeValue savedAttributeValue = stockService.saveAttributeValue(attributeValue);
@@ -64,10 +65,7 @@ public class AttributeValueResource {
         return attributeValueRef;
     }
 
-    @Path("{id}")
-    @PUT
-    @Valid
-    public WsAttributeValueRef updateAttributeValue(@PathParam("id") long id, @Valid WsAttributeValue wsAttributeValue) {
+    public WsAttributeValueRef updateAttributeValue(long id, WsAttributeValue wsAttributeValue) {
         idChecker.checkId(id, wsAttributeValue);
         AttributeValue attributeValue = fromWsAttributeValueConverter.convert(wsAttributeValue);
         employeeAccessChecker.checkOwnCompany(attributeValue.getAttributeDefinition());
@@ -78,10 +76,7 @@ public class AttributeValueResource {
         return attributeValueRef;
     }
 
-    @Path("{id}")
-    @GET
-    @Valid
-    public WsAttributeValue getAttributeValue(@PathParam("id") long id) {
+    public WsAttributeValue getAttributeValue(long id) {
         AttributeValue attributeValue = stockService.findAttributeValueById(id);
         employeeAccessChecker.checkOwnCompany(attributeValue.getAttributeDefinition());
 

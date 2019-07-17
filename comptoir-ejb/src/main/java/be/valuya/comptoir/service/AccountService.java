@@ -1,6 +1,11 @@
 package be.valuya.comptoir.service;
 
-import be.valuya.comptoir.model.accounting.*;
+import be.valuya.comptoir.model.accounting.Account;
+import be.valuya.comptoir.model.accounting.AccountType;
+import be.valuya.comptoir.model.accounting.Account_;
+import be.valuya.comptoir.model.accounting.AccountingEntry;
+import be.valuya.comptoir.model.accounting.AccountingEntry_;
+import be.valuya.comptoir.model.accounting.AccountingTransaction;
 import be.valuya.comptoir.model.cash.Balance;
 import be.valuya.comptoir.model.cash.Balance_;
 import be.valuya.comptoir.model.cash.MoneyPile;
@@ -9,6 +14,7 @@ import be.valuya.comptoir.model.commercial.Pos;
 import be.valuya.comptoir.model.commercial.PosPaymentAccount;
 import be.valuya.comptoir.model.commercial.PosPaymentAccount_;
 import be.valuya.comptoir.model.company.Company;
+import be.valuya.comptoir.model.lang.LocaleText;
 import be.valuya.comptoir.model.search.AccountSearch;
 import be.valuya.comptoir.model.search.AccountingEntrySearch;
 import be.valuya.comptoir.model.search.BalanceSearch;
@@ -18,15 +24,24 @@ import be.valuya.comptoir.persistence.util.PaginatedQueryService;
 import be.valuya.comptoir.util.pagination.AccountColumn;
 import be.valuya.comptoir.util.pagination.BalanceColumn;
 import be.valuya.comptoir.util.pagination.Pagination;
+import jdk.internal.joptsimple.internal.Strings;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
-import javax.persistence.criteria.*;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.From;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Subquery;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +56,8 @@ public class AccountService {
     private EntityManager entityManager;
     @EJB
     private PaginatedQueryService paginatedQueryService;
+    @Inject
+    private LangService langService;
 
     @Nonnull
     public List<Account> findAccounts(@Nonnull AccountSearch accountSearch, @CheckForNull Pagination<Account, AccountColumn> pagination) {
@@ -85,6 +102,11 @@ public class AccountService {
             predicates.add(accountTypePredicate);
         }
 
+        accountSearch.getMultiSearchOptional()
+                .filter(search -> !Strings.isNullOrEmpty(search))
+                .map(multiSearh -> this.createAccountMultiSearchPredicates(accountPath, multiSearh))
+                .ifPresent(predicates::add);
+
         Pos pos = accountSearch.getPos();
         if (pos != null) {
             Subquery<PosPaymentAccount> posPaymentAccountSubquery = query.subquery(PosPaymentAccount.class);
@@ -103,6 +125,20 @@ public class AccountService {
         }
 
         return predicates;
+    }
+
+    private Predicate createAccountMultiSearchPredicates(From<?, Account> accountFrom, String multiSearch) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        Path<String> namePath = accountFrom.get(Account_.name);
+        Join<Account, LocaleText> descriptionJoin = accountFrom.join(Account_.description);
+
+        Predicate namePredicate = langService.createContainsPredicate(namePath, multiSearch);
+        Predicate desriptionPredicate = langService.createLocaleTextContainsPredicate(descriptionJoin, multiSearch);
+
+        return criteriaBuilder.or(
+                namePredicate,
+                desriptionPredicate
+        );
     }
 
     public Account findAccountById(Long id) {

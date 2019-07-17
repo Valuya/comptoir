@@ -1,12 +1,16 @@
 package be.valuya.comptoir.ws.config;
 
+import be.valuya.comptoir.ws.rest.api.util.ApiParameters;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Optional;
-import java.util.Properties;
+import javax.inject.Inject;
+import javax.ws.rs.HttpMethod;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Created by cghislai on 11/02/17.
@@ -15,40 +19,44 @@ import java.util.Properties;
 @ApplicationScoped
 public class CorsOptionsProvider {
 
-    private CorsOptions options;
+    @Inject
+    @ConfigProperty(name = "be.valuya.comptoir.cors.allowedHosts", defaultValue = "*")
+    private List<String> allowedOrigins;
+    @Inject
+    @ConfigProperty(name = "be.valuya.comptoir.cors.allowedHeaders", defaultValue = "content-type,accept,accept-charset,authorization,X-Requested-With,ngsw-bypass")
+    private Set<String> allowedHeaders;
+    @Inject
+    @ConfigProperty(name = "be.valuya.comptoir.cors.exposedHeaders", defaultValue = "content-encoding,content-length," + ApiParameters.LIST_RESULTS_COUNT_HEADER)
+    private Set<String> exposedHeaders;
 
     @PostConstruct()
     public void init() {
-        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("webServices.properties")) {
-            Properties properties = new Properties();
-            properties.load(inputStream);
-            this.options = this.getOptionsFromProperties(properties);
-        } catch (IOException e) {
-            this.options = this.getDefaultOptions();
-        }
     }
 
-    @Produces
-    public CorsOptions getOptions() {
-        return this.options;
+    public List<String> getAllowedOrigins() {
+        return this.allowedOrigins;
     }
 
-    private CorsOptions getOptionsFromProperties(Properties properties) {
-        CorsOptions options = this.getDefaultOptions();
-        String allowedHosts = properties.getProperty("be.valuya.comptoir.ws.cors-allowed-hosts");
-        Optional.ofNullable(allowedHosts).ifPresent(options::setAllowedOrigins);
-        String allowAnyWithCredentialStirng = properties.getProperty("be.valuya.comptoir.ws.cors-allow-any-with-credentials");
-        Optional.ofNullable(allowAnyWithCredentialStirng)
-                .map(Boolean::valueOf)
-                .ifPresent(options::setAllowAllWithCredentials);
-        return options;
+    public Set<String> getAllowedMethods() {
+        return Set.of(
+                HttpMethod.GET, HttpMethod.PUT,
+                HttpMethod.POST, HttpMethod.DELETE
+        );
     }
 
-    private CorsOptions getDefaultOptions() {
-        CorsOptions options = new CorsOptions();
-        options.setAllowAllWithCredentials(false);
-        options.setAllowedOrigins("");
-        return options;
+    public Set<String> getAllowedHeaders() {
+        return allowedHeaders;
     }
 
+    public boolean isWsCorsAllowCredentials() {
+        return true;
+    }
+
+    public int getCorsMaxAge() {
+        return 0;
+    }
+
+    public Set<String> getExposedHeaders() {
+        return exposedHeaders;
+    }
 }

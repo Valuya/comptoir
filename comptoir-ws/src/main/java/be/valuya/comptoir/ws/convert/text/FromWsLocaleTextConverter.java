@@ -1,6 +1,6 @@
 package be.valuya.comptoir.ws.convert.text;
 
-import be.valuya.comptoir.api.domain.lang.WsLocaleText;
+import be.valuya.comptoir.ws.rest.api.domain.lang.WsLocaleText;
 import be.valuya.comptoir.model.lang.LocaleText;
 import java.util.List;
 import java.util.Locale;
@@ -24,7 +24,11 @@ public class FromWsLocaleTextConverter {
 
     public LocaleText update(List<WsLocaleText> wsLocaleTexts, LocaleText existingLocaleText) {
         Map<Locale, String> localeTextMap = wsLocaleTexts.stream()
-                .collect(Collectors.toMap(WsLocaleText::getLocale, WsLocaleText::getText, throwingMerger()));
+                .collect(Collectors.toMap(
+                        WsLocaleText::getLocale,
+                        WsLocaleText::getText,
+                        throwingMerger())
+                );
 
         if (existingLocaleText == null) {
             existingLocaleText = new LocaleText();

@@ -1,8 +1,8 @@
 package be.valuya.comptoir.ws.convert.commercial;
 
-import be.valuya.comptoir.api.domain.commercial.WsPictureRef;
-import be.valuya.comptoir.api.domain.commercial.WsPicture;
-import be.valuya.comptoir.api.domain.company.WsCompanyRef;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsPictureRef;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsPicture;
+import be.valuya.comptoir.ws.rest.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.model.commercial.Picture;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.service.StockService;

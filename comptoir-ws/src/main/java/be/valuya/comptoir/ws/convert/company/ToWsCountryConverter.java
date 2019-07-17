@@ -1,15 +1,13 @@
 package be.valuya.comptoir.ws.convert.company;
 
-import be.valuya.comptoir.api.domain.company.WsCountry;
-import be.valuya.comptoir.api.domain.company.WsCountryRef;
-import be.valuya.comptoir.api.domain.lang.WsLocaleText;
+import be.valuya.comptoir.ws.rest.api.domain.company.WsCountry;
+import be.valuya.comptoir.ws.rest.api.domain.company.WsCountryRef;
 import be.valuya.comptoir.model.company.Country;
 import be.valuya.comptoir.ws.convert.text.ToWsLocaleTextConverter;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.math.BigDecimal;
-import java.util.List;
 
 /**
  * @author Yannick Majoros <yannick@valuya.be>

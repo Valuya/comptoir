@@ -1,28 +1,28 @@
 package be.valuya.comptoir.ws.rest.control;
 
-import be.valuya.comptoir.api.domain.company.WsCompanyRef;
+import be.valuya.comptoir.ws.convert.company.FromWsPrestashopImportParamsConverter;
+import be.valuya.comptoir.ws.convert.company.ToWsImportSummaryConverter;
+import be.valuya.comptoir.ws.rest.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.model.company.Company;
+import be.valuya.comptoir.ws.rest.api.util.ComptoirRoles;
 import be.valuya.comptoir.service.ImportService;
 import be.valuya.comptoir.service.ImportSummary;
 import be.valuya.comptoir.service.PrestashopImportParams;
 import be.valuya.comptoir.ws.convert.company.FromWsCompanyConverter;
+import be.valuya.comptoir.ws.rest.api.ImportResourceApi;
+import be.valuya.comptoir.ws.rest.api.domain.company.WsImportSummary;
+import be.valuya.comptoir.ws.rest.api.domain.company.WsPrestashopImportParams;
 import be.valuya.comptoir.ws.rest.validation.EmployeeAccessChecker;
-import be.valuya.comptoir.security.ComptoirRoles;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.inject.Inject;
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
 
 /**
  * @author Yannick Majoros <yannick@valuya.be>
  */
-@Path("/import")
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
 @RolesAllowed({ComptoirRoles.EMPLOYEE})
-public class ImportResource {
+public class ImportResource implements ImportResourceApi {
 
     @EJB
     private ImportService importService;
@@ -30,15 +30,19 @@ public class ImportResource {
     private FromWsCompanyConverter fromWsCompanyConverter;
     @Inject
     private EmployeeAccessChecker accessChecker;
+    @Inject
+    private FromWsPrestashopImportParamsConverter fromWsPrestashopImportParamsConverter;
+    @Inject
+    private ToWsImportSummaryConverter toWsImportSummaryConverter;
 
-    @POST
-    @Path("{companyId}/{backendName}")
-    public ImportSummary importItems(@PathParam("companyId") Long companyId, @PathParam("backendName") String backendName, PrestashopImportParams prestashopImportParams) {
+    public WsImportSummary importItems(Long companyId, String backendName, WsPrestashopImportParams wsPrestashopImportParams) {
         WsCompanyRef wsCompanyRef = new WsCompanyRef(companyId);
         Company company = fromWsCompanyConverter.find(wsCompanyRef);
         accessChecker.checkOwnCompany(company);
 
+        PrestashopImportParams prestashopImportParams = fromWsPrestashopImportParamsConverter.fromWsPrestashopImportParams(wsPrestashopImportParams);
         ImportSummary importSummary = importService.doImport(company, backendName, prestashopImportParams);
-        return importSummary;
+        WsImportSummary wsImportSummary = toWsImportSummaryConverter.toWsImportSummary(importSummary);
+        return wsImportSummary;
     }
 }

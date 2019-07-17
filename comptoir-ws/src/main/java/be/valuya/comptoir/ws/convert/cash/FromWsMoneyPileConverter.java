@@ -1,8 +1,8 @@
 package be.valuya.comptoir.ws.convert.cash;
 
-import be.valuya.comptoir.api.domain.accounting.WsAccountRef;
-import be.valuya.comptoir.api.domain.accounting.WsBalanceRef;
-import be.valuya.comptoir.api.domain.cash.WsMoneyPile;
+import be.valuya.comptoir.ws.rest.api.domain.accounting.WsAccountRef;
+import be.valuya.comptoir.ws.rest.api.domain.accounting.WsBalanceRef;
+import be.valuya.comptoir.ws.rest.api.domain.cash.WsMoneyPile;
 import be.valuya.comptoir.model.accounting.Account;
 import be.valuya.comptoir.model.cash.Balance;
 import be.valuya.comptoir.model.cash.MoneyPile;

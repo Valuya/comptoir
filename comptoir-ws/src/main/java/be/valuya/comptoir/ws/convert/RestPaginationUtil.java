@@ -3,10 +3,13 @@ package be.valuya.comptoir.ws.convert;
 import be.valuya.comptoir.util.pagination.Column;
 import be.valuya.comptoir.util.pagination.Pagination;
 import be.valuya.comptoir.util.pagination.Sort;
-import be.valuya.comptoir.ws.api.parameters.ApiParameters;
-import be.valuya.comptoir.ws.api.parameters.PaginationParams;
+import be.valuya.comptoir.ws.rest.api.util.ApiParameters;
+import be.valuya.comptoir.ws.rest.api.util.PaginationParams;
+import be.valuya.comptoir.ws.rest.api.util.WsSearchResult;
+import com.google.common.base.Functions;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.naming.directory.SearchResult;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.MultivaluedMap;
@@ -22,6 +25,11 @@ import java.util.stream.Collectors;
 @ApplicationScoped
 public class RestPaginationUtil {
 
+    public <T, R extends WsSearchResult<T>> R setResults(R resultsIsntance, List<T> list, Pagination<?, ?> pagination) {
+        resultsIsntance.setList(list);
+        resultsIsntance.setTotalCount(pagination.getAllResultCountOptional().orElse(0L));
+        return resultsIsntance;
+    }
 
     public <T, C extends Column<T>> Pagination<T, C> parsePagination(PaginationParams paginationParams, Function<String, C> conversionFunction) {
         int offset = paginationParams.getOffsetOptional()
@@ -36,6 +44,28 @@ public class RestPaginationUtil {
         return new Pagination<>(offset, length, sorts);
     }
 
+    public <T> Pagination<T, ?> extractPagination(UriInfo uriInfo) {
+        MultivaluedMap<String, String> pathParameters = uriInfo.getQueryParameters();
+
+        int offset = 0;
+        if (pathParameters.containsKey(ApiParameters.PAGINATION_OFFSET_QUERY_PARAM)) {
+            List<String> offsetValues = pathParameters.get(ApiParameters.PAGINATION_OFFSET_QUERY_PARAM);
+            offset = offsetValues.stream()
+                    .findFirst()
+                    .map(Integer::parseInt)
+                    .orElse(0);
+        }
+
+        int length = 0;
+        if (pathParameters.containsKey(ApiParameters.PAGINATION_LENGTH_QUERY_PARAM)) {
+            List<String> lengthValues = pathParameters.get(ApiParameters.PAGINATION_LENGTH_QUERY_PARAM);
+            length = lengthValues.stream()
+                    .findFirst()
+                    .map(Integer::parseInt)
+                    .orElse(0);
+        }
+        return new Pagination<>(offset, length);
+    }
 
     /**
      * Deprecated: use parsePagination and inject the PaginationParam in method parameters
@@ -78,6 +108,8 @@ public class RestPaginationUtil {
 
         return new Pagination<>(offset, length, sorts);
     }
+
+
 
     private <T, C extends Column<T>> Sort<C> parseSort(String sortDef, Function<String, C> conversionFunction) {
         String[] sortDefs = sortDef.split(":");

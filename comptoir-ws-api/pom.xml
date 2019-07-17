@@ -11,6 +11,7 @@
 
     <artifactId>comptoir-ws-api</artifactId>
     <properties>
+        <api.version>1.0.0-alpha.1</api.version>
         <openapi.spec.url>https://comptoir.local:8443/openapi</openapi.spec.url>
         <openapi.skip>true</openapi.skip>
         <openapi.snapshot>true</openapi.snapshot>
@@ -25,12 +26,14 @@
             <groupId>org.eclipse.microprofile.openapi</groupId>
             <artifactId>microprofile-openapi-api</artifactId>
         </dependency>
-
         <dependency>
-            <groupId>be.valuya.comptoir</groupId>
-            <artifactId>comptoir-api-domain</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>compile</scope>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>annotations</artifactId>
+            <version>3.0.1</version>
         </dependency>
     </dependencies>
 
@@ -48,14 +51,13 @@
                         <configuration>
                             <skip>${openapi.skip}</skip>
                             <inputSpec>${project.build.directory}/comptoir-openapi-spec.yml</inputSpec>
-                            <generatorName>typescript-angular</generatorName>
+                            <generatorName>typescript-rxjs</generatorName>
                             <configOptions>
                                 <npmName>@valuya/comptoir-ws-api</npmName>
-                                <npmVersion>${project.version}</npmVersion>
+                                <npmVersion>${api.version}</npmVersion>
                                 <snapshot>${openapi.snapshot}</snapshot>
                                 <ngVersion>8.0</ngVersion>
 <!--                                <fileNaming>kebab-case</fileNaming>-->
-                                <withInterfaces>true</withInterfaces>
                                 <debug>true</debug>
                             </configOptions>
                         </configuration>

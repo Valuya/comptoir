@@ -1,25 +1,30 @@
 package be.valuya.comptoir.ws.rest.control;
 
-import be.valuya.comptoir.api.domain.accounting.WsAccountingEntry;
-import be.valuya.comptoir.api.domain.accounting.WsAccountingEntryRef;
-import be.valuya.comptoir.api.domain.search.WsAccountingEntrySearch;
+import be.valuya.comptoir.util.pagination.Pagination;
+import be.valuya.comptoir.ws.convert.RestPaginationUtil;
+import be.valuya.comptoir.ws.rest.api.domain.accounting.WsAccountingEntry;
+import be.valuya.comptoir.ws.rest.api.domain.accounting.WsAccountingEntryRef;
+import be.valuya.comptoir.ws.rest.api.domain.accounting.WsAccountingEntrySearchResult;
+import be.valuya.comptoir.ws.rest.api.domain.search.WsAccountingEntrySearch;
 import be.valuya.comptoir.model.accounting.AccountingEntry;
 import be.valuya.comptoir.model.search.AccountingEntrySearch;
+import be.valuya.comptoir.ws.rest.api.util.ComptoirRoles;
 import be.valuya.comptoir.service.AccountService;
-import be.valuya.comptoir.ws.api.AccountingEntryResourceApi;
-import be.valuya.comptoir.ws.api.parameters.ApiParameters;
+import be.valuya.comptoir.ws.rest.api.AccountingEntryResourceApi;
+import be.valuya.comptoir.ws.rest.api.util.ApiParameters;
 import be.valuya.comptoir.ws.convert.accounting.FromWsAccountingEntryConverter;
 import be.valuya.comptoir.ws.convert.accounting.ToWsAccountingEntryConverter;
 import be.valuya.comptoir.ws.convert.search.FromWsAccountingEntrySearchConverter;
+import be.valuya.comptoir.ws.rest.api.util.PaginationParams;
 import be.valuya.comptoir.ws.rest.validation.EmployeeAccessChecker;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
-import be.valuya.comptoir.security.ComptoirRoles;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriInfo;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,8 +46,12 @@ public class AccountingEntryResource implements AccountingEntryResourceApi {
     private IdChecker idChecker;
     @Inject
     private EmployeeAccessChecker employeeAccessChecker;
+    @Inject
+    private RestPaginationUtil restPaginationUtil;
     @Context
     private HttpServletResponse response;
+    @Context
+    private UriInfo uriInfo;
 
     public WsAccountingEntryRef createAccountingEntry(WsAccountingEntry wsAccountingEntry) {
         AccountingEntry accountingEntry = fromWsAccountingEntryConverter.convert(wsAccountingEntry);
@@ -54,7 +63,7 @@ public class AccountingEntryResource implements AccountingEntryResourceApi {
         return accountingEntryRef;
     }
 
-    public WsAccountingEntryRef saveAccountingEntry(long id, WsAccountingEntry wsAccountingEntry) {
+    public WsAccountingEntryRef updateAccountingEntry(long id, WsAccountingEntry wsAccountingEntry) {
         idChecker.checkId(id, wsAccountingEntry);
         AccountingEntry accountingEntry = fromWsAccountingEntryConverter.convert(wsAccountingEntry);
         employeeAccessChecker.checkOwnCompany(accountingEntry);
@@ -80,18 +89,19 @@ public class AccountingEntryResource implements AccountingEntryResourceApi {
         accountingEntryService.removeAccountingEntry(accountingEntry);
     }
 
-    public List<WsAccountingEntry> findAccountingEntries(WsAccountingEntrySearch wsAccountingEntrySearch) {
+    public WsAccountingEntrySearchResult findAccountingEntries(WsAccountingEntrySearch wsAccountingEntrySearch) {
+        Pagination<Object, ?> pagination = restPaginationUtil.extractPagination(uriInfo);
         AccountingEntrySearch accountingEntrySearch = fromWsAccountingEntrySearchConverter.convert(wsAccountingEntrySearch);
         employeeAccessChecker.checkOwnCompany(accountingEntrySearch);
         List<AccountingEntry> accountingEntrys = accountingEntryService.findAccountingEntries(accountingEntrySearch);
 
-        List<WsAccountingEntry> wsAccountingEntrys = accountingEntrys.stream()
-                .map(toWsAccountingEntryConverter::convert)
+        List<WsAccountingEntryRef> wsAccountingEntrys = accountingEntrys.stream()
+                .map(toWsAccountingEntryConverter::reference)
                 .collect(Collectors.toList());
 
         response.setHeader(ApiParameters.LIST_RESULTS_COUNT_HEADER, "101");
 
-        return wsAccountingEntrys;
+        return restPaginationUtil.setResults(new WsAccountingEntrySearchResult(), wsAccountingEntrys, pagination);
     }
 
 }

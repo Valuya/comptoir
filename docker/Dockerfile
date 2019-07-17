@@ -17,7 +17,6 @@ RUN mvn \
     clean install
 
 
-
 FROM jboss/wildfly:17.0.1.Final AS APP_SERVER
 ARG version=1.0-SNAPSHOT
 ARG mariadb_version=2.4.2
@@ -40,7 +39,7 @@ COPY docker/setup-wildfly.sh /tmp/setup-wildfly.sh
 RUN bash /tmp/setup-wildfly.sh
 
 # Ðeployed archives
-COPY --from=BUILD_IMAGE /src/comptoir-ear/target/comptoir-ear-${version}.ear \
+COPY --from=BUILD_IMAGE /src/comptoir-ear/target/comptoir-ear.ear \
     /opt/jboss/wildfly/standalone/deployments/
 
 CMD ["/opt/jboss/wildfly/bin/standalone.sh","-c", "standalone-full.xml", "-b", "0.0.0.0", "-bmanagement", "0.0.0.0", "--debug", "*:8787"]

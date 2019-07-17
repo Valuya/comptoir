@@ -1,11 +1,12 @@
 package be.valuya.comptoir.ws.rest;
 
 import be.valuya.comptoir.model.commercial.AttributeValue;
-import be.valuya.comptoir.security.ComptoirRoles;
-import be.valuya.comptoir.ws.api.ComptoirWsApplicationApi;
+import be.valuya.comptoir.ws.rest.api.util.ComptoirRoles;
+import be.valuya.comptoir.ws.rest.api.ComptoirWsApplicationApi;
 import be.valuya.comptoir.ws.rest.control.AccountResource;
 import be.valuya.comptoir.ws.rest.control.AccountingEntryResource;
 import be.valuya.comptoir.ws.rest.control.AttributeDefinitionResource;
+import be.valuya.comptoir.ws.rest.control.AttributeValueResource;
 import be.valuya.comptoir.ws.rest.control.AuthResource;
 import be.valuya.comptoir.ws.rest.control.BalanceResource;
 import be.valuya.comptoir.ws.rest.control.CompanyResource;
@@ -25,12 +26,15 @@ import be.valuya.comptoir.ws.rest.control.RegistrationResource;
 import be.valuya.comptoir.ws.rest.control.SaleResource;
 import be.valuya.comptoir.ws.rest.control.StockResource;
 import be.valuya.comptoir.ws.rest.provider.ComptoirWsParamConverterProvider;
+import be.valuya.comptoir.ws.rest.provider.CrossOriginResourceSharingPreflightRequestFilter;
 import be.valuya.comptoir.ws.rest.provider.CrossOriginResourceSharingResponseFilter;
+import be.valuya.comptoir.ws.rest.provider.UnauthenticatedExceptionMapper;
 import be.valuya.comptoir.ws.rest.provider.WsExceptionMapper;
 
 import javax.annotation.security.DeclareRoles;
 import javax.servlet.annotation.HttpConstraint;
 import javax.servlet.annotation.ServletSecurity;
+import javax.ws.rs.ApplicationPath;
 import java.util.Set;
 
 /**
@@ -45,6 +49,7 @@ import java.util.Set;
 @ServletSecurity(@HttpConstraint(
         transportGuarantee = ServletSecurity.TransportGuarantee.CONFIDENTIAL
 ))
+@ApplicationPath("/comptoir-ws")
 public class ComptoirWsApplication extends ComptoirWsApplicationApi {
 
 
@@ -60,6 +65,7 @@ public class ComptoirWsApplication extends ComptoirWsApplicationApi {
                 AccountingEntryResource.class,
                 AccountResource.class,
                 AttributeDefinitionResource.class,
+                AttributeValueResource.class,
                 AttributeValue.class,
                 AuthResource.class,
                 BalanceResource.class,
@@ -82,7 +88,10 @@ public class ComptoirWsApplication extends ComptoirWsApplicationApi {
 
                 ComptoirWsParamConverterProvider.class,
                 CrossOriginResourceSharingResponseFilter.class,
-                WsExceptionMapper.class
+                CrossOriginResourceSharingPreflightRequestFilter.class,
+                WsExceptionMapper.class,
+                UnauthenticatedExceptionMapper.class
+
         );
     }
 }

@@ -22,7 +22,7 @@ public class LoggedUserAuthProvider {
     @Produces
     @RequestScoped
     @LoggedUser
-    public Auth getLoggedUserAuth() {
+    public Auth getLoggedUserAuth()  {
         Principal callerPrincipal = securityContext.getCallerPrincipal();
         if (callerPrincipal == null) {
             throw new UnauthenticatedException();

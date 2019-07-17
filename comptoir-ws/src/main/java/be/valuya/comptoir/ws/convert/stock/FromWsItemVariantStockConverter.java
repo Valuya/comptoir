@@ -5,11 +5,12 @@
  */
 package be.valuya.comptoir.ws.convert.stock;
 
-import be.valuya.comptoir.api.domain.commercial.WsItemVariantRef;
-import be.valuya.comptoir.api.domain.commercial.WsItemVariantSaleRef;
-import be.valuya.comptoir.api.domain.stock.WsItemStock;
-import be.valuya.comptoir.api.domain.stock.WsItemStockRef;
-import be.valuya.comptoir.api.domain.stock.WsStockRef;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsItemVariantRef;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsItemVariantSaleRef;
+import be.valuya.comptoir.ws.rest.api.domain.stock.WsItemVariantStock;
+import be.valuya.comptoir.ws.rest.api.domain.stock.WsItemVariantStockRef;
+import be.valuya.comptoir.ws.rest.api.domain.stock.WsStockChangeType;
+import be.valuya.comptoir.ws.rest.api.domain.stock.WsStockRef;
 import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.model.commercial.ItemVariantSale;
 import be.valuya.comptoir.model.stock.ItemStock;
@@ -40,31 +41,34 @@ public class FromWsItemVariantStockConverter {
     private FromWsItemVariantConverter fromWsItemVariantConverter;
     @Inject
     private FromWsItemVariantSaleConverter fromWsItemVariantSaleConverter;
+    @Inject
+    private FromWsStockChangeTypeConverter fromWsStockChangeTypeConverter;
 
-    public ItemStock convert(WsItemStock wsItemStock) {
-        if (wsItemStock == null) {
+    public ItemStock convert(WsItemVariantStock wsItemVariantStock) {
+        if (wsItemVariantStock == null) {
             return null;
         }
         ItemStock itemStock = new ItemStock();
-        return patch(itemStock, wsItemStock);
+        return patch(itemStock, wsItemVariantStock);
     }
 
-    public ItemStock patch(@Nonnull ItemStock itemStock, @Nonnull WsItemStock wsItemStock) {
+    public ItemStock patch(@Nonnull ItemStock itemStock, @Nonnull WsItemVariantStock wsItemVariantStock) {
 
-        String comment = wsItemStock.getComment();
-        ZonedDateTime endDateTime = wsItemStock.getEndDateTime();
-        Long id = wsItemStock.getId();
-        WsItemVariantRef itemVariantRef = wsItemStock.getItemVariantRef();
-        BigDecimal quantity = wsItemStock.getQuantity();
-        ZonedDateTime startDateTime = wsItemStock.getStartDateTime();
-        WsStockRef stockRef = wsItemStock.getStockRef();
-        WsItemStockRef previousItemStockRef = wsItemStock.getPreviousItemStockRef();
-        StockChangeType stockChangeType = wsItemStock.getStockChangeType();
-        WsItemVariantSaleRef stockChangeSaleRef = wsItemStock.getStockChangeVariantSaleRef();
-        Integer orderPosition = wsItemStock.getOrderPosition();
+        String comment = wsItemVariantStock.getComment();
+        ZonedDateTime endDateTime = wsItemVariantStock.getEndDateTime();
+        Long id = wsItemVariantStock.getId();
+        WsItemVariantRef itemVariantRef = wsItemVariantStock.getItemVariantRef();
+        BigDecimal quantity = wsItemVariantStock.getQuantity();
+        ZonedDateTime startDateTime = wsItemVariantStock.getStartDateTime();
+        WsStockRef stockRef = wsItemVariantStock.getStockRef();
+        WsItemVariantStockRef previousItemStockRef = wsItemVariantStock.getPreviousItemStockRef();
+        WsStockChangeType wsStockChangeType = wsItemVariantStock.getStockChangeType();
+        WsItemVariantSaleRef stockChangeSaleRef = wsItemVariantStock.getStockChangeVariantSaleRef();
+        Integer orderPosition = wsItemVariantStock.getOrderPosition();
 
         ItemVariant itemVariant = fromWsItemVariantConverter.find(itemVariantRef);
         Stock stock = fromWsStockConverter.find(stockRef);
+        StockChangeType stockChangeType = fromWsStockChangeTypeConverter.fromWsStockChangeType(wsStockChangeType);
 
         itemStock.setComment(comment);
         itemStock.setEndDateTime(endDateTime);
@@ -87,8 +91,8 @@ public class FromWsItemVariantStockConverter {
         return itemStock;
     }
 
-    public ItemStock find(WsItemStockRef wsItemStockRef) {
-        ItemStock stockById = stockService.findItemStockById(wsItemStockRef.getId());
+    public ItemStock find(WsItemVariantStockRef wsItemVariantStockRef) {
+        ItemStock stockById = stockService.findItemStockById(wsItemVariantStockRef.getId());
         return stockById;
     }
 }

@@ -1,6 +1,6 @@
 package be.valuya.comptoir.ws.convert.company;
 
-import be.valuya.comptoir.api.domain.company.WsCompanyRef;
+import be.valuya.comptoir.ws.rest.api.domain.company.WsCompanyRef;
 import javax.ws.rs.ext.ParamConverter;
 
 /**

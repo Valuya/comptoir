@@ -1,11 +1,11 @@
 package be.valuya.comptoir.ws.convert.commercial;
 
-import be.valuya.comptoir.api.domain.commercial.WsItemVariantRef;
-import be.valuya.comptoir.api.domain.commercial.WsItemVariantSale;
-import be.valuya.comptoir.api.domain.commercial.WsItemVariantSaleRef;
-import be.valuya.comptoir.api.domain.commercial.WsSaleRef;
-import be.valuya.comptoir.api.domain.lang.WsLocaleText;
-import be.valuya.comptoir.api.domain.stock.WsStockRef;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsItemVariantRef;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsItemVariantSale;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsItemVariantSaleRef;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsSaleRef;
+import be.valuya.comptoir.ws.rest.api.domain.lang.WsLocaleText;
+import be.valuya.comptoir.ws.rest.api.domain.stock.WsStockRef;
 import be.valuya.comptoir.model.accounting.AccountingEntry;
 import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.model.commercial.ItemVariantSale;

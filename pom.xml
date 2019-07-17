@@ -7,11 +7,10 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <modules>
-        <module>comptoir-ear</module>
         <module>comptoir-ejb</module>
-        <module>comptoir-api-domain</module>
         <module>comptoir-ws</module>
         <module>comptoir-ws-api</module>
+        <module>comptoir-ear</module>
         <module>comptoir-uber</module>
     </modules>
 

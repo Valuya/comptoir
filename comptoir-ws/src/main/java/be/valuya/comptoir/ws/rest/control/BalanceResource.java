@@ -1,10 +1,12 @@
 package be.valuya.comptoir.ws.rest.control;
 
-import be.valuya.comptoir.api.domain.accounting.WsBalance;
-import be.valuya.comptoir.api.domain.accounting.WsBalanceRef;
-import be.valuya.comptoir.api.domain.search.WsBalanceSearch;
+import be.valuya.comptoir.ws.rest.api.domain.accounting.WsBalance;
+import be.valuya.comptoir.ws.rest.api.domain.accounting.WsBalanceRef;
+import be.valuya.comptoir.ws.rest.api.domain.accounting.WsBalanceSearchResult;
+import be.valuya.comptoir.ws.rest.api.domain.search.WsBalanceSearch;
 import be.valuya.comptoir.model.cash.Balance;
 import be.valuya.comptoir.model.search.BalanceSearch;
+import be.valuya.comptoir.ws.rest.api.util.ComptoirRoles;
 import be.valuya.comptoir.service.AccountService;
 import be.valuya.comptoir.util.pagination.BalanceColumn;
 import be.valuya.comptoir.util.pagination.Pagination;
@@ -12,32 +14,27 @@ import be.valuya.comptoir.ws.convert.RestPaginationUtil;
 import be.valuya.comptoir.ws.convert.accounting.FromWsBalanceConverter;
 import be.valuya.comptoir.ws.convert.accounting.ToWsBalanceConverter;
 import be.valuya.comptoir.ws.convert.search.FromWsBalanceSearchConverter;
+import be.valuya.comptoir.ws.rest.api.BalanceResourceApi;
 import be.valuya.comptoir.ws.rest.validation.BalanceStateChecker;
 import be.valuya.comptoir.ws.rest.validation.EmployeeAccessChecker;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
-import be.valuya.comptoir.ws.api.validation.NoId;
-import be.valuya.comptoir.security.ComptoirRoles;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
-@Path("/balance")
-@Produces(MediaType.APPLICATION_JSON)
+
+
 @RolesAllowed({ComptoirRoles.EMPLOYEE})
-public class BalanceResource {
+public class BalanceResource implements BalanceResourceApi {
 
     @EJB
     private AccountService accountService;
@@ -61,9 +58,7 @@ public class BalanceResource {
     private EmployeeAccessChecker accessChecker;
 
 
-    @POST
-    @Valid
-    public WsBalanceRef createBalance(@Valid @NoId WsBalance wsBalance) {
+    public WsBalanceRef createBalance(WsBalance wsBalance) {
         Balance balance = fromWsBalanceConverter.convert(wsBalance);
         accessChecker.checkOwnCompany(balance.getAccount());
         Balance savedBalance = accountService.saveBalance(balance);
@@ -73,10 +68,7 @@ public class BalanceResource {
         return balanceRef;
     }
 
-    @Path("{id}")
-    @PUT
-    @Valid
-    public WsBalanceRef saveBalance(@PathParam("id") long id, @Valid WsBalance wsBalance) {
+    public WsBalanceRef updateBalance(long id, WsBalance wsBalance) {
         idChecker.checkId(id, wsBalance);
         Balance balance = fromWsBalanceConverter.convert(wsBalance);
         accessChecker.checkOwnCompany(balance.getAccount());
@@ -87,10 +79,7 @@ public class BalanceResource {
         return balanceRef;
     }
 
-    @Path("{id}")
-    @GET
-    @Valid
-    public WsBalance getBalance(@PathParam("id") long id) {
+    public WsBalance getBalance(long id) {
         Balance balance = accountService.findBalanceById(id);
         accessChecker.checkOwnCompany(balance.getAccount());
 
@@ -99,36 +88,28 @@ public class BalanceResource {
         return wsBalance;
     }
 
-    @POST
-    @Valid
-    @Path("search")
-    public List<WsBalance> findBalances(@Valid WsBalanceSearch wsBalanceSearch) {
+    public WsBalanceSearchResult findBalances(WsBalanceSearch wsBalanceSearch) {
         Pagination<Balance, BalanceColumn> pagination = restPaginationUtil.extractPagination(uriInfo, BalanceColumn::valueOf);
         BalanceSearch balanceSearch = fromWsBalanceSearchConverter.convert(wsBalanceSearch);
         accessChecker.checkOwnCompany(balanceSearch);
         List<Balance> balances = accountService.findBalances(balanceSearch, pagination);
 
-        List<WsBalance> wsBalances = balances.stream()
-                .map(toWsBalanceConverter::convert)
+        List<WsBalanceRef> wsBalances = balances.stream()
+                .map(toWsBalanceConverter::reference)
                 .collect(Collectors.toList());
 
         restPaginationUtil.addResultCount(response, pagination);
 
-        return wsBalances;
+        return restPaginationUtil.setResults(new WsBalanceSearchResult(), wsBalances, pagination);
     }
 
-    @DELETE
-    @Path("{id}")
-    public void deleteBalance(@PathParam("id") long id) {
+    public void deleteBalance(long id) {
         Balance balance = accountService.findBalanceById(id);
         balanceStateChecker.checkState(balance, false); // TODO: replace with bean validation
         accountService.cancelOpenBalance(balance);
     }
 
-    @PUT
-    @Valid
-    @Path("{id}/state/CLOSED")
-    public WsBalanceRef closeBalance(@PathParam("id") long id) {
+    public WsBalanceRef closeBalance(long id) {
         Balance balance = accountService.findBalanceById(id);
         balanceStateChecker.checkState(balance, false); // TODO: replace with bean validation
         balance = accountService.closeBalance(balance);

@@ -1,9 +1,11 @@
 version: '3.6'
 
 services:
-  comptoir:
+
+  back:
     image: comptoir-uber
     environment:
+      - THORNTAIL_SWARM_DEBUG_PORT=8787
       - THORNTAIL_HTTPS_KEYSTORE_PATH=/certs/comptoir.local.p12
       - THORNTAIL_HTTPS_KEYSTORE_PASSWORD=password
       - THORNTAIL_HTTPS_KEY_ALIAS=comptoir.local

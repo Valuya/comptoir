@@ -1,22 +1,24 @@
 package be.valuya.comptoir.ws.rest.control;
 
-import be.valuya.comptoir.api.domain.commercial.WsPos;
-import be.valuya.comptoir.api.domain.commercial.WsPosRef;
-import be.valuya.comptoir.api.domain.search.WsPosSearch;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsPos;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsPosRef;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsPosSearchResult;
+import be.valuya.comptoir.ws.rest.api.domain.search.WsPosSearch;
 import be.valuya.comptoir.model.commercial.Pos;
 import be.valuya.comptoir.model.search.PosSearch;
+import be.valuya.comptoir.ws.rest.api.util.ComptoirRoles;
 import be.valuya.comptoir.service.PosService;
 import be.valuya.comptoir.util.pagination.Pagination;
 import be.valuya.comptoir.util.pagination.PosColumn;
-import be.valuya.comptoir.ws.api.PosResourceApi;
-import be.valuya.comptoir.ws.api.parameters.PaginationParams;
+import be.valuya.comptoir.ws.rest.api.PosResourceApi;
+import be.valuya.comptoir.ws.rest.api.util.PaginationParams;
 import be.valuya.comptoir.ws.convert.RestPaginationUtil;
 import be.valuya.comptoir.ws.convert.commercial.FromWsPosConverter;
 import be.valuya.comptoir.ws.convert.commercial.ToWsPosConverter;
 import be.valuya.comptoir.ws.convert.search.FromWsPosSearchConverter;
+import be.valuya.comptoir.ws.rest.api.util.WsSearchResult;
 import be.valuya.comptoir.ws.rest.validation.EmployeeAccessChecker;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
-import be.valuya.comptoir.security.ComptoirRoles;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
@@ -62,7 +64,7 @@ public class PosResource implements PosResourceApi {
         return posRef;
     }
 
-    public WsPosRef savePos(long id, WsPos wsPos) {
+    public WsPosRef updatePos(long id, WsPos wsPos) {
         idChecker.checkId(id, wsPos);
         Pos pos = fromWsPosConverter.convert(wsPos);
         accessChecker.checkOwnCompany(pos);
@@ -82,18 +84,17 @@ public class PosResource implements PosResourceApi {
         return wsPos;
     }
 
-    public List<WsPos> findPosList(PaginationParams paginationParams, WsPosSearch wsPosSearch) {
+    public WsPosSearchResult findPosList(PaginationParams paginationParams, WsPosSearch wsPosSearch) {
         Pagination<Pos, PosColumn> pagination = restPaginationUtil.extractPagination(uriInfo, PosColumn::valueOf);
         PosSearch posSearch = fromWsPosSearchConverter.convert(wsPosSearch);
         accessChecker.checkOwnCompany(posSearch);
         List<Pos> posList = posService.findPosList(posSearch, pagination);
 
-        List<WsPos> wsPosList = posList.stream()
-                .map(toWsPosConverter::convert)
+        List<WsPosRef> wsPosList = posList.stream()
+                .map(toWsPosConverter::reference)
                 .collect(Collectors.toList());
 
-        restPaginationUtil.addResultCount(response, pagination);
-        return wsPosList;
+        return restPaginationUtil.setResults(new WsPosSearchResult(), wsPosList, pagination);
     }
 
 }

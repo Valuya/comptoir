@@ -1,10 +1,10 @@
 package be.valuya.comptoir.ws.convert.commercial;
 
-import be.valuya.comptoir.api.domain.commercial.WsItem;
-import be.valuya.comptoir.api.domain.commercial.WsPictureRef;
-import be.valuya.comptoir.api.domain.commercial.WsItemRef;
-import be.valuya.comptoir.api.domain.company.WsCompanyRef;
-import be.valuya.comptoir.api.domain.lang.WsLocaleText;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsItem;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsPictureRef;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsItemRef;
+import be.valuya.comptoir.ws.rest.api.domain.company.WsCompanyRef;
+import be.valuya.comptoir.ws.rest.api.domain.lang.WsLocaleText;
 import be.valuya.comptoir.model.commercial.Item;
 import be.valuya.comptoir.model.commercial.Picture;
 import be.valuya.comptoir.model.commercial.Price;

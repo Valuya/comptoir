@@ -5,11 +5,12 @@
  */
 package be.valuya.comptoir.ws.convert.stock;
 
-import be.valuya.comptoir.api.domain.commercial.WsItemVariantRef;
-import be.valuya.comptoir.api.domain.commercial.WsItemVariantSaleRef;
-import be.valuya.comptoir.api.domain.stock.WsItemStock;
-import be.valuya.comptoir.api.domain.stock.WsItemStockRef;
-import be.valuya.comptoir.api.domain.stock.WsStockRef;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsItemVariantRef;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsItemVariantSaleRef;
+import be.valuya.comptoir.ws.rest.api.domain.stock.WsItemVariantStock;
+import be.valuya.comptoir.ws.rest.api.domain.stock.WsItemVariantStockRef;
+import be.valuya.comptoir.ws.rest.api.domain.stock.WsStockChangeType;
+import be.valuya.comptoir.ws.rest.api.domain.stock.WsStockRef;
 import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.model.commercial.ItemVariantSale;
 import be.valuya.comptoir.model.stock.ItemStock;
@@ -35,8 +36,10 @@ public class ToWsItemVariantStockConverter {
     private ToWsItemVariantSaleConverter toWsItemVariantSaleConverter;
     @Inject
     private ToWsStockConverter toWsStockConverter;
+    @Inject
+    private ToWsStockChangeTypeConverter toWsStockChangeTypeConverter;
 
-    public WsItemStock convert(ItemStock itemStock) {
+    public WsItemVariantStock convert(ItemStock itemStock) {
         Long id = itemStock.getId();
         String comment = itemStock.getComment();
         ZonedDateTime endDateTime = itemStock.getEndDateTime();
@@ -51,32 +54,33 @@ public class ToWsItemVariantStockConverter {
 
         WsItemVariantRef itemVariantRef = toWsItemVariantConverter.reference(itemVariant);
         WsStockRef stockRef = toWsStockConverter.reference(stock);
+        WsStockChangeType wsStockChangeType = toWsStockChangeTypeConverter.toWsStockChangeType(stockChangeType);
 
-        WsItemStock wsItemStock = new WsItemStock();
-        wsItemStock.setId(id);
-        wsItemStock.setStartDateTime(startDateTime);
-        wsItemStock.setComment(comment);
-        wsItemStock.setEndDateTime(endDateTime);
-        wsItemStock.setQuantity(quantity);
-        wsItemStock.setItemVariantRef(itemVariantRef);
-        wsItemStock.setStockRef(stockRef);
-        wsItemStock.setStockChangeType(stockChangeType);
-        wsItemStock.setOrderPosition(orderPosition);
+        WsItemVariantStock wsItemVariantStock = new WsItemVariantStock();
+        wsItemVariantStock.setId(id);
+        wsItemVariantStock.setStartDateTime(startDateTime);
+        wsItemVariantStock.setComment(comment);
+        wsItemVariantStock.setEndDateTime(endDateTime);
+        wsItemVariantStock.setQuantity(quantity);
+        wsItemVariantStock.setItemVariantRef(itemVariantRef);
+        wsItemVariantStock.setStockRef(stockRef);
+        wsItemVariantStock.setStockChangeType(wsStockChangeType);
+        wsItemVariantStock.setOrderPosition(orderPosition);
 
         if (previousItemStock != null) {
-            WsItemStockRef previousItemStockref = reference(previousItemStock);
-            wsItemStock.setPreviousItemStockRef(previousItemStockref);
+            WsItemVariantStockRef previousItemStockref = reference(previousItemStock);
+            wsItemVariantStock.setPreviousItemStockRef(previousItemStockref);
         }
         if (stockChangeSale != null) {
             WsItemVariantSaleRef itemVariantSaleRef = toWsItemVariantSaleConverter.reference(stockChangeSale);
-            wsItemStock.setStockChangeVariantSaleRef(itemVariantSaleRef);
+            wsItemVariantStock.setStockChangeVariantSaleRef(itemVariantSaleRef);
         }
-        return wsItemStock;
+        return wsItemVariantStock;
     }
 
-    public WsItemStockRef reference(ItemStock itemStock) {
+    public WsItemVariantStockRef reference(ItemStock itemStock) {
         Long id = itemStock.getId();
-        WsItemStockRef wsItemStockRef = new WsItemStockRef(id);
-        return wsItemStockRef;
+        WsItemVariantStockRef wsItemVariantStockRef = new WsItemVariantStockRef(id);
+        return wsItemVariantStockRef;
     }
 }

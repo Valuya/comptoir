@@ -16,9 +16,6 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <db.napo.driver>org.mariadb.jdbc.Driver</db.napo.driver>
-        <db.napo.url>jdbc:mariadb://napo-db:3306/napo</db.napo.url>
-        <db.napo.username>root</db.napo.username>
-        <db.napo.schema>napo</db.napo.schema>
         <jooq.version>3.11.11</jooq.version>
     </properties>
 

@@ -1,7 +1,7 @@
 package be.valuya.comptoir.ws.convert.company;
 
-import be.valuya.comptoir.api.domain.company.WsCountry;
-import be.valuya.comptoir.api.domain.company.WsCountryRef;
+import be.valuya.comptoir.ws.rest.api.domain.company.WsCountry;
+import be.valuya.comptoir.ws.rest.api.domain.company.WsCountryRef;
 import be.valuya.comptoir.model.company.Country;
 import be.valuya.comptoir.service.CountryService;
 
