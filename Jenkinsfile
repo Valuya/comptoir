@@ -1,6 +1,6 @@
 
 pipeline {
-
+    agent any
     parameters {
         booleanParam(name: 'SKIP_TESTS', defaultValue: false, description: 'Skip tests')
         string(name: 'ALT_DEPLOYMENT_REPOSITORY', defaultValue: '', description: 'Alternative deployment repo')
@@ -13,8 +13,7 @@ pipeline {
         stage ('Build') {
             agent {
                 docker {
-                    image 'maven:3-alpine'
-                    label 'be.valuya.jenkins.build=true'
+                    image 'maven'
                     args  '--network comptoir-dev-napo-db-net'
                 }
             }
@@ -24,15 +23,31 @@ pipeline {
             steps {
                withMaven(maven: 'maven', mavenSettingsConfig: 'nexus-mvn-settings') {
                     sh '''
-                        mvn \
-                        -Ddb.napo.url=jdbc:mariadb://db-napo:10101/napo \
+                        $MVN_CMD \
+                        -Ddb.napo.url=jdbc:mariadb://db-napo/napo \
                         -Ddb.napo.username=root \
                         -Ddb.napo.password="$NAPO_DB_PASSWORD" \
                         -Ddb.napo.schema=napo \
-                        -Pcomptoir-thorntails
+                        -Pcomptoir-thorntails \
                         clean package deploy
                     '''
                }
+               stash includes: 'comptoir-thorntail/Dockerfile,comptoir-thorntail/target/comptoir-thorntail-thorntail.jar', name: 'thorntail-jar'
+               stash includes: 'docker/**,comptoir-ear/target/comptoir-ear.ear', name: 'docker-ear'
+            }
+        }
+        stage ('Build docker image') {
+            steps {
+                unstash 'thorntail-jar'
+                sh '''
+                    export COMMIT="$(git rev-parse --short HEAD)"
+                    docker build \
+                      --tag comptoir-thorntail-jenkins-build:${COMMIT} \
+                      -f comptoir-thorntail/Dockerfile \
+                      .
+                    docker tag comptoir-thorntail-jenkins-build:${COMMIT} docker.valuya.be/comptoir-thorntail:latest
+                    docker push docker.valuya.be/comptoir-thorntail:latest
+                '''
             }
         }
     }

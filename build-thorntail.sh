@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-docker-compose up -d napo-db
+#docker-compose up -d napo-db
+# --build-arg NAPO_DB_PASSWORD=password \
+# --build-arg admin_password=password \
+# --network comptoir-napo-db \
 
 docker build \
- --build-arg NAPO_DB_PASSWORD=password \
- --build-arg admin_password=password \
- --network comptoir-napo-db \
  --tag comptoir-uber \
  -f comptoir-uber/Dockerfile \
  $@ \
