@@ -1,31 +1,24 @@
 package be.valuya.comptoir.model.accounting;
 
+import be.valuya.comptoir.model.common.WithCompany;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.lang.LocaleText;
 import be.valuya.comptoir.model.thirdparty.Customer;
+
+import javax.annotation.Nonnull;
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.Objects;
-import javax.annotation.Nonnull;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @Entity
 @Table(name = "accounting_entry")
-public class AccountingEntry implements Serializable {
+public class AccountingEntry implements Serializable, WithCompany {
 
     @Id
     @GeneratedValue
@@ -73,7 +66,7 @@ public class AccountingEntry implements Serializable {
     }
 
     public void setCompany(@NotNull
-            @Nonnull Company company) {
+                           @Nonnull Company company) {
         this.company = company;
     }
 
@@ -84,7 +77,7 @@ public class AccountingEntry implements Serializable {
     }
 
     public void setAccount(@NotNull
-            @Nonnull Account account) {
+                           @Nonnull Account account) {
         this.account = account;
     }
 
@@ -95,7 +88,7 @@ public class AccountingEntry implements Serializable {
     }
 
     public void setAmount(@NotNull
-            @Nonnull BigDecimal amount) {
+                          @Nonnull BigDecimal amount) {
         this.amount = amount;
     }
 
@@ -114,7 +107,7 @@ public class AccountingEntry implements Serializable {
     }
 
     public void setDateTime(@NotNull
-            @Nonnull ZonedDateTime dateTime) {
+                            @Nonnull ZonedDateTime dateTime) {
         this.dateTime = dateTime;
     }
 

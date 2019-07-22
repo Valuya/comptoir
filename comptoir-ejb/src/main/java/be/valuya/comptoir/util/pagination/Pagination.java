@@ -1,21 +1,27 @@
 package be.valuya.comptoir.util.pagination;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
- *
- * @author Yannick Majoros <yannick@valuya.be>
  * @param <T>
  * @param <S>
+ * @author Yannick Majoros <yannick@valuya.be>
  */
 public class Pagination<T, S extends Column<T>> {
 
     private int offset;
     private int maxResults;
     private Long allResultCount;
-    private List<Sort<S>> sortings;
+    private List<Sort<S>> sortings = new ArrayList<>();
 
     public Pagination() {
+    }
+
+    public Pagination(int offset, int maxResults) {
+        this.offset = offset;
+        this.maxResults = maxResults;
     }
 
     public Pagination(int offset, int maxResults, List<Sort<S>> sortings) {
@@ -42,6 +48,10 @@ public class Pagination<T, S extends Column<T>> {
 
     public Long getAllResultCount() {
         return allResultCount;
+    }
+
+    public Optional<Long> getAllResultCountOptional() {
+        return Optional.ofNullable(allResultCount);
     }
 
     public void setAllResultCount(Long allResultCount) {

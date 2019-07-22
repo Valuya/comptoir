@@ -1,12 +1,10 @@
 package be.valuya.comptoir.model.commercial;
 
 import be.valuya.comptoir.model.accounting.AccountingTransaction;
+import be.valuya.comptoir.model.common.WithCompany;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.thirdparty.Customer;
-import java.io.Serializable;
-import java.math.BigDecimal;
-import java.time.ZonedDateTime;
-import java.util.Objects;
+
 import javax.annotation.Nonnull;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -20,14 +18,17 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.time.ZonedDateTime;
+import java.util.Objects;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @Entity
 @Table(name = "sale")
-public class Sale implements Serializable {
+public class Sale implements Serializable, WithCompany {
 
     @Id
     @GeneratedValue
@@ -43,7 +44,6 @@ public class Sale implements Serializable {
     @OneToOne(mappedBy = "sale", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Invoice invoice;
     @NotNull
-    @Nonnull
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "accounting_transaction_id")
     private AccountingTransaction accountingTransaction;
@@ -104,12 +104,11 @@ public class Sale implements Serializable {
     }
 
     @NotNull
-    @Nonnull
     public AccountingTransaction getAccountingTransaction() {
         return accountingTransaction;
     }
 
-    public void setAccountingTransaction(@NotNull @Nonnull AccountingTransaction accountingTransaction) {
+    public void setAccountingTransaction(@NotNull AccountingTransaction accountingTransaction) {
         this.accountingTransaction = accountingTransaction;
     }
 

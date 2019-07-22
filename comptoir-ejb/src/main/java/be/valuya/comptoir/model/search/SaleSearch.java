@@ -1,5 +1,6 @@
 package be.valuya.comptoir.model.search;
 
+import be.valuya.comptoir.model.common.WithCompany;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.thirdparty.Customer;
 
@@ -8,10 +9,9 @@ import javax.validation.constraints.NotNull;
 import java.time.ZonedDateTime;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
-public class SaleSearch {
+public class SaleSearch implements WithCompany {
 
     @NotNull
     @Nonnull

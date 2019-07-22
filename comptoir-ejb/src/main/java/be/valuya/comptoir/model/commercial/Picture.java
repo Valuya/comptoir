@@ -1,25 +1,20 @@
 package be.valuya.comptoir.model.commercial;
 
+import be.valuya.comptoir.model.common.WithCompany;
 import be.valuya.comptoir.model.company.Company;
-import java.io.Serializable;
-import java.util.Objects;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
+import java.util.Objects;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @Entity
 @Table(name = "picture")
-public class Picture implements Serializable {
+public class Picture implements Serializable, WithCompany {
 
     @Id
     @GeneratedValue
@@ -28,8 +23,9 @@ public class Picture implements Serializable {
     @ManyToOne(optional = false)
     private Company company;
     @Column(name = "picture_data")
+//    @NotNull // cause issue with the jpa modelgen
     @Lob
-    @NotNull
+    @Basic(fetch = FetchType.LAZY)
     private byte[] data;
     @Column(name = "content_type")
     @Size(min = 1, max = 128)

@@ -5,17 +5,16 @@
  */
 package be.valuya.comptoir.model.search;
 
-import be.valuya.comptoir.model.commercial.Pos;
+import be.valuya.comptoir.model.common.WithCompany;
 import be.valuya.comptoir.model.company.Company;
 
 import javax.annotation.Nonnull;
 import javax.validation.constraints.NotNull;
 
 /**
- *
  * @author cghislai
  */
-public class StockSearch {
+public class StockSearch implements WithCompany {
 
     @NotNull
     @Nonnull

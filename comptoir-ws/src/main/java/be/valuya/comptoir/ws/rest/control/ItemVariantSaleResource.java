@@ -1,28 +1,31 @@
 package be.valuya.comptoir.ws.rest.control;
 
-import be.valuya.comptoir.api.domain.commercial.WsItemVariantSale;
-import be.valuya.comptoir.api.domain.commercial.WsItemVariantSaleRef;
-import be.valuya.comptoir.api.domain.search.WsItemVariantSaleSearch;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsItemVariantSale;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsItemVariantSaleRef;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsItemVariantSaleSearchResult;
+import be.valuya.comptoir.ws.rest.api.domain.search.WsItemVariantSaleSearch;
 import be.valuya.comptoir.model.commercial.ItemVariantSale;
 import be.valuya.comptoir.model.commercial.Sale;
 import be.valuya.comptoir.model.search.ItemVariantSaleSearch;
+import be.valuya.comptoir.ws.rest.api.domain.stock.WsItemVariantStockSearchResult;
+import be.valuya.comptoir.ws.rest.api.util.ComptoirRoles;
 import be.valuya.comptoir.service.SaleService;
 import be.valuya.comptoir.util.pagination.ItemVariantSaleColumn;
 import be.valuya.comptoir.util.pagination.Pagination;
+import be.valuya.comptoir.ws.convert.RestPaginationUtil;
 import be.valuya.comptoir.ws.convert.commercial.FromWsItemVariantSaleConverter;
 import be.valuya.comptoir.ws.convert.commercial.ToWsItemVariantSaleConverter;
 import be.valuya.comptoir.ws.convert.search.FromWsItemVariantSaleSearchConverter;
+import be.valuya.comptoir.ws.rest.api.ItemVariantSaleResourceApi;
+import be.valuya.comptoir.ws.rest.validation.EmployeeAccessChecker;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
-import be.valuya.comptoir.ws.rest.validation.NoId;
 import be.valuya.comptoir.ws.rest.validation.SaleStateChecker;
 
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,19 +33,17 @@ import java.util.stream.Collectors;
 /**
  * @author Yannick Majoros <yannick@valuya.be>
  */
-@Path("/itemVariantSale")
-@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-public class ItemVariantSaleResource {
+@RolesAllowed({ComptoirRoles.EMPLOYEE})
+public class ItemVariantSaleResource implements ItemVariantSaleResourceApi {
 
     @EJB
     private SaleService saleService;
     @Inject
-    private FromWsItemVariantSaleConverter fromWsItemSaleConverter;
+    private FromWsItemVariantSaleConverter fromWsItemVariantSaleConverter;
     @Inject
-    private FromWsItemVariantSaleSearchConverter fromWsItemSaleSearchConverter;
+    private FromWsItemVariantSaleSearchConverter fromWsItemVariantSaleSearchConverter;
     @Inject
-    private ToWsItemVariantSaleConverter toWsItemSaleConverter;
+    private ToWsItemVariantSaleConverter toWsItemVariantSaleConverter;
     @Inject
     private IdChecker idChecker;
     @Inject
@@ -53,73 +54,67 @@ public class ItemVariantSaleResource {
     private UriInfo uriInfo;
     @Inject
     private RestPaginationUtil restPaginationUtil;
+    @Inject
+    private EmployeeAccessChecker accessChecker;
 
-    @POST
-    @Valid
-    public WsItemVariantSaleRef createItemSale(@NoId @Valid WsItemVariantSale wsItemSale) {
-        ItemVariantSale itemSale = fromWsItemSaleConverter.convert(wsItemSale);
-        ItemVariantSale savedItemSale = saleService.saveItemSale(itemSale);
-        WsItemVariantSaleRef itemSaleRef = toWsItemSaleConverter.reference(savedItemSale);
-        WsItemVariantSaleRef savedItemSaleRef = itemSaleRef;
-        return savedItemSaleRef;
+    public WsItemVariantSaleRef createItemVariantSale(WsItemVariantSale wsItemVariantSale) {
+        ItemVariantSale itemVariantSale = fromWsItemVariantSaleConverter.convert(wsItemVariantSale);
+        accessChecker.checkOwnCompany(itemVariantSale.getSale());
+        ItemVariantSale savedItemVariantSale = saleService.saveItemSale(itemVariantSale);
+        WsItemVariantSaleRef itemVariantSaleRef = toWsItemVariantSaleConverter.reference(savedItemVariantSale);
+        WsItemVariantSaleRef savedItemVariantSaleRef = itemVariantSaleRef;
+        return savedItemVariantSaleRef;
     }
 
-    @Path("{id}")
-    @PUT
-    @Valid
-    public WsItemVariantSaleRef updateItemSale(@PathParam("id") long id, @Valid WsItemVariantSale wsItemSale) {
-        idChecker.checkId(id, wsItemSale);
+    public WsItemVariantSaleRef updateItemVariantSale(long id, WsItemVariantSale wsItemVariantSale) {
+        idChecker.checkId(id, wsItemVariantSale);
 
-        ItemVariantSale existingItemSale = saleService.findItemSaleById(id);
-        Sale sale = existingItemSale.getSale();
+        ItemVariantSale existingItemVariantSale = saleService.findItemSaleById(id);
+        accessChecker.checkOwnCompany(existingItemVariantSale.getSale());
+        Sale sale = existingItemVariantSale.getSale();
         saleStateChecker.checkState(sale, false);
 
-        ItemVariantSale updatedItemSale = fromWsItemSaleConverter.patch(existingItemSale, wsItemSale);
+        ItemVariantSale updatedItemVariantSale = fromWsItemVariantSaleConverter.patch(existingItemVariantSale, wsItemVariantSale);
 
-        ItemVariantSale savedItemSale = saleService.saveItemSale(updatedItemSale);
-        WsItemVariantSaleRef itemSaleRef = toWsItemSaleConverter.reference(savedItemSale);
+        ItemVariantSale savedItemVariantSale = saleService.saveItemSale(updatedItemVariantSale);
+        WsItemVariantSaleRef itemVariantSaleRef = toWsItemVariantSaleConverter.reference(savedItemVariantSale);
 
-        return itemSaleRef;
+        return itemVariantSaleRef;
     }
 
-    @Path("{id}")
-    @GET
-    @Valid
-    public WsItemVariantSale getItemSale(@PathParam("id") long id) {
-        ItemVariantSale itemSale = saleService.findItemSaleById(id);
+    public WsItemVariantSale getItemVariantSale(long id) {
+        ItemVariantSale itemVariantSale = saleService.findItemSaleById(id);
+        accessChecker.checkOwnCompany(itemVariantSale.getSale());
 
-        WsItemVariantSale wsItemSale = toWsItemSaleConverter.convert(itemSale);
+        WsItemVariantSale wsItemVariantSale = toWsItemVariantSaleConverter.convert(itemVariantSale);
 
-        return wsItemSale;
+        return wsItemVariantSale;
     }
 
-    @POST
-    @Path("search")
-    @Valid
-    public List<WsItemVariantSale> findItemSales(@Valid WsItemVariantSaleSearch wsItemSaleSearch) {
+    public WsItemVariantSaleSearchResult findItemVariantSales(WsItemVariantSaleSearch wsItemVariantSaleSearch) {
         Pagination<ItemVariantSale, ItemVariantSaleColumn> pagination = restPaginationUtil.extractPagination(uriInfo, ItemVariantSaleColumn::valueOf);
-        ItemVariantSaleSearch itemSaleSearch = fromWsItemSaleSearchConverter.convert(wsItemSaleSearch);
-        List<ItemVariantSale> itemSales = saleService.findItemSales(itemSaleSearch, pagination);
+        ItemVariantSaleSearch itemVariantSaleSearch = fromWsItemVariantSaleSearchConverter.convert(wsItemVariantSaleSearch);
+        accessChecker.checkOwnCompany(itemVariantSaleSearch);
+        List<ItemVariantSale> itemVariantSales = saleService.findItemSales(itemVariantSaleSearch, pagination);
 
-        List<WsItemVariantSale> wsItemSales = itemSales.stream()
-                .map(toWsItemSaleConverter::convert)
+        List<WsItemVariantSaleRef> wsItemVariantSales = itemVariantSales.stream()
+                .map(toWsItemVariantSaleConverter::reference)
                 .collect(Collectors.toList());
 
         restPaginationUtil.addResultCount(response, pagination);
-        return wsItemSales;
+        return restPaginationUtil.setResults(new WsItemVariantSaleSearchResult(), wsItemVariantSales, pagination);
     }
 
-    @DELETE
-    @Path("{id}")
-    public void deleteItemSale(@PathParam("id") long id) {
-        ItemVariantSale itemSale = saleService.findItemSaleById(id);
-        if (itemSale == null) {
+    public void deleteItemVariantSale(long id) {
+        ItemVariantSale itemVariantSale = saleService.findItemSaleById(id);
+        if (itemVariantSale == null) {
             return;
         }
-        Sale sale = itemSale.getSale();
+        accessChecker.checkOwnCompany(itemVariantSale.getSale());
+        Sale sale = itemVariantSale.getSale();
         saleStateChecker.checkState(sale, false); // TODO: replace with bean validation
 
-        saleService.removeItemSale(itemSale);
+        saleService.removeItemSale(itemVariantSale);
     }
 
 }

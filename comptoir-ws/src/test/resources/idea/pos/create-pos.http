@@ -1,0 +1,10 @@
+POST https://{{ws-uri}}/pos
+Authorization: {{ws-auth}}
+Content-Type: application/json
+Accept: application/json
+
+{
+
+}
+
+###

@@ -1,21 +1,22 @@
 package be.valuya.comptoir.model.search;
 
 import be.valuya.comptoir.model.accounting.Account;
+import be.valuya.comptoir.model.common.WithCompany;
 import be.valuya.comptoir.model.company.Company;
-import java.time.ZonedDateTime;
+
 import javax.annotation.Nonnull;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.time.ZonedDateTime;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class BalanceSearch {
+public class BalanceSearch implements WithCompany {
 
     @NotNull
     @Nonnull

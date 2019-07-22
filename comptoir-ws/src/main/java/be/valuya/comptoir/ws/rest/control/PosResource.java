@@ -1,43 +1,39 @@
 package be.valuya.comptoir.ws.rest.control;
 
-import be.valuya.comptoir.api.domain.commercial.WsPos;
-import be.valuya.comptoir.api.domain.commercial.WsPosRef;
-import be.valuya.comptoir.api.domain.search.WsPosSearch;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsPos;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsPosRef;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsPosSearchResult;
+import be.valuya.comptoir.ws.rest.api.domain.search.WsPosSearch;
 import be.valuya.comptoir.model.commercial.Pos;
 import be.valuya.comptoir.model.search.PosSearch;
+import be.valuya.comptoir.ws.rest.api.util.ComptoirRoles;
 import be.valuya.comptoir.service.PosService;
 import be.valuya.comptoir.util.pagination.Pagination;
 import be.valuya.comptoir.util.pagination.PosColumn;
+import be.valuya.comptoir.ws.rest.api.PosResourceApi;
+import be.valuya.comptoir.ws.rest.api.util.PaginationParams;
+import be.valuya.comptoir.ws.convert.RestPaginationUtil;
 import be.valuya.comptoir.ws.convert.commercial.FromWsPosConverter;
 import be.valuya.comptoir.ws.convert.commercial.ToWsPosConverter;
 import be.valuya.comptoir.ws.convert.search.FromWsPosSearchConverter;
+import be.valuya.comptoir.ws.rest.api.util.WsSearchResult;
+import be.valuya.comptoir.ws.rest.validation.EmployeeAccessChecker;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
-import be.valuya.comptoir.ws.rest.validation.NoId;
-import java.util.List;
-import java.util.stream.Collectors;
+
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
-@Path("/pos")
-@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-public class PosResource {
+@RolesAllowed({ComptoirRoles.EMPLOYEE})
+public class PosResource implements PosResourceApi {
 
     @EJB
     private PosService posService;
@@ -55,11 +51,12 @@ public class PosResource {
     private RestPaginationUtil restPaginationUtil;
     @Context
     private HttpServletResponse response;
+    @Inject
+    private EmployeeAccessChecker accessChecker;
 
-    @POST
-    @Valid
-    public WsPosRef createPos(@NoId @Valid WsPos wsPos) {
+    public WsPosRef createPos(WsPos wsPos) {
         Pos pos = fromWsPosConverter.convert(wsPos);
+        accessChecker.checkOwnCompany(pos);
         Pos savedPos = posService.savePos(pos);
 
         WsPosRef posRef = toWsPosConverter.reference(savedPos);
@@ -67,12 +64,10 @@ public class PosResource {
         return posRef;
     }
 
-    @Path("{id}")
-    @PUT
-    @Valid
-    public WsPosRef savePos(@PathParam("id") long id, @Valid WsPos wsPos) {
+    public WsPosRef updatePos(long id, WsPos wsPos) {
         idChecker.checkId(id, wsPos);
         Pos pos = fromWsPosConverter.convert(wsPos);
+        accessChecker.checkOwnCompany(pos);
         Pos savedPos = posService.savePos(pos);
 
         WsPosRef posRef = toWsPosConverter.reference(savedPos);
@@ -80,31 +75,26 @@ public class PosResource {
         return posRef;
     }
 
-    @Path("{id}")
-    @GET
-    @Valid
-    public WsPos getPos(@PathParam("id") long id) {
+    public WsPos getPos(long id) {
         Pos pos = posService.findPosById(id);
+        accessChecker.checkOwnCompany(pos);
 
         WsPos wsPos = toWsPosConverter.convert(pos);
 
         return wsPos;
     }
 
-    @Path("search")
-    @POST
-    @Valid
-    public List<WsPos> findPosList(@Valid WsPosSearch wsPosSearch) {
+    public WsPosSearchResult findPosList(PaginationParams paginationParams, WsPosSearch wsPosSearch) {
         Pagination<Pos, PosColumn> pagination = restPaginationUtil.extractPagination(uriInfo, PosColumn::valueOf);
         PosSearch posSearch = fromWsPosSearchConverter.convert(wsPosSearch);
+        accessChecker.checkOwnCompany(posSearch);
         List<Pos> posList = posService.findPosList(posSearch, pagination);
 
-        List<WsPos> wsPosList = posList.stream()
-                .map(toWsPosConverter::convert)
+        List<WsPosRef> wsPosList = posList.stream()
+                .map(toWsPosConverter::reference)
                 .collect(Collectors.toList());
 
-        restPaginationUtil.addResultCount(response, pagination);
-        return wsPosList;
+        return restPaginationUtil.setResults(new WsPosSearchResult(), wsPosList, pagination);
     }
 
 }

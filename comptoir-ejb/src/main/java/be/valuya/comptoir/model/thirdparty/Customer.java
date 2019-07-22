@@ -1,25 +1,21 @@
 package be.valuya.comptoir.model.thirdparty;
 
+import be.valuya.comptoir.model.common.WithCompany;
 import be.valuya.comptoir.model.company.Company;
-import java.io.Serializable;
-import java.util.Objects;
+
 import javax.annotation.Nonnull;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
+import java.util.Objects;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @Entity
 @Table(name = "customer")
-public class Customer implements Serializable {
+public class Customer implements Serializable, WithCompany {
 
     @Id
     @GeneratedValue

@@ -1,0 +1,42 @@
+thorntail:
+  datasources:
+    data-sources:
+      comptoir:
+        driver-name: mariadb
+        connection-url: "${gestemps.datasource.connection.url}"
+        user-name: "${gestemps.datasource.connection.user}"
+        password: "${gestemps.datasource.connection.password}"
+        jndi-name: 'java:jboss/datasources/comptoir'
+      comptoir-non-jta:
+        driver-name: mariadb
+        connection-url: "${gestemps.datasource.connection.url}"
+        user-name: "${gestemps.datasource.connection.user}"
+        password: "${gestemps.datasource.connection.password}"
+        jta: false
+        jndi-name: 'java:jboss/datasources/comptoirNonJta'
+
+
+  logging:
+    pattern-formatters:
+      LOG_FORMATTER:
+        pattern: "%p [%c] %s%e%n"
+    periodic-rotating-file-handlers:
+      FILE:
+        file:
+          path: /logs/comptoir.log
+        suffix: .yyyy-MM-dd
+        named-formatter: LOG_FORMATTER
+        level: INFO
+    root-logger:
+      handlers:
+        - CONSOLE
+        - FILE
+
+  https:
+    port: 8443
+    keystore:
+      path: "${gestemps.https.keytore.path}"
+      password: "${gestemps.https.keytore.password}"
+    key:
+      alias: "${gestemps.https.key.alias}"
+      password: "${gestemps.https.key.password}"

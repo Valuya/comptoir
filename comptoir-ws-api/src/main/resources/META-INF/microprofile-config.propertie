@@ -1,0 +1,4 @@
+mp.openapi.servers=https://comptoir.local:8443/comptoir-ws
+# Make smallrye use references for nested objects rather than inline them
+mp.openapi.extensions.schema-references.enable=true
+

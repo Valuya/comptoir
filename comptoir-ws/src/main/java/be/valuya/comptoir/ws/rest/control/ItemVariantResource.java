@@ -1,46 +1,39 @@
 package be.valuya.comptoir.ws.rest.control;
 
-import be.valuya.comptoir.api.domain.commercial.WsItemVariant;
-import be.valuya.comptoir.api.domain.commercial.WsItemVariantRef;
-import be.valuya.comptoir.api.domain.search.WsItemVariantSearch;
-import be.valuya.comptoir.model.commercial.Item;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsItemVariant;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsItemVariantRef;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsItemVariantSearchResult;
+import be.valuya.comptoir.ws.rest.api.domain.search.WsItemVariantSearch;
 import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.model.search.ItemVariantSearch;
+import be.valuya.comptoir.ws.rest.api.util.ComptoirRoles;
 import be.valuya.comptoir.service.StockService;
 import be.valuya.comptoir.util.pagination.ItemVariantColumn;
 import be.valuya.comptoir.util.pagination.Pagination;
+import be.valuya.comptoir.ws.convert.RestPaginationUtil;
 import be.valuya.comptoir.ws.convert.commercial.FromWsItemVariantConverter;
 import be.valuya.comptoir.ws.convert.commercial.ToWsItemVariantConverter;
 import be.valuya.comptoir.ws.convert.search.FromWsItemVariantSearchConverter;
+import be.valuya.comptoir.ws.rest.api.ItemVariantResourceApi;
+import be.valuya.comptoir.ws.rest.api.util.PaginationParams;
 import be.valuya.comptoir.ws.rest.validation.ActiveStateChecker;
+import be.valuya.comptoir.ws.rest.validation.EmployeeAccessChecker;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
-import be.valuya.comptoir.ws.rest.validation.NoId;
-import java.util.List;
-import java.util.stream.Collectors;
+
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
-@Path("/itemVariant")
-@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-public class ItemVariantResource {
+@RolesAllowed({ComptoirRoles.EMPLOYEE})
+public class ItemVariantResource implements ItemVariantResourceApi {
 
     @EJB
     private StockService stockService;
@@ -60,11 +53,12 @@ public class ItemVariantResource {
     private RestPaginationUtil restPaginationUtil;
     @Inject
     private ActiveStateChecker activeStateChecker;
+    @Inject
+    private EmployeeAccessChecker accessChecker;
 
-    @POST
-    @Valid
-    public WsItemVariantRef createItemVariant(@NoId @Valid WsItemVariant wsItem) {
+    public WsItemVariantRef createItemVariant(WsItemVariant wsItem) {
         ItemVariant itemVariant = fromWsItemConverter.convert(wsItem);
+        accessChecker.checkOwnCompany(itemVariant.getItem());
         ItemVariant savedItem = stockService.saveItemVariant(itemVariant);
 
         WsItemVariantRef itemVariantRef = toWsItemConverter.reference(savedItem);
@@ -72,12 +66,10 @@ public class ItemVariantResource {
         return itemVariantRef;
     }
 
-    @Path("{id}")
-    @PUT
-    @Valid
-    public WsItemVariantRef updateItemVariant(@PathParam("id") long id, @Valid WsItemVariant wsItem) {
+    public WsItemVariantRef updateItemVariant(long id, WsItemVariant wsItem) {
         idChecker.checkId(id, wsItem);
         ItemVariant itemVariant = fromWsItemConverter.convert(wsItem);
+        accessChecker.checkOwnCompany(itemVariant.getItem());
         ItemVariant savedItem = stockService.saveItemVariant(itemVariant);
 
         WsItemVariantRef itemVariantRef = toWsItemConverter.reference(savedItem);
@@ -85,43 +77,38 @@ public class ItemVariantResource {
         return itemVariantRef;
     }
 
-    @Path("{id}")
-    @GET
-    @Valid
-    public WsItemVariant getItemVariant(@PathParam("id") long id) {
+    public WsItemVariant getItemVariant(long id) {
         ItemVariant itemVariant = stockService.findItemVariantById(id);
+        accessChecker.checkOwnCompany(itemVariant.getItem());
 
         WsItemVariant wsItem = toWsItemConverter.convert(itemVariant);
 
         return wsItem;
     }
 
-    @Path("{id}")
-    @DELETE
-    public void deleteItemVariant(@PathParam("id") long id) {
+    public void deleteItemVariant(long id) {
         ItemVariant itemVariant = stockService.findItemVariantById(id);
+        accessChecker.checkOwnCompany(itemVariant.getItem());
         activeStateChecker.checkState(itemVariant, true);
         itemVariant.setActive(false);
         stockService.saveItemVariant(itemVariant);
     }
 
-    @POST
-    @Path("search")
-    @Valid
-    public List<WsItemVariant> findItemVariants(@Valid WsItemVariantSearch wsItemVariantSearch) {
+    public WsItemVariantSearchResult findItemVariants(PaginationParams paginationParams, WsItemVariantSearch wsItemVariantSearch) {
         Pagination<ItemVariant, ItemVariantColumn> pagination = restPaginationUtil.extractPagination(uriInfo, ItemVariantColumn::valueOf);
 
         ItemVariantSearch itemVariantSearch = fromWsItemVariantSearchConverter.convert(wsItemVariantSearch);
+        accessChecker.checkOwnCompany(itemVariantSearch.getItemSearch());
 
         List<ItemVariant> items = stockService.findItemVariants(itemVariantSearch, pagination);
 
-        List<WsItemVariant> wsItems = items.stream()
-                .map(toWsItemConverter::convert)
+        List<WsItemVariantRef> wsItems = items.stream()
+                .map(toWsItemConverter::reference)
                 .collect(Collectors.toList());
 
         restPaginationUtil.addResultCount(response, pagination);
 
-        return wsItems;
+        return restPaginationUtil.setResults(new WsItemVariantSearchResult(), wsItems, pagination);
     }
 
 }

@@ -6,6 +6,8 @@ import be.valuya.comptoir.model.commercial.ExternalReferenceType;
 import be.valuya.comptoir.model.commercial.ExternalReference_;
 import be.valuya.comptoir.model.common.WithId;
 import be.valuya.comptoir.model.company.Company;
+import be.valuya.comptoir.persistence.util.PrestashopImportUtil;
+
 import java.util.Optional;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;

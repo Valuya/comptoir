@@ -1,0 +1,40 @@
+deploy --name=mariadb /tmp/mariadb-client.jar
+
+data-source add \
+    --name=ComptoirDataSource \
+    --driver-name=mariadb \
+    --jndi-name=java:jboss/datasources/comptoir \
+    --connectable=true \
+    --connection-url="jdbc:mariadb://${env.COMPTOIR_DB_URL:þworkaroundð}" \
+    --driver-class="org.mariadb.jdbc.Driver" \
+    --user-name=${env.COMPTOIR_DB_USER:þworkaroundð} \
+    --password=${env.COMPTOIR_DB_PASSWORD:þworkaroundð} \
+    --valid-connection-checker-class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLValidConnectionChecker" \
+    --exception-sorter-class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLExceptionSorter"
+
+
+data-source add \
+    --name=ComptoirNonJtaDataSource \
+    --driver-name=mariadb \
+    --jndi-name=java:jboss/datasources/comptoirNonJta \
+    --jta=false \
+    --connectable=true \
+    --connection-url="jdbc:mariadb://${env.COMPTOIR_DB_URL:þworkaroundð}" \
+    --driver-class="org.mariadb.jdbc.Driver" \
+    --user-name=${env.COMPTOIR_DB_USER:þworkaroundð} \
+    --password=${env.COMPTOIR_DB_PASSWORD:þworkaroundð} \
+    --valid-connection-checker-class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLValidConnectionChecker" \
+    --exception-sorter-class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLExceptionSorter"
+
+batch
+
+/subsystem=microprofile-config-smallrye/config-source=file-props:add(dir={path=/wildfly-configs})
+/system-property=eclipselink.archive.factory:add(value=org.jipijapa.eclipselink.JBossArchiveFactoryImpl)
+
+/system-property=java.net.preferIPv4Stack:add(value=true)
+/system-property=java.awt.headless:add(value=true)
+/system-property=ee8.preview.mode:add(value=true)
+/system-property=com.sun.management.jmxremote.local.only:add(value=true)
+/system-property=java.rmi.server.hostname:add(value=localhost)
+
+run-batch

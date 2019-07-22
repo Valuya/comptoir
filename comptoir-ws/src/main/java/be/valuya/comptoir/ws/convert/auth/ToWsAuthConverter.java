@@ -1,8 +1,8 @@
 package be.valuya.comptoir.ws.convert.auth;
 
-import be.valuya.comptoir.api.domain.auth.WsAuth;
-import be.valuya.comptoir.api.domain.auth.WsAuthRef;
-import be.valuya.comptoir.api.domain.thirdparty.WsEmployeeRef;
+import be.valuya.comptoir.ws.rest.api.domain.auth.WsAuth;
+import be.valuya.comptoir.ws.rest.api.domain.auth.WsAuthRef;
+import be.valuya.comptoir.ws.rest.api.domain.thirdparty.WsEmployeeRef;
 import be.valuya.comptoir.model.auth.Auth;
 import be.valuya.comptoir.model.thirdparty.Employee;
 import be.valuya.comptoir.ws.convert.thirdparty.ToWsEmployeeConverter;

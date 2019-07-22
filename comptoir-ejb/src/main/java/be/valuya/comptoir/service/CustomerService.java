@@ -9,11 +9,14 @@ import be.valuya.comptoir.model.search.CustomerLoyaltyAccountingEntrySearch;
 import be.valuya.comptoir.model.search.CustomerSearch;
 import be.valuya.comptoir.model.thirdparty.Customer;
 import be.valuya.comptoir.model.thirdparty.Customer_;
+import be.valuya.comptoir.persistence.util.CustomerColumnPersistenceUtils;
+import be.valuya.comptoir.persistence.util.PaginatedQueryService;
 import be.valuya.comptoir.util.pagination.CustomerColumn;
 import be.valuya.comptoir.util.pagination.Pagination;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
@@ -33,6 +36,8 @@ public class CustomerService {
     private EntityManager entityManager;
     @EJB
     private PaginatedQueryService paginatedQueryService;
+    @Inject
+    private LangService langService;
 
     public Customer saveCustomer(Customer customer) {
         Customer managedCustomer = entityManager.merge(customer);
@@ -167,27 +172,27 @@ public class CustomerService {
 
         String cityContains = customerSearch.getCityContains();
         if (cityContains != null) {
-            Predicate cityPredicate = createContainsPredicate(cityPath, cityContains);
+            Predicate cityPredicate = langService.createContainsPredicate(cityPath, cityContains);
             predicates.add(cityPredicate);
         }
         String emailContains = customerSearch.getEmailContains();
         if (emailContains != null) {
-            Predicate mailPredicate = createContainsPredicate(emailPath, emailContains);
+            Predicate mailPredicate = langService.createContainsPredicate(emailPath, emailContains);
             predicates.add(mailPredicate);
         }
         String firstNameContains = customerSearch.getFirstNameContains();
         if (firstNameContains != null) {
-            Predicate firstNamePredicate = createContainsPredicate(firstNamePath, firstNameContains);
+            Predicate firstNamePredicate = langService.createContainsPredicate(firstNamePath, firstNameContains);
             predicates.add(firstNamePredicate);
         }
         String lastNameContains = customerSearch.getLastNameContains();
         if (lastNameContains != null) {
-            Predicate lastNamePredicate = createContainsPredicate(lastNamePath, lastNameContains);
+            Predicate lastNamePredicate = langService.createContainsPredicate(lastNamePath, lastNameContains);
             predicates.add(lastNamePredicate);
         }
         String notesContains = customerSearch.getNotesContains();
         if (notesContains != null) {
-            Predicate notesPredicate = createContainsPredicate(notesPath, notesContains);
+            Predicate notesPredicate = langService.createContainsPredicate(notesPath, notesContains);
             predicates.add(notesPredicate);
         }
         String multiSearch = customerSearch.getMultiSearch();
@@ -195,16 +200,16 @@ public class CustomerService {
             String[] stringParts = multiSearch.split(" ");
             List<Predicate> multiPredicates = new ArrayList<>();
             for (String part : stringParts) {
-                Predicate firstNamePredicate = createContainsPredicate(firstNamePath, part);
-                Predicate lastNamePredicate = createContainsPredicate(lastNamePath, part);
-                Predicate address1Predicate = createContainsPredicate(address1Path, part);
-                Predicate address2Predicate = createContainsPredicate(address2Path, part);
-                Predicate zipPredicate = createContainsPredicate(zipPath, part);
-                Predicate cityPredicate = createContainsPredicate(cityPath, part);
-                Predicate phone1Predicate = createContainsPredicate(phone1Path, part);
-                Predicate phone2Predicate = createContainsPredicate(phone2Path, part);
-                Predicate mailPredicate = createContainsPredicate(emailPath, part);
-                Predicate notesPredicate = createContainsPredicate(notesPath, part);
+                Predicate firstNamePredicate = langService.createContainsPredicate(firstNamePath, part);
+                Predicate lastNamePredicate = langService.createContainsPredicate(lastNamePath, part);
+                Predicate address1Predicate = langService.createContainsPredicate(address1Path, part);
+                Predicate address2Predicate = langService.createContainsPredicate(address2Path, part);
+                Predicate zipPredicate = langService.createContainsPredicate(zipPath, part);
+                Predicate cityPredicate = langService.createContainsPredicate(cityPath, part);
+                Predicate phone1Predicate = langService.createContainsPredicate(phone1Path, part);
+                Predicate phone2Predicate = langService.createContainsPredicate(phone2Path, part);
+                Predicate mailPredicate = langService.createContainsPredicate(emailPath, part);
+                Predicate notesPredicate = langService.createContainsPredicate(notesPath, part);
                 Predicate multiSearchPartPredicate = criteriaBuilder.or(
                         firstNamePredicate,
                         lastNamePredicate,
@@ -222,15 +227,6 @@ public class CustomerService {
             predicates.add(multiSearchPredicate);
         }
         return predicates;
-    }
-
-    private Predicate createContainsPredicate(Path<String> path, String contains) {
-        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        Expression<String> lowerPathExpression = criteriaBuilder.lower(path);
-        String lowerContains = contains.toLowerCase();
-        Expression<Integer> containsExpression = criteriaBuilder.locate(lowerPathExpression, lowerContains);
-        Predicate containsPredicate = criteriaBuilder.greaterThan(containsExpression, 0);
-        return containsPredicate;
     }
 
 }

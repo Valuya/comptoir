@@ -1,9 +1,10 @@
 package be.valuya.comptoir.ws.convert.accounting;
 
-import be.valuya.comptoir.api.domain.accounting.WsAccount;
-import be.valuya.comptoir.api.domain.accounting.WsAccountRef;
-import be.valuya.comptoir.api.domain.company.WsCompanyRef;
-import be.valuya.comptoir.api.domain.lang.WsLocaleText;
+import be.valuya.comptoir.ws.rest.api.domain.accounting.WsAccount;
+import be.valuya.comptoir.ws.rest.api.domain.accounting.WsAccountRef;
+import be.valuya.comptoir.ws.rest.api.domain.accounting.WsAccountType;
+import be.valuya.comptoir.ws.rest.api.domain.company.WsCompanyRef;
+import be.valuya.comptoir.ws.rest.api.domain.lang.WsLocaleText;
 import be.valuya.comptoir.model.accounting.Account;
 import be.valuya.comptoir.model.accounting.AccountType;
 import be.valuya.comptoir.model.company.Company;
@@ -11,13 +12,14 @@ import be.valuya.comptoir.model.lang.LocaleText;
 import be.valuya.comptoir.service.AccountService;
 import be.valuya.comptoir.ws.convert.company.FromWsCompanyConverter;
 import be.valuya.comptoir.ws.convert.text.FromWsLocaleTextConverter;
+
 import java.util.List;
+import java.util.Objects;
 import javax.ejb.EJB;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @ApplicationScoped
@@ -27,6 +29,8 @@ public class FromWsAccountConverter {
     private FromWsLocaleTextConverter fromWsLocaleTextConverter;
     @Inject
     private FromWsCompanyConverter fromWsCompanyConverter;
+    @Inject
+    private FromWsAccountTypeConverter fromWsAccountTypeConverter;
     @EJB
     private AccountService accountService;
 
@@ -35,7 +39,7 @@ public class FromWsAccountConverter {
             return null;
         }
         Long id = wsAccount.getId();
-        AccountType accountType = wsAccount.getAccountType();
+        WsAccountType wsAccountType = wsAccount.getAccountType();
         String accountingNumber = wsAccount.getAccountingNumber();
         String bic = wsAccount.getBic();
         WsCompanyRef companyRef = wsAccount.getCompanyRef();
@@ -45,7 +49,8 @@ public class FromWsAccountConverter {
 
         LocaleText wsDescription = fromWsLocaleTextConverter.convert(description);
         Company company = fromWsCompanyConverter.find(companyRef);
-        
+        AccountType accountType = fromWsAccountTypeConverter.fromWsAccountType(wsAccountType);
+
         boolean cash = wsAccount.isCash();
 
         Account account = new Account();
@@ -62,6 +67,7 @@ public class FromWsAccountConverter {
 
         return account;
     }
+
 
     public Account find(WsAccountRef accountRef) {
         if (accountRef == null) {

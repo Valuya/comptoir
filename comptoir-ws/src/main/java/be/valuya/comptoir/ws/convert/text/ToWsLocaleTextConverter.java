@@ -1,6 +1,6 @@
 package be.valuya.comptoir.ws.convert.text;
 
-import be.valuya.comptoir.api.domain.lang.WsLocaleText;
+import be.valuya.comptoir.ws.rest.api.domain.lang.WsLocaleText;
 import be.valuya.comptoir.model.lang.LocaleText;
 import java.util.List;
 import java.util.stream.Collectors;

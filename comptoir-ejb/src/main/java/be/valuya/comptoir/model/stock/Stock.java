@@ -1,26 +1,23 @@
 package be.valuya.comptoir.model.stock;
 
 import be.valuya.comptoir.model.common.Activable;
+import be.valuya.comptoir.model.common.WithCompany;
 import be.valuya.comptoir.model.common.WithId;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.lang.LocaleText;
+
+import javax.annotation.Nonnull;
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Objects;
-import javax.annotation.Nonnull;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @Entity
 @Table(name = "stock")
-public class Stock implements Serializable, Activable, WithId {
+public class Stock implements Serializable, Activable, WithId, WithCompany {
 
     @Id
     @GeneratedValue

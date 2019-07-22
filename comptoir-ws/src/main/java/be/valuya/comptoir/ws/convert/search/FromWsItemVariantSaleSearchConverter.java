@@ -1,9 +1,9 @@
 package be.valuya.comptoir.ws.convert.search;
 
-import be.valuya.comptoir.api.domain.commercial.WsItemVariantRef;
-import be.valuya.comptoir.api.domain.commercial.WsSaleRef;
-import be.valuya.comptoir.api.domain.company.WsCompanyRef;
-import be.valuya.comptoir.api.domain.search.WsItemVariantSaleSearch;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsItemVariantRef;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsSaleRef;
+import be.valuya.comptoir.ws.rest.api.domain.company.WsCompanyRef;
+import be.valuya.comptoir.ws.rest.api.domain.search.WsItemVariantSaleSearch;
 import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.model.commercial.Sale;
 import be.valuya.comptoir.model.company.Company;

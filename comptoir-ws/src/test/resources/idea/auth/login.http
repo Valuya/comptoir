@@ -1,0 +1,5 @@
+POST https://{{ws-uri}}/auth
+Authorization: Basic {{ws-username}} {{ws-password}}
+Accept: application/json
+
+###
