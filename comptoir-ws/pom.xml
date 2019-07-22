@@ -12,10 +12,6 @@
     <packaging>war</packaging>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <be.valuya.comptoir.ws.cors-allowed-hosts>*</be.valuya.comptoir.ws.cors-allowed-hosts>
-        <be.valuya.comptoir.ws.cors-allow-any-with-credentials>true
-        </be.valuya.comptoir.ws.cors-allow-any-with-credentials>
         <resteasy.version>3.6.2.Final</resteasy.version>
         <jackson.version>2.9.8</jackson.version>
     </properties>
@@ -102,12 +98,13 @@
             <version>1.3</version>
             <scope>compile</scope>
         </dependency>
-        <!-- to trigger scanning -->
-<!--        <dependency>-->
-<!--            <groupId>org.jboss.resteasy</groupId>-->
-<!--            <artifactId>resteasy-servlet-initializer</artifactId>-->
-<!--            <version>3.0.9.Final</version>-->
-<!--        </dependency>-->
+
+        <!-- to trigger scanning / disabled until interfaces are not considered anymore -->
+        <!--        <dependency>-->
+        <!--            <groupId>org.jboss.resteasy</groupId>-->
+        <!--            <artifactId>resteasy-servlet-initializer</artifactId>-->
+        <!--            <version>3.0.9.Final</version>-->
+        <!--        </dependency>-->
 
     </dependencies>
 

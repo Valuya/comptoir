@@ -1,7 +1,6 @@
-#!groovy
 
 pipeline {
-    agent any
+
     parameters {
         booleanParam(name: 'SKIP_TESTS', defaultValue: false, description: 'Skip tests')
         string(name: 'ALT_DEPLOYMENT_REPOSITORY', defaultValue: '', description: 'Alternative deployment repo')
@@ -12,24 +11,28 @@ pipeline {
     }
     stages {
         stage ('Build') {
-            steps {
-               withMaven(maven: 'maven', mavenSettingsConfig: 'db-napo-settings-xml') {
-                    sh "mvn -DskipTests=${params.SKIP_TESTS} clean compile install"
-               }
+            agent {
+                docker {
+                    image 'maven:3-alpine'
+                    label 'be.valuya.jenkins.build=true'
+                    args  '--network comptoir-dev-napo-db-net'
+                }
             }
-        }
-        stage ('Publish') {
+            environment {
+                NAPO_DB_PASSWORD = credentials('comptoir-dev-napo-db-root-password')
+            }
             steps {
-                script {
-                    env.MVN_ARGS=""
-                    if (params.ALT_DEPLOYMENT_REPOSITORY != '') {
-                        env.MVN_ARGS="-DaltDeploymentRepository=${params.ALT_DEPLOYMENT_REPOSITORY}"
-                    }
-                }
-                withMaven(maven: 'maven', mavenSettingsConfig: 'db-napo-settings-xml',
-                          mavenOpts: '-DskipTests=true') {
-                    sh "mvn deploy $MVN_ARGS"
-                }
+               withMaven(maven: 'maven', mavenSettingsConfig: 'nexus-mvn-settings') {
+                    sh '''
+                        mvn \
+                        -Ddb.napo.url=jdbc:mariadb://db-napo:10101/napo \
+                        -Ddb.napo.username=root \
+                        -Ddb.napo.password="$NAPO_DB_PASSWORD" \
+                        -Ddb.napo.schema=napo \
+                        -Pcomptoir-thorntails
+                        clean package deploy
+                    '''
+               }
             }
         }
     }

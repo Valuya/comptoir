@@ -6,24 +6,25 @@
     <artifactId>comptoir</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
+
     <modules>
         <module>comptoir-ejb</module>
         <module>comptoir-ws</module>
         <module>comptoir-ws-api</module>
         <module>comptoir-ear</module>
-        <module>comptoir-uber</module>
+        <module>comptoir-thorntail</module>
     </modules>
 
     <distributionManagement>
         <repository>
             <id>nexus@valuya</id>
             <name>Nexus</name>
-            <url>https://valuya.be:50443/nexus/repository/maven-releases/</url>
+            <url>https://nexus.valuya.be/nexus/repository/maven-releases/</url>
         </repository>
         <snapshotRepository>
             <id>nexus@valuya</id>
             <name>Nexus</name>
-            <url>https://valuya.be:50443/nexus/repository/maven-snapshots/</url>
+            <url>https://nexus.valuya.be/nexus/repository/maven-snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 
@@ -32,6 +33,7 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -109,13 +111,15 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+
     <build>
         <pluginManagement>
             <plugins>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.1</version>
+                    <version>3.8.1</version>
                     <configuration>
                         <encoding>${project.build.sourceEncoding}</encoding>
                         <source>1.8</source>
@@ -125,7 +129,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-ear-plugin</artifactId>
-                    <version>2.10.1</version>
+                    <version>3.0.1</version>
                     <configuration>
                         <version>7</version>
                         <defaultLibBundleDir>lib</defaultLibBundleDir>
@@ -133,24 +137,24 @@
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-resources-plugin</artifactId>
-                    <version>2.4.3</version>
-                    <configuration>
-                        <encoding>${project.build.sourceEncoding}</encoding>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-war-plugin</artifactId>
-                    <version>2.3</version>
+                    <version>3.2.3</version>
                     <configuration>
                         <failOnMissingWebXml>false</failOnMissingWebXml>
                     </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>3.1.0</version>
+                    <configuration>
+                        <encoding>${project.build.sourceEncoding}</encoding>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-ejb-plugin</artifactId>
-                    <version>2.3</version>
+                    <version>3.0.1</version>
                     <configuration>
                         <ejbVersion>3.2</ejbVersion>
                     </configuration>
@@ -158,4 +162,16 @@
             </plugins>
         </pluginManagement>
     </build>
+
+    <profiles>
+        <profile>
+            <id>release</id>
+        </profile>
+        <profile>
+            <id>openapi-codegen</id>
+        </profile>
+        <profile>
+            <id>comptoir-thorntails</id>
+        </profile>
+    </profiles>
 </project>

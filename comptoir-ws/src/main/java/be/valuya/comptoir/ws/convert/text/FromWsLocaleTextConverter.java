@@ -1,29 +1,36 @@
 package be.valuya.comptoir.ws.convert.text;
 
-import be.valuya.comptoir.ws.rest.api.domain.lang.WsLocaleText;
 import be.valuya.comptoir.model.lang.LocaleText;
+import be.valuya.comptoir.ws.rest.api.domain.lang.WsLocaleText;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.ws.rs.BadRequestException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
-import javax.enterprise.context.ApplicationScoped;
-import javax.ws.rs.BadRequestException;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @ApplicationScoped
 public class FromWsLocaleTextConverter {
 
     public LocaleText convert(List<WsLocaleText> wsLocaleTexts) {
-        LocaleText localeText = new LocaleText();
-        return update(wsLocaleTexts, localeText);
+        LocaleText newTexts = new LocaleText();
+        List<WsLocaleText> sourcesTexts = Optional.ofNullable(wsLocaleTexts)
+                .orElseGet(ArrayList::new);
+        return update(sourcesTexts, newTexts);
     }
 
-    public LocaleText update(List<WsLocaleText> wsLocaleTexts, LocaleText existingLocaleText) {
-        Map<Locale, String> localeTextMap = wsLocaleTexts.stream()
+    public LocaleText update(List<WsLocaleText> texts, LocaleText existingLocaleText) {
+        List<WsLocaleText> sourcesTexts = Optional.ofNullable(texts)
+                .orElseGet(ArrayList::new);
+
+        Map<Locale, String> localeTextMap = sourcesTexts.stream()
                 .collect(Collectors.toMap(
                         WsLocaleText::getLocale,
                         WsLocaleText::getText,
