@@ -1,63 +1,43 @@
 package be.valuya.comptoir.ws.rest.control;
 
-import be.valuya.comptoir.api.domain.auth.WsAuth;
-import be.valuya.comptoir.api.domain.auth.WsLoginCredentials;
+import be.valuya.comptoir.ws.rest.api.domain.auth.WsAuth;
 import be.valuya.comptoir.model.auth.Auth;
-import be.valuya.comptoir.model.thirdparty.Employee;
+import be.valuya.comptoir.ws.rest.api.util.ComptoirRoles;
 import be.valuya.comptoir.service.AuthService;
-import be.valuya.comptoir.service.EmployeeService;
+import be.valuya.comptoir.util.LoggedUser;
+import be.valuya.comptoir.ws.rest.api.AuthResourceApi;
 import be.valuya.comptoir.ws.convert.auth.ToWsAuthConverter;
+import be.valuya.comptoir.ws.rest.validation.EmployeeAccessChecker;
+
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
+import javax.enterprise.context.RequestScoped;
+import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
-import javax.validation.Valid;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+import javax.ws.rs.NotAuthorizedException;
 
-/**
- *
- * @author Yannick Majoros <yannick@valuya.be>
- */
-@Path("/auth")
-@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-public class AuthResource {
+@RolesAllowed(ComptoirRoles.ACTIVE)
+public class AuthResource implements AuthResourceApi {
 
-    @EJB
-    private EmployeeService employeeService;
     @EJB
     private AuthService authService;
     @Inject
     private ToWsAuthConverter toWsAuthConverter;
+    @Inject
+    private EmployeeAccessChecker accessChecker;
 
-    @POST
-    @Path("/refresh/{refreshToken}")
-    @Valid
-    public WsAuth refreshAuth(@PathParam("refreshToken") String refreshToken) {
-        Auth auth = authService.refreshAuth(refreshToken);
 
-        WsAuth wsAuth = toWsAuthConverter.convert(auth);
+    public WsAuth login(String header) {
+        return authService.getAuthOptional()
+                .map(toWsAuthConverter::convert)
+                .orElseThrow(() -> new NotAuthorizedException("no user logged in"));
 
-        return wsAuth;
     }
 
-    @POST
-    @Valid
-    public WsAuth login(@Valid WsLoginCredentials credentials) {
-        String login = credentials.getLogin();
-        Employee employee = employeeService.findEmployeeByLogin(login);
-        if (employee == null) {
-            throw new NotFoundException();
-        }
 
-        String passwordHash = credentials.getPasswordHash();
-
-        Auth auth = authService.login(employee, passwordHash);
-
+    public WsAuth refreshAuth(String refreshToken) {
+        Auth auth = authService.refreshAuth(refreshToken);
+        accessChecker.checkSelf(auth.getEmployee());
         WsAuth wsAuth = toWsAuthConverter.convert(auth);
 
         return wsAuth;

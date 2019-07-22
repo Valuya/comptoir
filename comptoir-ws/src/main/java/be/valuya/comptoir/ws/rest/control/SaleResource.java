@@ -1,49 +1,42 @@
 package be.valuya.comptoir.ws.rest.control;
 
-import be.valuya.comptoir.api.domain.commercial.WsSale;
-import be.valuya.comptoir.api.domain.commercial.WsSalePrice;
-import be.valuya.comptoir.api.domain.commercial.WsSaleRef;
-import be.valuya.comptoir.api.domain.search.WsSaleSearch;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsSale;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsSalePrice;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsSaleRef;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsSalesSearchResult;
+import be.valuya.comptoir.ws.rest.api.domain.search.WsSaleSearch;
 import be.valuya.comptoir.model.commercial.Sale;
 import be.valuya.comptoir.model.commercial.SalePrice;
 import be.valuya.comptoir.model.search.SaleSearch;
+import be.valuya.comptoir.ws.rest.api.util.ComptoirRoles;
 import be.valuya.comptoir.service.SaleService;
 import be.valuya.comptoir.util.pagination.Pagination;
 import be.valuya.comptoir.util.pagination.SaleColumn;
+import be.valuya.comptoir.ws.convert.RestPaginationUtil;
 import be.valuya.comptoir.ws.convert.commercial.FromWsSaleConverter;
 import be.valuya.comptoir.ws.convert.commercial.ToWsSaleConverter;
 import be.valuya.comptoir.ws.convert.commercial.ToWsSalePriceConverter;
 import be.valuya.comptoir.ws.convert.search.FromWsSaleSearchConverter;
+import be.valuya.comptoir.ws.rest.api.SaleResourceApi;
+import be.valuya.comptoir.ws.rest.api.util.PaginationParams;
+import be.valuya.comptoir.ws.rest.validation.EmployeeAccessChecker;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
-import be.valuya.comptoir.ws.rest.validation.NoId;
 import be.valuya.comptoir.ws.rest.validation.SaleStateChecker;
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.stream.Collectors;
+
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
-@Path("/sale")
-@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-public class SaleResource {
+@RolesAllowed({ComptoirRoles.EMPLOYEE})
+public class SaleResource implements SaleResourceApi {
 
     @EJB
     private SaleService saleService;
@@ -65,12 +58,12 @@ public class SaleResource {
     private HttpServletResponse response;
     @Context
     private UriInfo uriInfo;
+    @Inject
+    private EmployeeAccessChecker accessChecker;
 
-    @POST
-    @Valid
-    public WsSaleRef createSale(@NoId @Valid WsSale wsSale) {
+    public WsSaleRef createSale(WsSale wsSale) {
         Sale sale = fromWsSaleConverter.convert(wsSale);
-
+        accessChecker.checkOwnCompany(sale);
         Sale savedSale = saleService.saveSale(sale);
 
         WsSaleRef saleRef = toWsSaleConverter.reference(savedSale);
@@ -78,13 +71,11 @@ public class SaleResource {
         return saleRef;
     }
 
-    @Path("{id}")
-    @PUT
-    @Valid
-    public WsSaleRef updateSale(@PathParam("id") long id, @Valid WsSale wsSale) {
+    public WsSaleRef updateSale(long id, WsSale wsSale) {
         idChecker.checkId(id, wsSale);
 
         Sale existingSale = saleService.findSaleById(id);
+        accessChecker.checkOwnCompany(existingSale);
         Sale updatedSale = fromWsSaleConverter.patch(existingSale, wsSale);
 
         Sale savedSale = saleService.saveSale(updatedSale);
@@ -94,59 +85,48 @@ public class SaleResource {
         return saleRef;
     }
 
-    @Path("{id}")
-    @GET
-    @Valid
-    public WsSale getSale(@PathParam("id") long id) {
+    public WsSale getSale(long id) {
         Sale sale = saleService.findSaleById(id);
+        accessChecker.checkOwnCompany(sale);
         WsSale wsSale = toWsSaleConverter.convert(sale);
 
         return wsSale;
     }
 
-    @POST
-    @Path("search")
-    @Valid
-    public List<WsSale> findSales(@Valid WsSaleSearch wsSaleSearch) {
+    public WsSalesSearchResult findSales(PaginationParams paginationParams, WsSaleSearch wsSaleSearch) {
         Pagination<Sale, SaleColumn> pagination = restPaginationUtil.extractPagination(uriInfo, SaleColumn::valueOf);
         SaleSearch saleSearch = fromWsSaleSearchConverter.convert(wsSaleSearch);
+        accessChecker.checkOwnCompany(saleSearch);
 
         List<Sale> sales = saleService.findSales(saleSearch, pagination);
 
-        List<WsSale> wsSales = sales.stream()
-                .map(toWsSaleConverter::convert)
+        List<WsSaleRef> wsSales = sales.stream()
+                .map(toWsSaleConverter::reference)
                 .collect(Collectors.toList());
 
-        restPaginationUtil.addResultCount(response, pagination);
-
-        return wsSales;
+        return restPaginationUtil.setResults(new WsSalesSearchResult(), wsSales, pagination);
     }
 
-    @POST
-    @Path("searchTotalPayed")
-    @Valid
-    public WsSalePrice findSalesTotalPayed(@Valid WsSaleSearch wsSaleSearch) {
+    public WsSalePrice findSalesTotalPayed(WsSaleSearch wsSaleSearch) {
         SaleSearch saleSearch = fromWsSaleSearchConverter.convert(wsSaleSearch);
+        accessChecker.checkOwnCompany(saleSearch);
 
         SalePrice salesTotalPayed = saleService.getSalesTotalPayed(saleSearch);
         WsSalePrice wsSalePrice = toWsSalePriceConverter.convert(salesTotalPayed);
         return wsSalePrice;
     }
 
-    @DELETE
-    @Path("{id}")
-    public void deleteSale(@PathParam("id") long id) {
+    public void deleteSale(long id) {
         Sale sale = saleService.findSaleById(id);
+        accessChecker.checkOwnCompany(sale);
         saleStateChecker.checkState(sale, false); // TODO: replace with bean validation
 
         saleService.cancelOpenSale(sale);
     }
 
-    @PUT
-    @Path("{id}/state/CLOSED")
-    @Valid
-    public WsSaleRef closeSale(@PathParam("id") long id) {
+    public WsSaleRef closeSale(long id) {
         Sale sale = saleService.findSaleById(id);
+        accessChecker.checkOwnCompany(sale);
         saleStateChecker.checkState(sale, false); // TODO: replace with bean validation
 
         sale = saleService.closeSale(sale);
@@ -156,11 +136,9 @@ public class SaleResource {
         return saleRef;
     }
 
-    @PUT
-    @Path("{id}/state/OPEN")
-    @Valid
-    public WsSaleRef openSale(@PathParam("id") long id) {
+    public WsSaleRef openSale(long id) {
         Sale sale = saleService.findSaleById(id);
+        accessChecker.checkOwnCompany(sale);
         saleStateChecker.checkState(sale, true); // TODO: replace with bean validation
 
         sale = saleService.reopenSale(sale);
@@ -170,11 +148,10 @@ public class SaleResource {
         return saleRef;
     }
 
-    @GET
-    @Path("{id}/payed")
-    public BigDecimal getSaleTotalPayed(@PathParam("id") long id) {
+    public String getSaleTotalPayed(long id) {
         Sale sale = saleService.findSaleById(id);
-        return saleService.getSaleTotalPayed(sale);
+        accessChecker.checkOwnCompany(sale);
+        return saleService.getSaleTotalPayed(sale).toPlainString();
     }
 
 }

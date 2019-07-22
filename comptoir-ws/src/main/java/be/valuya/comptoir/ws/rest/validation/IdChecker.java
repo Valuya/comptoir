@@ -1,10 +1,11 @@
 package be.valuya.comptoir.ws.rest.validation;
 
-import be.valuya.comptoir.model.common.WithId;
+
+import be.valuya.comptoir.ws.rest.api.util.WithId;
+
 import javax.enterprise.context.ApplicationScoped;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @ApplicationScoped

@@ -1,21 +1,22 @@
 package be.valuya.comptoir.model.search;
 
+import be.valuya.comptoir.model.common.WithCompany;
 import be.valuya.comptoir.model.company.Company;
-import java.util.Locale;
+
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.Locale;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ItemSearch {
+public class ItemSearch implements WithCompany {
 
     @NotNull
     @Nonnull

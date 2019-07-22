@@ -1,24 +1,21 @@
 package be.valuya.comptoir.ws.convert.commercial;
 
-import be.valuya.comptoir.api.domain.commercial.WsPictureRef;
-import be.valuya.comptoir.api.domain.commercial.WsItemRef;
-import be.valuya.comptoir.api.domain.commercial.WsItemVariant;
-import be.valuya.comptoir.api.domain.commercial.WsItemVariantRef;
-import be.valuya.comptoir.model.commercial.AttributeValue;
-import be.valuya.comptoir.model.commercial.Item;
-import be.valuya.comptoir.model.commercial.Picture;
-import be.valuya.comptoir.model.commercial.ItemVariant;
-import be.valuya.comptoir.model.commercial.Pricing;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsItemRef;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsItemVariant;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsItemVariantRef;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsPictureRef;
+import be.valuya.comptoir.model.commercial.*;
 import be.valuya.comptoir.service.StockService;
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.stream.Collectors;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsPricing;
+
 import javax.ejb.EJB;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @ApplicationScoped
@@ -32,6 +29,8 @@ public class FromWsItemVariantConverter {
     private FromWsItemConverter fromWsItemConverter;
     @Inject
     private FromWsPictureConverter fromWsPictureConverter;
+    @Inject
+    private FromWsPricingConverter fromWsPricingConverter;
 
     public ItemVariant convert(WsItemVariant wsItemVariant) {
         if (wsItemVariant == null) {
@@ -40,12 +39,13 @@ public class FromWsItemVariantConverter {
         Long id = wsItemVariant.getId();
 
         String variantReference = wsItemVariant.getVariantReference();
-        Pricing pricing = wsItemVariant.getPricing();
+        WsPricing wsPricing = wsItemVariant.getPricing();
         BigDecimal pricingAmount = wsItemVariant.getPricingAmount();
 
         WsPictureRef mainPictureRef = wsItemVariant.getMainPictureRef();
 
         Picture mainPicture = fromWsPictureConverter.find(mainPictureRef);
+        Pricing pricing = fromWsPricingConverter.fromWsPricing(wsPricing);
 
         WsItemRef itemRef = wsItemVariant.getItemRef();
         Item item = fromWsItemConverter.find(itemRef);

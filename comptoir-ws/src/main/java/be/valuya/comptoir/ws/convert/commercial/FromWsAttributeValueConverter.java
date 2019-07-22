@@ -1,9 +1,9 @@
 package be.valuya.comptoir.ws.convert.commercial;
 
-import be.valuya.comptoir.api.domain.commercial.WsAttributeDefinitionRef;
-import be.valuya.comptoir.api.domain.commercial.WsAttributeValue;
-import be.valuya.comptoir.api.domain.commercial.WsAttributeValueRef;
-import be.valuya.comptoir.api.domain.lang.WsLocaleText;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsAttributeDefinitionRef;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsAttributeValue;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsAttributeValueRef;
+import be.valuya.comptoir.ws.rest.api.domain.lang.WsLocaleText;
 import be.valuya.comptoir.model.commercial.AttributeDefinition;
 import be.valuya.comptoir.model.commercial.AttributeValue;
 import be.valuya.comptoir.model.lang.LocaleText;

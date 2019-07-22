@@ -1,0 +1,3 @@
+GET https://{{ws-uri}}/employee/{{employee_id}}
+Authorization: Basic {{ws-username}} {{ws-password}}
+Accept: application/json

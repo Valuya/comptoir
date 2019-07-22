@@ -3,3 +3,4 @@ target/
 /comptoir-ejb/nbproject/
 .idea
 **/*.iml
+**/*.private.env.json

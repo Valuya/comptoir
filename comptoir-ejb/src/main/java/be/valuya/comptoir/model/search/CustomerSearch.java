@@ -1,17 +1,15 @@
 package be.valuya.comptoir.model.search;
 
+import be.valuya.comptoir.model.common.WithCompany;
 import be.valuya.comptoir.model.company.Company;
 
 import javax.annotation.Nonnull;
 import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Created by cghislai on 23/03/16.
  */
-public class CustomerSearch {
+public class CustomerSearch implements WithCompany {
     @NotNull
     @Nonnull
     private Company company;

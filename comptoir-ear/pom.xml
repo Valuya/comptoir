@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>be.valuya.comptoir</groupId>
@@ -15,7 +16,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-   
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -30,44 +31,18 @@
             <type>war</type>
         </dependency>
     </dependencies>
-    
+
     <build>
+        <finalName>comptoir-ear</finalName>
         <plugins>
             <plugin>
-                <groupId>org.codehaus.cargo</groupId>
-                <artifactId>cargo-maven2-plugin</artifactId>
-                <version>1.5.0</version>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-ear-plugin</artifactId>
                 <configuration>
-                    <container>
-                        <containerId>glassfish4x</containerId>
-                        <type>remote</type>
-                    </container>
-                    <configuration>
-                        <type>runtime</type>
-<!--                        <properties>
-                            <cargo.hostname>localhost</cargo.hostname>
-                            <cargo.remote.username>admin</cargo.remote.username>
-                            <cargo.remote.password>admin</cargo.remote.password>
-                            <cargo.remote.port>50447</cargo.remote.port>
-                            <cargo.glassfish.domain.name>/myapp</cargo.glassfish.domain.name>
-                        </properties>-->
-                    </configuration>
-                    <deployables>
-                        <deployable>
-                            <groupId>${project.groupId}</groupId>
-                            <artifactId>${project.artifactId}</artifactId>
-                            <type>ear</type>
-                        </deployable>
-                    </deployables>
+                    <unpackTypes>war,ejb</unpackTypes>
                 </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.glassfish.deployment</groupId>
-                        <artifactId>deployment-client</artifactId>
-                        <version>3.2-b06</version>
-                    </dependency>
-                </dependencies>
             </plugin>
         </plugins>
     </build>
+
 </project>

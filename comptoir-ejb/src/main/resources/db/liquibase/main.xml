@@ -1,9 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <databaseChangeLog
-    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
 
-    <includeAll path="db/liquibase/changelogs" />
+    <include file="changelogs/001.point_of_sale.xml" relativeToChangelogFile="true"/>
+    <include file="changelogs/002.sale.xml" relativeToChangelogFile="true"/>
+    <include file="changelogs/003.invoice.xml" relativeToChangelogFile="true"/>
+    <include file="changelogs/004.pos_default_customer.xml" relativeToChangelogFile="true"/>
+    <include file="changelogs/005.accounting_transaction.xml" relativeToChangelogFile="true"/>
+    <include file="changelogs/006.sale_accounting_entry.xml" relativeToChangelogFile="true"/>
+    <include file="changelogs/007.employee_login_unique.xml" relativeToChangelogFile="true"/>
+    <include file="changelogs/008.item_main_picture.xml" relativeToChangelogFile="true"/>
+    <include file="changelogs/009.sale.xml" relativeToChangelogFile="true"/>
+    <include file="changelogs/010.decimals.xml" relativeToChangelogFile="true"/>
+    <include file="changelogs/011.balance_comment.xml" relativeToChangelogFile="true"/>
+    <include file="changelogs/012.money_pile.xml" relativeToChangelogFile="true"/>
+    <include file="changelogs/013.balance_close.xml" relativeToChangelogFile="true"/>
+    <include file="changelogs/014.auth.xml" relativeToChangelogFile="true"/>
+    <include file="changelogs/015.invoice_company.xml" relativeToChangelogFile="true"/>
+    <include file="changelogs/016.item_sale_total.xml" relativeToChangelogFile="true"/>
+    <include file="changelogs/017.item_variant.xml" relativeToChangelogFile="true"/>
+    <include file="changelogs/018.picture.xml" relativeToChangelogFile="true"/>
+    <include file="changelogs/019.external_reference.xml" relativeToChangelogFile="true"/>
+    <include file="changelogs/020.attribute_definition.xml" relativeToChangelogFile="true"/>
+    <include file="changelogs/021.attribute_value.xml" relativeToChangelogFile="true"/>
+    <include file="changelogs/022.item_attribute_value.xml" relativeToChangelogFile="true"/>
+    <include file="changelogs/023.item_active.xml" relativeToChangelogFile="true"/>
+    <include file="changelogs/024.account_cash.xml" relativeToChangelogFile="true"/>
+    <include file="changelogs/025.item_multi_sale.xml" relativeToChangelogFile="true"/>
+    <include file="changelogs/026.sequence.xml" relativeToChangelogFile="true"/>
+    <include file="changelogs/027.stock.xml" relativeToChangelogFile="true"/>
+    <include file="changelogs/028.item_variant_stock.xml" relativeToChangelogFile="true"/>
+    <include file="changelogs/029.country.xml" relativeToChangelogFile="true"/>
+    <include file="changelogs/030.customer_loyalty.xml" relativeToChangelogFile="true"/>
+
 
 </databaseChangeLog>

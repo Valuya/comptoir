@@ -4,18 +4,15 @@ import be.valuya.comptoir.model.commercial.Invoice;
 import be.valuya.comptoir.model.commercial.Invoice_;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.search.InvoiceSearch;
-import java.util.ArrayList;
-import java.util.List;
+
 import javax.annotation.Nonnull;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *

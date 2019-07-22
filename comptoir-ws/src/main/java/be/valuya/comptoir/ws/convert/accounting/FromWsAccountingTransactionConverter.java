@@ -1,20 +1,22 @@
 package be.valuya.comptoir.ws.convert.accounting;
 
-import be.valuya.comptoir.api.domain.accounting.WsAccountingTransaction;
-import be.valuya.comptoir.api.domain.accounting.WsAccountingTransactionRef;
-import be.valuya.comptoir.api.domain.company.WsCompanyRef;
+import be.valuya.comptoir.ws.rest.api.domain.accounting.WsAccountingTransaction;
+import be.valuya.comptoir.ws.rest.api.domain.accounting.WsAccountingTransactionRef;
+import be.valuya.comptoir.ws.rest.api.domain.accounting.WsAccountingTransactionType;
+import be.valuya.comptoir.ws.rest.api.domain.company.WsCompanyRef;
 import be.valuya.comptoir.model.accounting.AccountingTransaction;
 import be.valuya.comptoir.model.accounting.AccountingTransactionType;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.service.AccountService;
 import be.valuya.comptoir.ws.convert.company.FromWsCompanyConverter;
+
 import java.time.ZonedDateTime;
 import javax.ejb.EJB;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.validation.constraints.NotNull;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @ApplicationScoped
@@ -24,6 +26,8 @@ public class FromWsAccountingTransactionConverter {
     private AccountService accountService;
     @Inject
     private FromWsCompanyConverter fromWsCompanyConverter;
+    @Inject
+    private FromWsAccountingTransactionTypeConverter fromWsAccountingTransactionTypeConverter;
 
     public AccountingTransaction convert(WsAccountingTransaction wsAccountingTransaction) {
         if (wsAccountingTransaction == null) {
@@ -31,10 +35,11 @@ public class FromWsAccountingTransactionConverter {
         }
         Long id = wsAccountingTransaction.getId();
         WsCompanyRef companyRef = wsAccountingTransaction.getCompanyRef();
-        AccountingTransactionType accountingTransactionType = wsAccountingTransaction.getAccountingTransactionType();
+        WsAccountingTransactionType wsAccountingTransactionType = wsAccountingTransaction.getWsAccountingTransactionType();
         ZonedDateTime dateTime = wsAccountingTransaction.getDateTime();
 
         Company company = fromWsCompanyConverter.find(companyRef);
+        AccountingTransactionType accountingTransactionType = fromWsAccountingTransactionTypeConverter.fromWsAccountingTransactionType(wsAccountingTransactionType);
 
         AccountingTransaction accountingTransaction = new AccountingTransaction();
         accountingTransaction.setId(id);

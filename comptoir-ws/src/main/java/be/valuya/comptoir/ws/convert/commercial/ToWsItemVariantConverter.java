@@ -1,15 +1,17 @@
 package be.valuya.comptoir.ws.convert.commercial;
 
-import be.valuya.comptoir.api.domain.commercial.WsAttributeValueRef;
-import be.valuya.comptoir.api.domain.commercial.WsItemRef;
-import be.valuya.comptoir.api.domain.commercial.WsItemVariant;
-import be.valuya.comptoir.api.domain.commercial.WsPictureRef;
-import be.valuya.comptoir.api.domain.commercial.WsItemVariantRef;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsAttributeValueRef;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsItemRef;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsItemVariant;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsPictureRef;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsItemVariantRef;
 import be.valuya.comptoir.model.commercial.AttributeValue;
 import be.valuya.comptoir.model.commercial.Item;
 import be.valuya.comptoir.model.commercial.Picture;
 import be.valuya.comptoir.model.commercial.ItemVariant;
 import be.valuya.comptoir.model.commercial.Pricing;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsPricing;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +20,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @ApplicationScoped
@@ -30,6 +31,8 @@ public class ToWsItemVariantConverter {
     private ToWsPictureConverter toWsPictureConverter;
     @Inject
     private ToWsItemConverter toWsItemConverter;
+    @Inject
+    private ToWsPricingConverter toWsPricingConverter;
 
     public WsItemVariant convert(ItemVariant itemVariant) {
         if (itemVariant == null) {
@@ -42,6 +45,7 @@ public class ToWsItemVariantConverter {
         WsPictureRef mainPictureRef = toWsPictureConverter.reference(mainPicture);
 
         Pricing pricing = itemVariant.getPricing();
+        WsPricing wsPricing = toWsPricingConverter.toWsPricing(pricing);
         BigDecimal pricingAmount = itemVariant.getPricingAmount();
 
         // Copy to List : IndirectList does not handle stream
@@ -58,7 +62,7 @@ public class ToWsItemVariantConverter {
         wsItem.setId(id);
         wsItem.setMainPictureRef(mainPictureRef);
         wsItem.setVariantReference(variantReference);
-        wsItem.setPricing(pricing);
+        wsItem.setPricing(wsPricing);
         wsItem.setPricingAmount(pricingAmount);
         wsItem.setAttributeValueRefs(attributeValueRefs);
         wsItem.setItemRef(itemRef);

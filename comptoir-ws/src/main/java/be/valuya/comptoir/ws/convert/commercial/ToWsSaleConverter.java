@@ -1,11 +1,11 @@
 package be.valuya.comptoir.ws.convert.commercial;
 
-import be.valuya.comptoir.api.domain.accounting.WsAccountingTransactionRef;
-import be.valuya.comptoir.api.domain.commercial.WsInvoiceRef;
-import be.valuya.comptoir.api.domain.commercial.WsSale;
-import be.valuya.comptoir.api.domain.commercial.WsSaleRef;
-import be.valuya.comptoir.api.domain.company.WsCompanyRef;
-import be.valuya.comptoir.api.domain.thirdparty.WsCustomerRef;
+import be.valuya.comptoir.ws.rest.api.domain.accounting.WsAccountingTransactionRef;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsInvoiceRef;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsSale;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsSaleRef;
+import be.valuya.comptoir.ws.rest.api.domain.company.WsCompanyRef;
+import be.valuya.comptoir.ws.rest.api.domain.thirdparty.WsCustomerRef;
 import be.valuya.comptoir.model.accounting.AccountingTransaction;
 import be.valuya.comptoir.model.commercial.Invoice;
 import be.valuya.comptoir.model.commercial.Sale;

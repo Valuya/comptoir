@@ -11,6 +11,8 @@ import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.Properties;
+
+import be.valuya.comptoir.persistence.util.PrestashopImportUtil;
 import org.junit.Before;
 import org.junit.Test;
 

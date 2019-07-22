@@ -5,10 +5,10 @@
  */
 package be.valuya.comptoir.ws.convert.stock;
 
-import be.valuya.comptoir.api.domain.company.WsCompanyRef;
-import be.valuya.comptoir.api.domain.lang.WsLocaleText;
-import be.valuya.comptoir.api.domain.stock.WsStock;
-import be.valuya.comptoir.api.domain.stock.WsStockRef;
+import be.valuya.comptoir.ws.rest.api.domain.company.WsCompanyRef;
+import be.valuya.comptoir.ws.rest.api.domain.lang.WsLocaleText;
+import be.valuya.comptoir.ws.rest.api.domain.stock.WsStock;
+import be.valuya.comptoir.ws.rest.api.domain.stock.WsStockRef;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.lang.LocaleText;
 import be.valuya.comptoir.model.stock.Stock;

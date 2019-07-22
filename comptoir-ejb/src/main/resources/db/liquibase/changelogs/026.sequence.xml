@@ -1,36 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <databaseChangeLog
-    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
 
     <changeSet id="CLONE sequence -> SEQUENCE" author="cghislai">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="SEQUENCE" />
+                <tableExists tableName="SEQUENCE"/>
             </not>
         </preConditions>
-        <createTable tableName="SEQUENCE" >
-            <column name="SEQ_NAME" type="VARCHAR(50)" >
+        <createTable tableName="SEQUENCE">
+            <column name="SEQ_NAME" type="VARCHAR(50)">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="SEQ_COUNT" type="DECIMAL(38)" />
+            <column name="SEQ_COUNT" type="DECIMAL(38)"/>
         </createTable>
     </changeSet>
-    <changeSet id="CLONE sequence -> SEQUENCE values" author="cghislai" >
+    <changeSet id="CLONE sequence -> SEQUENCE values" author="cghislai" failOnError="false" runOnChange="false">
         <preConditions onFail="MARK_RAN">
             <not>
-                <sqlCheck expectedResult="SEQ_GEN">
-                    SELECT SEQ_NAME 
-                    FROM SEQUENCE 
+                <sqlCheck expectedResult="1">
+                    SELECT COUNT(SEQ_NAME)
+                    FROM SEQUENCE
                     WHERE SEQUENCE.SEQ_NAME = 'SEQ_GEN';
                 </sqlCheck>
             </not>
         </preConditions>
         <sql>
             INSERT INTO SEQUENCE (SEQ_NAME, SEQ_COUNT)
-            (SELECT SEQ_NAME, SEQ_COUNT 
-            FROM sequence 
+            (SELECT SEQ_NAME, SEQ_COUNT
+            FROM sequence
             WHERE SEQ_NAME = 'SEQ_GEN');
         </sql>
     </changeSet>

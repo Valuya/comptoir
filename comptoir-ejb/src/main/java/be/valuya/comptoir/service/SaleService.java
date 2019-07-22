@@ -8,6 +8,9 @@ import be.valuya.comptoir.model.search.*;
 import be.valuya.comptoir.model.stock.ItemStock;
 import be.valuya.comptoir.model.stock.Stock;
 import be.valuya.comptoir.model.thirdparty.Customer;
+import be.valuya.comptoir.persistence.util.ItemVariantSaleColumnPersistenceUtil;
+import be.valuya.comptoir.persistence.util.PaginatedQueryService;
+import be.valuya.comptoir.persistence.util.SaleColumnPersistenceUtils;
 import be.valuya.comptoir.util.pagination.ItemVariantSaleColumn;
 import be.valuya.comptoir.util.pagination.Pagination;
 import be.valuya.comptoir.util.pagination.SaleColumn;
@@ -17,7 +20,6 @@ import javax.annotation.Nonnull;
 import javax.ejb.EJB;
 import javax.ejb.EJBException;
 import javax.ejb.Stateless;
-import javax.jms.IllegalStateException;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Tuple;
@@ -397,6 +399,7 @@ public class SaleService {
         }
 
         ItemVariantSale managedItemSale = entityManager.merge(itemSale);
+        entityManager.flush();
         Sale managedSale = managedItemSale.getSale();
         managedSale = calcSale(managedSale);
 
@@ -501,16 +504,16 @@ public class SaleService {
             try {
                 stockService.adaptStockForRemovedItemSale(variantSale);
             } catch (IllegalStateException e) {
-                switch (e.getErrorCode()) {
-                    case StockService.ERROR_MISSING_STOCK:
-                        // Discard sales which do not have stocks (yet)
-                        Logger logger = Logger.getLogger(getClass().getName());
-                        logger.log(Level.WARNING, "Missing stock entry for an itemvariant sale", e);
-                        break;
-                    default: {
-                        throw new EJBException(e);
-                    }
-                }
+                throw new EJBException(e);
+//                switch (e.getErrorCode()) {
+//                    case StockService.ERROR_MISSING_STOCK:
+//                         Discard sales which do not have stocks (yet)
+//                        Logger logger = Logger.getLogger(getClass().getName());
+//                        logger.log(Level.WARNING, "Missing stock entry for an itemvariant sale", e);
+//                        break;
+//                    default: {
+//                    }
+//                }
             }
         }
 
@@ -527,7 +530,7 @@ public class SaleService {
             Optional.ofNullable(customerLoyaltyEntry)
                     .ifPresent(this::removeCustomerLoyaltyAccountingEntry);
         } catch (IllegalStateException e) {
-            throw new EJBException("Error while fetching customer loyalty entry for sale #"+sale.getId());
+            throw new EJBException("Error while fetching customer loyalty entry for sale #" + sale.getId());
         }
 
         // Create new one
