@@ -1,0 +1,52 @@
+
+pipeline {
+    agent any
+    parameters {
+        string(name: 'API_HOST', defaultValue: 'https://comptoir.valuya.be', description: 'Ws api url')
+        string(name: 'SPEC_FILE_PATH', defaultValue: '/openapi', description: 'Ws api url')
+        string(name: 'ALT_DEPLOYMENT_REPOSITORY', defaultValue: '', description: 'Alternative deployment repo')
+    }
+    options {
+        disableConcurrentBuilds()
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+    }
+    stages {
+        stage ('Build') {
+            agent {
+                docker {
+                    image 'maven'
+                }
+            }
+            steps {
+               withMaven(maven: 'maven', mavenSettingsConfig: 'nexus-mvn-settings') {
+                    sh '''
+                        cd comptoir-ws-api
+                        $MVN_CMD \
+                        -Dopenapi.spec.url="${API_HOST}${SPEC_FILE_PATH}" \
+                        -Popenapi-codegen \
+                        clean package deploy
+                    '''
+               }
+               stash includes: 'comptoir-ws-api/target/openapi/**', name: 'openapi'
+            }
+        }
+        stage ('Build npm package') {
+            steps {
+                unstash 'openapi'
+                withCredentials([usernameColonPassword(credentialsId: 'nexus-basic-auth', variable: 'NEXUS_BASIC_AUTH')]) {
+                 nodejs(nodeJSInstallationName: 'node 10', configId: 'npm-global-config') {   catchError {
+                  ansiColor('xterm') {
+                    sh '''
+                        cd comptoir-ws-api/target/openapi/ts
+
+                        npm install
+                        npm run build
+                        npm publish
+                    '''
+                  }
+                 }}
+                }
+            }
+        }
+    }
+}
