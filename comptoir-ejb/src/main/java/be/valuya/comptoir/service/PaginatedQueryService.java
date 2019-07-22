@@ -3,26 +3,19 @@ package be.valuya.comptoir.service;
 import be.valuya.comptoir.util.pagination.Column;
 import be.valuya.comptoir.util.pagination.Pagination;
 import be.valuya.comptoir.util.pagination.Sort;
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.From;
-import javax.persistence.criteria.Order;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @Stateless
@@ -39,7 +32,7 @@ public class PaginatedQueryService {
         return items;
     }
 
-    public <T, C extends Column<T>> void applySort(Pagination<T, C> pagination, From<?, T> from, CriteriaQuery<T> query, Function<C, Path<?>> sortToPathFunction) {
+    public <T, C extends Column<T>> void applySort(Pagination<T, C> pagination, From<?, T> from, CriteriaQuery<T> query, Function<C, Expression<?>> sortToPathFunction) {
         if (pagination != null) {
             List<Order> orders = createOrders(pagination, from, sortToPathFunction);
             query.orderBy(orders);
@@ -67,7 +60,7 @@ public class PaginatedQueryService {
         }
     }
 
-    private <T, C extends Column<T>> List<Order> createOrders(Pagination<T, C> pagination, From<?, T> from, Function<C, Path<?>> sortToPathFunction) {
+    private <T, C extends Column<T>> List<Order> createOrders(Pagination<T, C> pagination, From<?, T> from, Function<C, Expression<?>> sortToPathFunction) {
         List<Sort<C>> sortings = pagination.getSortings();
         if (sortings == null) {
             return Arrays.asList();
@@ -80,9 +73,9 @@ public class PaginatedQueryService {
         return orders;
     }
 
-    private <T, C extends Column<T>> Order createOrder(Sort<C> sort, Function<C, Path<?>> sortToPathFunction) {
+    private <T, C extends Column<T>> Order createOrder(Sort<C> sort, Function<C, Expression<?>> sortToPathFunction) {
         C sortColumn = sort.getSortColumn();
-        Path<?> path = sortToPathFunction.apply(sortColumn);
+        Expression<?> path = sortToPathFunction.apply(sortColumn);
         Order order;
         if (sort.isAscending()) {
             order = createAscOrder(path);
@@ -92,12 +85,12 @@ public class PaginatedQueryService {
         return order;
     }
 
-    private Order createDescOrder(Path<?> path) {
+    private Order createDescOrder(Expression<?> path) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         return criteriaBuilder.desc(path);
     }
 
-    private Order createAscOrder(Path<?> path) {
+    private Order createAscOrder(Expression<?> path) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         Order order = criteriaBuilder.asc(path);
         return order;
@@ -106,6 +99,8 @@ public class PaginatedQueryService {
     private <T, C extends Object & Column<T>> long countResults(Root<T> root, List<Predicate> predicates) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Long> query = criteriaBuilder.createQuery(Long.class);
+
+        query.getRoots().add(root);
 
         Expression<Long> countExpression = criteriaBuilder.count(root);
         query.select(countExpression);

@@ -24,10 +24,8 @@ public class ItemStock implements Serializable {
     @GeneratedValue
     private Long id;
     @Column(name = "start_date_time")
-    @Temporal(TemporalType.TIMESTAMP)
     private ZonedDateTime startDateTime;
     @Column(name = "end_date_time")
-    @Temporal(TemporalType.TIMESTAMP)
     private ZonedDateTime endDateTime;
     @Column(name = "order_position")
     @CheckForNull

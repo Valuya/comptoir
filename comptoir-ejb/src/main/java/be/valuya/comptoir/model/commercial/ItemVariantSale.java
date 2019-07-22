@@ -32,7 +32,7 @@ public class ItemVariantSale implements Serializable {
     private BigDecimal total;
     @ManyToOne
     private Sale sale;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     private LocaleText comment;
     @OneToOne
     private AccountingEntry accountingEntry;
