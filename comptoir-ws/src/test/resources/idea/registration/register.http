@@ -8,13 +8,13 @@ Content-Type: application/json
     "name": [
     {
       "locale": "fr",
-      "text": "{{company.name.fr}}"
+      "text": "{{company-name-fr}}"
     }
   ],
   "description": [
     {
       "locale": "fr",
-      "text": "{{company.description.fr}}"
+      "text": "{{company-description-fr}}"
     }
   ],
   "countryRef": {
@@ -25,8 +25,8 @@ Content-Type: application/json
   "employee": {
     "active": true,
     "login": "{{ws-username}}",
-    "lastName": "{{employee.lastName}}",
-    "firstName": "{{employee.firstName}}",
+    "lastName": "{{employee-lastName}}",
+    "firstName": "{{employee-firstName}}",
     "locale": "fr"
   },
   "employeePassword": "{{ws-password}}"
