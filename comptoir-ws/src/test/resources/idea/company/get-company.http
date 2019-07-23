@@ -1,4 +1,4 @@
-GET https://{{ws-uri}}/employee/me
+GET https://{{ws-uri}}/company/{{company_id}}
 Authorization: Basic {{ws-username}} {{ws-password}}
 Accept: application/json
 

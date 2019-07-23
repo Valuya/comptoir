@@ -1,0 +1,26 @@
+POST https://{{ws-uri}}/company
+Authorization: Basic {{ws-username}} {{ws-password}}
+Accept: application/json
+Content-Type: application/json
+
+{
+  "name": [
+    {
+      "locale": "fr",
+      "text": "{{company.name.fr}}"
+    }
+  ],
+  "description": [
+    {
+      "locale": "fr",
+      "text": "{{company.description.fr}}"
+    }
+  ],
+  "conutryRef": {
+    "code": "be"
+  },
+  "customerLoyaltyRate": 0
+}
+
+
+

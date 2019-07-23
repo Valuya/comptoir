@@ -2,8 +2,7 @@
 pipeline {
     agent any
     parameters {
-        string(name: 'API_HOST', defaultValue: 'https://comptoir.valuya.be', description: 'Ws api url')
-        string(name: 'SPEC_FILE_PATH', defaultValue: '/openapi', description: 'Ws api url')
+        string(name: 'SPEC_URL', defaultValue: 'https://comptoir.valuya.be/openapi', description: 'Spec api url')
         string(name: 'ALT_DEPLOYMENT_REPOSITORY', defaultValue: '', description: 'Alternative deployment repo')
     }
     options {
@@ -22,7 +21,7 @@ pipeline {
                     sh '''
                         cd comptoir-ws-api
                         $MVN_CMD \
-                        -Dopenapi.spec.url="${API_HOST}${SPEC_FILE_PATH}" \
+                        -Dopenapi.spec.url="${SPEC_URL} \
                         -Popenapi-codegen \
                         clean package deploy
                     '''

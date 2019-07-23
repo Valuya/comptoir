@@ -1,0 +1,35 @@
+POST https://{{ws-uri}}/registration
+Authorization: Basic {{ws-username}} {{ws-password}}
+Accept: application/json
+Content-Type: application/json
+
+{
+  "company": {
+    "name": [
+    {
+      "locale": "fr",
+      "text": "{{company.name.fr}}"
+    }
+  ],
+  "description": [
+    {
+      "locale": "fr",
+      "text": "{{company.description.fr}}"
+    }
+  ],
+  "countryRef": {
+    "code": "be"
+  },
+  "customerLoyaltyRate": 0
+  },
+  "employee": {
+    "active": true,
+    "login": "{{ws-username}}",
+    "lastName": "{{employee.lastName}}",
+    "firstName": "{{employee.firstName}}",
+    "locale": "fr"
+  },
+  "employeePassword": "{{ws-password}}"
+}
+
+###
