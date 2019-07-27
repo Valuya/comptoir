@@ -4,45 +4,39 @@ services:
 
   back:
     image: comptoir-thorntail
+    command: -jar /comptoir-thorntail.jar -s/configs/comptoirdev/thorntail-local-config.yml
     environment:
       - THORNTAIL_SWARM_DEBUG_PORT=8787
-      - THORNTAIL_HTTPS_KEYSTORE_PATH=/certs/comptoir.local.p12
-      - THORNTAIL_HTTPS_KEYSTORE_PASSWORD=password
-      - THORNTAIL_HTTPS_KEY_ALIAS=comptoir.local
-      - THORNTAIL_HTTPS_KEY_PASSWORD=password
       - THORNTAIL_HTTPS_ONLY=false
-      - THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_COMPTOIR_USER_DASH_NAME=root
-      - THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_COMPTOIR_PASSWORD=password
-      - THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_COMPTOIR_CONNECTION_DASH_URL=jdbc:mariadb://cghislai:22307/comptoir?sessionVariables=wait_timeout=34343434
-      - THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_COMPTOIR_DASH_NON_DASH_JTA_USER_DASH_NAME=root
-      - THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_COMPTOIR_DASH_NON_DASH_JTA_PASSWORD=password
-      - THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_COMPTOIR_DASH_NON_DASH_JTA_CONNECTION_DASH_URL=jdbc:mariadb://cghislai:22307/comptoir?sessionVariables=wait_timeout=34343434
     ports:
       - 8443:8443
       - 9990:9990
       - 8787:8787 # debugger
     volumes:
       - valuya_dev-certs:/certs
+      - valuya_dev-secrets:/configs
 
   db:
     image: mariadb:10
     environment:
-      MYSQL_ROOT_PASSWORD: password
+      MYSQL_ROOT_PASSWORD_FILE: /configs/comptoirdev/db-root-password
       MYSQL_DATABASE: comptoir
     volumes:
       - db-data:/var/lib/mysql
       - ../res/comptoir.sql:/docker-entrypoint-initdb.d/comptoir.sql
+      - valuya_dev-secrets:/configs
     ports:
       - 22307:3306
 
   napo-db:
     image: mariadb:10
     environment:
-      MYSQL_ROOT_PASSWORD: password
+      MYSQL_ROOT_PASSWORD_FILE: /configs/comptoirdev/napo-db-root-password
       MYSQL_DATABASE: napo
     volumes:
       - napo-db-data:/var/lib/mysql
       - ../res/petitnapo.sql:/docker-entrypoint-initdb.d/petitnapo.sql
+      - valuya_dev-secrets:/configs
     networks:
       - napo-db
     ports:
@@ -52,6 +46,8 @@ volumes:
   db-data: {}
   napo-db-data: {}
   valuya_dev-certs:
+    external: true
+  valuya_dev-secrets:
     external: true
 
 

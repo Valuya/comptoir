@@ -40,3 +40,9 @@ thorntail:
     key:
       alias: "${gestemps.https.key.alias}"
       password: "${gestemps.https.key.password}"
+
+  microprofile:
+    config:
+      config-sources:
+        file-props:
+          dir: /configs/comptoirdev
