@@ -7,6 +7,9 @@ thorntail:
         user-name: "${gestemps.datasource.connection.user}"
         password: "${gestemps.datasource.connection.password}"
         jndi-name: 'java:jboss/datasources/comptoir'
+        valid-connection-checker-class-name: org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLValidConnectionChecker
+        validate-on-match: true
+        background-validation: false
       comptoir-non-jta:
         driver-name: mariadb
         connection-url: "${gestemps.datasource.connection.url}"
@@ -14,6 +17,9 @@ thorntail:
         password: "${gestemps.datasource.connection.password}"
         jta: false
         jndi-name: 'java:jboss/datasources/comptoirNonJta'
+        valid-connection-checker-class-name: org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLValidConnectionChecker
+        validate-on-match: true
+        background-validation: false
 
 
   logging:

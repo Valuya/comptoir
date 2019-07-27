@@ -3,6 +3,8 @@ package be.valuya.comptoir.service;
 import be.valuya.comptoir.model.accounting.*;
 import be.valuya.comptoir.model.commercial.*;
 import be.valuya.comptoir.model.company.Company;
+import be.valuya.comptoir.model.event.SaleRemovedEvent;
+import be.valuya.comptoir.model.event.SaleUpdateEvent;
 import be.valuya.comptoir.model.lang.LocaleText;
 import be.valuya.comptoir.model.search.*;
 import be.valuya.comptoir.model.stock.ItemStock;
@@ -20,6 +22,8 @@ import javax.annotation.Nonnull;
 import javax.ejb.EJB;
 import javax.ejb.EJBException;
 import javax.ejb.Stateless;
+import javax.enterprise.event.Event;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Tuple;
@@ -51,6 +55,10 @@ public class SaleService {
     private CustomerService customerService;
     @EJB
     private PaginatedQueryService paginatedQueryService;
+    @Inject
+    private Event<SaleUpdateEvent> saleUpdateEvent;
+    @Inject
+    private Event<SaleRemovedEvent> saleRemovedEvent;
 
 
     @Nonnull
@@ -189,6 +197,7 @@ public class SaleService {
         }
 
         Sale managedSale = entityManager.merge(adjustedSale);
+        saleUpdateEvent.fire(new SaleUpdateEvent(managedSale));
         return managedSale;
     }
 
@@ -316,6 +325,7 @@ public class SaleService {
 
         Sale managedSale = entityManager.merge(sale);
         managedSale = calcSale(managedSale);
+        saleUpdateEvent.fire(new SaleUpdateEvent(managedSale));
 
         return managedSale;
     }
@@ -337,8 +347,10 @@ public class SaleService {
             accountService.removeAccountingEntry(accountingEntry);
         }
 
+        Long saleId = sale.getId();
         Sale managedSale = entityManager.merge(sale);
         entityManager.remove(managedSale);
+        saleRemovedEvent.fire(new SaleRemovedEvent(saleId));
     }
 
     public ItemVariantSale saveItemSale(ItemVariantSale itemSale) {
@@ -402,7 +414,7 @@ public class SaleService {
         entityManager.flush();
         Sale managedSale = managedItemSale.getSale();
         managedSale = calcSale(managedSale);
-
+        saleUpdateEvent.fire(new SaleUpdateEvent(managedSale));
         return managedItemSale;
     }
 
@@ -435,6 +447,7 @@ public class SaleService {
         entityManager.remove(managedItemSale);
 
         managedSale = calcSale(managedSale);
+        saleUpdateEvent.fire(new SaleUpdateEvent(managedSale));
     }
 
     @Nonnull
@@ -492,6 +505,7 @@ public class SaleService {
         }
 
         // TODO: create accounting entry
+        saleUpdateEvent.fire(new SaleUpdateEvent(managedSale));
 
         return managedSale;
 

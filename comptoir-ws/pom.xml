@@ -99,6 +99,20 @@
             <scope>compile</scope>
         </dependency>
 
+
+
+        <dependency>
+            <groupId>nl.martijndwars</groupId>
+            <artifactId>web-push</artifactId>
+            <version>5.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15on</artifactId>
+            <version>1.62</version>
+        </dependency>
+
+
         <!-- to trigger scanning / disabled until interfaces are not considered anymore -->
         <!--        <dependency>-->
         <!--            <groupId>org.jboss.resteasy</groupId>-->

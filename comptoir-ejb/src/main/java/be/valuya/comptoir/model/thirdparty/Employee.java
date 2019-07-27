@@ -1,6 +1,7 @@
 package be.valuya.comptoir.model.thirdparty;
 
 import be.valuya.comptoir.model.company.Company;
+
 import java.io.Serializable;
 import java.util.Locale;
 import java.util.Objects;
@@ -15,7 +16,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @Entity
@@ -131,4 +131,11 @@ public class Employee implements Serializable {
         return Objects.equals(this.id, other.id);
     }
 
+    @Override
+    public String toString() {
+        return "Employee{" +
+                "id=" + id +
+                ", login='" + login + '\'' +
+                '}';
+    }
 }

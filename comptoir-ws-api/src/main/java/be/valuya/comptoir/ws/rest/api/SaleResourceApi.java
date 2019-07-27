@@ -4,10 +4,10 @@ import be.valuya.comptoir.ws.rest.api.domain.commercial.WsSale;
 import be.valuya.comptoir.ws.rest.api.domain.commercial.WsSalePrice;
 import be.valuya.comptoir.ws.rest.api.domain.commercial.WsSaleRef;
 import be.valuya.comptoir.ws.rest.api.domain.commercial.WsSalesSearchResult;
+import be.valuya.comptoir.ws.rest.api.domain.event.WsComptoirServerEvent;
 import be.valuya.comptoir.ws.rest.api.domain.search.WsSaleSearch;
 import be.valuya.comptoir.ws.rest.api.util.ApiParameters;
 import be.valuya.comptoir.ws.rest.api.util.PaginationParams;
-import be.valuya.comptoir.ws.rest.api.util.WsSearchResult;
 import be.valuya.comptoir.ws.rest.api.validation.NoId;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.enums.ParameterIn;
@@ -15,11 +15,9 @@ import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
-import org.eclipse.microprofile.openapi.annotations.parameters.Parameters;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 
-import javax.naming.directory.SearchResult;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.BeanParam;
@@ -31,8 +29,9 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import java.util.List;
+import javax.ws.rs.sse.SseEventSink;
 
 @Path("/sale")
 @Produces(MediaType.APPLICATION_JSON)
@@ -50,7 +49,7 @@ public interface SaleResourceApi {
     @PUT
     @Operation(operationId = "updateSale", description = "Update a sale")
     @Valid WsSaleRef updateSale(
-            @Parameter(description = "The sale id", name = "id")
+            @Parameter(description = "The sale id", name = "id", required = true)
             @PathParam("id") long id,
             @RequestBody(required = true, description = "sale to update")
             @Valid WsSale wsSale
@@ -60,7 +59,7 @@ public interface SaleResourceApi {
     @GET
     @Operation(operationId = "getSale", description = "Get a sale")
     @Valid WsSale getSale(
-            @Parameter(description = "The sale id", name = "id")
+            @Parameter(description = "The sale id", name = "id", required = true)
             @PathParam("id") long id);
 
     @POST
@@ -90,27 +89,52 @@ public interface SaleResourceApi {
     @Path("{id}")
     @Operation(operationId = "deleteSale", description = "Delete a sale")
     void deleteSale(
-            @Parameter(description = "The sale id", name = "id")
+            @Parameter(description = "The sale id", name = "id", required = true)
             @PathParam("id") long id);
 
     @PUT
     @Path("{id}/state/CLOSED")
     @Operation(operationId = "closeSale", description = "Close a sale")
     @Valid WsSaleRef closeSale(
-            @Parameter(description = "The sale id", name = "id")
+            @Parameter(description = "The sale id", name = "id", required = true)
             @PathParam("id") long id);
 
     @PUT
     @Path("{id}/state/OPEN")
     @Operation(operationId = "openSale", description = "Open a sale")
     @Valid WsSaleRef openSale(
-            @Parameter(description = "The sale id", name = "id")
+            @Parameter(description = "The sale id", name = "id", required = true)
             @PathParam("id") long id);
 
     @GET
     @Path("{id}/payed")
     @Operation(operationId = "getSaleTotalPayed", description = "Get total paid on a sale")
     String getSaleTotalPayed(
-            @Parameter(description = "The sale id", name = "id")
+            @Parameter(description = "The sale id", name = "id", required = true)
             @PathParam("id") long id);
+
+
+    @GET
+    @Path("{id}/events")
+    @Produces(MediaType.SERVER_SENT_EVENTS)
+    @Operation(operationId = "registerToSaleEvents", description = "Register to server-sent sale events")
+    @APIResponse(name = "sucess", description = "Registered to events",
+            responseCode = "200",
+            content = @Content(
+                    mediaType = MediaType.SERVER_SENT_EVENTS,
+                    schema = @Schema(
+                            name = "CompoirServerEvents",
+                            description = "Comptoir server events",
+                            type = SchemaType.OBJECT,
+                            // OneOf typescript generation seems broken
+                            implementation = WsComptoirServerEvent.class
+                    )
+            ))
+    void registerToSaleEvents(
+            @Parameter(description = "The sale id", name = "id", required = true)
+            @PathParam("id") long id,
+            @Context SseEventSink eventSink
+    );
+
+
 }

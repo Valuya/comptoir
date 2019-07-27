@@ -31,6 +31,7 @@ import be.valuya.comptoir.ws.rest.provider.CrossOriginResourceSharingPreflightRe
 import be.valuya.comptoir.ws.rest.provider.CrossOriginResourceSharingResponseFilter;
 import be.valuya.comptoir.ws.rest.provider.UnauthenticatedExceptionMapper;
 import be.valuya.comptoir.ws.rest.provider.WsExceptionMapper;
+import be.valuya.comptoir.ws.rest.service.ComptoirEventService;
 
 import javax.annotation.security.DeclareRoles;
 import javax.servlet.annotation.HttpConstraint;
@@ -96,7 +97,7 @@ public class ComptoirWsApplication extends ComptoirWsApplicationApi {
                 CrossOriginResourceSharingPreflightRequestFilter.class,
                 WsExceptionMapper.class,
                 UnauthenticatedExceptionMapper.class
-
+//                ComptoirEventService.class,
         );
     }
 }
