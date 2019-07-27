@@ -55,7 +55,7 @@ public class CrossOriginResourceSharingPreflightRequestFilter implements Contain
         Set<String> allowedHeaders = corsOptionsProvider.getAllowedHeaders();
         boolean requestedHeadersAllowed = CorsUtils.isRequestedHeadersAllowed(headers, allowedHeaders);
         if (!requestedHeadersAllowed) {
-            abortWitError(requestContext, "Not all headers allowed");
+            abortWitError(requestContext, "Some requested header not allowed");
             return;
         }
 

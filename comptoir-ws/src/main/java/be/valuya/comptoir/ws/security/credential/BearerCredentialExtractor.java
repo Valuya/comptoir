@@ -33,8 +33,7 @@ public class BearerCredentialExtractor implements CredentialExtractor {
 
     private Optional<String> getEncodedAuthTokenOptional(HttpServletRequest servletRequest) {
         return getAuthHeaderValueOptional(servletRequest)
-                .map(Optional::of)
-                .orElseGet(() -> this.getAuthRequestValueOptional(servletRequest));
+                .or(() -> this.getAuthRequestValueOptional(servletRequest));
     }
 
     private Optional<String> getAuthHeaderValueOptional(HttpServletRequest servletRequest) {
