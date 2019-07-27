@@ -6,7 +6,7 @@
 # --network comptoir-napo-db \
 
 docker build \
- --tag comptoir-uber \
- -f comptoir-uber/Dockerfile \
+ --tag comptoir-thorntail \
+ -f comptoir-thorntail/Dockerfile \
  $@ \
  .
