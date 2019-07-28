@@ -1,21 +1,31 @@
 package be.valuya.comptoir.ws.rest.service;
 
+import be.valuya.comptoir.model.accounting.AccountingEntry;
+import be.valuya.comptoir.model.accounting.AccountingTransaction;
 import be.valuya.comptoir.model.commercial.ItemVariantSale;
 import be.valuya.comptoir.model.commercial.Sale;
 import be.valuya.comptoir.model.thirdparty.Employee;
 import be.valuya.comptoir.service.SaleService;
+import be.valuya.comptoir.ws.convert.accounting.ToWsAccountingEntryConverter;
+import be.valuya.comptoir.ws.convert.accounting.ToWsAccountingTransactionConverter;
 import be.valuya.comptoir.ws.convert.commercial.ToWsItemVariantSaleConverter;
 import be.valuya.comptoir.ws.convert.commercial.ToWsSaleConverter;
+import be.valuya.comptoir.ws.rest.api.domain.accounting.WsAccountingEntry;
+import be.valuya.comptoir.ws.rest.api.domain.accounting.WsAccountingEntryRef;
+import be.valuya.comptoir.ws.rest.api.domain.accounting.WsAccountingTransactionRef;
 import be.valuya.comptoir.ws.rest.api.domain.commercial.WsItemVariantSale;
 import be.valuya.comptoir.ws.rest.api.domain.commercial.WsSale;
 import be.valuya.comptoir.ws.rest.api.domain.commercial.WsSaleRef;
 import be.valuya.comptoir.ws.rest.api.domain.event.WsComptoirEvent;
+import be.valuya.comptoir.ws.rest.api.domain.event.WsComptoirServerEvent;
 import be.valuya.comptoir.ws.rest.api.domain.event.WsSaleItemsUpdateEvent;
+import be.valuya.comptoir.ws.rest.api.domain.event.WsSalePaymentEntriesUpdateEvent;
 import be.valuya.comptoir.ws.rest.api.domain.event.WsSaleUpdateEvent;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.sse.OutboundSseEvent;
 import javax.ws.rs.sse.Sse;
@@ -39,6 +49,10 @@ public class ComptoirEventService {
     @Inject
     private ToWsItemVariantSaleConverter toWsItemVariantSaleConverter;
     @Inject
+    private ToWsAccountingEntryConverter toWsAccountingEntryConverter;
+    @Inject
+    private ToWsAccountingTransactionConverter toWsAccountingTransactionConverter;
+    @Inject
     private Logger logger;
 
     private Map<Employee, EmployeeSaleEventSubscription> employeeWatchedSales;
@@ -49,7 +63,6 @@ public class ComptoirEventService {
         this.employeeWatchedSales = new HashMap<>();
         this.watchedSales = new HashMap<>();
     }
-
 
     public List<EmployeeSaleEventSubscription> getSaleSubscriptions(WsSaleRef saleRef) {
         return Optional.ofNullable(watchedSales.get(saleRef))
@@ -85,13 +98,9 @@ public class ComptoirEventService {
         updateEvent.setPageSize(itemCount);
         updateEvent.setTotalCount(itemCount);
 
-        OutboundSseEvent sseEvent = sse.newEventBuilder()
-                .mediaType(MediaType.APPLICATION_JSON_TYPE)
-                .name(WsComptoirEvent.SALE_ITEMS.name())
-                .data(updateEvent)
-                .build();
-        eventSink.send(sseEvent);
+        dispatchEvent(sse, eventSink, updateEvent);
     }
+
 
     public void sendSaleUpdate(Sse sse, EmployeeSaleEventSubscription employeeSaleEventSubscription) {
         SseEventSink eventSink = employeeSaleEventSubscription.getEventSink();
@@ -116,9 +125,44 @@ public class ComptoirEventService {
         updateEvent.setTotalPaid(totalPaid);
         updateEvent.setTotalVatInclusive(saleTotalWithVat);
 
+        dispatchEvent(sse, eventSink, updateEvent);
+    }
+
+
+    public void sendSaleAccountingEntriesUpdate(Sse sse, EmployeeSaleEventSubscription employeeSaleEventSubscription) {
+        SseEventSink eventSink = employeeSaleEventSubscription.getEventSink();
+        WsSaleRef saleRef = employeeSaleEventSubscription.getSaleRef();
+        Employee employee = employeeSaleEventSubscription.getEmployee();
+
+        if (eventSink.isClosed()) {
+            removeEmployeeSaleSubscription(employee, saleRef);
+            return;
+        }
+        Sale sale = saleService.findSaleById(saleRef.getId());
+        @NotNull AccountingTransaction accountingTransaction = sale.getAccountingTransaction();
+        WsAccountingTransactionRef wsAccountingTransactionRef = toWsAccountingTransactionConverter.reference(accountingTransaction);
+
+        List<AccountingEntry> accountingEntries = saleService.findPaymentAccountingEntries(sale);
+        List<WsAccountingEntry> wsAccountingEntries = accountingEntries.stream()
+                .map(toWsAccountingEntryConverter::convert)
+                .collect(Collectors.toList());
+        long itemCount = accountingEntries.size();
+
+        WsSalePaymentEntriesUpdateEvent updateEvent = new WsSalePaymentEntriesUpdateEvent();
+        updateEvent.setSaleRef(saleRef);
+        updateEvent.setAccountingTransactionRef(wsAccountingTransactionRef);
+        updateEvent.setFirstPage(wsAccountingEntries);
+        updateEvent.setPageSize(itemCount);
+        updateEvent.setTotalCount(itemCount);
+
+        dispatchEvent(sse, eventSink, updateEvent);
+    }
+
+
+    private <T extends WsComptoirServerEvent> void dispatchEvent(Sse sse, SseEventSink eventSink, T updateEvent) {
         OutboundSseEvent sseEvent = sse.newEventBuilder()
                 .mediaType(MediaType.APPLICATION_JSON_TYPE)
-                .name(WsComptoirEvent.SALE_UPDATE.name())
+                .name(updateEvent.getEventType().name())
                 .data(updateEvent)
                 .build();
         eventSink.send(sseEvent);
@@ -156,9 +200,10 @@ public class ComptoirEventService {
         Employee employee = eventSubscription.getEmployee();
         WsSaleRef saleRef = eventSubscription.getSaleRef();
 
-        employeeWatchedSales.values().stream()
+        List<EmployeeSaleEventSubscription> subscriptionsToRemove = employeeWatchedSales.values().stream()
                 .filter(subscription -> subscription.getSaleRef().equals(saleRef))
-                .forEach(this::unsubscribe);
+                .collect(Collectors.toList());
+        subscriptionsToRemove.forEach(this::unsubscribe);
 
         employeeWatchedSales.put(employee, eventSubscription);
         List<EmployeeSaleEventSubscription> saleSubscriptions = watchedSales.computeIfAbsent(saleRef, ref -> new ArrayList<>());

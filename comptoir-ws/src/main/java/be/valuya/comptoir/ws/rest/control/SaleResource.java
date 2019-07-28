@@ -1,8 +1,16 @@
 package be.valuya.comptoir.ws.rest.control;
 
+import be.valuya.comptoir.model.accounting.AccountingEntry;
+import be.valuya.comptoir.model.commercial.ItemVariantSale;
 import be.valuya.comptoir.model.event.SaleUpdateEvent;
 import be.valuya.comptoir.model.thirdparty.Employee;
+import be.valuya.comptoir.service.AccountService;
 import be.valuya.comptoir.util.LoggedUser;
+import be.valuya.comptoir.ws.convert.accounting.FromWsAccountingEntryConverter;
+import be.valuya.comptoir.ws.convert.accounting.ToWsAccountingEntryConverter;
+import be.valuya.comptoir.ws.rest.api.domain.accounting.WsAccountingEntry;
+import be.valuya.comptoir.ws.rest.api.domain.accounting.WsAccountingEntryRef;
+import be.valuya.comptoir.ws.rest.api.domain.accounting.WsAccountingTransactionRef;
 import be.valuya.comptoir.ws.rest.api.domain.commercial.WsSale;
 import be.valuya.comptoir.ws.rest.api.domain.commercial.WsSalePrice;
 import be.valuya.comptoir.ws.rest.api.domain.commercial.WsSaleRef;
@@ -49,6 +57,8 @@ public class SaleResource implements SaleResourceApi {
 
     @EJB
     private SaleService saleService;
+    @EJB
+    private AccountService accountService;
     @Inject
     private FromWsSaleConverter fromWsSaleConverter;
     @Inject
@@ -57,6 +67,10 @@ public class SaleResource implements SaleResourceApi {
     private ToWsSaleConverter toWsSaleConverter;
     @Inject
     private ToWsSalePriceConverter toWsSalePriceConverter;
+    @Inject
+    private FromWsAccountingEntryConverter fromWsAccountingEntryConverter;
+    @Inject
+    private ToWsAccountingEntryConverter toWsAccountingEntryConverter;
     @Inject
     private IdChecker idChecker;
     @Inject
@@ -172,6 +186,26 @@ public class SaleResource implements SaleResourceApi {
         return saleService.getSaleTotalPayed(sale).toPlainString();
     }
 
+    @Override
+    public WsAccountingEntryRef addSalePayment(long id, WsAccountingEntry paymentEntry) {
+        Sale sale = saleService.findSaleById(id);
+        accessChecker.checkOwnCompany(sale);
+
+        AccountingEntry accountingEntry = fromWsAccountingEntryConverter.convert(paymentEntry);
+        AccountingEntry addedEntry = saleService.addPayment(sale, accountingEntry);
+
+        WsAccountingEntryRef accountingEntryRef = toWsAccountingEntryConverter.reference(addedEntry);
+        return accountingEntryRef;
+    }
+
+    @Override
+    public void deleteSalePayment(long id, long entryId) {
+        Sale sale = saleService.findSaleById(id);
+        accessChecker.checkOwnCompany(sale);
+        AccountingEntry accountingEntry = accountService.findAccountingEntryById(entryId);
+
+        saleService.deletePayment(sale, accountingEntry);
+    }
 
     public void registerToSaleEvents(long id, @Context SseEventSink eventSink) {
         WsSaleRef wsSaleRef = new WsSaleRef(id);
@@ -179,6 +213,7 @@ public class SaleResource implements SaleResourceApi {
 
         eventService.sendSaleUpdate(sse, subscription);
         eventService.sendSaleItemsUpdate(sse, subscription);
+        eventService.sendSaleAccountingEntriesUpdate(sse, subscription);
     }
 
     public void notifySaleUpdated(@Observes SaleUpdateEvent updateEvent) {
@@ -195,6 +230,7 @@ public class SaleResource implements SaleResourceApi {
 
         eventService.sendSaleUpdate(sse, employeeSaleEventSubscription);
         eventService.sendSaleItemsUpdate(sse, employeeSaleEventSubscription);
+        eventService.sendSaleAccountingEntriesUpdate(sse, employeeSaleEventSubscription);
 
         logger.fine("Notified sale " + saleRef + " update to " + employee);
     }

@@ -1,5 +1,8 @@
 package be.valuya.comptoir.ws.rest.api;
 
+import be.valuya.comptoir.ws.rest.api.domain.accounting.WsAccountingEntry;
+import be.valuya.comptoir.ws.rest.api.domain.accounting.WsAccountingEntryRef;
+import be.valuya.comptoir.ws.rest.api.domain.accounting.WsAccountingTransactionRef;
 import be.valuya.comptoir.ws.rest.api.domain.commercial.WsSale;
 import be.valuya.comptoir.ws.rest.api.domain.commercial.WsSalePrice;
 import be.valuya.comptoir.ws.rest.api.domain.commercial.WsSaleRef;
@@ -112,6 +115,29 @@ public interface SaleResourceApi {
     String getSaleTotalPayed(
             @Parameter(description = "The sale id", name = "id", required = true)
             @PathParam("id") long id);
+
+    @POST
+    @Path("{id}/payment")
+    @Operation(operationId = "addSalePayment", description = "Add a sale payment entry")
+    WsAccountingEntryRef addSalePayment(
+            @Parameter(description = "The sale id", name = "id", required = true)
+            @PathParam("id")
+                    long id,
+            @RequestBody(name = "paymentAccountingEntry", description = "The accounting entry", required = true)
+                    WsAccountingEntry paymentEntry
+    );
+
+    @DELETE
+    @Path("{id}/payment/{entryId}")
+    @Operation(operationId = "deleteSalePayment", description = "Delete a sale payment entry")
+    void deleteSalePayment(
+            @Parameter(description = "The sale id", name = "id", required = true)
+            @PathParam("id")
+                    long id,
+            @Parameter(description = "The accounting entry id", name = "entryId", required = true)
+            @PathParam("entryId")
+                    long entryId
+    );
 
 
     @GET

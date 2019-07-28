@@ -1,5 +1,8 @@
 package be.valuya.comptoir.ws.rest.api.domain.event;
 
+import be.valuya.comptoir.ws.rest.api.domain.accounting.WsAccountingEntry;
+import be.valuya.comptoir.ws.rest.api.domain.accounting.WsAccountingTransaction;
+import be.valuya.comptoir.ws.rest.api.domain.accounting.WsAccountingTransactionRef;
 import be.valuya.comptoir.ws.rest.api.domain.commercial.WsItemVariantSale;
 import be.valuya.comptoir.ws.rest.api.domain.commercial.WsSaleRef;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
@@ -9,18 +12,19 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 
-@XmlRootElement(name = "WsSaleItemsUpdateEvent")
+@XmlRootElement(name = "WsSalePaymentEntriesUpdateEvent")
 @XmlAccessorType(XmlAccessType.FIELD)
-@Schema(description = "A sale update event", name = "WsSaleItemsUpdateEvent")
-public class WsSaleItemsUpdateEvent extends WsComptoirServerEvent {
+@Schema(description = "A sale update event", name = "WsSalePaymentEntriesUpdateEvent")
+public class WsSalePaymentEntriesUpdateEvent extends WsComptoirServerEvent {
 
     private WsSaleRef saleRef;
-    private List<WsItemVariantSale> firstPage;
+    private WsAccountingTransactionRef accountingTransactionRef;
+    private List<WsAccountingEntry> firstPage;
     private Long pageSize;
     private Long totalCount;
 
-    public WsSaleItemsUpdateEvent() {
-        super(WsComptoirEvent.SALE_ITEMS);
+    public WsSalePaymentEntriesUpdateEvent() {
+        super(WsComptoirEvent.SALE_PAYMENT_ENTRIES);
     }
 
     public WsSaleRef getSaleRef() {
@@ -31,11 +35,19 @@ public class WsSaleItemsUpdateEvent extends WsComptoirServerEvent {
         this.saleRef = saleRef;
     }
 
-    public List<WsItemVariantSale> getFirstPage() {
+    public WsAccountingTransactionRef getAccountingTransactionRef() {
+        return accountingTransactionRef;
+    }
+
+    public void setAccountingTransactionRef(WsAccountingTransactionRef accountingTransactionRef) {
+        this.accountingTransactionRef = accountingTransactionRef;
+    }
+
+    public List<WsAccountingEntry> getFirstPage() {
         return firstPage;
     }
 
-    public void setFirstPage(List<WsItemVariantSale> firstPage) {
+    public void setFirstPage(List<WsAccountingEntry> firstPage) {
         this.firstPage = firstPage;
     }
 

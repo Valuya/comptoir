@@ -29,14 +29,13 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Tuple;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.*;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -79,6 +78,26 @@ public class SaleService {
 
         TypedQuery<ItemVariantSale> typedQuery = entityManager.createQuery(query);
         return typedQuery.getResultList();
+    }
+
+    @Nonnull
+    public List<AccountingEntry> findPaymentAccountingEntries(@Nonnull Sale sale) {
+        if (sale.getId() == null) {
+            return new ArrayList<>();
+        }
+        @NotNull AccountingTransaction accountingTransaction = sale.getAccountingTransaction();
+        Company company = sale.getCompany();
+
+        AccountSearch accountSearch = new AccountSearch();
+        accountSearch.setAccountType(AccountType.PAYMENT);
+        accountSearch.setCompany(company);
+
+        AccountingEntrySearch accountingEntrySearch = new AccountingEntrySearch();
+        accountingEntrySearch.setAccountingTransaction(accountingTransaction);
+        accountingEntrySearch.setAccountSearch(accountSearch);
+        accountingEntrySearch.setCompany(company);
+        List<AccountingEntry> accountingEntries = accountService.findAccountingEntries(accountingEntrySearch);
+        return accountingEntries;
     }
 
     public Sale calcSale(Sale sale) {
@@ -157,6 +176,7 @@ public class SaleService {
     private AccountingEntry createSaleDebitAccountingEntry(Sale sale, AccountingEntry paymentAccountingEntry, ZonedDateTime dateTime) {
         AccountingTransaction accountingTransaction = sale.getAccountingTransaction();
         Company company = sale.getCompany();
+        Customer customer = sale.getCustomer();
         //TODO
 //        AccountingEntry vatAccountingEntry = sale.getVatAccountingEntry();
         Account account = paymentAccountingEntry.getAccount();
@@ -168,9 +188,36 @@ public class SaleService {
         saleDebitAccountingEntry.setDateTime(dateTime);
         saleDebitAccountingEntry.setAccount(account);
         saleDebitAccountingEntry.setAmount(amount);
+        saleDebitAccountingEntry.setCustomer(customer); // or null?
 //        saleDebitAccountingEntry.setVatAccountingEntry(vatAccountingEntry);
 
         return saleDebitAccountingEntry;
+    }
+
+    public AccountingEntry addPayment(Sale sale, AccountingEntry paymentAccountingEntry) {
+        List<ItemVariantSale> itemSales = findItemSales(sale);
+        Sale adjustedSale = AccountingUtils.calcSale(sale, itemSales);
+
+        ZonedDateTime dateTime = ZonedDateTime.now();
+        AccountingEntry saleDebitAccountingEntry = createSaleDebitAccountingEntry(adjustedSale, paymentAccountingEntry, dateTime);
+        AccountingEntry managedSaleDebitAccountingEntry = entityManager.merge(saleDebitAccountingEntry);
+
+        saleUpdateEvent.fire(new SaleUpdateEvent(adjustedSale));
+        return managedSaleDebitAccountingEntry;
+    }
+
+    public void deletePayment(Sale sale, AccountingEntry paymentAccountingEntry) {
+        if (sale.isClosed()) {
+            throw new IllegalStateException();
+        }
+        @NotNull AccountingTransaction saleTransaction = sale.getAccountingTransaction();
+        @NotNull AccountingTransaction paymentTransaction = paymentAccountingEntry.getAccountingTransaction();
+        if (saleTransaction.equals(paymentTransaction)) {
+            accountService.removeAccountingEntry(paymentAccountingEntry);
+            saleUpdateEvent.fire(new SaleUpdateEvent(sale));
+        } else {
+            throw new IllegalStateException("Invalid transaction");
+        }
     }
 
     public Sale pay(Sale sale, List<ItemVariantSale> itemSales, List<AccountingEntry> paymentAccountingEntryList, boolean close) {

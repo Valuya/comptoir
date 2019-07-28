@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.math.BigDecimal;
 
-@XmlRootElement(name = "saleUpdate")
+@XmlRootElement(name = "WsSaleUpdateEvent")
 @XmlAccessorType(XmlAccessType.FIELD)
 @Schema(description = "A sale update event", name = "WsSaleUpdateEvent")
 public class WsSaleUpdateEvent extends WsComptoirServerEvent {
