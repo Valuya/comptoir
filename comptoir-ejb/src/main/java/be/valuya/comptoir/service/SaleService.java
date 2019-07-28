@@ -3,6 +3,8 @@ package be.valuya.comptoir.service;
 import be.valuya.comptoir.model.accounting.*;
 import be.valuya.comptoir.model.commercial.*;
 import be.valuya.comptoir.model.company.Company;
+import be.valuya.comptoir.model.event.SaleRemovedEvent;
+import be.valuya.comptoir.model.event.SaleUpdateEvent;
 import be.valuya.comptoir.model.lang.LocaleText;
 import be.valuya.comptoir.model.search.*;
 import be.valuya.comptoir.model.stock.ItemStock;
@@ -20,19 +22,20 @@ import javax.annotation.Nonnull;
 import javax.ejb.EJB;
 import javax.ejb.EJBException;
 import javax.ejb.Stateless;
+import javax.enterprise.event.Event;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Tuple;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.*;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -51,6 +54,10 @@ public class SaleService {
     private CustomerService customerService;
     @EJB
     private PaginatedQueryService paginatedQueryService;
+    @Inject
+    private Event<SaleUpdateEvent> saleUpdateEvent;
+    @Inject
+    private Event<SaleRemovedEvent> saleRemovedEvent;
 
 
     @Nonnull
@@ -71,6 +78,26 @@ public class SaleService {
 
         TypedQuery<ItemVariantSale> typedQuery = entityManager.createQuery(query);
         return typedQuery.getResultList();
+    }
+
+    @Nonnull
+    public List<AccountingEntry> findPaymentAccountingEntries(@Nonnull Sale sale) {
+        if (sale.getId() == null) {
+            return new ArrayList<>();
+        }
+        @NotNull AccountingTransaction accountingTransaction = sale.getAccountingTransaction();
+        Company company = sale.getCompany();
+
+        AccountSearch accountSearch = new AccountSearch();
+        accountSearch.setAccountType(AccountType.PAYMENT);
+        accountSearch.setCompany(company);
+
+        AccountingEntrySearch accountingEntrySearch = new AccountingEntrySearch();
+        accountingEntrySearch.setAccountingTransaction(accountingTransaction);
+        accountingEntrySearch.setAccountSearch(accountSearch);
+        accountingEntrySearch.setCompany(company);
+        List<AccountingEntry> accountingEntries = accountService.findAccountingEntries(accountingEntrySearch);
+        return accountingEntries;
     }
 
     public Sale calcSale(Sale sale) {
@@ -149,6 +176,7 @@ public class SaleService {
     private AccountingEntry createSaleDebitAccountingEntry(Sale sale, AccountingEntry paymentAccountingEntry, ZonedDateTime dateTime) {
         AccountingTransaction accountingTransaction = sale.getAccountingTransaction();
         Company company = sale.getCompany();
+        Customer customer = sale.getCustomer();
         //TODO
 //        AccountingEntry vatAccountingEntry = sale.getVatAccountingEntry();
         Account account = paymentAccountingEntry.getAccount();
@@ -160,9 +188,36 @@ public class SaleService {
         saleDebitAccountingEntry.setDateTime(dateTime);
         saleDebitAccountingEntry.setAccount(account);
         saleDebitAccountingEntry.setAmount(amount);
+        saleDebitAccountingEntry.setCustomer(customer); // or null?
 //        saleDebitAccountingEntry.setVatAccountingEntry(vatAccountingEntry);
 
         return saleDebitAccountingEntry;
+    }
+
+    public AccountingEntry addPayment(Sale sale, AccountingEntry paymentAccountingEntry) {
+        List<ItemVariantSale> itemSales = findItemSales(sale);
+        Sale adjustedSale = AccountingUtils.calcSale(sale, itemSales);
+
+        ZonedDateTime dateTime = ZonedDateTime.now();
+        AccountingEntry saleDebitAccountingEntry = createSaleDebitAccountingEntry(adjustedSale, paymentAccountingEntry, dateTime);
+        AccountingEntry managedSaleDebitAccountingEntry = entityManager.merge(saleDebitAccountingEntry);
+
+        saleUpdateEvent.fire(new SaleUpdateEvent(adjustedSale));
+        return managedSaleDebitAccountingEntry;
+    }
+
+    public void deletePayment(Sale sale, AccountingEntry paymentAccountingEntry) {
+        if (sale.isClosed()) {
+            throw new IllegalStateException();
+        }
+        @NotNull AccountingTransaction saleTransaction = sale.getAccountingTransaction();
+        @NotNull AccountingTransaction paymentTransaction = paymentAccountingEntry.getAccountingTransaction();
+        if (saleTransaction.equals(paymentTransaction)) {
+            accountService.removeAccountingEntry(paymentAccountingEntry);
+            saleUpdateEvent.fire(new SaleUpdateEvent(sale));
+        } else {
+            throw new IllegalStateException("Invalid transaction");
+        }
     }
 
     public Sale pay(Sale sale, List<ItemVariantSale> itemSales, List<AccountingEntry> paymentAccountingEntryList, boolean close) {
@@ -189,6 +244,7 @@ public class SaleService {
         }
 
         Sale managedSale = entityManager.merge(adjustedSale);
+        saleUpdateEvent.fire(new SaleUpdateEvent(managedSale));
         return managedSale;
     }
 
@@ -316,6 +372,7 @@ public class SaleService {
 
         Sale managedSale = entityManager.merge(sale);
         managedSale = calcSale(managedSale);
+        saleUpdateEvent.fire(new SaleUpdateEvent(managedSale));
 
         return managedSale;
     }
@@ -337,8 +394,10 @@ public class SaleService {
             accountService.removeAccountingEntry(accountingEntry);
         }
 
+        Long saleId = sale.getId();
         Sale managedSale = entityManager.merge(sale);
         entityManager.remove(managedSale);
+        saleRemovedEvent.fire(new SaleRemovedEvent(saleId));
     }
 
     public ItemVariantSale saveItemSale(ItemVariantSale itemSale) {
@@ -402,7 +461,7 @@ public class SaleService {
         entityManager.flush();
         Sale managedSale = managedItemSale.getSale();
         managedSale = calcSale(managedSale);
-
+        saleUpdateEvent.fire(new SaleUpdateEvent(managedSale));
         return managedItemSale;
     }
 
@@ -435,6 +494,7 @@ public class SaleService {
         entityManager.remove(managedItemSale);
 
         managedSale = calcSale(managedSale);
+        saleUpdateEvent.fire(new SaleUpdateEvent(managedSale));
     }
 
     @Nonnull
@@ -492,6 +552,7 @@ public class SaleService {
         }
 
         // TODO: create accounting entry
+        saleUpdateEvent.fire(new SaleUpdateEvent(managedSale));
 
         return managedSale;
 

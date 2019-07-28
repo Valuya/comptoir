@@ -21,7 +21,7 @@ pipeline {
                     sh '''
                         cd comptoir-ws-api
                         $MVN_CMD \
-                        -Dopenapi.spec.url="${SPEC_URL} \
+                        -Dopenapi.spec.url="${SPEC_URL}" \
                         -Popenapi-codegen \
                         clean package deploy
                     '''

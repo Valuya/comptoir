@@ -16,7 +16,7 @@ pushd comptoir-ws-api
 
   mvn -Popenapi-codegen  package
 
-  pushd target/generated-sources/openapi
+  pushd target/openapi/ts
 #    sed -i 's#.*angular/http.*##' package.json
 #    sed -i 's#.*typescript.*#    "typescript": "=3.4.5",#' package.json
     npm install

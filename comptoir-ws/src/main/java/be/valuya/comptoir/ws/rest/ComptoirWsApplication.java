@@ -25,11 +25,13 @@ import be.valuya.comptoir.ws.rest.control.PosResource;
 import be.valuya.comptoir.ws.rest.control.RegistrationResource;
 import be.valuya.comptoir.ws.rest.control.SaleResource;
 import be.valuya.comptoir.ws.rest.control.StockResource;
+import be.valuya.comptoir.ws.rest.control.WebNotificationsResource;
 import be.valuya.comptoir.ws.rest.provider.ComptoirWsParamConverterProvider;
 import be.valuya.comptoir.ws.rest.provider.CrossOriginResourceSharingPreflightRequestFilter;
 import be.valuya.comptoir.ws.rest.provider.CrossOriginResourceSharingResponseFilter;
 import be.valuya.comptoir.ws.rest.provider.UnauthenticatedExceptionMapper;
 import be.valuya.comptoir.ws.rest.provider.WsExceptionMapper;
+import be.valuya.comptoir.ws.rest.service.ComptoirEventService;
 
 import javax.annotation.security.DeclareRoles;
 import javax.servlet.annotation.HttpConstraint;
@@ -55,7 +57,9 @@ public class ComptoirWsApplication extends ComptoirWsApplicationApi {
 
     @Override
     public Set<Object> getSingletons() {
-        return super.getSingletons();
+        return Set.of(
+
+        );
     }
 
     @Override
@@ -86,12 +90,14 @@ public class ComptoirWsApplication extends ComptoirWsApplicationApi {
                 SaleResource.class,
                 StockResource.class,
 
+                WebNotificationsResource.class,
+
                 ComptoirWsParamConverterProvider.class,
                 CrossOriginResourceSharingResponseFilter.class,
                 CrossOriginResourceSharingPreflightRequestFilter.class,
                 WsExceptionMapper.class,
                 UnauthenticatedExceptionMapper.class
-
+//                ComptoirEventService.class,
         );
     }
 }

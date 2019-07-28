@@ -23,7 +23,7 @@ public class CorsOptionsProvider {
     @ConfigProperty(name = "be.valuya.comptoir.cors.allowedHosts", defaultValue = "*")
     private List<String> allowedOrigins;
     @Inject
-    @ConfigProperty(name = "be.valuya.comptoir.cors.allowedHeaders", defaultValue = "content-type,accept,accept-charset,authorization,X-Requested-With,ngsw-bypass")
+    @ConfigProperty(name = "be.valuya.comptoir.cors.allowedHeaders", defaultValue = "cache-control,content-type,accept,accept-charset,authorization,X-Requested-With,ngsw-bypass")
     private Set<String> allowedHeaders;
     @Inject
     @ConfigProperty(name = "be.valuya.comptoir.cors.exposedHeaders", defaultValue = "content-encoding,content-length," + ApiParameters.LIST_RESULTS_COUNT_HEADER)

@@ -1,10 +1,12 @@
 package be.valuya.comptoir.util;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.InjectionPoint;
 import java.lang.reflect.Member;
 import java.util.logging.Logger;
 
+@ApplicationScoped
 public class LoggerProducer {
 
     @Produces
