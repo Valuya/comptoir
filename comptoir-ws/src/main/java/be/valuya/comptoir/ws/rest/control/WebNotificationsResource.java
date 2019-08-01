@@ -10,6 +10,7 @@ import be.valuya.comptoir.ws.rest.api.domain.notification.WebNotificationSubscri
 import com.fasterxml.jackson.databind.ObjectMapper;
 import nl.martijndwars.webpush.Notification;
 import nl.martijndwars.webpush.PushService;
+import org.apache.http.HttpResponse;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.jose4j.lang.JoseException;
 
@@ -18,11 +19,16 @@ import javax.annotation.security.PermitAll;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.ws.rs.InternalServerErrorException;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.security.GeneralSecurityException;
 import java.security.Security;
 import java.util.concurrent.ExecutionException;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 @PermitAll
@@ -32,6 +38,8 @@ public class WebNotificationsResource implements WebNotificationApi {
     private ObjectMapper mapper;
     @Inject
     private WebNotificationsConfigProvider webNotificationsConfigProvider;
+    @Inject
+    private Logger logger;
 
     private PushService pushService;
 
@@ -67,7 +75,15 @@ public class WebNotificationsResource implements WebNotificationApi {
         String endpoint = subscription.getEndpoint();
         try {
             Notification testNotification = new Notification(endpoint, p256dh, auth, jsonPayload);
-            pushService.send(testNotification);
+            HttpResponse response = pushService.send(testNotification);
+
+            String reasonPhrase = response.getStatusLine().getReasonPhrase();
+            InputStream responseContent = response.getEntity().getContent();
+            try (InputStreamReader streamReader = new InputStreamReader(responseContent)) {
+                BufferedReader bufferedReader = new BufferedReader(streamReader);
+                String responseString = bufferedReader.lines().collect(Collectors.joining("\n"));
+                logger.info("Push notification response: " + reasonPhrase + " - " + responseString);
+            }
         } catch (ExecutionException | InterruptedException | GeneralSecurityException | JoseException | IOException e) {
             throw new RuntimeException(e);
         }
