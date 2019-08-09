@@ -202,7 +202,7 @@ public class SaleService {
         AccountingEntry saleDebitAccountingEntry = createSaleDebitAccountingEntry(adjustedSale, paymentAccountingEntry, dateTime);
         AccountingEntry managedSaleDebitAccountingEntry = entityManager.merge(saleDebitAccountingEntry);
 
-        saleUpdateEvent.fire(new SaleUpdateEvent(adjustedSale));
+        saleUpdateEvent.fireAsync(new SaleUpdateEvent(adjustedSale));
         return managedSaleDebitAccountingEntry;
     }
 
@@ -214,7 +214,7 @@ public class SaleService {
         @NotNull AccountingTransaction paymentTransaction = paymentAccountingEntry.getAccountingTransaction();
         if (saleTransaction.equals(paymentTransaction)) {
             accountService.removeAccountingEntry(paymentAccountingEntry);
-            saleUpdateEvent.fire(new SaleUpdateEvent(sale));
+            saleUpdateEvent.fireAsync(new SaleUpdateEvent(sale));
         } else {
             throw new IllegalStateException("Invalid transaction");
         }
@@ -244,7 +244,7 @@ public class SaleService {
         }
 
         Sale managedSale = entityManager.merge(adjustedSale);
-        saleUpdateEvent.fire(new SaleUpdateEvent(managedSale));
+        saleUpdateEvent.fireAsync(new SaleUpdateEvent(managedSale));
         return managedSale;
     }
 
@@ -372,7 +372,7 @@ public class SaleService {
 
         Sale managedSale = entityManager.merge(sale);
         managedSale = calcSale(managedSale);
-        saleUpdateEvent.fire(new SaleUpdateEvent(managedSale));
+        saleUpdateEvent.fireAsync(new SaleUpdateEvent(managedSale));
 
         return managedSale;
     }
@@ -397,7 +397,7 @@ public class SaleService {
         Long saleId = sale.getId();
         Sale managedSale = entityManager.merge(sale);
         entityManager.remove(managedSale);
-        saleRemovedEvent.fire(new SaleRemovedEvent(saleId));
+        saleRemovedEvent.fireAsync(new SaleRemovedEvent(saleId));
     }
 
     public ItemVariantSale saveItemSale(ItemVariantSale itemSale) {
@@ -461,7 +461,7 @@ public class SaleService {
         entityManager.flush();
         Sale managedSale = managedItemSale.getSale();
         managedSale = calcSale(managedSale);
-        saleUpdateEvent.fire(new SaleUpdateEvent(managedSale));
+        saleUpdateEvent.fireAsync(new SaleUpdateEvent(managedSale));
         return managedItemSale;
     }
 
@@ -494,7 +494,7 @@ public class SaleService {
         entityManager.remove(managedItemSale);
 
         managedSale = calcSale(managedSale);
-        saleUpdateEvent.fire(new SaleUpdateEvent(managedSale));
+        saleUpdateEvent.fireAsync(new SaleUpdateEvent(managedSale));
     }
 
     @Nonnull
@@ -535,6 +535,7 @@ public class SaleService {
 
     public Sale closeSale(Sale sale) {
         sale.setClosed(true);
+        calcSale(sale);
         Sale managedSale = saveSale(sale);
 
         List<ItemVariantSale> itemSales = findItemSales(managedSale);
@@ -551,8 +552,20 @@ public class SaleService {
             orderPosition++;
         }
 
+        BigDecimal saleTotalPayed = getSaleTotalPayed(sale);
+        @NotNull BigDecimal vatExclusiveAmount = sale.getVatExclusiveAmount();
+        @NotNull BigDecimal vatAmount = sale.getVatAmount();
+        BigDecimal saleTotal = vatExclusiveAmount.add(vatAmount);
+        BigDecimal saleRemaining = saleTotal.min(saleTotalPayed);
+
         // TODO: create accounting entry
-        saleUpdateEvent.fire(new SaleUpdateEvent(managedSale));
+        if (saleRemaining.compareTo(BigDecimal.ZERO) > 0) {
+            // TODO: add discount accounting entry
+        } else if (saleRemaining.compareTo(BigDecimal.ZERO) < 0) {
+            // TODO: add reimbursed accounting entry
+        }
+
+        saleUpdateEvent.fireAsync(new SaleUpdateEvent(managedSale));
 
         return managedSale;
 
