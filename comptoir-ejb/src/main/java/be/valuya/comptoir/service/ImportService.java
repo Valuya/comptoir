@@ -43,7 +43,7 @@ public class ImportService {
 
     @Inject
     @ConfigProperty(name = "be.valuya.comptoir.import.timeout.minute", defaultValue = "10")
-    private int timeoutMinnute;
+    private int timeoutMinute;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -51,7 +51,7 @@ public class ImportService {
     private UserTransaction userTransaction;
 
     public ImportSummary doImport(Company company, String backendName, PrestashopImportParams prestashopImportParams) {
-        int timoutSeconds = (int) Duration.ofMinutes(this.timeoutMinnute)
+        int timoutSeconds = (int) Duration.ofMinutes(this.timeoutMinute)
                 .get(ChronoUnit.SECONDS);
         try {
             userTransaction.setTransactionTimeout(timoutSeconds);
