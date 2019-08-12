@@ -9,6 +9,9 @@ services:
       - THORNTAIL_SWARM_DEBUG_PORT=8787
       - THORNTAIL_HTTPS_ONLY=false
       - THORNTAIL_LOGGING_ROOT_DASH_LOGGER_LEVEL=FINE
+    networks:
+      - default
+      - napo-db
     ports:
       - 8443:8443
       - 9990:9990
@@ -53,5 +56,6 @@ volumes:
 
 
 networks:
+  default: {}
   napo-db:
     name: comptoir-napo-db

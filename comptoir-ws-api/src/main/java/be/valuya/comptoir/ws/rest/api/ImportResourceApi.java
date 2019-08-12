@@ -25,7 +25,7 @@ public interface ImportResourceApi {
     WsImportSummary importItems(
             @Parameter(name = "companyId", description = "The company id", required = true)
             @PathParam("companyId") Long companyId,
-            @Parameter(name = "ibackendNamed", description = "The backend name", required = true)
+            @Parameter(name = "backendName", description = "The backend name", required = true)
             @PathParam("backendName") String backendName,
             @RequestBody(required = true, description = "The parameters")
             @Valid WsPrestashopImportParams prestashopImportParams);
