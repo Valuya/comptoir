@@ -526,6 +526,12 @@ public class SaleService {
             predicates.add(itemPredicate);
         }
 
+        SaleSearch saleSearch = itemSaleSearch.getSaleSearch();
+        if (saleSearch != null) {
+            List<Predicate> salePredicates = applySaleSearch(saleSearch, saleJoin, criteriaBuilder);
+            predicates.addAll(salePredicates);
+        }
+
         paginatedQueryService.applySort(pagination, itemSaleRoot, query,
                 (itemVarianSaleColumn) -> ItemVariantSaleColumnPersistenceUtil.getPath(itemSaleRoot, itemVarianSaleColumn));
 
