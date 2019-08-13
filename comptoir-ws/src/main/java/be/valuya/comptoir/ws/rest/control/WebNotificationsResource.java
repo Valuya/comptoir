@@ -3,9 +3,8 @@ package be.valuya.comptoir.ws.rest.control;
 
 import be.valuya.comptoir.ws.config.WebNotificationsConfigProvider;
 import be.valuya.comptoir.ws.rest.api.WebNotificationApi;
-import be.valuya.comptoir.ws.rest.api.domain.event.WsSaleUpdateEvent;
-import be.valuya.comptoir.ws.rest.api.domain.notification.NotificationPayload;
 import be.valuya.comptoir.ws.rest.api.domain.notification.NotificationOptions;
+import be.valuya.comptoir.ws.rest.api.domain.notification.NotificationPayload;
 import be.valuya.comptoir.ws.rest.api.domain.notification.WebNotificationSubscriptionRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import nl.martijndwars.webpush.Notification;
@@ -69,7 +68,6 @@ public class WebNotificationsResource implements WebNotificationApi {
         notificationOptions.setData("testdata");
         NotificationPayload payload = new NotificationPayload();
         payload.setNotification(notificationOptions);
-        payload.setServerEvent(new WsSaleUpdateEvent());
         String jsonPayload = writeJsonString(payload);
 
         String endpoint = subscription.getEndpoint();
