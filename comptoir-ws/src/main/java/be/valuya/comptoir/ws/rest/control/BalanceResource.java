@@ -1,20 +1,23 @@
 package be.valuya.comptoir.ws.rest.control;
 
-import be.valuya.comptoir.ws.rest.api.domain.accounting.WsBalance;
-import be.valuya.comptoir.ws.rest.api.domain.accounting.WsBalanceRef;
-import be.valuya.comptoir.ws.rest.api.domain.accounting.WsBalanceSearchResult;
-import be.valuya.comptoir.ws.rest.api.domain.search.WsBalanceSearch;
 import be.valuya.comptoir.model.cash.Balance;
+import be.valuya.comptoir.model.cash.MoneyPile;
 import be.valuya.comptoir.model.search.BalanceSearch;
-import be.valuya.comptoir.ws.rest.api.util.ComptoirRoles;
 import be.valuya.comptoir.service.AccountService;
 import be.valuya.comptoir.util.pagination.BalanceColumn;
 import be.valuya.comptoir.util.pagination.Pagination;
 import be.valuya.comptoir.ws.convert.RestPaginationUtil;
 import be.valuya.comptoir.ws.convert.accounting.FromWsBalanceConverter;
 import be.valuya.comptoir.ws.convert.accounting.ToWsBalanceConverter;
+import be.valuya.comptoir.ws.convert.cash.ToWsMoneyPileConverter;
 import be.valuya.comptoir.ws.convert.search.FromWsBalanceSearchConverter;
 import be.valuya.comptoir.ws.rest.api.BalanceResourceApi;
+import be.valuya.comptoir.ws.rest.api.domain.accounting.WsBalance;
+import be.valuya.comptoir.ws.rest.api.domain.accounting.WsBalanceRef;
+import be.valuya.comptoir.ws.rest.api.domain.accounting.WsBalanceSearchResult;
+import be.valuya.comptoir.ws.rest.api.domain.cash.WsMoneyPile;
+import be.valuya.comptoir.ws.rest.api.domain.search.WsBalanceSearch;
+import be.valuya.comptoir.ws.rest.api.util.ComptoirRoles;
 import be.valuya.comptoir.ws.rest.validation.BalanceStateChecker;
 import be.valuya.comptoir.ws.rest.validation.EmployeeAccessChecker;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
@@ -56,6 +59,8 @@ public class BalanceResource implements BalanceResourceApi {
     private RestPaginationUtil restPaginationUtil;
     @Inject
     private EmployeeAccessChecker accessChecker;
+    @Inject
+    private ToWsMoneyPileConverter toWsMoneyPileConverter;
 
 
     public WsBalanceRef createBalance(WsBalance wsBalance) {
@@ -118,4 +123,11 @@ public class BalanceResource implements BalanceResourceApi {
         return balanceRef;
     }
 
+    public List<WsMoneyPile> getBalanceMoneyPiles(long id) {
+        Balance balance = accountService.findBalanceById(id);
+        List<MoneyPile> moneyPiles = accountService.findMoneyPileListForBalance(balance);
+        return moneyPiles.stream()
+                .map(toWsMoneyPileConverter::convert)
+                .collect(Collectors.toList());
+    }
 }

@@ -3,6 +3,7 @@ package be.valuya.comptoir.ws.rest.api;
 import be.valuya.comptoir.ws.rest.api.domain.accounting.WsBalance;
 import be.valuya.comptoir.ws.rest.api.domain.accounting.WsBalanceRef;
 import be.valuya.comptoir.ws.rest.api.domain.accounting.WsBalanceSearchResult;
+import be.valuya.comptoir.ws.rest.api.domain.cash.WsMoneyPile;
 import be.valuya.comptoir.ws.rest.api.domain.search.WsBalanceSearch;
 import be.valuya.comptoir.ws.rest.api.util.ApiParameters;
 import be.valuya.comptoir.ws.rest.api.validation.NoId;
@@ -90,4 +91,15 @@ public interface BalanceResourceApi {
     WsBalanceRef closeBalance(
             @Parameter(name = "id", description = "The balance id", required = true)
             @PathParam("id") long id);
+
+
+    @GET
+    @Path("{id}/moneyPiles")
+    @Valid
+    @Operation(summary = "Get a balance moneyPiles", operationId = "getBalanceMoneyPiles")
+    List<WsMoneyPile> getBalanceMoneyPiles(
+            @Parameter(name = "id", description = "The balance id", required = true)
+            @PathParam("id") long id
+    );
+
 }
