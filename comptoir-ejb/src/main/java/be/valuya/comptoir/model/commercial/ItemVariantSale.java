@@ -12,7 +12,6 @@ import java.time.ZonedDateTime;
 import java.util.Objects;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @Entity
@@ -41,6 +40,8 @@ public class ItemVariantSale implements Serializable {
     private Stock stock;
     @Column(name = "CUSTOMER_LOYALTY")
     private Boolean includeCustomerLoyalty;
+    @Column(name = "INCLUDE_CUSTOMER_DISCOUNT")
+    private Boolean includeCustomerDiscount;
 
     public Long getId() {
         return id;
@@ -128,6 +129,14 @@ public class ItemVariantSale implements Serializable {
 
     public void setIncludeCustomerLoyalty(Boolean customerLoyalty) {
         this.includeCustomerLoyalty = customerLoyalty;
+    }
+
+    public Boolean getIncludeCustomerDiscount() {
+        return includeCustomerDiscount;
+    }
+
+    public void setIncludeCustomerDiscount(Boolean includeCustomerDiscount) {
+        this.includeCustomerDiscount = includeCustomerDiscount;
     }
 
     @Override
