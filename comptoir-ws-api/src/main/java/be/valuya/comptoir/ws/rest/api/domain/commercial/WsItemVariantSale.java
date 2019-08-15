@@ -26,7 +26,6 @@ public class WsItemVariantSale implements WithId {
     @XmlJavaTypeAdapter(ZonedDateTimeXmlAdapter.class)
     private ZonedDateTime dateTime;
     private WsItemVariantRef itemVariantRef;
-    private BigDecimal quantity;
     private WsSaleRef saleRef;
     private List<WsLocaleText> comment;
     private Boolean includeCustomerLoyalty;
@@ -57,14 +56,6 @@ public class WsItemVariantSale implements WithId {
 
     public void setItemVariantRef(WsItemVariantRef itemVariantRef) {
         this.itemVariantRef = itemVariantRef;
-    }
-
-    public BigDecimal getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(BigDecimal quantity) {
-        this.quantity = quantity;
     }
 
     public WsSaleRef getSaleRef() {

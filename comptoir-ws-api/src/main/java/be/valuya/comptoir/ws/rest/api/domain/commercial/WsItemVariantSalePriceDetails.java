@@ -1,5 +1,7 @@
 package be.valuya.comptoir.ws.rest.api.domain.commercial;
 
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -9,7 +11,8 @@ import java.math.BigDecimal;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 @NotNull
-public class WsItemVariantSalePrice {
+@Schema(name = "WsItemVariantSalePriceDetails")
+public class WsItemVariantSalePriceDetails {
 
     private WsItemVariantSaleRef variantSaleRef;
     private Integer quantity;

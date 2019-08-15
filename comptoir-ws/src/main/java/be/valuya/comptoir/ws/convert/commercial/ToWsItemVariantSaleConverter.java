@@ -41,7 +41,6 @@ public class ToWsItemVariantSaleConverter {
         }
         Long id = itemSale.getId();
         ZonedDateTime dateTime = itemSale.getDateTime();
-        BigDecimal quantity = itemSale.getQuantity();
 
         Sale sale = itemSale.getSale();
         WsSaleRef saleRef = toWsSaleConverter.reference(sale);
@@ -63,7 +62,6 @@ public class ToWsItemVariantSaleConverter {
         wsItemSale.setComment(wsComment);
         wsItemSale.setDateTime(dateTime);
         wsItemSale.setItemVariantRef(itemVariantRef);
-        wsItemSale.setQuantity(quantity);
         wsItemSale.setSaleRef(saleRef);
         wsItemSale.setStockRef(stockRef);
         wsItemSale.setIncludeCustomerLoyalty(includeCustomerLyalty);

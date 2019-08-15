@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.Objects;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -80,6 +81,7 @@ public class Price implements Serializable {
         this.vatRate = vatRate;
     }
 
+    @Nullable
     public BigDecimal getDiscountRatio() {
         return discountRatio;
     }

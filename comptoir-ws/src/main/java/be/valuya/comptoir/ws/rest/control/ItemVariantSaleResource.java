@@ -3,9 +3,9 @@ package be.valuya.comptoir.ws.rest.control;
 import be.valuya.comptoir.model.commercial.ItemVariantSalePriceDetails;
 import be.valuya.comptoir.model.commercial.Price;
 import be.valuya.comptoir.service.AccountingUtils;
-import be.valuya.comptoir.ws.convert.commercial.ToWsItemVariantSalePriceConverter;
+import be.valuya.comptoir.ws.convert.commercial.ToWsItemVariantSalePriceDetailsConverter;
 import be.valuya.comptoir.ws.rest.api.domain.commercial.WsItemVariantSale;
-import be.valuya.comptoir.ws.rest.api.domain.commercial.WsItemVariantSalePrice;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsItemVariantSalePriceDetails;
 import be.valuya.comptoir.ws.rest.api.domain.commercial.WsItemVariantSaleRef;
 import be.valuya.comptoir.ws.rest.api.domain.commercial.WsItemVariantSaleSearchResult;
 import be.valuya.comptoir.ws.rest.api.domain.search.WsItemVariantSaleSearch;
@@ -29,7 +29,6 @@ import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
@@ -52,7 +51,7 @@ public class ItemVariantSaleResource implements ItemVariantSaleResourceApi {
     @Inject
     private ToWsItemVariantSaleConverter toWsItemVariantSaleConverter;
     @Inject
-    private ToWsItemVariantSalePriceConverter toWsItemVariantSalePriceConverter;
+    private ToWsItemVariantSalePriceDetailsConverter toWsItemVariantSalePriceDetailsConverter;
     @Inject
     private IdChecker idChecker;
     @Inject
@@ -69,6 +68,7 @@ public class ItemVariantSaleResource implements ItemVariantSaleResourceApi {
     public WsItemVariantSaleRef createItemVariantSale(WsItemVariantSale wsItemVariantSale) {
         ItemVariantSale itemVariantSale = fromWsItemVariantSaleConverter.convert(wsItemVariantSale);
         accessChecker.checkOwnCompany(itemVariantSale.getSale());
+
         ItemVariantSale savedItemVariantSale = saleService.saveItemSale(itemVariantSale);
         WsItemVariantSaleRef itemVariantSaleRef = toWsItemVariantSaleConverter.reference(savedItemVariantSale);
         WsItemVariantSaleRef savedItemVariantSaleRef = itemVariantSaleRef;
@@ -127,18 +127,31 @@ public class ItemVariantSaleResource implements ItemVariantSaleResourceApi {
     }
 
     @Override
-    public WsItemVariantSalePrice getItemVariantSalePrice(long id) {
+    public WsItemVariantSalePriceDetails getItemVariantSalePrice(long id) {
         ItemVariantSale itemVariantSale = saleService.findItemSaleById(id);
         accessChecker.checkOwnCompany(itemVariantSale.getSale());
 
         ItemVariantSalePriceDetails priceDetails = AccountingUtils.calcItemVariantSalePriceDetails(itemVariantSale);
-        WsItemVariantSalePrice wsItemVariantSalePrice = toWsItemVariantSalePriceConverter.convert(priceDetails, itemVariantSale);
-        return wsItemVariantSalePrice;
+        WsItemVariantSalePriceDetails wsItemVariantSalePriceDetails = toWsItemVariantSalePriceDetailsConverter.convert(priceDetails, itemVariantSale);
+        return wsItemVariantSalePriceDetails;
     }
 
 
     @Override
-    public WsItemVariantSalePrice setItemVariantSaleUnitPriceVatExclusive(long id, @NotNull BigDecimal unitPriceVatExclusive) {
+    public WsItemVariantSalePriceDetails setItemVariantSaleQuantity(long id, @NotNull Integer quantity) {
+        ItemVariantSale itemVariantSale = saleService.findItemSaleById(id);
+        accessChecker.checkOwnCompany(itemVariantSale.getSale());
+
+        itemVariantSale.setQuantity(BigDecimal.valueOf(quantity));
+        ItemVariantSale updatedVariantSale = saleService.saveItemSale(itemVariantSale);
+
+        ItemVariantSalePriceDetails priceDetails = AccountingUtils.calcItemVariantSalePriceDetails(updatedVariantSale);
+        WsItemVariantSalePriceDetails wsItemVariantSalePriceDetails = toWsItemVariantSalePriceDetailsConverter.convert(priceDetails, updatedVariantSale);
+        return wsItemVariantSalePriceDetails;
+    }
+
+    @Override
+    public WsItemVariantSalePriceDetails setItemVariantSaleUnitPriceVatExclusive(long id, @NotNull BigDecimal unitPriceVatExclusive) {
         ItemVariantSale itemVariantSale = saleService.findItemSaleById(id);
         accessChecker.checkOwnCompany(itemVariantSale.getSale());
 
@@ -147,12 +160,12 @@ public class ItemVariantSaleResource implements ItemVariantSaleResourceApi {
         ItemVariantSale updatedVariantSale = saleService.saveItemSale(itemVariantSale);
 
         ItemVariantSalePriceDetails priceDetails = AccountingUtils.calcItemVariantSalePriceDetails(updatedVariantSale);
-        WsItemVariantSalePrice wsItemVariantSalePrice = toWsItemVariantSalePriceConverter.convert(priceDetails, updatedVariantSale);
-        return wsItemVariantSalePrice;
+        WsItemVariantSalePriceDetails wsItemVariantSalePriceDetails = toWsItemVariantSalePriceDetailsConverter.convert(priceDetails, updatedVariantSale);
+        return wsItemVariantSalePriceDetails;
     }
 
     @Override
-    public WsItemVariantSalePrice setItemVariantSaleTotalVatExclusivePriorDiscount(long id, @NotNull BigDecimal totalVatExclusivePriorDiscount) {
+    public WsItemVariantSalePriceDetails setItemVariantSaleTotalVatExclusivePriorDiscount(long id, @NotNull BigDecimal totalVatExclusivePriorDiscount) {
         ItemVariantSale itemVariantSale = saleService.findItemSaleById(id);
         accessChecker.checkOwnCompany(itemVariantSale.getSale());
 
@@ -162,12 +175,12 @@ public class ItemVariantSaleResource implements ItemVariantSaleResourceApi {
         ItemVariantSale updatedVariantSale = saleService.saveItemSale(itemVariantSale);
 
         ItemVariantSalePriceDetails priceDetails = AccountingUtils.calcItemVariantSalePriceDetails(updatedVariantSale);
-        WsItemVariantSalePrice wsItemVariantSalePrice = toWsItemVariantSalePriceConverter.convert(priceDetails, updatedVariantSale);
-        return wsItemVariantSalePrice;
+        WsItemVariantSalePriceDetails wsItemVariantSalePriceDetails = toWsItemVariantSalePriceDetailsConverter.convert(priceDetails, updatedVariantSale);
+        return wsItemVariantSalePriceDetails;
     }
 
     @Override
-    public WsItemVariantSalePrice setItemVariantSaleDiscountRatio(long id, @NotNull BigDecimal discountRatio) {
+    public WsItemVariantSalePriceDetails setItemVariantSaleDiscountRatio(long id, @NotNull BigDecimal discountRatio) {
         ItemVariantSale itemVariantSale = saleService.findItemSaleById(id);
         accessChecker.checkOwnCompany(itemVariantSale.getSale());
 
@@ -176,12 +189,12 @@ public class ItemVariantSaleResource implements ItemVariantSaleResourceApi {
         ItemVariantSale updatedVariantSale = saleService.saveItemSale(itemVariantSale);
 
         ItemVariantSalePriceDetails priceDetails = AccountingUtils.calcItemVariantSalePriceDetails(updatedVariantSale);
-        WsItemVariantSalePrice wsItemVariantSalePrice = toWsItemVariantSalePriceConverter.convert(priceDetails, updatedVariantSale);
-        return wsItemVariantSalePrice;
+        WsItemVariantSalePriceDetails wsItemVariantSalePriceDetails = toWsItemVariantSalePriceDetailsConverter.convert(priceDetails, updatedVariantSale);
+        return wsItemVariantSalePriceDetails;
     }
 
     @Override
-    public WsItemVariantSalePrice setItemVariantSaleDiscountAmount(long id, @NotNull BigDecimal discountAmount) {
+    public WsItemVariantSalePriceDetails setItemVariantSaleDiscountAmount(long id, @NotNull BigDecimal discountAmount) {
         ItemVariantSale itemVariantSale = saleService.findItemSaleById(id);
         accessChecker.checkOwnCompany(itemVariantSale.getSale());
 
@@ -191,12 +204,12 @@ public class ItemVariantSaleResource implements ItemVariantSaleResourceApi {
         ItemVariantSale updatedVariantSale = saleService.saveItemSale(itemVariantSale);
 
         ItemVariantSalePriceDetails priceDetails = AccountingUtils.calcItemVariantSalePriceDetails(updatedVariantSale);
-        WsItemVariantSalePrice wsItemVariantSalePrice = toWsItemVariantSalePriceConverter.convert(priceDetails, updatedVariantSale);
-        return wsItemVariantSalePrice;
+        WsItemVariantSalePriceDetails wsItemVariantSalePriceDetails = toWsItemVariantSalePriceDetailsConverter.convert(priceDetails, updatedVariantSale);
+        return wsItemVariantSalePriceDetails;
     }
 
     @Override
-    public WsItemVariantSalePrice setItemVariantSaleTotalVatExclusive(long id, @NotNull BigDecimal totalVatExclusive) {
+    public WsItemVariantSalePriceDetails setItemVariantSaleTotalVatExclusive(long id, @NotNull BigDecimal totalVatExclusive) {
         ItemVariantSale itemVariantSale = saleService.findItemSaleById(id);
         accessChecker.checkOwnCompany(itemVariantSale.getSale());
 
@@ -206,12 +219,12 @@ public class ItemVariantSaleResource implements ItemVariantSaleResourceApi {
         ItemVariantSale updatedVariantSale = saleService.saveItemSale(itemVariantSale);
 
         ItemVariantSalePriceDetails priceDetails = AccountingUtils.calcItemVariantSalePriceDetails(updatedVariantSale);
-        WsItemVariantSalePrice wsItemVariantSalePrice = toWsItemVariantSalePriceConverter.convert(priceDetails, updatedVariantSale);
-        return wsItemVariantSalePrice;
+        WsItemVariantSalePriceDetails wsItemVariantSalePriceDetails = toWsItemVariantSalePriceDetailsConverter.convert(priceDetails, updatedVariantSale);
+        return wsItemVariantSalePriceDetails;
     }
 
     @Override
-    public WsItemVariantSalePrice setItemVariantSaleVatRate(long id, @NotNull BigDecimal vatRate) {
+    public WsItemVariantSalePriceDetails setItemVariantSaleVatRate(long id, @NotNull BigDecimal vatRate) {
         ItemVariantSale itemVariantSale = saleService.findItemSaleById(id);
         accessChecker.checkOwnCompany(itemVariantSale.getSale());
 
@@ -220,12 +233,12 @@ public class ItemVariantSaleResource implements ItemVariantSaleResourceApi {
         ItemVariantSale updatedVariantSale = saleService.saveItemSale(itemVariantSale);
 
         ItemVariantSalePriceDetails priceDetails = AccountingUtils.calcItemVariantSalePriceDetails(updatedVariantSale);
-        WsItemVariantSalePrice wsItemVariantSalePrice = toWsItemVariantSalePriceConverter.convert(priceDetails, updatedVariantSale);
-        return wsItemVariantSalePrice;
+        WsItemVariantSalePriceDetails wsItemVariantSalePriceDetails = toWsItemVariantSalePriceDetailsConverter.convert(priceDetails, updatedVariantSale);
+        return wsItemVariantSalePriceDetails;
     }
 
     @Override
-    public WsItemVariantSalePrice setItemVariantSaleVatAmount(long id, @NotNull BigDecimal vatAmount) {
+    public WsItemVariantSalePriceDetails setItemVariantSaleVatAmount(long id, @NotNull BigDecimal vatAmount) {
         ItemVariantSale itemVariantSale = saleService.findItemSaleById(id);
         accessChecker.checkOwnCompany(itemVariantSale.getSale());
 
@@ -235,12 +248,12 @@ public class ItemVariantSaleResource implements ItemVariantSaleResourceApi {
         ItemVariantSale updatedVariantSale = saleService.saveItemSale(itemVariantSale);
 
         ItemVariantSalePriceDetails priceDetails = AccountingUtils.calcItemVariantSalePriceDetails(updatedVariantSale);
-        WsItemVariantSalePrice wsItemVariantSalePrice = toWsItemVariantSalePriceConverter.convert(priceDetails, updatedVariantSale);
-        return wsItemVariantSalePrice;
+        WsItemVariantSalePriceDetails wsItemVariantSalePriceDetails = toWsItemVariantSalePriceDetailsConverter.convert(priceDetails, updatedVariantSale);
+        return wsItemVariantSalePriceDetails;
     }
 
     @Override
-    public WsItemVariantSalePrice setItemVariantSaleTotalVatInclusive(long id, @NotNull BigDecimal totalVatInclusive) {
+    public WsItemVariantSalePriceDetails setItemVariantSaleTotalVatInclusive(long id, @NotNull BigDecimal totalVatInclusive) {
         ItemVariantSale itemVariantSale = saleService.findItemSaleById(id);
         accessChecker.checkOwnCompany(itemVariantSale.getSale());
 
@@ -250,8 +263,8 @@ public class ItemVariantSaleResource implements ItemVariantSaleResourceApi {
         ItemVariantSale updatedVariantSale = saleService.saveItemSale(itemVariantSale);
 
         ItemVariantSalePriceDetails priceDetails = AccountingUtils.calcItemVariantSalePriceDetails(updatedVariantSale);
-        WsItemVariantSalePrice wsItemVariantSalePrice = toWsItemVariantSalePriceConverter.convert(priceDetails, updatedVariantSale);
-        return wsItemVariantSalePrice;
+        WsItemVariantSalePriceDetails wsItemVariantSalePriceDetails = toWsItemVariantSalePriceDetailsConverter.convert(priceDetails, updatedVariantSale);
+        return wsItemVariantSalePriceDetails;
     }
 
 }

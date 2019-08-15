@@ -28,6 +28,7 @@ public class ItemVariantSale implements Serializable {
     @ManyToOne(cascade = CascadeType.ALL)
     private Price price;
     private BigDecimal quantity;
+    @Deprecated //use value derived from other fields
     private BigDecimal total;
     @ManyToOne
     private Sale sale;
@@ -107,10 +108,12 @@ public class ItemVariantSale implements Serializable {
         this.accountingEntry = accountingEntry;
     }
 
+    @Deprecated // Use value derived from other fields
     public BigDecimal getTotal() {
         return total;
     }
 
+    @Deprecated // Use value derived from other fields
     public void setTotal(BigDecimal total) {
         this.total = total;
     }

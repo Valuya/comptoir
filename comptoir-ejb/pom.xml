@@ -171,7 +171,7 @@
                     </dependency>
                     <dependency>
                         <groupId>be.valuya.comptoir</groupId>
-                        <artifactId>java9jooqgeneratorstrategy</artifactId>
+                        <artifactId>java9jooqgeneratorworkarounds</artifactId>
                         <version>1.0-SNAPSHOT</version>
                     </dependency>
                 </dependencies>

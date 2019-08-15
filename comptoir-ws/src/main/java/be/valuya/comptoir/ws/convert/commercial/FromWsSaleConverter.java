@@ -53,8 +53,6 @@ public class FromWsSaleConverter {
         Long id = wsSale.getId();
         ZonedDateTime dateTime = wsSale.getDateTime();
         String reference = wsSale.getReference();
-        BigDecimal vatAmount = wsSale.getVatAmount();
-        BigDecimal vatExclusiveAmount = wsSale.getVatExclusiveAmount();
         boolean closed = wsSale.isClosed();
 
         WsAccountingTransactionRef accountingTransactionRef = wsSale.getAccountingTransactionRef();
@@ -69,9 +67,6 @@ public class FromWsSaleConverter {
         WsCompanyRef companyRef = wsSale.getCompanyRef();
         Company company = fromWsCompanyConverter.find(companyRef);
 
-        BigDecimal discountAmount = wsSale.getDiscountAmount();
-        BigDecimal discountRatio = wsSale.getDiscountRatio();
-
         sale.setId(id);
         sale.setCompany(company);
         sale.setReference(reference);
@@ -79,10 +74,6 @@ public class FromWsSaleConverter {
         sale.setCustomer(customer);
         sale.setDateTime(dateTime);
         sale.setInvoice(invoice);
-        sale.setVatAmount(vatAmount);
-        sale.setVatExclusiveAmount(vatExclusiveAmount);
-        sale.setDiscountAmount(discountAmount);
-        sale.setDiscountRatio(discountRatio);
 
         if (accountingTransaction != null) {
             sale.setAccountingTransaction(accountingTransaction);

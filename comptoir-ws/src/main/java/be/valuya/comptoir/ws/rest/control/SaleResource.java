@@ -2,49 +2,51 @@ package be.valuya.comptoir.ws.rest.control;
 
 import be.valuya.comptoir.model.accounting.AccountingEntry;
 import be.valuya.comptoir.model.commercial.ItemVariantSale;
+import be.valuya.comptoir.model.commercial.Sale;
+import be.valuya.comptoir.model.commercial.SalePriceDetails;
 import be.valuya.comptoir.model.event.SaleUpdateEvent;
+import be.valuya.comptoir.model.search.SaleSearch;
 import be.valuya.comptoir.model.thirdparty.Employee;
 import be.valuya.comptoir.service.AccountService;
-import be.valuya.comptoir.util.LoggedUser;
-import be.valuya.comptoir.ws.convert.accounting.FromWsAccountingEntryConverter;
-import be.valuya.comptoir.ws.convert.accounting.ToWsAccountingEntryConverter;
-import be.valuya.comptoir.ws.rest.api.domain.accounting.WsAccountingEntry;
-import be.valuya.comptoir.ws.rest.api.domain.accounting.WsAccountingEntryRef;
-import be.valuya.comptoir.ws.rest.api.domain.accounting.WsAccountingTransactionRef;
-import be.valuya.comptoir.ws.rest.api.domain.commercial.WsSale;
-import be.valuya.comptoir.ws.rest.api.domain.commercial.WsSalePrice;
-import be.valuya.comptoir.ws.rest.api.domain.commercial.WsSaleRef;
-import be.valuya.comptoir.ws.rest.api.domain.commercial.WsSalesSearchResult;
-import be.valuya.comptoir.ws.rest.api.domain.search.WsSaleSearch;
-import be.valuya.comptoir.model.commercial.Sale;
-import be.valuya.comptoir.model.commercial.SalePrice;
-import be.valuya.comptoir.model.search.SaleSearch;
-import be.valuya.comptoir.ws.rest.api.util.ComptoirRoles;
+import be.valuya.comptoir.service.AccountingUtils;
 import be.valuya.comptoir.service.SaleService;
+import be.valuya.comptoir.util.LoggedUser;
 import be.valuya.comptoir.util.pagination.Pagination;
 import be.valuya.comptoir.util.pagination.SaleColumn;
 import be.valuya.comptoir.ws.convert.RestPaginationUtil;
+import be.valuya.comptoir.ws.convert.accounting.FromWsAccountingEntryConverter;
+import be.valuya.comptoir.ws.convert.accounting.ToWsAccountingEntryConverter;
 import be.valuya.comptoir.ws.convert.commercial.FromWsSaleConverter;
 import be.valuya.comptoir.ws.convert.commercial.ToWsSaleConverter;
-import be.valuya.comptoir.ws.convert.commercial.ToWsSalePriceConverter;
+import be.valuya.comptoir.ws.convert.commercial.ToWsSalePriceDetailsConverter;
 import be.valuya.comptoir.ws.convert.search.FromWsSaleSearchConverter;
 import be.valuya.comptoir.ws.rest.api.SaleResourceApi;
+import be.valuya.comptoir.ws.rest.api.domain.accounting.WsAccountingEntry;
+import be.valuya.comptoir.ws.rest.api.domain.accounting.WsAccountingEntryRef;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsSale;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsSalePriceDetails;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsSaleRef;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsSalesSearchResult;
+import be.valuya.comptoir.ws.rest.api.domain.search.WsSaleSearch;
+import be.valuya.comptoir.ws.rest.api.util.ComptoirRoles;
 import be.valuya.comptoir.ws.rest.api.util.PaginationParams;
+import be.valuya.comptoir.ws.rest.service.ComptoirEventService;
+import be.valuya.comptoir.ws.rest.service.EmployeeSaleEventSubscription;
 import be.valuya.comptoir.ws.rest.validation.EmployeeAccessChecker;
 import be.valuya.comptoir.ws.rest.validation.IdChecker;
 import be.valuya.comptoir.ws.rest.validation.SaleStateChecker;
-import be.valuya.comptoir.ws.rest.service.ComptoirEventService;
-import be.valuya.comptoir.ws.rest.service.EmployeeSaleEventSubscription;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.sse.Sse;
 import javax.ws.rs.sse.SseEventSink;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -66,11 +68,11 @@ public class SaleResource implements SaleResourceApi {
     @Inject
     private ToWsSaleConverter toWsSaleConverter;
     @Inject
-    private ToWsSalePriceConverter toWsSalePriceConverter;
-    @Inject
     private FromWsAccountingEntryConverter fromWsAccountingEntryConverter;
     @Inject
     private ToWsAccountingEntryConverter toWsAccountingEntryConverter;
+    @Inject
+    private ToWsSalePriceDetailsConverter toWsSalePriceDetailsConverter;
     @Inject
     private IdChecker idChecker;
     @Inject
@@ -139,13 +141,12 @@ public class SaleResource implements SaleResourceApi {
         return restPaginationUtil.setResults(new WsSalesSearchResult(), wsSales, pagination);
     }
 
-    public WsSalePrice findSalesTotalPayed(WsSaleSearch wsSaleSearch) {
+    public BigDecimal findSalesTotalPayed(WsSaleSearch wsSaleSearch) {
         SaleSearch saleSearch = fromWsSaleSearchConverter.convert(wsSaleSearch);
         accessChecker.checkOwnCompany(saleSearch);
 
-        SalePrice salesTotalPayed = saleService.getSalesTotalPayed(saleSearch);
-        WsSalePrice wsSalePrice = toWsSalePriceConverter.convert(salesTotalPayed);
-        return wsSalePrice;
+        BigDecimal salesTotalPayed = saleService.getSalesTotalPayed(saleSearch);
+        return salesTotalPayed;
     }
 
     public void deleteSale(long id) {
@@ -205,6 +206,65 @@ public class SaleResource implements SaleResourceApi {
         AccountingEntry accountingEntry = accountService.findAccountingEntryById(entryId);
 
         saleService.deletePayment(sale, accountingEntry);
+    }
+
+    @Override
+    public WsSalePriceDetails getSalePrice(long id) {
+        Sale sale = saleService.findSaleById(id);
+        accessChecker.checkOwnCompany(sale);
+
+        List<ItemVariantSale> itemVariantSales = saleService.findItemSales(sale);
+        SalePriceDetails salePriceDetails = AccountingUtils.calcSalePriceDetails(sale, itemVariantSales);
+
+        WsSalePriceDetails wsSalePriceDetails = toWsSalePriceDetailsConverter.convert(salePriceDetails, sale);
+        return wsSalePriceDetails;
+    }
+
+    @Override
+    public WsSalePriceDetails setSaleDiscountRatio(long id, @NotNull BigDecimal discountRatio) {
+        Sale sale = saleService.findSaleById(id);
+        accessChecker.checkOwnCompany(sale);
+
+        sale.setDiscountRatio(discountRatio);
+        Sale updatedSale = saleService.saveSale(sale);
+
+        List<ItemVariantSale> itemVariantSales = saleService.findItemSales(updatedSale);
+        SalePriceDetails salePriceDetails = AccountingUtils.calcSalePriceDetails(updatedSale, itemVariantSales);
+
+        WsSalePriceDetails wsSalePriceDetails = toWsSalePriceDetailsConverter.convert(salePriceDetails, updatedSale);
+        return wsSalePriceDetails;
+    }
+
+    @Override
+    public WsSalePriceDetails setSaleDiscountAmount(long id, @NotNull BigDecimal discountAmount) {
+        Sale sale = saleService.findSaleById(id);
+        accessChecker.checkOwnCompany(sale);
+
+        List<ItemVariantSale> itemVariantSales = saleService.findItemSales(sale);
+        BigDecimal discountRate = AccountingUtils.calcDiscountRateFromDiscountAmount(sale, itemVariantSales, discountAmount);
+        sale.setDiscountRatio(discountRate);
+        Sale updatedSale = saleService.saveSale(sale);
+
+        SalePriceDetails salePriceDetails = AccountingUtils.calcSalePriceDetails(updatedSale, itemVariantSales);
+
+        WsSalePriceDetails wsSalePriceDetails = toWsSalePriceDetailsConverter.convert(salePriceDetails, updatedSale);
+        return wsSalePriceDetails;
+    }
+
+    @Override
+    public WsSalePriceDetails setSaleTotalVatInclusive(long id, @NotNull BigDecimal totalVatInclusive) {
+        Sale sale = saleService.findSaleById(id);
+        accessChecker.checkOwnCompany(sale);
+
+        List<ItemVariantSale> itemVariantSales = saleService.findItemSales(sale);
+        BigDecimal discountRate = AccountingUtils.calcDiscountRateFromTotalVatInclusive(sale, itemVariantSales, totalVatInclusive);
+        sale.setDiscountRatio(discountRate);
+        Sale updatedSale = saleService.saveSale(sale);
+
+        SalePriceDetails salePriceDetails = AccountingUtils.calcSalePriceDetails(updatedSale, itemVariantSales);
+
+        WsSalePriceDetails wsSalePriceDetails = toWsSalePriceDetailsConverter.convert(salePriceDetails, updatedSale);
+        return wsSalePriceDetails;
     }
 
     public void registerToSaleEvents(long id, @Context SseEventSink eventSink) {

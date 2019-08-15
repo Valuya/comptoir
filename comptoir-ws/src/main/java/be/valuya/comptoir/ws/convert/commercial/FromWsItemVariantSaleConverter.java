@@ -45,6 +45,7 @@ public class FromWsItemVariantSaleConverter {
             return null;
         }
         ItemVariantSale itemSale = new ItemVariantSale();
+        itemSale.setQuantity(BigDecimal.ONE);
 
         return patch(itemSale, wsItemSale);
     }
@@ -53,7 +54,6 @@ public class FromWsItemVariantSaleConverter {
         Long id = wsItemSale.getId();
 
         ZonedDateTime dateTime = wsItemSale.getDateTime();
-        BigDecimal quantity = wsItemSale.getQuantity();
 
         List<WsLocaleText> wsComment = wsItemSale.getComment();
         LocaleText comment = fromWsLocaleTextConverter.convert(wsComment);
@@ -72,7 +72,6 @@ public class FromWsItemVariantSaleConverter {
 
         itemSale.setId(id);
         itemSale.setItemVariant(itemVariant);
-        itemSale.setQuantity(quantity);
         itemSale.setSale(sale);
         itemSale.setComment(comment);
         itemSale.setDateTime(dateTime);
