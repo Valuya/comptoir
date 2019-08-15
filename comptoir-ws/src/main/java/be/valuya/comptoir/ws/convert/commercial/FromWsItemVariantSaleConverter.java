@@ -24,7 +24,6 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @ApplicationScoped
@@ -68,19 +67,8 @@ public class FromWsItemVariantSaleConverter {
         WsStockRef stockRef = wsItemSale.getStockRef();
         Stock stock = fromWsStockConverter.find(stockRef);
 
-
-        BigDecimal vatExclusive = wsItemSale.getVatExclusive();
-        BigDecimal vatRate = wsItemSale.getVatRate();
-
-        BigDecimal total = wsItemSale.getTotal();
-
-        BigDecimal discountRatio = wsItemSale.getDiscountRatio();
         Boolean includeCustomerLoyalty = wsItemSale.getIncludeCustomerLoyalty();
-
-        Price price = new Price();
-        price.setVatExclusive(vatExclusive);
-        price.setVatRate(vatRate);
-        price.setDiscountRatio(discountRatio);
+        Boolean includeCustomerDiscount = wsItemSale.getIncludeCustomerDiscount();
 
         itemSale.setId(id);
         itemSale.setItemVariant(itemVariant);
@@ -88,10 +76,9 @@ public class FromWsItemVariantSaleConverter {
         itemSale.setSale(sale);
         itemSale.setComment(comment);
         itemSale.setDateTime(dateTime);
-        itemSale.setPrice(price);
-        itemSale.setTotal(total);
         itemSale.setStock(stock);
         itemSale.setIncludeCustomerLoyalty(includeCustomerLoyalty);
+        itemSale.setIncludeCustomerDiscount(includeCustomerDiscount);
 
         return itemSale;
     }
