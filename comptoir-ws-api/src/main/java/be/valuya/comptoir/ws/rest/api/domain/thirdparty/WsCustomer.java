@@ -4,11 +4,13 @@ import be.valuya.comptoir.ws.rest.api.util.WithId;
 import be.valuya.comptoir.ws.rest.api.domain.company.WsCompanyRef;
 
 import javax.annotation.Nonnull;
+import javax.persistence.Column;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.math.BigDecimal;
 
 /**
  * @author Yannick Majoros <yannick@valuya.be>
@@ -40,6 +42,8 @@ public class WsCustomer implements WithId {
     @Size(max = 200)
     private String email;
     private String notes;
+    private BigDecimal discountRate;
+    private Boolean discountCumulable;
 
     @Override
     public Long getId() {
@@ -139,4 +143,19 @@ public class WsCustomer implements WithId {
         this.notes = notes;
     }
 
+    public BigDecimal getDiscountRate() {
+        return discountRate;
+    }
+
+    public void setDiscountRate(BigDecimal discountRate) {
+        this.discountRate = discountRate;
+    }
+
+    public Boolean getDiscountCumulable() {
+        return discountCumulable;
+    }
+
+    public void setDiscountCumulable(Boolean discountCumulable) {
+        this.discountCumulable = discountCumulable;
+    }
 }
