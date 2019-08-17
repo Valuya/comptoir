@@ -1,6 +1,7 @@
 package be.valuya.comptoir.ws.rest.api;
 
 import be.valuya.comptoir.ws.rest.api.domain.commercial.WsItemVariantSale;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsItemVariantSalePriceDetails;
 import be.valuya.comptoir.ws.rest.api.domain.commercial.WsItemVariantSaleRef;
 import be.valuya.comptoir.ws.rest.api.domain.commercial.WsItemVariantSaleSearchResult;
 import be.valuya.comptoir.ws.rest.api.domain.search.WsItemVariantSaleSearch;
@@ -14,6 +15,7 @@ import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -23,7 +25,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.util.List;
+import java.math.BigDecimal;
 
 @Path("/itemVariantSale")
 @Produces(MediaType.APPLICATION_JSON)
@@ -81,5 +83,105 @@ public interface ItemVariantSaleResourceApi {
     void deleteItemVariantSale(
             @Parameter(name = "id", description = "The itemVariantSale id", required = true)
             @PathParam("id") long id);
+
+
+    @GET
+    @Path("{id}/price")
+    @Operation(summary = "Get a itemVariantSale price", operationId = "getItemVariantSalePrice")
+    WsItemVariantSalePriceDetails getItemVariantSalePrice(
+            @Parameter(name = "id", description = "The itemVariantSale id", required = true)
+            @PathParam("id") long id
+    );
+
+    @PUT
+    @Path("{id}/quantity")
+    @Operation(summary = "Update an itemVariantSale quantity", operationId = "setItemVariantSaleQuantity")
+    WsItemVariantSalePriceDetails setItemVariantSaleQuantity(
+            @Parameter(name = "id", description = "The itemVariantSale quantity", required = true)
+            @PathParam("id") long id,
+            @RequestBody(required = true, description = "The quantity")
+            @NotNull Integer quantity
+    );
+
+    @PUT
+    @Path("{id}/unitPriceVatExclusive")
+    @Operation(summary = "Update an itemVariantSale unitPriceVatExclusive", operationId = "setItemVariantSaleUnitPriceVatExclusive")
+    WsItemVariantSalePriceDetails setItemVariantSaleUnitPriceVatExclusive(
+            @Parameter(name = "id", description = "The itemVariantSale id", required = true)
+            @PathParam("id") long id,
+            @RequestBody(required = true, description = "The amount")
+            @NotNull BigDecimal unitPriceVatExclusive
+    );
+
+    @PUT
+    @Path("{id}/totalVatExclusivePriorDiscount")
+    @Operation(summary = "Update an itemVariantSale totalVatExclusivePriorDiscount", operationId = "setItemVariantSaleTotalVatExclusivePriorDiscount")
+    WsItemVariantSalePriceDetails setItemVariantSaleTotalVatExclusivePriorDiscount(
+            @Parameter(name = "id", description = "The itemVariantSale id", required = true)
+            @PathParam("id") long id,
+            @RequestBody(required = true, description = "The amount")
+            @NotNull BigDecimal totalVatExclusivePriorDiscount
+    );
+
+
+    @PUT
+    @Path("{id}/discountRatio")
+    @Operation(summary = "Update an itemVariantSale discountRatio", operationId = "setItemVariantSaleDiscountRatio")
+    WsItemVariantSalePriceDetails setItemVariantSaleDiscountRatio(
+            @Parameter(name = "id", description = "The itemVariantSale id", required = true)
+            @PathParam("id") long id,
+            @RequestBody(required = true, description = "The amount")
+            @NotNull BigDecimal discountRatio
+    );
+
+    @PUT
+    @Path("{id}/discountAmount")
+    @Operation(summary = "Update an itemVariantSale discountAmount", operationId = "setItemVariantSaleDiscountAmount")
+    WsItemVariantSalePriceDetails setItemVariantSaleDiscountAmount(
+            @Parameter(name = "id", description = "The itemVariantSale id", required = true)
+            @PathParam("id") long id,
+            @RequestBody(required = true, description = "The amount")
+            @NotNull BigDecimal discountAmount
+    );
+
+    @PUT
+    @Path("{id}/totalVatExclusive")
+    @Operation(summary = "Update an itemVariantSale totalVatExclusive", operationId = "setItemVariantSaleTotalVatExclusive")
+    WsItemVariantSalePriceDetails setItemVariantSaleTotalVatExclusive(
+            @Parameter(name = "id", description = "The itemVariantSale id", required = true)
+            @PathParam("id") long id,
+            @RequestBody(required = true, description = "The amount")
+            @NotNull BigDecimal totalVatExclusive
+    );
+
+    @PUT
+    @Path("{id}/vatRate")
+    @Operation(summary = "Update an itemVariantSale vatRate", operationId = "setItemVariantSaleVatRate")
+    WsItemVariantSalePriceDetails setItemVariantSaleVatRate(
+            @Parameter(name = "id", description = "The itemVariantSale id", required = true)
+            @PathParam("id") long id,
+            @RequestBody(required = true, description = "The amount")
+            @NotNull BigDecimal vatRate
+    );
+
+    @PUT
+    @Path("{id}/vatAmount")
+    @Operation(summary = "Update an itemVariantSale vatAmount", operationId = "setItemVariantSaleVatAmount")
+    WsItemVariantSalePriceDetails setItemVariantSaleVatAmount(
+            @Parameter(name = "id", description = "The itemVariantSale id", required = true)
+            @PathParam("id") long id,
+            @RequestBody(required = true, description = "The amount")
+            @NotNull BigDecimal vatAmount
+    );
+
+    @PUT
+    @Path("{id}/totalVatInclusive")
+    @Operation(summary = "Update an itemVariantSale totalVatInclusive", operationId = "setItemVariantSaleTotalVatInclusive")
+    WsItemVariantSalePriceDetails setItemVariantSaleTotalVatInclusive(
+            @Parameter(name = "id", description = "The itemVariantSale id", required = true)
+            @PathParam("id") long id,
+            @RequestBody(required = true, description = "The amount")
+            @NotNull BigDecimal totalVatInclusive
+    );
 
 }

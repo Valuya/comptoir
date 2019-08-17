@@ -1,13 +1,17 @@
 package be.valuya.comptoir.ws.rest.control;
 
+import be.valuya.comptoir.model.commercial.ItemVariantSalePriceDetails;
+import be.valuya.comptoir.model.commercial.Price;
+import be.valuya.comptoir.service.AccountingUtils;
+import be.valuya.comptoir.ws.convert.commercial.ToWsItemVariantSalePriceDetailsConverter;
 import be.valuya.comptoir.ws.rest.api.domain.commercial.WsItemVariantSale;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsItemVariantSalePriceDetails;
 import be.valuya.comptoir.ws.rest.api.domain.commercial.WsItemVariantSaleRef;
 import be.valuya.comptoir.ws.rest.api.domain.commercial.WsItemVariantSaleSearchResult;
 import be.valuya.comptoir.ws.rest.api.domain.search.WsItemVariantSaleSearch;
 import be.valuya.comptoir.model.commercial.ItemVariantSale;
 import be.valuya.comptoir.model.commercial.Sale;
 import be.valuya.comptoir.model.search.ItemVariantSaleSearch;
-import be.valuya.comptoir.ws.rest.api.domain.stock.WsItemVariantStockSearchResult;
 import be.valuya.comptoir.ws.rest.api.util.ComptoirRoles;
 import be.valuya.comptoir.service.SaleService;
 import be.valuya.comptoir.util.pagination.ItemVariantSaleColumn;
@@ -25,8 +29,10 @@ import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,6 +51,8 @@ public class ItemVariantSaleResource implements ItemVariantSaleResourceApi {
     @Inject
     private ToWsItemVariantSaleConverter toWsItemVariantSaleConverter;
     @Inject
+    private ToWsItemVariantSalePriceDetailsConverter toWsItemVariantSalePriceDetailsConverter;
+    @Inject
     private IdChecker idChecker;
     @Inject
     private SaleStateChecker saleStateChecker;
@@ -60,6 +68,7 @@ public class ItemVariantSaleResource implements ItemVariantSaleResourceApi {
     public WsItemVariantSaleRef createItemVariantSale(WsItemVariantSale wsItemVariantSale) {
         ItemVariantSale itemVariantSale = fromWsItemVariantSaleConverter.convert(wsItemVariantSale);
         accessChecker.checkOwnCompany(itemVariantSale.getSale());
+
         ItemVariantSale savedItemVariantSale = saleService.saveItemSale(itemVariantSale);
         WsItemVariantSaleRef itemVariantSaleRef = toWsItemVariantSaleConverter.reference(savedItemVariantSale);
         WsItemVariantSaleRef savedItemVariantSaleRef = itemVariantSaleRef;
@@ -115,6 +124,147 @@ public class ItemVariantSaleResource implements ItemVariantSaleResourceApi {
         saleStateChecker.checkState(sale, false); // TODO: replace with bean validation
 
         saleService.removeItemSale(itemVariantSale);
+    }
+
+    @Override
+    public WsItemVariantSalePriceDetails getItemVariantSalePrice(long id) {
+        ItemVariantSale itemVariantSale = saleService.findItemSaleById(id);
+        accessChecker.checkOwnCompany(itemVariantSale.getSale());
+
+        ItemVariantSalePriceDetails priceDetails = AccountingUtils.calcItemVariantSalePriceDetails(itemVariantSale);
+        WsItemVariantSalePriceDetails wsItemVariantSalePriceDetails = toWsItemVariantSalePriceDetailsConverter.convert(priceDetails, itemVariantSale);
+        return wsItemVariantSalePriceDetails;
+    }
+
+
+    @Override
+    public WsItemVariantSalePriceDetails setItemVariantSaleQuantity(long id, @NotNull Integer quantity) {
+        ItemVariantSale itemVariantSale = saleService.findItemSaleById(id);
+        accessChecker.checkOwnCompany(itemVariantSale.getSale());
+
+        itemVariantSale.setQuantity(BigDecimal.valueOf(quantity));
+        ItemVariantSale updatedVariantSale = saleService.saveItemSale(itemVariantSale);
+
+        ItemVariantSalePriceDetails priceDetails = AccountingUtils.calcItemVariantSalePriceDetails(updatedVariantSale);
+        WsItemVariantSalePriceDetails wsItemVariantSalePriceDetails = toWsItemVariantSalePriceDetailsConverter.convert(priceDetails, updatedVariantSale);
+        return wsItemVariantSalePriceDetails;
+    }
+
+    @Override
+    public WsItemVariantSalePriceDetails setItemVariantSaleUnitPriceVatExclusive(long id, @NotNull BigDecimal unitPriceVatExclusive) {
+        ItemVariantSale itemVariantSale = saleService.findItemSaleById(id);
+        accessChecker.checkOwnCompany(itemVariantSale.getSale());
+
+        Price price = itemVariantSale.getPrice();
+        price.setVatExclusive(unitPriceVatExclusive);
+        ItemVariantSale updatedVariantSale = saleService.saveItemSale(itemVariantSale);
+
+        ItemVariantSalePriceDetails priceDetails = AccountingUtils.calcItemVariantSalePriceDetails(updatedVariantSale);
+        WsItemVariantSalePriceDetails wsItemVariantSalePriceDetails = toWsItemVariantSalePriceDetailsConverter.convert(priceDetails, updatedVariantSale);
+        return wsItemVariantSalePriceDetails;
+    }
+
+    @Override
+    public WsItemVariantSalePriceDetails setItemVariantSaleTotalVatExclusivePriorDiscount(long id, @NotNull BigDecimal totalVatExclusivePriorDiscount) {
+        ItemVariantSale itemVariantSale = saleService.findItemSaleById(id);
+        accessChecker.checkOwnCompany(itemVariantSale.getSale());
+
+        BigDecimal unitPriceVatExclusice = AccountingUtils.calcUnitPriceVatExclusiveFromTotalVatExclusivePriorDiscount(itemVariantSale, totalVatExclusivePriorDiscount);
+        Price price = itemVariantSale.getPrice();
+        price.setVatExclusive(unitPriceVatExclusice);
+        ItemVariantSale updatedVariantSale = saleService.saveItemSale(itemVariantSale);
+
+        ItemVariantSalePriceDetails priceDetails = AccountingUtils.calcItemVariantSalePriceDetails(updatedVariantSale);
+        WsItemVariantSalePriceDetails wsItemVariantSalePriceDetails = toWsItemVariantSalePriceDetailsConverter.convert(priceDetails, updatedVariantSale);
+        return wsItemVariantSalePriceDetails;
+    }
+
+    @Override
+    public WsItemVariantSalePriceDetails setItemVariantSaleDiscountRatio(long id, @NotNull BigDecimal discountRatio) {
+        ItemVariantSale itemVariantSale = saleService.findItemSaleById(id);
+        accessChecker.checkOwnCompany(itemVariantSale.getSale());
+
+        Price price = itemVariantSale.getPrice();
+        price.setDiscountRatio(discountRatio);
+        ItemVariantSale updatedVariantSale = saleService.saveItemSale(itemVariantSale);
+
+        ItemVariantSalePriceDetails priceDetails = AccountingUtils.calcItemVariantSalePriceDetails(updatedVariantSale);
+        WsItemVariantSalePriceDetails wsItemVariantSalePriceDetails = toWsItemVariantSalePriceDetailsConverter.convert(priceDetails, updatedVariantSale);
+        return wsItemVariantSalePriceDetails;
+    }
+
+    @Override
+    public WsItemVariantSalePriceDetails setItemVariantSaleDiscountAmount(long id, @NotNull BigDecimal discountAmount) {
+        ItemVariantSale itemVariantSale = saleService.findItemSaleById(id);
+        accessChecker.checkOwnCompany(itemVariantSale.getSale());
+
+        BigDecimal discountRate = AccountingUtils.calcDiscountRateFromDiscountAmount(itemVariantSale, discountAmount);
+        Price price = itemVariantSale.getPrice();
+        price.setDiscountRatio(discountAmount);
+        ItemVariantSale updatedVariantSale = saleService.saveItemSale(itemVariantSale);
+
+        ItemVariantSalePriceDetails priceDetails = AccountingUtils.calcItemVariantSalePriceDetails(updatedVariantSale);
+        WsItemVariantSalePriceDetails wsItemVariantSalePriceDetails = toWsItemVariantSalePriceDetailsConverter.convert(priceDetails, updatedVariantSale);
+        return wsItemVariantSalePriceDetails;
+    }
+
+    @Override
+    public WsItemVariantSalePriceDetails setItemVariantSaleTotalVatExclusive(long id, @NotNull BigDecimal totalVatExclusive) {
+        ItemVariantSale itemVariantSale = saleService.findItemSaleById(id);
+        accessChecker.checkOwnCompany(itemVariantSale.getSale());
+
+        BigDecimal unitPrice = AccountingUtils.calcUnitPriceVatExclusiveFromTotalVatExclusive(itemVariantSale, totalVatExclusive);
+        Price price = itemVariantSale.getPrice();
+        price.setVatExclusive(unitPrice);
+        ItemVariantSale updatedVariantSale = saleService.saveItemSale(itemVariantSale);
+
+        ItemVariantSalePriceDetails priceDetails = AccountingUtils.calcItemVariantSalePriceDetails(updatedVariantSale);
+        WsItemVariantSalePriceDetails wsItemVariantSalePriceDetails = toWsItemVariantSalePriceDetailsConverter.convert(priceDetails, updatedVariantSale);
+        return wsItemVariantSalePriceDetails;
+    }
+
+    @Override
+    public WsItemVariantSalePriceDetails setItemVariantSaleVatRate(long id, @NotNull BigDecimal vatRate) {
+        ItemVariantSale itemVariantSale = saleService.findItemSaleById(id);
+        accessChecker.checkOwnCompany(itemVariantSale.getSale());
+
+        Price price = itemVariantSale.getPrice();
+        price.setVatRate(vatRate);
+        ItemVariantSale updatedVariantSale = saleService.saveItemSale(itemVariantSale);
+
+        ItemVariantSalePriceDetails priceDetails = AccountingUtils.calcItemVariantSalePriceDetails(updatedVariantSale);
+        WsItemVariantSalePriceDetails wsItemVariantSalePriceDetails = toWsItemVariantSalePriceDetailsConverter.convert(priceDetails, updatedVariantSale);
+        return wsItemVariantSalePriceDetails;
+    }
+
+    @Override
+    public WsItemVariantSalePriceDetails setItemVariantSaleVatAmount(long id, @NotNull BigDecimal vatAmount) {
+        ItemVariantSale itemVariantSale = saleService.findItemSaleById(id);
+        accessChecker.checkOwnCompany(itemVariantSale.getSale());
+
+        BigDecimal vatRate = AccountingUtils.calcVatRateFromVatAmount(itemVariantSale, vatAmount);
+        Price price = itemVariantSale.getPrice();
+        price.setVatRate(vatRate);
+        ItemVariantSale updatedVariantSale = saleService.saveItemSale(itemVariantSale);
+
+        ItemVariantSalePriceDetails priceDetails = AccountingUtils.calcItemVariantSalePriceDetails(updatedVariantSale);
+        WsItemVariantSalePriceDetails wsItemVariantSalePriceDetails = toWsItemVariantSalePriceDetailsConverter.convert(priceDetails, updatedVariantSale);
+        return wsItemVariantSalePriceDetails;
+    }
+
+    @Override
+    public WsItemVariantSalePriceDetails setItemVariantSaleTotalVatInclusive(long id, @NotNull BigDecimal totalVatInclusive) {
+        ItemVariantSale itemVariantSale = saleService.findItemSaleById(id);
+        accessChecker.checkOwnCompany(itemVariantSale.getSale());
+
+        BigDecimal unitPrice = AccountingUtils.calcUnitPriceVatExclusiveFromTotalVatInclusive(itemVariantSale, totalVatInclusive);
+        Price price = itemVariantSale.getPrice();
+        price.setVatExclusive(unitPrice);
+        ItemVariantSale updatedVariantSale = saleService.saveItemSale(itemVariantSale);
+
+        ItemVariantSalePriceDetails priceDetails = AccountingUtils.calcItemVariantSalePriceDetails(updatedVariantSale);
+        WsItemVariantSalePriceDetails wsItemVariantSalePriceDetails = toWsItemVariantSalePriceDetailsConverter.convert(priceDetails, updatedVariantSale);
+        return wsItemVariantSalePriceDetails;
     }
 
 }

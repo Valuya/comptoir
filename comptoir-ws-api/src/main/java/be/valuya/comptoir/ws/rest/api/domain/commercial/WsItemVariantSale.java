@@ -2,12 +2,10 @@ package be.valuya.comptoir.ws.rest.api.domain.commercial;
 
 import be.valuya.comptoir.ws.rest.api.domain.lang.WsLocaleText;
 import be.valuya.comptoir.ws.rest.api.domain.stock.WsStockRef;
-import be.valuya.comptoir.ws.rest.api.util.ZonedDateTimeXmlAdapter;
 import be.valuya.comptoir.ws.rest.api.util.WithId;
+import be.valuya.comptoir.ws.rest.api.util.ZonedDateTimeXmlAdapter;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
-import javax.validation.constraints.NotNull;
+import javax.annotation.Nullable;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -21,27 +19,18 @@ import java.util.List;
  */
 @XmlRootElement(name = "ItemVariantSale")
 @XmlAccessorType(XmlAccessType.FIELD)
+@Nullable
 public class WsItemVariantSale implements WithId {
 
     private Long id;
     @XmlJavaTypeAdapter(ZonedDateTimeXmlAdapter.class)
     private ZonedDateTime dateTime;
     private WsItemVariantRef itemVariantRef;
-    private BigDecimal quantity;
-    private BigDecimal total;
     private WsSaleRef saleRef;
     private List<WsLocaleText> comment;
-    @NotNull
-    @Nonnull
-    private BigDecimal vatExclusive;
-    @NotNull
-    @Nonnull
-    private BigDecimal vatRate;
-    private BigDecimal discountRatio;
-    @CheckForNull
-    private WsStockRef stockRef;
-    @CheckForNull
     private Boolean includeCustomerLoyalty;
+    private Boolean includeCustomerDiscount;
+    private WsStockRef stockRef;
 
     @Override
     public Long getId() {
@@ -69,38 +58,6 @@ public class WsItemVariantSale implements WithId {
         this.itemVariantRef = itemVariantRef;
     }
 
-    public BigDecimal getVatExclusive() {
-        return vatExclusive;
-    }
-
-    public void setVatExclusive(BigDecimal vatExclusive) {
-        this.vatExclusive = vatExclusive;
-    }
-
-    public BigDecimal getVatRate() {
-        return vatRate;
-    }
-
-    public void setVatRate(BigDecimal vatRate) {
-        this.vatRate = vatRate;
-    }
-
-    public BigDecimal getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(BigDecimal quantity) {
-        this.quantity = quantity;
-    }
-
-    public BigDecimal getTotal() {
-        return total;
-    }
-
-    public void setTotal(BigDecimal total) {
-        this.total = total;
-    }
-
     public WsSaleRef getSaleRef() {
         return saleRef;
     }
@@ -117,12 +74,21 @@ public class WsItemVariantSale implements WithId {
         this.comment = comment;
     }
 
-    public BigDecimal getDiscountRatio() {
-        return discountRatio;
+    public Boolean getIncludeCustomerLoyalty() {
+        return includeCustomerLoyalty;
     }
 
-    public void setDiscountRatio(BigDecimal discountRatio) {
-        this.discountRatio = discountRatio;
+    public void setIncludeCustomerLoyalty(Boolean includeCustomerLoyalty) {
+        this.includeCustomerLoyalty = includeCustomerLoyalty;
+    }
+
+
+    public Boolean getIncludeCustomerDiscount() {
+        return includeCustomerDiscount;
+    }
+
+    public void setIncludeCustomerDiscount(Boolean includeCustomerDiscount) {
+        this.includeCustomerDiscount = includeCustomerDiscount;
     }
 
     public WsStockRef getStockRef() {
@@ -133,12 +99,4 @@ public class WsItemVariantSale implements WithId {
         this.stockRef = stockRef;
     }
 
-    @CheckForNull
-    public Boolean getIncludeCustomerLoyalty() {
-        return includeCustomerLoyalty;
-    }
-
-    public void setIncludeCustomerLoyalty(Boolean includeCustomerLoyalty) {
-        this.includeCustomerLoyalty = includeCustomerLoyalty;
-    }
 }

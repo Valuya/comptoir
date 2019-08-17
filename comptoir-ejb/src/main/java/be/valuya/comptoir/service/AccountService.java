@@ -24,7 +24,6 @@ import be.valuya.comptoir.persistence.util.PaginatedQueryService;
 import be.valuya.comptoir.util.pagination.AccountColumn;
 import be.valuya.comptoir.util.pagination.BalanceColumn;
 import be.valuya.comptoir.util.pagination.Pagination;
-import jdk.internal.joptsimple.internal.Strings;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -103,7 +102,7 @@ public class AccountService {
         }
 
         accountSearch.getMultiSearchOptional()
-                .filter(search -> !Strings.isNullOrEmpty(search))
+                .filter(search -> !search.isBlank())
                 .map(multiSearh -> this.createAccountMultiSearchPredicates(accountPath, multiSearh))
                 .ifPresent(predicates::add);
 

@@ -34,6 +34,6 @@
     <include file="changelogs/028.item_variant_stock.xml" relativeToChangelogFile="true"/>
     <include file="changelogs/029.country.xml" relativeToChangelogFile="true"/>
     <include file="changelogs/030.customer_loyalty.xml" relativeToChangelogFile="true"/>
-
+    <include file="changelogs/031.customer_discount.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

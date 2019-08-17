@@ -12,7 +12,6 @@ import java.time.ZonedDateTime;
 import java.util.Objects;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @Entity
@@ -29,6 +28,7 @@ public class ItemVariantSale implements Serializable {
     @ManyToOne(cascade = CascadeType.ALL)
     private Price price;
     private BigDecimal quantity;
+    @Deprecated //use value derived from other fields
     private BigDecimal total;
     @ManyToOne
     private Sale sale;
@@ -41,6 +41,8 @@ public class ItemVariantSale implements Serializable {
     private Stock stock;
     @Column(name = "CUSTOMER_LOYALTY")
     private Boolean includeCustomerLoyalty;
+    @Column(name = "INCLUDE_CUSTOMER_DISCOUNT")
+    private Boolean includeCustomerDiscount;
 
     public Long getId() {
         return id;
@@ -106,10 +108,12 @@ public class ItemVariantSale implements Serializable {
         this.accountingEntry = accountingEntry;
     }
 
+    @Deprecated // Use value derived from other fields
     public BigDecimal getTotal() {
         return total;
     }
 
+    @Deprecated // Use value derived from other fields
     public void setTotal(BigDecimal total) {
         this.total = total;
     }
@@ -128,6 +132,14 @@ public class ItemVariantSale implements Serializable {
 
     public void setIncludeCustomerLoyalty(Boolean customerLoyalty) {
         this.includeCustomerLoyalty = customerLoyalty;
+    }
+
+    public Boolean getIncludeCustomerDiscount() {
+        return includeCustomerDiscount;
+    }
+
+    public void setIncludeCustomerDiscount(Boolean includeCustomerDiscount) {
+        this.includeCustomerDiscount = includeCustomerDiscount;
     }
 
     @Override

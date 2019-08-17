@@ -3,7 +3,7 @@ package be.valuya.comptoir.ws.rest.api;
 import be.valuya.comptoir.ws.rest.api.domain.accounting.WsAccountingEntry;
 import be.valuya.comptoir.ws.rest.api.domain.accounting.WsAccountingEntryRef;
 import be.valuya.comptoir.ws.rest.api.domain.commercial.WsSale;
-import be.valuya.comptoir.ws.rest.api.domain.commercial.WsSalePrice;
+import be.valuya.comptoir.ws.rest.api.domain.commercial.WsSalePriceDetails;
 import be.valuya.comptoir.ws.rest.api.domain.commercial.WsSaleRef;
 import be.valuya.comptoir.ws.rest.api.domain.commercial.WsSalesSearchResult;
 import be.valuya.comptoir.ws.rest.api.domain.search.WsSaleSearch;
@@ -29,6 +29,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.math.BigDecimal;
 
 @Path("/sale")
 @Produces(MediaType.APPLICATION_JSON)
@@ -77,8 +78,8 @@ public interface SaleResourceApi {
 
     @POST
     @Path("searchTotalPayed")
-    @Operation(operationId = "findSalesTotalPayed", description = "Search sales")
-    @Valid WsSalePrice findSalesTotalPayed(
+    @Operation(operationId = "findSalesTotalPayed", description = "get Total payed amont")
+    @Valid BigDecimal findSalesTotalPayed(
             @RequestBody(required = true, description = "search filter")
             @Valid WsSaleSearch wsSaleSearch);
 
@@ -131,6 +132,47 @@ public interface SaleResourceApi {
             @Parameter(description = "The accounting entry id", name = "entryId", required = true)
             @PathParam("entryId")
                     long entryId
+    );
+
+    @GET
+    @Path("{id}/price")
+    @Operation(summary = "Get a sale price", operationId = "getSalePrice")
+    WsSalePriceDetails getSalePrice(
+            @Parameter(name = "id", description = "The sale id", required = true)
+            @PathParam("id") long id
+    );
+
+
+    @PUT
+    @Path("{id}/discountRatio")
+    @Operation(summary = "Update a sale discountRatio", operationId = "setSaleDiscountRatio")
+    WsSalePriceDetails setSaleDiscountRatio(
+            @Parameter(name = "id", description = "The itemVariantSale id", required = true)
+            @PathParam("id") long id,
+            @RequestBody(required = true, description = "The amount")
+            @NotNull BigDecimal discountRatio
+    );
+
+
+    @PUT
+        @Path("{id}/discountAmount")
+    @Operation(summary = "Update a sale discountAmount", operationId = "setSaleDiscountAmount")
+    WsSalePriceDetails setSaleDiscountAmount(
+            @Parameter(name = "id", description = "The itemVariantSale id", required = true)
+            @PathParam("id") long id,
+            @RequestBody(required = true, description = "The amount")
+            @NotNull BigDecimal discountAmount
+    );
+
+
+    @PUT
+    @Path("{id}/totalVatInclusive")
+    @Operation(summary = "Update a sale totalVatInclusive", operationId = "setSaleTotalVatInclusive")
+    WsSalePriceDetails setSaleTotalVatInclusive(
+            @Parameter(name = "id", description = "The itemVariantSale id", required = true)
+            @PathParam("id") long id,
+            @RequestBody(required = true, description = "The amount")
+            @NotNull BigDecimal totalVatInclusive
     );
 
 }

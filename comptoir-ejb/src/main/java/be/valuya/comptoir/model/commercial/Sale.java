@@ -60,6 +60,7 @@ public class Sale implements Serializable, WithCompany {
     private String reference;
     @Column(name = "discount_ratio")
     private BigDecimal discountRatio;
+    @Deprecated // Use ratio
     @Column(name = "discount_amount")
     private BigDecimal discountAmount;
 
@@ -156,10 +157,12 @@ public class Sale implements Serializable, WithCompany {
         this.discountRatio = discountRatio;
     }
 
+    @Deprecated // Use ratio
     public BigDecimal getDiscountAmount() {
         return discountAmount;
     }
 
+    @Deprecated // Use ratio
     public void setDiscountAmount(BigDecimal discountAmount) {
         this.discountAmount = discountAmount;
     }

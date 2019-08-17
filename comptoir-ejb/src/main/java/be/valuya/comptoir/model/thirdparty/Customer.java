@@ -8,6 +8,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Objects;
 
 /**
@@ -53,6 +54,10 @@ public class Customer implements Serializable, WithCompany {
     private String email;
     @Column(columnDefinition = "TEXT")
     private String notes;
+    @Column(name = "DISCOUNT_RATE")
+    private BigDecimal discountRate;
+    @Column(name = "DISCOUNT_CUMULABLE")
+    private boolean discountCumulable;
 
     public Long getId() {
         return id;
@@ -148,6 +153,22 @@ public class Customer implements Serializable, WithCompany {
 
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    public BigDecimal getDiscountRate() {
+        return discountRate;
+    }
+
+    public void setDiscountRate(BigDecimal discountRate) {
+        this.discountRate = discountRate;
+    }
+
+    public boolean isDiscountCumulable() {
+        return discountCumulable;
+    }
+
+    public void setDiscountCumulable(boolean discountCumulable) {
+        this.discountCumulable = discountCumulable;
     }
 
     @Override

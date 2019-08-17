@@ -13,6 +13,7 @@
         <module>comptoir-ws-api</module>
         <module>comptoir-ear</module>
         <module>comptoir-thorntail</module>
+        <module>java9jooqgeneratorworkarounds</module>
     </modules>
 
     <distributionManagement>

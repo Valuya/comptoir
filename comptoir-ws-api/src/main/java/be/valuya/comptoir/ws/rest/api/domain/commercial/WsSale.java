@@ -28,14 +28,10 @@ public class WsSale implements WithId {
     @XmlJavaTypeAdapter(ZonedDateTimeXmlAdapter.class)
     private ZonedDateTime dateTime;
     private WsInvoiceRef invoiceRef;
-    private BigDecimal vatExclusiveAmount;
-    private BigDecimal vatAmount;
     private boolean closed;
     @Size(max = 128)
     private String reference;
     private WsAccountingTransactionRef accountingTransactionRef;
-    private BigDecimal discountRatio;
-    private BigDecimal discountAmount;
 
     @Override
     public Long getId() {
@@ -79,22 +75,6 @@ public class WsSale implements WithId {
         this.invoiceRef = invoiceRef;
     }
 
-    public BigDecimal getVatExclusiveAmount() {
-        return vatExclusiveAmount;
-    }
-
-    public void setVatExclusiveAmount(BigDecimal vatExclusiveAmount) {
-        this.vatExclusiveAmount = vatExclusiveAmount;
-    }
-
-    public BigDecimal getVatAmount() {
-        return vatAmount;
-    }
-
-    public void setVatAmount(BigDecimal vatAmount) {
-        this.vatAmount = vatAmount;
-    }
-
     public boolean isClosed() {
         return closed;
     }
@@ -117,22 +97,6 @@ public class WsSale implements WithId {
 
     public void setAccountingTransactionRef(WsAccountingTransactionRef accountingTransactionRef) {
         this.accountingTransactionRef = accountingTransactionRef;
-    }
-
-    public BigDecimal getDiscountRatio() {
-        return discountRatio;
-    }
-
-    public void setDiscountRatio(BigDecimal discountRatio) {
-        this.discountRatio = discountRatio;
-    }
-
-    public BigDecimal getDiscountAmount() {
-        return discountAmount;
-    }
-
-    public void setDiscountAmount(BigDecimal discountAmount) {
-        this.discountAmount = discountAmount;
     }
 
     @Override
