@@ -8,7 +8,6 @@ services:
     environment:
       - THORNTAIL_SWARM_DEBUG_PORT=8787
       - THORNTAIL_HTTPS_ONLY=false
-      - THORNTAIL_LOGGING_ROOT_DASH_LOGGER_LEVEL=FINE
     networks:
       - default
       - napo-db

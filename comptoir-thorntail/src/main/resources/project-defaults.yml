@@ -37,6 +37,11 @@ thorntail:
       handlers:
         - CONSOLE
         - FILE
+    loggers:
+      org.eclipse.persistence:
+        level: DEBUG
+      be.valuya.comptoir:
+        level: DEBUG
 
   https:
     port: 8443
