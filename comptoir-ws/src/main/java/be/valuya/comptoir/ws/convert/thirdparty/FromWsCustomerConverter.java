@@ -10,6 +10,8 @@ import be.valuya.comptoir.ws.convert.company.FromWsCompanyConverter;
 import javax.ejb.EJB;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.math.BigDecimal;
+import java.util.Optional;
 
 /**
  *
@@ -46,6 +48,9 @@ public class FromWsCustomerConverter {
         String notes = wsCustomer.getNotes();
         String phone1 = wsCustomer.getPhone1();
         String phone2 = wsCustomer.getPhone2();
+        BigDecimal discountRate = wsCustomer.getDiscountRate();
+        boolean discountCumulable = Optional.ofNullable(wsCustomer.getDiscountCumulable())
+                .orElse(false);
 
         WsCompanyRef companyRef = wsCustomer.getCompanyRef();
         Company company = fromWsCompanyConverter.find(companyRef);
@@ -62,6 +67,8 @@ public class FromWsCustomerConverter {
         customer.setNotes(notes);
         customer.setPhone1(phone1);
         customer.setPhone2(phone2);
+        customer.setDiscountRate(discountRate);
+        customer.setDiscountCumulable(discountCumulable);
         return customer;
     }
 

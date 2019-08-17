@@ -6,11 +6,12 @@ import be.valuya.comptoir.ws.rest.api.domain.thirdparty.WsCustomerRef;
 import be.valuya.comptoir.model.company.Company;
 import be.valuya.comptoir.model.thirdparty.Customer;
 import be.valuya.comptoir.ws.convert.company.ToWsCompanyConverter;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.math.BigDecimal;
 
 /**
- *
  * @author Yannick Majoros <yannick@valuya.be>
  */
 @ApplicationScoped
@@ -34,6 +35,8 @@ public class ToWsCustomerConverter {
         String notes = customer.getNotes();
         String phone1 = customer.getPhone1();
         String phone2 = customer.getPhone2();
+        BigDecimal discountRate = customer.getDiscountRate();
+        boolean discountCumulable = customer.isDiscountCumulable();
 
         Company company = customer.getCompany();
         WsCompanyRef companyRef = toWsCompanyConverter.reference(company);
@@ -51,6 +54,8 @@ public class ToWsCustomerConverter {
         wsCustomer.setNotes(notes);
         wsCustomer.setPhone1(phone1);
         wsCustomer.setPhone2(phone2);
+        wsCustomer.setDiscountRate(discountRate);
+        wsCustomer.setDiscountCumulable(discountCumulable);
 
         return wsCustomer;
     }
