@@ -6,6 +6,7 @@ import be.valuya.comptoir.model.common.WithCompany;
 import be.valuya.comptoir.model.company.Company;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -16,6 +17,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
+@Nullable
 public class ItemVariantSaleSearch implements WithCompany {
 
     @NotNull
@@ -23,6 +25,7 @@ public class ItemVariantSaleSearch implements WithCompany {
     private Company company;
     private ItemVariant itemVariant;
     private Sale sale;
+    private SaleSearch saleSearch;
 
     public Company getCompany() {
         return company;
@@ -48,4 +51,11 @@ public class ItemVariantSaleSearch implements WithCompany {
         this.sale = sale;
     }
 
+    public SaleSearch getSaleSearch() {
+        return saleSearch;
+    }
+
+    public void setSaleSearch(SaleSearch saleSearch) {
+        this.saleSearch = saleSearch;
+    }
 }
