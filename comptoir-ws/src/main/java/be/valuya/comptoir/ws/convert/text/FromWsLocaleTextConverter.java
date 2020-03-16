@@ -31,6 +31,7 @@ public class FromWsLocaleTextConverter {
                 .orElseGet(ArrayList::new);
 
         Map<Locale, String> localeTextMap = sourcesTexts.stream()
+                .filter(t -> t.getText() != null)
                 .collect(Collectors.toMap(
                         WsLocaleText::getLocale,
                         WsLocaleText::getText,
