@@ -3,8 +3,8 @@ version: '3.6'
 services:
 
   back:
-    image: comptoir-thorntail
-    command: -jar /comptoir-thorntail.jar -s/configs/comptoirdev/thorntail-local-config.yml
+    build: ./comptoir-thorntail
+    command: -jar /comptoir-thorntail.jar
     environment:
       - THORNTAIL_SWARM_DEBUG_PORT=8787
       - THORNTAIL_HTTPS_ONLY=false
@@ -16,8 +16,7 @@ services:
       - 9990:9990
       - 8787:8787 # debugger
     volumes:
-      - valuya_dev-certs:/certs
-      - valuya_dev-secrets:/configs
+      - valuya-dev_certs:/certs
 
   db:
     image: mariadb:10
@@ -27,7 +26,7 @@ services:
     volumes:
       - db-data:/var/lib/mysql
       - ../res/comptoir.sql:/docker-entrypoint-initdb.d/comptoir.sql
-      - valuya_dev-secrets:/configs
+      - ./.secrets/db-root-password:/configs/comptoirdev/db-root-password
     ports:
       - 22307:3306
 
@@ -39,18 +38,25 @@ services:
     volumes:
       - napo-db-data:/var/lib/mysql
       - ../res/petitnapo.sql:/docker-entrypoint-initdb.d/petitnapo.sql
-      - valuya_dev-secrets:/configs
+      - ./.secrets/napo-db-root-password:/configs/comptoirdev/napo-db-root-password
     networks:
       - napo-db
     ports:
       - 22306:3306
 
+  make_cert:
+    image: docker.valuya.be/openssl:2
+    environment:
+      - KEYSTORE_PASSWORD=password
+      - CERT_CN=comptoir.local
+    command: '/create-certificate.sh'
+    volumes:
+      - valuya-dev_certs:/etc/ssl/selfsigned
+
 volumes:
   db-data: {}
   napo-db-data: {}
-  valuya_dev-certs:
-    external: true
-  valuya_dev-secrets:
+  valuya-dev_certs:
     external: true
 
 

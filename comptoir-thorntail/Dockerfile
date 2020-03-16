@@ -1,6 +1,6 @@
 FROM openjdk:11
 
-COPY comptoir-thorntail/target/comptoir-thorntail-thorntail.jar /comptoir-thorntail.jar
+COPY ./target/comptoir-thorntail.jar /comptoir-thorntail.jar
 
 ENTRYPOINT ["java", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8787" ]
 

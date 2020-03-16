@@ -3,18 +3,18 @@ thorntail:
     data-sources:
       comptoir:
         driver-name: mariadb
-        connection-url: "${gestemps.datasource.connection.url}"
-        user-name: "${gestemps.datasource.connection.user}"
-        password: "${gestemps.datasource.connection.password}"
+        connection-url: "${comptoir.datasource.connection.url:jdbc:mariadb://db:3306/comptoir?autoReconnect=true&amp;enablePacketDebug=true}"
+        user-name: "${comptoir.datasource.connection.user:root}"
+        password: "${comptoir.datasource.connection.password}"
         jndi-name: 'java:jboss/datasources/comptoir'
         valid-connection-checker-class-name: org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLValidConnectionChecker
         validate-on-match: true
         background-validation: false
       comptoir-non-jta:
         driver-name: mariadb
-        connection-url: "${gestemps.datasource.connection.url}"
-        user-name: "${gestemps.datasource.connection.user}"
-        password: "${gestemps.datasource.connection.password}"
+        connection-url: "${comptoir.datasource.connection.url:jdbc:mariadb://db:3306/comptoir?autoReconnect=true&amp;enablePacketDebug=true}"
+        user-name: "${comptoir.datasource.connection.user:root}"
+        password: "${comptoir.datasource.connection.password}"
         jta: false
         jndi-name: 'java:jboss/datasources/comptoirNonJta'
         valid-connection-checker-class-name: org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLValidConnectionChecker
@@ -46,11 +46,11 @@ thorntail:
   https:
     port: 8443
     keystore:
-      path: "${gestemps.https.keytore.path}"
-      password: "${gestemps.https.keytore.password}"
+      path: "${comptoir.https.keytore.path}"
+      password: "${comptoir.https.keytore.password}"
     key:
-      alias: "${gestemps.https.key.alias}"
-      password: "${gestemps.https.key.password}"
+      alias: "${comptoir.https.key.alias}"
+      password: "${comptoir.https.key.password}"
 
   microprofile:
     config:

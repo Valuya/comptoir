@@ -32,7 +32,7 @@ pipeline {
                         clean package deploy
                     '''
                }
-               stash includes: 'comptoir-thorntail/Dockerfile,comptoir-thorntail/target/comptoir-thorntail-thorntail.jar', name: 'thorntail-jar'
+               stash includes: 'comptoir-thorntail/Dockerfile,comptoir-thorntail/target/comptoir-thorntail.jar', name: 'thorntail-jar'
                stash includes: 'docker/**,comptoir-ear/target/comptoir-ear.ear', name: 'docker-ear'
             }
         }
@@ -40,10 +40,10 @@ pipeline {
             steps {
                 unstash 'thorntail-jar'
                 sh '''
+                    cd comptoir-thorntail
                     export COMMIT="$(git rev-parse --short HEAD)"
                     docker build \
                       --tag comptoir-thorntail-jenkins-build:${COMMIT} \
-                      -f comptoir-thorntail/Dockerfile \
                       .
                     docker tag comptoir-thorntail-jenkins-build:${COMMIT} docker.valuya.be/comptoir-thorntail:latest
                     docker push docker.valuya.be/comptoir-thorntail:latest
