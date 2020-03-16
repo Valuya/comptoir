@@ -40,10 +40,10 @@ pipeline {
             steps {
                 unstash 'thorntail-jar'
                 sh '''
+                    cd comptoir-thorntail
                     export COMMIT="$(git rev-parse --short HEAD)"
                     docker build \
                       --tag comptoir-thorntail-jenkins-build:${COMMIT} \
-                      -f comptoir-thorntail/Dockerfile \
                       .
                     docker tag comptoir-thorntail-jenkins-build:${COMMIT} docker.valuya.be/comptoir-thorntail:latest
                     docker push docker.valuya.be/comptoir-thorntail:latest
