@@ -32,7 +32,7 @@ pipeline {
                         clean package deploy
                     '''
                }
-               stash includes: 'comptoir-thorntail/Dockerfile,comptoir-thorntail/target/comptoir-thorntail-thorntail.jar', name: 'thorntail-jar'
+               stash includes: 'comptoir-thorntail/Dockerfile,comptoir-thorntail/target/comptoir-thorntail.jar', name: 'thorntail-jar'
                stash includes: 'docker/**,comptoir-ear/target/comptoir-ear.ear', name: 'docker-ear'
             }
         }

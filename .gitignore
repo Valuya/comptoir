@@ -4,3 +4,4 @@ target/
 .idea
 **/*.iml
 **/*.private.env.json
+.secrets
